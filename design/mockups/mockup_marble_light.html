@@ -1,0 +1,203 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<title>HERMES VOICE CONSOLE — MARBLE LIGHT mockup</title>
+<style>
+  :root{
+    --bg:#F2EFE7; --surface:#FAF7F0; --surface2:#E9E4D8; --outline:#C9BFA9;
+    --ink:#201E19; --ink2:#5A554A; --bronze:#7A5C2E; --gold:#B08D4C;
+    --cyan:#0E7490; --cyanBright:#06B6D4; --glow:#7DD3E8;
+    --stone:#D9D4C8; --stoneShade:#C2BBAB; --ok:#2A7654; --warn:#9A5B12; --err:#B3261E;
+    --serif:Georgia,'Noto Serif SC',serif; --sans:'Noto Sans SC',system-ui,sans-serif; --mono:'DejaVu Sans Mono',monospace;
+  }
+  *{box-sizing:border-box;margin:0;padding:0}
+  body{background:#DDD8CB;font-family:var(--sans);color:var(--ink);padding:34px 38px}
+  .board{display:flex;gap:38px;align-items:flex-start}
+  /* ---------- phone ---------- */
+  .phone{width:404px;border-radius:44px;padding:10px;background:#14120E;box-shadow:0 18px 44px rgba(32,30,25,.35)}
+  .screen{border-radius:34px;overflow:hidden;height:846px;display:flex;flex-direction:column;
+    background:
+      radial-gradient(1200px 500px at 80% -10%, rgba(176,141,76,.10), transparent 60%),
+      radial-gradient(900px 500px at -10% 110%, rgba(14,116,144,.08), transparent 55%),
+      var(--bg);}
+  .watermark{font:600 9px var(--mono);letter-spacing:.14em;color:var(--ink2);text-align:center;padding:5px 0;background:var(--surface2)}
+  /* ---------- header ---------- */
+  .pediment{display:flex;flex-direction:column;align-items:center;padding:14px 0 0}
+  .pediment-line{width:300px;height:14px;
+    clip-path:polygon(50% 0,100% 100%,0 100%);
+    border-bottom:2px solid var(--gold); background:linear-gradient(transparent 10px, var(--gold) 10px)}
+  .brand{font:600 21px var(--serif);letter-spacing:.34em;color:var(--ink);margin-top:6px}
+  .brand b{color:var(--bronze);font-weight:700}
+  .meander{height:16px;width:100%;margin-top:10px;opacity:.85;
+    background-image:url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='40' height='16'%3E%3Cg fill='none' stroke='%23B08D4C' stroke-width='1.6'%3E%3Cpath d='M0 15H40M3 15V3H37V11H15V7H27'/%3E%3C/g%3E%3C/svg%3E");
+    background-repeat:repeat-x;background-position:center}
+  /* ---------- status strip ---------- */
+  .strip{display:flex;align-items:center;gap:6px;padding:9px 14px}
+  .chip{font:600 9.5px var(--mono);letter-spacing:.08em;padding:5px 9px;border-radius:999px;
+    border:1px solid var(--outline);color:var(--ink2);background:var(--surface)}
+  .chip.active{border-color:var(--bronze);color:var(--surface);background:var(--bronze)}
+  .spacer{flex:1}
+  .pill{display:flex;align-items:center;gap:5px;font:600 9px var(--mono);letter-spacing:.06em;
+    padding:5px 8px;border-radius:999px;border:1px solid var(--outline);color:var(--ink2)}
+  .dot{width:7px;height:7px;border-radius:50%}
+  .dot.cyan{background:var(--cyanBright);box-shadow:0 0 6px var(--cyanBright)}
+  .dot.green{background:var(--ok)}
+  .dot.red{background:var(--err)}
+  .dot.gray{background:#8d8779}
+  /* ---------- tower stage ---------- */
+  .stage{position:relative;height:308px;margin:4px 14px 0;border-radius:20px;overflow:hidden;
+    background:linear-gradient(180deg, rgba(233,228,216,.65), rgba(217,212,200,.35));
+    border:1px solid var(--outline)}
+  .stage .halo{position:absolute;left:50%;top:44%;width:300px;height:300px;transform:translate(-50%,-50%);
+    background:radial-gradient(circle, rgba(6,182,212,.16), transparent 62%)}
+  .towerfig{position:absolute;left:50%;top:50%;transform:translate(-50%,-46%);width:170px;height:250px}
+  .towerfig>*{position:absolute;left:50%;transform:translateX(-50%)}
+  .plinth3{bottom:0;width:170px;height:13px;border-radius:4px;background:linear-gradient(180deg,var(--stone),var(--stoneShade));box-shadow:inset 0 -2px 0 rgba(122,92,46,.35)}
+  .plinth2{bottom:13px;width:146px;height:11px;border-radius:4px;background:linear-gradient(180deg,var(--stone),var(--stoneShade))}
+  .plinth1{bottom:24px;width:124px;height:10px;border-radius:4px;background:linear-gradient(180deg,var(--stone),var(--stoneShade))}
+  .shaft{bottom:34px;width:78px;height:142px;border-radius:7px 7px 0 0;
+    background:repeating-linear-gradient(90deg,var(--stone) 0 9px,var(--stoneShade) 9px 12px);
+    box-shadow:inset 0 0 14px rgba(32,30,25,.12)}
+  .cap{bottom:176px;width:106px;height:12px;border-radius:3px;background:linear-gradient(180deg,var(--stoneShade),var(--stone))}
+  .abacus{bottom:188px;width:118px;height:8px;border-radius:3px;background:var(--stoneShade)}
+  .beacon{bottom:200px;width:30px;height:30px;transform:translateX(-50%) rotate(45deg);
+    background:linear-gradient(135deg,var(--cyanBright),var(--cyan));border-radius:6px;
+    box-shadow:0 0 18px 4px rgba(6,182,212,.55);animation:beaconPulse 4s ease-in-out infinite}
+  .ring{position:absolute;left:50%;bottom:60px;width:110px;height:110px;border:2px solid var(--cyanBright);
+    border-radius:50%;opacity:0;transform:translateX(-50%) scale(.35);
+    animation:ringExpand 1.6s cubic-bezier(.2,.6,.4,1) infinite}
+  .ring.d2{animation-delay:.53s}.ring.d3{animation-delay:1.06s}
+  @keyframes ringExpand{0%{opacity:.75;transform:translateX(-50%) scale(.35)}100%{opacity:0;transform:translateX(-50%) scale(1.5)}}
+  @keyframes beaconPulse{0%,100%{box-shadow:0 0 14px 3px rgba(6,182,212,.45)}50%{box-shadow:0 0 26px 7px rgba(6,182,212,.7)}}
+  .statechip{position:absolute;left:50%;bottom:10px;transform:translateX(-50%);
+    font:700 10.5px var(--mono);letter-spacing:.22em;color:var(--cyan);
+    background:var(--surface);border:1px solid var(--outline);border-radius:999px;padding:6px 14px;
+    box-shadow:0 2px 8px rgba(32,30,25,.08)}
+  /* ---------- transcript ---------- */
+  .transcript{margin:12px 16px 0;padding:11px 13px;border-radius:14px;background:var(--surface);
+    border:1px solid var(--outline);display:flex;flex-direction:column;gap:8px;height:172px}
+  .turn{display:flex;flex-direction:column;gap:2px}
+  .who{font:700 8.5px var(--mono);letter-spacing:.16em}
+  .who.owner{color:var(--bronze)} .who.local{color:var(--ok)} .who.tower{color:var(--cyan)}
+  .what{font:400 12.5px var(--sans);color:var(--ink);line-height:1.45}
+  .draft{font:italic 400 12.5px var(--sans);color:var(--ink2)}
+  .caption{margin:8px 16px 0;font:italic 400 13px var(--serif);color:var(--cyan);text-align:center;min-height:20px}
+  /* ---------- controls ---------- */
+  .controls{margin-top:auto;display:flex;justify-content:center;gap:18px;padding:14px 0 20px;
+    background:linear-gradient(180deg,transparent,var(--surface2))}
+  .ctl{width:56px;height:56px;border-radius:50%;border:1.5px solid var(--outline);background:var(--surface);
+    display:flex;align-items:center;justify-content:center;color:var(--bronze);box-shadow:0 2px 6px rgba(32,30,25,.12)}
+  .ctl.primary{width:66px;height:66px;border-color:var(--bronze);color:var(--bronze)}
+  .ctl svg{width:24px;height:24px}
+  /* ---------- annotations ---------- */
+  .notes{width:560px;display:flex;flex-direction:column;gap:16px}
+  .panel{background:var(--surface);border:1px solid var(--outline);border-radius:16px;padding:18px 20px}
+  .panel h1{font:600 24px var(--serif);letter-spacing:.06em;color:var(--ink)}
+  .panel h1 span{color:var(--bronze)}
+  .panel .tag{font:600 10px var(--mono);letter-spacing:.18em;color:var(--cyan);margin:4px 0 10px}
+  .panel p{font:400 12.5px/1.6 var(--sans);color:var(--ink2)}
+  .sw{display:grid;grid-template-columns:repeat(4,1fr);gap:8px;margin-top:10px}
+  .swatch{border:1px solid var(--outline);border-radius:10px;overflow:hidden;background:var(--surface)}
+  .swatch .c{height:34px}
+  .swatch .l{font:600 8.5px var(--mono);padding:4px 6px;color:var(--ink2);letter-spacing:.03em}
+  .type h3{font:600 12px var(--mono);letter-spacing:.14em;color:var(--ink2);margin:10px 0 4px}
+  .spec{font:400 15px var(--serif);color:var(--ink)} .spec.mono{font:600 12px var(--mono);color:var(--cyan);letter-spacing:.12em}
+  .tiles{display:flex;gap:10px;margin-top:10px}
+  .tile{flex:1;height:120px;border-radius:12px;border:1px solid var(--outline);position:relative;overflow:hidden;
+    background:linear-gradient(180deg,var(--surface2),var(--surface))}
+  .tile .mini{position:absolute;left:50%;top:50%;transform:translate(-50%,-50%)}
+  .minitower{width:34px}
+  .minitower .b1{width:34px;height:5px;background:var(--stoneShade);border-radius:2px;margin:0 auto 1px}
+  .minitower .b2{width:22px;height:26px;background:repeating-linear-gradient(90deg,var(--stone) 0 4px,var(--stoneShade) 4px 5px);border-radius:2px 2px 0 0;margin:0 auto}
+  .minitower .b3{width:0;height:0;border:7px solid transparent;border-bottom:9px solid var(--cyanBright);margin:2px auto 0;filter:drop-shadow(0 0 4px var(--cyanBright))}
+  .tile.muted{filter:grayscale(.4) brightness(.97)}
+  .tile.muted .b3{border-bottom-color:#8d8779;filter:none}
+  .tile.dead{filter:grayscale(1) brightness(.92)}
+  .tile.dead .b3{border-bottom-color:#8d8779;filter:none}
+  .mic-slash{position:absolute;left:50%;top:50%;transform:translate(-50%,-50%);width:22px;height:22px}
+  .brk{position:absolute;left:50%;top:50%;width:60px;transform:translate(-50%,-50%);border-top:2px solid var(--err);transform:translate(-50%,-50%) rotate(-8deg)}
+  .tile .lbl{position:absolute;bottom:5px;width:100%;text-align:center;font:700 8px var(--mono);letter-spacing:.12em;color:var(--ink2)}
+  .rules{margin:8px 0 0 16px}
+  .rules li{font:400 12px/1.7 var(--sans);color:var(--ink2)}
+</style>
+</head>
+<body>
+<div class="board">
+  <!-- ================= PHONE ================= -->
+  <div class="phone"><div class="screen">
+    <div class="watermark">V0.1 DESIGN MOCKUP — NOT APP OUTPUT</div>
+    <div class="pediment">
+      <div class="pediment-line"></div>
+      <div class="brand">HER<b>MES</b></div>
+      <div class="meander"></div>
+    </div>
+    <div class="strip">
+      <div class="chip">OFF</div><div class="chip">LOCAL</div><div class="chip">TOWER</div><div class="chip active">HYBRID</div>
+      <div class="spacer"></div>
+      <div class="pill"><span class="dot cyan"></span>MOCK BRIDGE</div>
+      <div class="pill"><span class="dot green"></span>MIC</div>
+    </div>
+    <div class="stage">
+      <div class="halo"></div>
+      <div class="towerfig">
+        <div class="plinth3"></div><div class="plinth2"></div><div class="plinth1"></div>
+        <div class="shaft"></div><div class="cap"></div><div class="abacus"></div>
+        <div class="beacon"></div>
+        <div class="ring"></div><div class="ring d2"></div><div class="ring d3"></div>
+      </div>
+      <div class="statechip">LISTENING</div>
+    </div>
+    <div class="transcript">
+      <div class="turn"><span class="who owner">OWNER · 09:41</span><span class="what">Good day, Hermes. Report the console status.</span></div>
+      <div class="turn"><span class="who local">HERMES · LOCAL</span><span class="what">Console standing by. Mode HYBRID, bridge simulated, microphone armed.</span></div>
+      <div class="draft">you: “prepare tomorrow mission plan”</div>
+    </div>
+    <div class="caption">“Speaking your words back, calmly and in truth.”</div>
+    <div class="controls">
+      <div class="ctl"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M12 3a3 3 0 0 1 3 3v5a3 3 0 0 1-6 0V6a3 3 0 0 1 3-3z"/><path d="M5 11a7 7 0 0 0 14 0"/><path d="M12 18v3"/></svg></div>
+      <div class="ctl primary"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="9"/><path d="M8 12h8"/></svg></div>
+      <div class="ctl"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="4" y="6" width="16" height="12" rx="2"/><path d="M7 10h.01M11 10h.01M15 10h.01M7 14h10"/></svg></div>
+    </div>
+  </div></div>
+
+  <!-- ================= ANNOTATIONS ================= -->
+  <div class="notes">
+    <div class="panel">
+      <h1>MARBLE <span>LIGHT</span></h1>
+      <div class="tag">DAYLIGHT / INSPECTION IDENTITY — PROPOSED ALTERNATE</div>
+      <p>Warm marble surfaces with quiet bronze geometry. Energy cyan appears only where something is truly
+         happening: the beacon, the listening rings, live captions. One meander band per screen zone, fluting
+         only on the Tower shaft — restraint is the identity.</p>
+      <div class="sw">
+        <div class="swatch"><div class="c" style="background:#F2EFE7"></div><div class="l">#F2EFE7 marble bg</div></div>
+        <div class="swatch"><div class="c" style="background:#FAF7F0"></div><div class="l">#FAF7F0 surface</div></div>
+        <div class="swatch"><div class="c" style="background:#7A5C2E"></div><div class="l">#7A5C2E bronze</div></div>
+        <div class="swatch"><div class="c" style="background:#B08D4C"></div><div class="l">#B08D4C gold</div></div>
+        <div class="swatch"><div class="c" style="background:#0E7490"></div><div class="l">#0E7490 energy</div></div>
+        <div class="swatch"><div class="c" style="background:#06B6D4"></div><div class="l">#06B6D4 energy bright</div></div>
+        <div class="swatch"><div class="c" style="background:#D9D4C8"></div><div class="l">#D9D4C8 stone</div></div>
+        <div class="swatch"><div class="c" style="background:#2A7654"></div><div class="l">#2A7654 success</div></div>
+      </div>
+    </div>
+    <div class="panel type">
+      <h3>TYPOGRAPHY</h3>
+      <div class="spec">Hermes Tower — serif display for the Word.</div>
+      <div class="spec" style="font-family:var(--sans)">Body voice in humanist sans — 12.5–15sp, AA verified.</div>
+      <div class="spec mono">STATUS · LISTENING · MONO UPPERCASE</div>
+      <h3 style="margin-top:14px">STATES SHOWN IN THIS THEME</h3>
+      <div class="tiles">
+        <div class="tile"><div class="mini"><div class="minitower"><div class="b1"></div><div class="b2"></div><div class="b3"></div></div></div><div class="lbl">IDLE · PULSE</div></div>
+        <div class="tile muted"><div class="mini"><div class="minitower"><div class="b1"></div><div class="b2"></div><div class="b3"></div></div><svg class="mic-slash" viewBox="0 0 24 24" fill="none" stroke="#B3261E" stroke-width="2"><path d="M12 3a3 3 0 0 1 3 3v5a3 3 0 0 1-6 0V6a3 3 0 0 1 3-3z"/><path d="M4 3l16 18"/></svg></div><div class="lbl">PRIVACY MUTED</div></div>
+        <div class="tile dead"><div class="mini"><div class="minitower"><div class="b1"></div><div class="b2"></div><div class="b3"></div></div><div class="brk"></div></div><div class="lbl">DISCONNECTED</div></div>
+      </div>
+      <ul class="rules">
+        <li>Motif budget: one meander band per zone; fluting on the shaft only.</li>
+        <li>Energy = truth: cyan only for real activity, amber only for QUEUED/ERROR.</li>
+        <li>Contrast: body ≥ 4.5:1, large/UI ≥ 3:1 (computed, see VISUAL_DIRECTION.md §3).</li>
+      </ul>
+    </div>
+  </div>
+</div>
+</body>
+</html>

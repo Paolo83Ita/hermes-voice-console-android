@@ -1,0 +1,209 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<title>HERMES VOICE CONSOLE — OBSIDIAN NIGHT mockup</title>
+<style>
+  :root{
+    --bg:#0B0D10; --surface:#12151A; --surface2:#1B2027; --outline:#2E3640;
+    --ink:#E8E6E1; --ink2:#A7A39A; --bronze:#C08A3E; --gold:#D4A24E;
+    --cyan:#22D3EE; --cyanBright:#35D6FF; --glow:#164E5F;
+    --stone:#222933; --stoneShade:#333D4A; --ok:#34D399; --warn:#F59E0B; --err:#F87171;
+    --serif:Georgia,'Noto Serif SC',serif; --sans:'Noto Sans SC',system-ui,sans-serif; --mono:'DejaVu Sans Mono',monospace;
+  }
+  *{box-sizing:border-box;margin:0;padding:0}
+  body{background:#07090C;font-family:var(--sans);color:var(--ink);padding:34px 38px}
+  .board{display:flex;gap:38px;align-items:flex-start}
+  /* ---------- phone ---------- */
+  .phone{width:404px;border-radius:44px;padding:10px;background:#04060A;box-shadow:0 18px 44px rgba(0,0,0,.7),0 0 0 1px #1B2027}
+  .screen{border-radius:34px;overflow:hidden;height:846px;display:flex;flex-direction:column;
+    background:
+      radial-gradient(1200px 500px at 80% -10%, rgba(192,138,62,.08), transparent 60%),
+      radial-gradient(900px 500px at -10% 110%, rgba(34,211,238,.07), transparent 55%),
+      var(--bg);}
+  .watermark{font:600 9px var(--mono);letter-spacing:.14em;color:var(--ink2);text-align:center;padding:5px 0;background:var(--surface2)}
+  /* ---------- header ---------- */
+  .pediment{display:flex;flex-direction:column;align-items:center;padding:14px 0 0}
+  .pediment-line{width:300px;height:14px;
+    clip-path:polygon(50% 0,100% 100%,0 100%);
+    border-bottom:2px solid var(--gold); background:linear-gradient(transparent 10px, var(--gold) 10px)}
+  .brand{font:600 21px var(--serif);letter-spacing:.34em;color:var(--ink);margin-top:6px}
+  .brand b{color:var(--bronze);font-weight:700}
+  .meander{height:16px;width:100%;margin-top:10px;opacity:.8;
+    background-image:url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='40' height='16'%3E%3Cg fill='none' stroke='%23D4A24E' stroke-width='1.6'%3E%3Cpath d='M0 15H40M3 15V3H37V11H15V7H27'/%3E%3C/g%3E%3C/svg%3E");
+    background-repeat:repeat-x;background-position:center}
+  /* ---------- status strip ---------- */
+  .strip{display:flex;align-items:center;gap:6px;padding:9px 14px}
+  .chip{font:600 9.5px var(--mono);letter-spacing:.08em;padding:5px 9px;border-radius:999px;
+    border:1px solid var(--outline);color:var(--ink2);background:var(--surface)}
+  .chip.active{border-color:var(--bronze);color:#120C04;background:var(--bronze)}
+  .spacer{flex:1}
+  .pill{display:flex;align-items:center;gap:5px;font:600 9px var(--mono);letter-spacing:.06em;
+    padding:5px 8px;border-radius:999px;border:1px solid var(--outline);color:var(--ink2)}
+  .dot{width:7px;height:7px;border-radius:50%}
+  .dot.cyan{background:var(--cyanBright);box-shadow:0 0 6px var(--cyanBright)}
+  .dot.green{background:var(--ok)}
+  .dot.amber{background:var(--warn)}
+  .dot.red{background:var(--err)}
+  .dot.gray{background:#6B7280}
+  /* ---------- tower stage ---------- */
+  .stage{position:relative;height:308px;margin:4px 14px 0;border-radius:20px;overflow:hidden;
+    background:linear-gradient(180deg, rgba(27,32,39,.55), rgba(18,21,26,.4));
+    border:1px solid var(--outline)}
+  .stage .halo{position:absolute;left:50%;top:44%;width:320px;height:320px;transform:translate(-50%,-50%);
+    background:radial-gradient(circle, rgba(34,211,238,.14), transparent 62%)}
+  .towerfig{position:absolute;left:50%;top:50%;transform:translate(-50%,-46%);width:170px;height:250px}
+  .towerfig>*{position:absolute;left:50%;transform:translateX(-50%)}
+  .plinth3{bottom:0;width:170px;height:13px;border-radius:4px;background:linear-gradient(180deg,var(--stoneShade),var(--stone));box-shadow:inset 0 -2px 0 rgba(192,138,62,.4)}
+  .plinth2{bottom:13px;width:146px;height:11px;border-radius:4px;background:linear-gradient(180deg,var(--stoneShade),var(--stone))}
+  .plinth1{bottom:24px;width:124px;height:10px;border-radius:4px;background:linear-gradient(180deg,var(--stoneShade),var(--stone))}
+  .shaft{bottom:34px;width:78px;height:142px;border-radius:7px 7px 0 0;
+    background:repeating-linear-gradient(90deg,var(--stoneShade) 0 9px,var(--stone) 9px 12px);
+    box-shadow:inset 0 0 18px rgba(34,211,238,.10)}
+  .cap{bottom:176px;width:106px;height:12px;border-radius:3px;background:linear-gradient(180deg,var(--stone),var(--stoneShade))}
+  .abacus{bottom:188px;width:118px;height:8px;border-radius:3px;background:var(--stoneShade)}
+  .beacon{bottom:200px;width:30px;height:30px;transform:translateX(-50%) rotate(45deg);
+    background:linear-gradient(135deg,var(--cyanBright),#0E7490);border-radius:6px;
+    box-shadow:0 0 22px 6px rgba(34,211,238,.5);animation:beaconPulse 4s ease-in-out infinite}
+  .orbit{position:absolute;left:50%;border-radius:50%;border:2px solid transparent;
+    animation:spin 2s linear infinite}
+  .orbit.a{bottom:76px;width:150px;height:150px;border-top-color:var(--cyanBright);filter:drop-shadow(0 0 4px rgba(34,211,238,.6))}
+  .orbit.b{bottom:108px;width:110px;height:110px;border-bottom-color:var(--cyan);animation-direction:reverse;animation-duration:1.5s;opacity:.8}
+  @keyframes spin{to{transform:translateX(-50%) rotate(360deg)}}
+  @keyframes beaconPulse{0%,100%{box-shadow:0 0 16px 4px rgba(34,211,238,.4)}50%{box-shadow:0 0 30px 8px rgba(34,211,238,.75)}}
+  .particle{position:absolute;left:50%;bottom:190px;width:4px;height:4px;border-radius:50%;background:var(--cyanBright);
+    box-shadow:0 0 6px var(--cyanBright);animation:rise 2.4s linear infinite}
+  .particle.p2{margin-left:-26px;animation-delay:.8s}.particle.p3{margin-left:26px;animation-delay:1.6s}
+  @keyframes rise{0%{opacity:0;transform:translateY(0)}25%{opacity:.9}100%{opacity:0;transform:translateY(-84px)}}
+  .statechip{position:absolute;left:50%;bottom:10px;transform:translateX(-50%);
+    font:700 10.5px var(--mono);letter-spacing:.22em;color:var(--cyan);
+    background:var(--surface);border:1px solid var(--outline);border-radius:999px;padding:6px 14px;
+    box-shadow:0 2px 10px rgba(0,0,0,.5)}
+  /* ---------- transcript ---------- */
+  .transcript{margin:12px 16px 0;padding:11px 13px;border-radius:14px;background:var(--surface);
+    border:1px solid var(--outline);display:flex;flex-direction:column;gap:8px;height:172px}
+  .turn{display:flex;flex-direction:column;gap:2px}
+  .who{font:700 8.5px var(--mono);letter-spacing:.16em}
+  .who.owner{color:var(--gold)} .who.local{color:var(--ok)} .who.tower{color:var(--cyan)}
+  .what{font:400 12.5px var(--sans);color:var(--ink);line-height:1.45}
+  .draft{font:italic 400 12.5px var(--sans);color:var(--ink2)}
+  .caption{margin:8px 16px 0;font:italic 400 13px var(--serif);color:var(--cyan);text-align:center;min-height:20px}
+  /* ---------- controls ---------- */
+  .controls{margin-top:auto;display:flex;justify-content:center;gap:18px;padding:14px 0 20px;
+    background:linear-gradient(180deg,transparent,var(--surface2))}
+  .ctl{width:56px;height:56px;border-radius:50%;border:1.5px solid var(--outline);background:var(--surface);
+    display:flex;align-items:center;justify-content:center;color:var(--gold);box-shadow:0 2px 8px rgba(0,0,0,.5)}
+  .ctl.primary{width:66px;height:66px;border-color:var(--bronze);color:var(--gold)}
+  .ctl svg{width:24px;height:24px}
+  /* ---------- annotations ---------- */
+  .notes{width:560px;display:flex;flex-direction:column;gap:16px}
+  .panel{background:var(--surface);border:1px solid var(--outline);border-radius:16px;padding:18px 20px}
+  .panel h1{font:600 24px var(--serif);letter-spacing:.06em;color:var(--ink)}
+  .panel h1 span{color:var(--bronze)}
+  .panel .tag{font:600 10px var(--mono);letter-spacing:.18em;color:var(--cyan);margin:4px 0 10px}
+  .panel p{font:400 12.5px/1.6 var(--sans);color:var(--ink2)}
+  .sw{display:grid;grid-template-columns:repeat(4,1fr);gap:8px;margin-top:10px}
+  .swatch{border:1px solid var(--outline);border-radius:10px;overflow:hidden;background:var(--surface)}
+  .swatch .c{height:34px}
+  .swatch .l{font:600 8.5px var(--mono);padding:4px 6px;color:var(--ink2);letter-spacing:.03em}
+  .type h3{font:600 12px var(--mono);letter-spacing:.14em;color:var(--ink2);margin:10px 0 4px}
+  .spec{font:400 15px var(--serif);color:var(--ink)} .spec.mono{font:600 12px var(--mono);color:var(--cyan);letter-spacing:.12em}
+  .tiles{display:flex;gap:10px;margin-top:10px}
+  .tile{flex:1;height:120px;border-radius:12px;border:1px solid var(--outline);position:relative;overflow:hidden;
+    background:linear-gradient(180deg,var(--surface2),var(--surface))}
+  .tile .mini{position:absolute;left:50%;top:50%;transform:translate(-50%,-50%)}
+  .minitower{width:34px}
+  .minitower .b1{width:34px;height:5px;background:var(--stoneShade);border-radius:2px;margin:0 auto 1px}
+  .minitower .b2{width:22px;height:26px;background:repeating-linear-gradient(90deg,var(--stoneShade) 0 4px,var(--stone) 4px 5px);border-radius:2px 2px 0 0;margin:0 auto}
+  .minitower .b3{width:0;height:0;border:7px solid transparent;border-bottom:9px solid var(--cyanBright);margin:2px auto 0;filter:drop-shadow(0 0 4px var(--cyanBright))}
+  .tile.muted{filter:brightness(.8)}
+  .tile.muted .b3{border-bottom-color:#6B7280;filter:none}
+  .tile.dead{filter:grayscale(.9) brightness(.75)}
+  .tile.dead .b3{border-bottom-color:#6B7280;filter:none}
+  .mic-slash{position:absolute;left:50%;top:50%;transform:translate(-50%,-50%);width:22px;height:22px}
+  .brk{position:absolute;left:50%;top:50%;width:60px;transform:translate(-50%,-50%) rotate(-8deg);border-top:2px solid var(--err)}
+  .tile .lbl{position:absolute;bottom:5px;width:100%;text-align:center;font:700 8px var(--mono);letter-spacing:.12em;color:var(--ink2)}
+  .rules{margin:8px 0 0 16px}
+  .rules li{font:400 12px/1.7 var(--sans);color:var(--ink2)}
+</style>
+</head>
+<body>
+<div class="board">
+  <!-- ================= PHONE ================= -->
+  <div class="phone"><div class="screen">
+    <div class="watermark">V0.1 DESIGN MOCKUP — NOT APP OUTPUT</div>
+    <div class="pediment">
+      <div class="pediment-line"></div>
+      <div class="brand">HER<b>MES</b></div>
+      <div class="meander"></div>
+    </div>
+    <div class="strip">
+      <div class="chip">OFF</div><div class="chip">LOCAL</div><div class="chip active">TOWER</div><div class="chip">HYBRID</div>
+      <div class="spacer"></div>
+      <div class="pill"><span class="dot amber"></span>QUEUED ×1</div>
+      <div class="pill"><span class="dot green"></span>MIC</div>
+    </div>
+    <div class="stage">
+      <div class="halo"></div>
+      <div class="towerfig">
+        <div class="plinth3"></div><div class="plinth2"></div><div class="plinth1"></div>
+        <div class="shaft"></div><div class="cap"></div><div class="abacus"></div>
+        <div class="beacon"></div>
+        <div class="orbit a"></div><div class="orbit b"></div>
+        <div class="particle"></div><div class="particle p2"></div><div class="particle p3"></div>
+      </div>
+      <div class="statechip">TOWER PROCESSING</div>
+    </div>
+    <div class="transcript">
+      <div class="turn"><span class="who owner">OWNER · 21:07</span><span class="what">Prepare tomorrow's mission plan.</span></div>
+      <div class="turn"><span class="who tower">HERMES TOWER · STREAMING</span><span class="what">Understood. Drafting the plan now; I will ask for your approval before any step…</span></div>
+      <div class="draft">queued: “status summary” — delivered when reachable</div>
+    </div>
+    <div class="caption">“Energy circles the core only while the Tower truly works.”</div>
+    <div class="controls">
+      <div class="ctl"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M12 3a3 3 0 0 1 3 3v5a3 3 0 0 1-6 0V6a3 3 0 0 1 3-3z"/><path d="M5 11a7 7 0 0 0 14 0"/><path d="M12 18v3"/></svg></div>
+      <div class="ctl primary"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="7" y="4" width="10" height="12" rx="2"/><path d="M8 10h8"/></svg></div>
+      <div class="ctl"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="9"/><path d="M8 8l8 8"/></svg></div>
+    </div>
+  </div></div>
+
+  <!-- ================= ANNOTATIONS ================= -->
+  <div class="notes">
+    <div class="panel">
+      <h1>OBSIDIAN <span>NIGHT</span></h1>
+      <div class="tag">ALWAYS-ON IDENTITY — PROPOSED DEFAULT (D-009)</div>
+      <p>Dark obsidian glass with bronze etching and cyan energy. Designed for a device that lives on a desk,
+         powered and displayed for months: lowest AMOLED stress, lowest power draw, correct night ambience.
+         The energy language stays identical to Marble Light so the identity survives the theme switch.</p>
+      <div class="sw">
+        <div class="swatch"><div class="c" style="background:#0B0D10"></div><div class="l">#0B0D10 obsidian bg</div></div>
+        <div class="swatch"><div class="c" style="background:#12151A"></div><div class="l">#12151A surface</div></div>
+        <div class="swatch"><div class="c" style="background:#C08A3E"></div><div class="l">#C08A3E bronze</div></div>
+        <div class="swatch"><div class="c" style="background:#D4A24E"></div><div class="l">#D4A24E gold</div></div>
+        <div class="swatch"><div class="c" style="background:#22D3EE"></div><div class="l">#22D3EE energy</div></div>
+        <div class="swatch"><div class="c" style="background:#35D6FF"></div><div class="l">#35D6FF energy bright</div></div>
+        <div class="swatch"><div class="c" style="background:#222933"></div><div class="l">#222933 stone</div></div>
+        <div class="swatch"><div class="c" style="background:#34D399"></div><div class="l">#34D399 success</div></div>
+      </div>
+    </div>
+    <div class="panel type">
+      <h3>TYPOGRAPHY</h3>
+      <div class="spec">Hermes Tower — serif display for the Word.</div>
+      <div class="spec" style="font-family:var(--sans)">Body voice in humanist sans — 12.5–15sp, AA verified.</div>
+      <div class="spec mono">STATUS · TOWER PROCESSING · MONO</div>
+      <h3 style="margin-top:14px">STATES SHOWN IN THIS THEME</h3>
+      <div class="tiles">
+        <div class="tile"><div class="mini"><div class="minitower"><div class="b1"></div><div class="b2"></div><div class="b3"></div></div></div><div class="lbl">IDLE · PULSE</div></div>
+        <div class="tile muted"><div class="mini"><div class="minitower"><div class="b1"></div><div class="b2"></div><div class="b3"></div></div><svg class="mic-slash" viewBox="0 0 24 24" fill="none" stroke="#F87171" stroke-width="2"><path d="M12 3a3 3 0 0 1 3 3v5a3 3 0 0 1-6 0V6a3 3 0 0 1 3-3z"/><path d="M4 3l16 18"/></svg></div><div class="lbl">PRIVACY MUTED</div></div>
+        <div class="tile dead"><div class="mini"><div class="minitower"><div class="b1"></div><div class="b2"></div><div class="b3"></div></div><div class="brk"></div></div><div class="lbl">DISCONNECTED</div></div>
+      </div>
+      <ul class="rules">
+        <li>Streaming text appears as it arrives; nothing is shown before the Tower sends it.</li>
+        <li>QUEUED pill counts real backlog; never a decorative badge.</li>
+        <li>Glow radius is the animation-intensity knob; reduced motion freezes it mid-state.</li>
+      </ul>
+    </div>
+  </div>
+</div>
+</body>
+</html>

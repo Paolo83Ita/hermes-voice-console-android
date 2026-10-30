@@ -1,0 +1,167 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<title>HERMES VOICE CONSOLE — theme comparison</title>
+<style>
+  *{box-sizing:border-box;margin:0;padding:0}
+  :root{--serif:Georgia,'Noto Serif SC',serif;--sans:'Noto Sans SC',system-ui,sans-serif;--mono:'DejaVu Sans Mono',monospace}
+  body{background:#14171C;font-family:var(--sans);color:#E8E6E1;padding:30px 36px}
+  .head{display:flex;align-items:baseline;gap:16px;margin-bottom:20px}
+  .head h1{font:600 26px var(--serif);letter-spacing:.1em}
+  .head h1 span{color:#D4A24E}
+  .head .tag{font:600 10px var(--mono);letter-spacing:.16em;color:#22D3EE}
+  .watermark{font:600 9px var(--mono);letter-spacing:.14em;color:#8b877c;text-align:center;padding:5px 0;background:#1B2027;border-radius:8px 8px 0 0}
+  .duo{display:flex;gap:30px;justify-content:center;margin-bottom:22px}
+  .phone{width:330px;border-radius:38px;padding:8px;box-shadow:0 16px 40px rgba(0,0,0,.6)}
+  .light-phone{background:#14120E}
+  .dark-phone{background:#04060A}
+  .screen{border-radius:30px;overflow:hidden;height:690px;display:flex;flex-direction:column}
+  /* theme variable scopes */
+  .theme-light{
+    --bg:#F2EFE7;--surface:#FAF7F0;--surface2:#E9E4D8;--outline:#C9BFA9;--ink:#201E19;--ink2:#5A554A;
+    --bronze:#7A5C2E;--gold:#B08D4C;--cyan:#0E7490;--cyanBright:#06B6D4;--stone:#D9D4C8;--stoneShade:#C2BBAB;
+    --ok:#2A7654;--warn:#9A5B12;--err:#B3261E;--onAccent:#FAF7F0;--stage:linear-gradient(180deg,rgba(233,228,216,.65),rgba(217,212,200,.35));
+    --meander:url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='40' height='16'%3E%3Cg fill='none' stroke='%23B08D4C' stroke-width='1.6'%3E%3Cpath d='M0 15H40M3 15V3H37V11H15V7H27'/%3E%3C/g%3E%3C/svg%3E");
+  }
+  .theme-dark{
+    --bg:#0B0D10;--surface:#12151A;--surface2:#1B2027;--outline:#2E3640;--ink:#E8E6E1;--ink2:#A7A39A;
+    --bronze:#C08A3E;--gold:#D4A24E;--cyan:#22D3EE;--cyanBright:#35D6FF;--stone:#222933;--stoneShade:#333D4A;
+    --ok:#34D399;--warn:#F59E0B;--err:#F87171;--onAccent:#120C04;--stage:linear-gradient(180deg,rgba(27,32,39,.55),rgba(18,21,26,.4));
+    --meander:url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='40' height='16'%3E%3Cg fill='none' stroke='%23D4A24E' stroke-width='1.6'%3E%3Cpath d='M0 15H40M3 15V3H37V11H15V7H27'/%3E%3C/g%3E%3C/svg%3E");
+  }
+  .screen.theme-light{background:radial-gradient(1000px 420px at 80% -10%,rgba(176,141,76,.10),transparent 60%),var(--bg)}
+  .screen.theme-dark{background:radial-gradient(1000px 420px at 80% -10%,rgba(192,138,62,.08),transparent 60%),var(--bg)}
+  .pediment{display:flex;flex-direction:column;align-items:center;padding:10px 0 0}
+  .pediment-line{width:240px;height:12px;clip-path:polygon(50% 0,100% 100%,0 100%);
+    border-bottom:2px solid var(--gold);background:linear-gradient(transparent 8px,var(--gold) 8px)}
+  .brand{font:600 16px var(--serif);letter-spacing:.32em;color:var(--ink);margin-top:4px}
+  .brand b{color:var(--bronze);font-weight:700}
+  .meander{height:13px;width:100%;margin-top:7px;opacity:.8;background-image:var(--meander);background-repeat:repeat-x;background-position:center}
+  .strip{display:flex;align-items:center;gap:4px;padding:7px 10px}
+  .chip{font:600 8px var(--mono);letter-spacing:.08em;padding:4px 7px;border-radius:999px;border:1px solid var(--outline);color:var(--ink2);background:var(--surface)}
+  .chip.active{border-color:var(--bronze);color:var(--onAccent);background:var(--bronze)}
+  .spacer{flex:1}
+  .pill{display:flex;align-items:center;gap:4px;font:600 7.5px var(--mono);padding:4px 6px;border-radius:999px;border:1px solid var(--outline);color:var(--ink2)}
+  .dot{width:6px;height:6px;border-radius:50%}
+  .dot.cyan{background:var(--cyanBright)} .dot.green{background:var(--ok)} .dot.gray{background:#6B7280}
+  .stage{position:relative;height:246px;margin:3px 10px 0;border-radius:16px;overflow:hidden;border:1px solid var(--outline);background:var(--stage)}
+  .towerfig{position:absolute;left:50%;top:50%;transform:translate(-50%,-46%);width:136px;height:200px}
+  .towerfig>*{position:absolute;left:50%;transform:translateX(-50%)}
+  .plinth3{bottom:0;width:136px;height:10px;border-radius:3px;background:linear-gradient(180deg,var(--stone),var(--stoneShade));box-shadow:inset 0 -2px 0 rgba(122,92,46,.35)}
+  .plinth2{bottom:10px;width:117px;height:9px;border-radius:3px;background:linear-gradient(180deg,var(--stone),var(--stoneShade))}
+  .plinth1{bottom:19px;width:99px;height:8px;border-radius:3px;background:linear-gradient(180deg,var(--stone),var(--stoneShade))}
+  .shaft{bottom:27px;width:62px;height:114px;border-radius:6px 6px 0 0;background:repeating-linear-gradient(90deg,var(--stone) 0 7px,var(--stoneShade) 7px 10px);box-shadow:inset 0 0 14px rgba(32,30,25,.12)}
+  .cap{bottom:141px;width:85px;height:10px;border-radius:2px;background:linear-gradient(180deg,var(--stoneShade),var(--stone))}
+  .abacus{bottom:151px;width:94px;height:6px;border-radius:2px;background:var(--stoneShade)}
+  .beacon{bottom:159px;width:24px;height:24px;transform:translateX(-50%) rotate(45deg);border-radius:5px;
+    background:linear-gradient(135deg,var(--cyanBright),var(--cyan));box-shadow:0 0 18px 5px rgba(34,211,238,.5)}
+  .ring{position:absolute;left:50%;bottom:48px;width:88px;height:88px;border:2px solid var(--cyanBright);border-radius:50%;opacity:0;
+    transform:translateX(-50%) scale(.35);animation:ringExpand 1.6s cubic-bezier(.2,.6,.4,1) infinite}
+  .ring.d2{animation-delay:.53s}.ring.d3{animation-delay:1.06s}
+  @keyframes ringExpand{0%{opacity:.7;transform:translateX(-50%) scale(.35)}100%{opacity:0;transform:translateX(-50%) scale(1.5)}}
+  .orbit{position:absolute;left:50%;border-radius:50%;border:2px solid transparent;animation:spin 2s linear infinite}
+  .orbit.a{bottom:60px;width:120px;height:120px;border-top-color:var(--cyanBright)}
+  .orbit.b{bottom:86px;width:88px;height:88px;border-bottom-color:var(--cyan);animation-direction:reverse;animation-duration:1.5s;opacity:.8}
+  @keyframes spin{to{transform:translateX(-50%) rotate(360deg)}}
+  .statechip{position:absolute;left:50%;bottom:8px;transform:translateX(-50%);font:700 8.5px var(--mono);
+    letter-spacing:.2em;color:var(--cyan);background:var(--surface);border:1px solid var(--outline);border-radius:999px;padding:5px 11px}
+  .transcript{margin:9px 12px 0;padding:9px 10px;border-radius:11px;background:var(--surface);border:1px solid var(--outline);display:flex;flex-direction:column;gap:6px;height:128px}
+  .who{font:700 7px var(--mono);letter-spacing:.14em}
+  .who.owner{color:var(--bronze)} .who.tower{color:var(--cyan)}
+  .what{font:400 10.5px var(--sans);color:var(--ink);line-height:1.4}
+  .caption{margin:6px 12px 0;font:italic 400 11px var(--serif);color:var(--cyan);text-align:center}
+  .controls{margin-top:auto;display:flex;justify-content:center;gap:14px;padding:10px 0 14px;background:linear-gradient(180deg,transparent,var(--surface2))}
+  .ctl{width:44px;height:44px;border-radius:50%;border:1.5px solid var(--outline);background:var(--surface);display:flex;align-items:center;justify-content:center;color:var(--bronze)}
+  .ctl.primary{width:52px;height:52px;border-color:var(--bronze);color:var(--bronze)}
+  .ctl svg{width:19px;height:19px}
+  .tl{font:700 9px var(--mono);letter-spacing:.2em;text-align:center;margin:8px 0 2px;color:#A7A39A}
+  /* ---------- verdict table ---------- */
+  .verdict{max-width:1000px;margin:0 auto;background:#12151A;border:1px solid #2E3640;border-radius:16px;padding:20px 24px}
+  .verdict h2{font:600 16px var(--serif);letter-spacing:.08em;margin-bottom:10px}
+  table{width:100%;border-collapse:collapse}
+  th,td{font:400 12.5px/1.5 var(--sans);padding:7px 10px;border-bottom:1px solid #222933;text-align:left;vertical-align:top}
+  th{font:700 9.5px var(--mono);letter-spacing:.14em;color:#A7A39A}
+  td.c{color:#A7A39A} td b{color:#E8E6E1} .win{color:#35D6FF;font-weight:700}
+  .banner{margin-top:14px;padding:12px 16px;border-radius:12px;background:linear-gradient(90deg,rgba(192,138,62,.16),rgba(34,211,238,.10));
+    border:1px solid #C08A3E;font:400 13.5px/1.6 var(--sans)}
+  .banner b{color:#D4A24E}
+</style>
+</head>
+<body>
+  <div class="head"><h1>MARBLE LIGHT <span>vs</span> OBSIDIAN NIGHT</h1><div class="tag">V0.1 DESIGN MOCKUP — NOT APP OUTPUT</div></div>
+  <div class="duo">
+    <div>
+      <div class="phone light-phone"><div class="screen theme-light">
+        <div class="pediment"><div class="pediment-line"></div><div class="brand">HER<b>MES</b></div><div class="meander"></div></div>
+        <div class="strip">
+          <div class="chip">OFF</div><div class="chip">LOCAL</div><div class="chip">TOWER</div><div class="chip active">HYBRID</div>
+          <div class="spacer"></div><div class="pill"><span class="dot cyan"></span>MOCK</div><div class="pill"><span class="dot green"></span>MIC</div>
+        </div>
+        <div class="stage"><div class="towerfig">
+          <div class="plinth3"></div><div class="plinth2"></div><div class="plinth1"></div>
+          <div class="shaft"></div><div class="cap"></div><div class="abacus"></div><div class="beacon"></div>
+          <div class="ring"></div><div class="ring d2"></div><div class="ring d3"></div>
+        </div><div class="statechip">LISTENING</div></div>
+        <div class="transcript">
+          <span class="who owner">OWNER · 09:41</span><span class="what">Good day, Hermes. Report the console status.</span>
+          <span class="who owner" style="color:var(--ok)">HERMES · LOCAL</span><span class="what">Console standing by. Mode HYBRID, bridge simulated.</span>
+        </div>
+        <div class="caption">“Warm marble, quiet bronze, honest energy.”</div>
+        <div class="controls">
+          <div class="ctl"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M12 3a3 3 0 0 1 3 3v5a3 3 0 0 1-6 0V6a3 3 0 0 1 3-3z"/><path d="M5 11a7 7 0 0 0 14 0"/><path d="M12 18v3"/></svg></div>
+          <div class="ctl primary"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="9"/><path d="M8 12h8"/></svg></div>
+          <div class="ctl"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="4" y="6" width="16" height="12" rx="2"/><path d="M7 10h.01M11 10h.01M15 10h.01M7 14h10"/></svg></div>
+        </div>
+      </div></div>
+      <div class="tl">MARBLE LIGHT — DAYLIGHT / INSPECTION</div>
+    </div>
+    <div>
+      <div class="phone dark-phone"><div class="screen theme-dark">
+        <div class="pediment"><div class="pediment-line"></div><div class="brand">HER<b>MES</b></div><div class="meander"></div></div>
+        <div class="strip">
+          <div class="chip">OFF</div><div class="chip">LOCAL</div><div class="chip active">TOWER</div><div class="chip">HYBRID</div>
+          <div class="spacer"></div><div class="pill"><span class="dot cyan"></span>MOCK</div><div class="pill"><span class="dot green"></span>MIC</div>
+        </div>
+        <div class="stage"><div class="towerfig">
+          <div class="plinth3"></div><div class="plinth2"></div><div class="plinth1"></div>
+          <div class="shaft"></div><div class="cap"></div><div class="abacus"></div><div class="beacon"></div>
+          <div class="orbit a"></div><div class="orbit b"></div>
+        </div><div class="statechip">TOWER PROCESSING</div></div>
+        <div class="transcript">
+          <span class="who owner">OWNER · 21:07</span><span class="what">Prepare tomorrow's mission plan.</span>
+          <span class="who tower">HERMES TOWER · STREAMING</span><span class="what">Understood. Drafting the plan; approval will be requested first…</span>
+        </div>
+        <div class="caption">“Obsidian glass, bronze etching, patient energy.”</div>
+        <div class="controls">
+          <div class="ctl"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M12 3a3 3 0 0 1 3 3v5a3 3 0 0 1-6 0V6a3 3 0 0 1 3-3z"/><path d="M5 11a7 7 0 0 0 14 0"/><path d="M12 18v3"/></svg></div>
+          <div class="ctl primary"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="7" y="4" width="10" height="12" rx="2"/><path d="M8 10h8"/></svg></div>
+          <div class="ctl"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="9"/><path d="M8 8l8 8"/></svg></div>
+        </div>
+      </div></div>
+      <div class="tl">OBSIDIAN NIGHT — ALWAYS-ON DEFAULT</div>
+    </div>
+  </div>
+
+  <div class="verdict">
+    <h2>Which should become the default identity?</h2>
+    <table>
+      <tr><th>Criterion</th><th>Marble Light</th><th>Obsidian Night</th><th>Why it matters here</th></tr>
+      <tr><td class="c">AMOLED power draw (always on)</td><td>High — bright static fields</td><td class="win">Low — dark pixels are off pixels</td><td class="c">Device is powered 24/7 and stationary; sustained draw also becomes heat.</td></tr>
+      <tr><td class="c">Burn-in stress (A-10, R-02)</td><td>Higher — large bright areas age panels</td><td class="win">Lower — reduced panel stress</td><td class="c">The console shows the same layout for months; burn-in is a first-class risk.</td></tr>
+      <tr><td class="c">Heat in passive enclosure (R-14)</td><td>More display heat</td><td class="win">Less display heat</td><td class="c">Charging + display already defines the thermal budget; every watt counts.</td></tr>
+      <tr><td class="c">Night ambience / presence</td><td>Bright beacon in a dark room</td><td class="win">Calm, restrained glow</td><td class="c">The desk device will be most used mornings, evenings and nights.</td></tr>
+      <tr><td class="c">Daylight legibility</td><td class="win">Excellent (14.5:1 body)</td><td>Good (15.6:1 body; reflections possible)</td><td class="c">Marble Light is the better inspection/review surface in bright rooms.</td></tr>
+      <tr><td class="c">Identity impact</td><td>Classical, airy, public-facing</td><td class="win">Monumental, premium, energy reads brighter</td><td class="c">Cyan energy on obsidian reads as living marble veins at night.</td></tr>
+      <tr><td class="c">Guest/owner glance privacy</td><td>Transcript visible at distance</td><td class="win">Dark surfaces mask idle content</td><td class="c">Secondary privacy benefit on a desk in shared rooms.</td></tr>
+    </table>
+    <div class="banner">
+      <b>VERDICT — Obsidian Night becomes the default identity</b> (decision D-009): it wins every always-on criterion
+      (power, burn-in, heat, ambience) that matters for a permanently displayed AMOLED console.
+      <b>Marble Light remains the daylight / inspection theme</b> and the identity is preserved across both because the
+      palette architecture, motifs, motion and state language are identical. An automatic time-based switch is
+      proposed for V0.2 (Owner-configurable, never forced).
+    </div>
+  </div>
+</body>
+</html>
