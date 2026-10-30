@@ -52,10 +52,11 @@ PRIVACY_MUTED      → IDLE
 UPDATE_AVAILABLE   → IDLE
 ```
 
-Two universal rules complete the table (implemented in code):
+Three universal rules complete the table (implemented in code):
 
 1. **Any state → DORMANT** (power off is always legal).
 2. **Any state except DORMANT → PRIVACY_MUTED** (the Owner can always silence the console).
+3. **Any state except DORMANT → IDLE** (Owner override / barge-in / recovery to rest — e.g. a new submission while SPEAKING or CONTACTING_TOWER returns the console to rest before re-entering the pipeline).
 
 Everything not listed is illegal and throws. Unit tests assert: every state appears, all driver paths used in the simulation are legal, illegal pairs are rejected.
 

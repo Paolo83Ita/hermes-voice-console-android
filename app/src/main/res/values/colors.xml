@@ -1,0 +1,7 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <!-- Window bootstrap background: matches the Obsidian Night default (D-009)
+         so app start never flashes bright on the always-on device. -->
+    <color name="console_background">#0B0D10</color>
+    <color name="launcher_background">#0B0D10</color>
+</resources>

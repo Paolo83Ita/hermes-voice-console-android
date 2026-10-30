@@ -1,0 +1,50 @@
+<?xml version="1.0" encoding="utf-8"?>
+<manifest xmlns:android="http://schemas.android.com/apk/res/android">
+
+    <!--
+      Permission policy (SEC-01/SEC-08, SECURITY_AND_PRIVACY_MODEL.md):
+      These permissions are DECLARED for the V0.2+ stages and are NOT requested at
+      runtime in V0.1. No audio is captured, no network is contacted, no notification
+      is posted by the V0.1 prototype. Each permission carries its justification.
+    -->
+    <!-- V0.2: microphone capture behind the explicit LISTENING state and the privacy mute. -->
+    <uses-permission android:name="android.permission.RECORD_AUDIO" />
+    <!-- V0.4: real TowerBridge transport (HTTPS/WSS). The V0.1 bridge is mock-only. -->
+    <uses-permission android:name="android.permission.INTERNET" />
+    <uses-permission android:name="android.permission.ACCESS_NETWORK_STATE" />
+    <!-- V0.2: foreground voice service notification. -->
+    <uses-permission android:name="android.permission.POST_NOTIFICATIONS" />
+    <uses-permission android:name="android.permission.FOREGROUND_SERVICE" />
+    <uses-permission android:name="android.permission.FOREGROUND_SERVICE_MICROPHONE" />
+
+    <application
+        android:name=".app.HermesApp"
+        android:allowBackup="false"
+        android:icon="@mipmap/ic_launcher"
+        android:label="@string/app_name"
+        android:supportsRtl="true"
+        android:theme="@style/Theme.HermesConsole">
+
+        <!-- Single-activity Compose application. -->
+        <activity
+            android:name=".ui.MainActivity"
+            android:exported="true"
+            android:configChanges="orientation|screenSize|screenLayout|keyboardHidden"
+            android:resizeableActivity="true">
+            <intent-filter>
+                <action android:name="android.intent.action.MAIN" />
+                <category android:name="android.intent.category.LAUNCHER" />
+            </intent-filter>
+        </activity>
+
+        <!--
+          V0.1 skeleton: registered but never started (decision D-011).
+          Diagnostics reports its truthful state: "registered, not started".
+          Foreground microphone typing and the real service arrive in V0.2.
+        -->
+        <service
+            android:name=".service.VoiceConsoleService"
+            android:exported="false" />
+    </application>
+
+</manifest>

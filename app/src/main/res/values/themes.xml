@@ -1,0 +1,14 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <!--
+      Single-activity Compose app: the visual system lives in Compose
+      (ui/theme/). This XML theme only bootstraps the window before the first
+      Compose frame. No Material Components XML dependency is used.
+    -->
+    <style name="Theme.HermesConsole" parent="android:Theme.Material.NoActionBar">
+        <item name="android:windowBackground">@color/console_background</item>
+        <item name="android:statusBarColor">@color/console_background</item>
+        <item name="android:navigationBarColor">@color/console_background</item>
+        <item name="android:windowLayoutInDisplayCutoutMode">shortEdges</item>
+    </style>
+</resources>
