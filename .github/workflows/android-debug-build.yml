@@ -1,0 +1,65 @@
+name: android-debug-build
+
+on:
+  push:
+    branches: [ foundation/v0.1-cloud-build ]
+  workflow_dispatch:
+
+jobs:
+  build:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+
+      - name: Set up JDK 17
+        uses: actions/setup-java@v4
+        with:
+          distribution: temurin
+          java-version: '17'
+
+      - name: Set up Android SDK
+        uses: android-actions/setup-android@v3
+
+      - name: Install pinned SDK packages
+        run: |
+          sdkmanager --install "platform-tools" "platforms;android-35" "build-tools;35.0.0" > /dev/null
+          yes | sdkmanager --licenses > /dev/null || true
+
+      - name: Set up Gradle caching
+        uses: gradle/actions/setup-gradle@v4
+
+      - name: Build debug APK and run unit tests
+        run: ./gradlew --no-daemon --console=plain :app:assembleDebug :app:testDebugUnitTest
+
+      - name: Lint (executed, non-blocking; report archived)
+        run: ./gradlew --no-daemon --console=plain :app:lintDebug || true
+
+      - name: Compute APK SHA-256
+        run: |
+          test -f app/build/outputs/apk/debug/app-debug.apk
+          sha256sum app/build/outputs/apk/debug/app-debug.apk
+          echo "commit: $GITHUB_SHA"
+
+      - name: Upload debug APK
+        uses: actions/upload-artifact@v4
+        with:
+          name: hermes-voice-console-debug-apk-${{ github.sha }}
+          path: app/build/outputs/apk/debug/app-debug.apk
+          if-no-files-found: error
+
+      - name: Upload unit test results
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: hermes-voice-console-test-results-${{ github.sha }}
+          path: app/build/test-results/testDebugUnitTest/
+          if-no-files-found: ignore
+
+      - name: Upload lint report
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: hermes-voice-console-lint-report-${{ github.sha }}
+          path: app/build/reports/
+          if-no-files-found: ignore
