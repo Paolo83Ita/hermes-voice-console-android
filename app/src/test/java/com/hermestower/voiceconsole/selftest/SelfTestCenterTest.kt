@@ -7,8 +7,8 @@ import com.hermestower.voiceconsole.models.DefaultVoiceModelCatalog
 import com.hermestower.voiceconsole.models.DefaultVoicePackResolver
 import com.hermestower.voiceconsole.models.DeviceResources
 import com.hermestower.voiceconsole.models.FileInstallationRegistry
-import com.hermestower.voiceconsole.models.ModelActivationController
-import com.hermestower.voiceconsole.models.ModelRollbackController
+import com.hermestower.voiceconsole.models.DefaultModelActivationController
+import com.hermestower.voiceconsole.models.DefaultModelRollbackController
 import com.hermestower.voiceconsole.migration.InMemoryKeyValueStore
 import com.hermestower.voiceconsole.tower.FileTowerProfileStore
 import com.hermestower.voiceconsole.tower.InMemorySecretVault
@@ -58,8 +58,8 @@ class SelfTestCenterTest {
                 registry = registry,
                 downloads = DefaultModelDownloadManager(storage, registry, Dispatchers.Default),
                 qualificationRunner = DefaultModelQualificationRunner(storage),
-                activation = ModelActivationController(registry, DefaultModelQualificationRunner(storage)),
-                rollback = ModelRollbackController(storage, registry),
+                activation = DefaultModelActivationController(registry, DefaultModelQualificationRunner(storage)),
+                rollback = DefaultModelRollbackController(storage, registry),
                 profileStore = profileStore,
                 vault = vault,
                 realBridge = RealTowerBridge(profileStore, Dispatchers.Default),

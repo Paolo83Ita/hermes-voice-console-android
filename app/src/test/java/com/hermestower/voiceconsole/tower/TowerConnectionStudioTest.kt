@@ -194,7 +194,7 @@ class TowerConnectionStudioTest {
         val secretValue = "SUPER-SECRET-VALUE-42"
         store.setSecret("profile-1", secretValue.toCharArray())
         store.saveValidated(profile().copy())
-        val persisted = Files.readString(dir.resolve("tower_profile.json"))
+        val persisted = String(Files.readAllBytes(dir.resolve("tower_profile.json")), Charsets.UTF_8)
         assertFalse(persisted.contains(secretValue))
         assertTrue(persisted.contains("profileName"))
         assertEquals(secretValue, String(store.secretFor("profile-1")!!))

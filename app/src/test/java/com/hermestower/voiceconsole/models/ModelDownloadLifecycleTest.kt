@@ -71,13 +71,13 @@ class ModelDownloadLifecycleTest {
     }
 
     private fun awaitState(identity: String, vararg states: ModelInstallState, timeoutMs: Long = 8000) {
-        withTimeout(timeoutMs) {
-            while (true) {
-                val s = downloads.progress(identity).value.state
-                if (states.contains(s)) return@withTimeout
-                Thread.sleep(20)
-            }
+        val deadline = System.currentTimeMillis() + timeoutMs
+        while (System.currentTimeMillis() < deadline) {
+            val s = downloads.progress(identity).value.state
+            if (states.contains(s)) return
+            Thread.sleep(20)
         }
+        throw AssertionError("timeout waiting for $identity in ${states.toList()}")
     }
 
     @Test
