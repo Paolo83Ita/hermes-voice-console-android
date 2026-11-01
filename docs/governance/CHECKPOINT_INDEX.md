@@ -1,0 +1,22 @@
+# CHECKPOINT INDEX — Hermes Voice Console Android
+
+Foundation-era commits (preserved, local history before Graph 1):
+
+| Commit | Checkpoint |
+| --- | --- |
+| 7a86640 | stage-a-docs: Stage A documentation set complete, Mermaid diagrams validated |
+| 3aa69ad | stage-a-visuals: Marble Light / Obsidian Night mockups, comparison, contrast verification |
+| ffe6749 | stage-c-package: README, BUILDING, FINAL_REPORT, worklog checkpoints; V0.1 checkpoint |
+
+Graph 1 checkpoints (branch `foundation/v0.1-cloud-build`, pushed to private origin):
+
+| Checkpoint | Content | Evidence added |
+| --- | --- | --- |
+| graph-1/repair | Local build brought to green: Gradle wrapper committed, 44+9 compile errors and 7 test failures repaired, UI_STATE_MACHINE doc co-updated | UNIT_TEST_EXECUTED (33/33 local) |
+| graph-1/governance | 10 authority files installed under docs/governance/ | DOCUMENT_CREATED |
+| graph-1/ci | GitHub Actions debug-build workflow (JDK 17, SDK 35, wrapper, tests, lint, artifacts) | CLOUD_WORKFLOW_CREATED |
+| graph-1/receipt | Cloud-built APK retrieved + SHA-256 + commit binding | APK_CREATED, APK_HASHED, APK_BOUND_TO_COMMIT |
+| graph-1/qualification | Owner install runbook + device checklist refresh | DOCUMENT_CREATED |
+| graph-1/final | Truth refresh, blockers closed, ZIP refresh | DOCUMENT_CREATED |
+
+Exact SHAs are recorded in `WORK_LOG.md` at the moment each checkpoint was created.

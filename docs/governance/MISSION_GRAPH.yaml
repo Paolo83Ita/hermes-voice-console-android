@@ -1,0 +1,31 @@
+# MISSION GRAPH — Hermes Voice Console Android
+
+```yaml
+graph:
+  id: HVC_GRAPH_1_PRIVATE_REPOSITORY_CLOUD_BUILD
+  version: "1.0"
+  project: hermes-voice-console-android
+  owner: Paolo Lombisani
+  executor: GLM 5.3 Flash
+  mission_mode: CONTINUE_EXISTING_PROJECT
+  repository: { owner: Paolo83Ita, name: hermes-voice-console-android, visibility: PRIVATE }
+  default_branch: main          # untouched by graph (Owner merges)
+  working_branch: foundation/v0.1-cloud-build
+  updated: "2026-11-01"
+```
+
+Node statuses are tracked with timestamps in `WORK_LOG.md` (single active Node Context
+Bundle rule) and summarized in `CURRENT_PROJECT_TRUTH.md`. This file records the graph
+identity and node topology only, to avoid dual-maintained status duplicates.
+
+| Node | Objective | Depends on |
+| --- | --- | --- |
+| N0_workspace_reconciliation | Physically verify every Foundation Run claim | — |
+| N1_governance_install | 10 authority files under docs/governance/ | N0 |
+| N2_git_foundation | Working branch, mode normalization, secret scan | N1 |
+| N3_repo_convergence | Push complete project to private repo + read-back | N2, N4 |
+| N4_build_readiness | Wrapper + local toolchain + static checks + local green build | N2 |
+| N5_cloud_build | Execute Actions debug build, repair ≤3 iterations | N3 |
+| N6_apk_receipt | Retrieve artifact, SHA-256, commit binding, receipt | N5 |
+| N7_xiaomi_readiness | Owner install runbook + device checklist refresh | N6 |
+| N8_final_report | Truth refresh, ZIP refresh, checkpoint report | N7 |
