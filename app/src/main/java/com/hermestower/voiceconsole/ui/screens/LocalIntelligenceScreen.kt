@@ -11,6 +11,7 @@ import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.unit.dp
+import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import com.hermestower.voiceconsole.app.AppGraph
 import com.hermestower.voiceconsole.ui.components.SectionCard
 import com.hermestower.voiceconsole.ui.components.TruthBadge

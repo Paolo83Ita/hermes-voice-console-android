@@ -34,14 +34,14 @@ class RuleBasedIntentRouterTest {
         assertEquals(RoutingAction.HANDLE_LOCAL, router.route(req("good morning")).action)
         assertEquals(RoutingAction.HANDLE_LOCAL, router.route(req("what is the battery status")).action)
         assertEquals(RoutingAction.HANDLE_LOCAL, router.route(req("chi sei")).action)
-        assertEquals(RoutingAction.DECLINE, router.route(req("prepare tomorrow mission plan"), OperatingMode.LOCAL).action)
-        assertEquals(RoutingAction.DECLINE, router.route(req("what is the weather"), OperatingMode.LOCAL).action)
+        assertEquals(RoutingAction.DECLINE, router.route(req("prepare tomorrow mission plan", OperatingMode.LOCAL)).action)
+        assertEquals(RoutingAction.DECLINE, router.route(req("what is the weather", OperatingMode.LOCAL)).action)
     }
 
     @Test
     fun `TOWER routes everything except offline queueing rules`() {
-        assertEquals(RoutingAction.ROUTE_TOWER, router.route(req("hello there"), OperatingMode.TOWER).action)
-        assertEquals(RoutingAction.ROUTE_TOWER, router.route(req("status"), OperatingMode.TOWER).action)
+        assertEquals(RoutingAction.ROUTE_TOWER, router.route(req("hello there", OperatingMode.TOWER)).action)
+        assertEquals(RoutingAction.ROUTE_TOWER, router.route(req("status", OperatingMode.TOWER)).action)
     }
 
     @Test
@@ -65,7 +65,7 @@ class RuleBasedIntentRouterTest {
         assertEquals(RoutingAction.DECLINE, offline.action)
         assertTrue(offline.consequential)
 
-        val local = router.route(req("delete the archive"), OperatingMode.LOCAL)
+        val local = router.route(req("delete the archive", OperatingMode.LOCAL))
         assertEquals(RoutingAction.DECLINE, local.action)
         assertTrue(local.consequential)
     }

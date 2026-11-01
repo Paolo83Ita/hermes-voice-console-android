@@ -2,6 +2,8 @@ package com.hermestower.voiceconsole.health
 
 import android.app.ActivityManager
 import android.content.Context
+import android.content.Intent
+import android.content.IntentFilter
 import android.os.BatteryManager
 import android.os.Build
 import android.os.PowerManager
@@ -22,7 +24,10 @@ class AndroidDeviceHealthMonitor(private val context: Context) : DeviceHealthMon
 
         val memInfo = ActivityManager.MemoryInfo().also { activityManager?.getMemoryInfo(it) }
         val stat = runCatching { StatFs(android.os.Environment.getDataDirectory().path) }.getOrNull()
-        val temperature = batteryManager?.getProperty(BatteryManager.BATTERY_PROPERTY_TEMPERATURE)
+        // Battery temperature is not a BatteryManager property on this API level;
+        // it is exposed via the sticky ACTION_BATTERY_CHANGED broadcast (tenths of °C).
+        val temperature = context.registerReceiver(null, IntentFilter(Intent.ACTION_BATTERY_CHANGED))
+            ?.getIntExtra(BatteryManager.EXTRA_TEMPERATURE, Int.MIN_VALUE)
         val display: Display? = context.display
 
         return DeviceHealthMonitor.DeviceHealthSnapshot(

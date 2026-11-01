@@ -1,5 +1,7 @@
 package com.hermestower.voiceconsole.domain
 
+import com.hermestower.voiceconsole.bridge.TowerEventFrame
+import com.hermestower.voiceconsole.bridge.TowerRequestFrame
 import com.hermestower.voiceconsole.core.state.ConnectionStatus
 import kotlinx.coroutines.flow.StateFlow
 

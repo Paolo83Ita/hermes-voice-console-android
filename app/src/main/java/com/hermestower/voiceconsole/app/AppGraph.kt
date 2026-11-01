@@ -69,11 +69,10 @@ class AppGraph(context: Context) {
         events = events,
         session = session,
         statusProvider = {
-            val s = health.snapshot()
             buildString {
                 val time = java.time.LocalTime.now(clock).withSecond(0)
                 append("${time.hour.format2()}:${time.minute.format2()}, ")
-                append(s.statusSummary())
+                append(health.statusSummary())
             }
         },
     )

@@ -14,6 +14,7 @@ import com.hermestower.voiceconsole.tts.MockTextToSpeechEngine
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.SupervisorJob
 import kotlinx.coroutines.cancel
+import kotlinx.coroutines.test.TestDispatcher
 import kotlinx.coroutines.test.UnconfinedTestDispatcher
 import kotlinx.coroutines.test.advanceUntilIdle
 import kotlinx.coroutines.test.runTest
@@ -48,7 +49,7 @@ class ScriptedConsoleDriverTest {
         if (this::scope.isInitialized) scope.cancel()
     }
 
-    private fun buildDriver(testDispatcher: UnconfinedTestDispatcher): ScriptedConsoleDriver {
+    private fun buildDriver(testDispatcher: TestDispatcher): ScriptedConsoleDriver {
         scope = CoroutineScope(SupervisorJob() + testDispatcher)
         bridge = MockTowerBridge(DeterministicTowerSimulator(), testDispatcher)
         return ScriptedConsoleDriver(
@@ -57,14 +58,14 @@ class ScriptedConsoleDriverTest {
             router = RuleBasedIntentRouter(),
             localEngine = MockLocalConversationEngine(),
             bridge = bridge,
-            tts = MockTextToSpeechEngine(),
+            tts = MockTextToSpeechEngine(testDispatcher),
             events = events,
             session = DefaultSessionController(),
             statusProvider = { fixedStatus },
         )
     }
 
-    private fun kotlinx.coroutines.test.TestScope.bootDriver(): ScriptedConsoleDriver {
+    private suspend fun kotlinx.coroutines.test.TestScope.bootDriver(): ScriptedConsoleDriver {
         val d = buildDriver(UnconfinedTestDispatcher(testScheduler))
         store.transition(ConsoleState.IDLE)
         bridge.handshake() // deterministic handshake on virtual time

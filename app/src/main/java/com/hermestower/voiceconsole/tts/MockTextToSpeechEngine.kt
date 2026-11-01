@@ -8,6 +8,7 @@ import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.flow.asStateFlow
 import kotlinx.coroutines.flow.flow
 import kotlinx.coroutines.flow.flowOn
+import kotlinx.coroutines.CoroutineDispatcher
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.currentCoroutineContext
 import kotlinx.coroutines.isActive
@@ -17,7 +18,10 @@ import kotlinx.coroutines.isActive
  * so SPEAKING visuals and captions behave truthfully relative to this engine's output.
  * No audio is produced; the real system-TTS adapter is V0.3 (VOICE_PIPELINE_OPTIONS §5).
  */
-class MockTextToSpeechEngine : TextToSpeechEngine {
+class MockTextToSpeechEngine(
+    // Injectable so virtual-time tests can drive SPEAKING deterministically.
+    private val dispatcher: CoroutineDispatcher = Dispatchers.Default,
+) : TextToSpeechEngine {
 
     private val _state = MutableStateFlow(TextToSpeechEngine.State.READY)
     override val state: StateFlow<TextToSpeechEngine.State> = _state.asStateFlow()
@@ -45,7 +49,7 @@ class MockTextToSpeechEngine : TextToSpeechEngine {
                 _state.value = TextToSpeechEngine.State.READY
             }
         }
-    }.flowOn(Dispatchers.Default)
+    }.flowOn(dispatcher)
 
     override fun interrupt() {
         generation++
@@ -57,7 +61,7 @@ class MockTextToSpeechEngine : TextToSpeechEngine {
         const val MAX_MS = 6000L
 
         fun speakingDurationMs(text: String, rate: Float): Long {
-            val base = (text.length * 55L) / rate.coerceIn(0.5f, 2.0f)
+            val base = ((text.length * 55L) / rate.coerceIn(0.5f, 2.0f)).toLong()
             return base.coerceIn(600L, MAX_MS)
         }
     }

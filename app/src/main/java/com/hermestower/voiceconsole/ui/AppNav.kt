@@ -12,7 +12,7 @@ import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.rememberScrollState
 import androidx.compose.foundation.verticalScroll
 import androidx.compose.material.icons.Icons
-import androidx.compose.material.icons.automirrored.filled.Menu
+import androidx.compose.material.icons.filled.Menu
 import androidx.compose.material.icons.outlined.BugReport
 import androidx.compose.material.icons.outlined.History
 import androidx.compose.material.icons.outlined.Info
@@ -144,7 +144,7 @@ fun AppNav(graph: AppGraph) {
                     title = { Text(current.label, style = HermesType.screenTitle, color = c.ink) },
                     navigationIcon = {
                         IconButton(onClick = { scope.launch { drawerState.open() } }) {
-                            Icon(Icons.AutoMirrored.Filled.Menu, contentDescription = "Open navigation drawer", tint = c.bronze)
+                            Icon(Icons.Filled.Menu, contentDescription = "Open navigation drawer", tint = c.bronze)
                         }
                     },
                     colors = TopAppBarDefaults.topAppBarColors(containerColor = c.background),

@@ -3,6 +3,7 @@ package com.hermestower.voiceconsole.bridge
 import com.hermestower.voiceconsole.core.state.ConnectionStatus
 import com.hermestower.voiceconsole.domain.BridgeResult
 import kotlinx.coroutines.flow.toList
+import kotlinx.coroutines.test.TestDispatcher
 import kotlinx.coroutines.test.UnconfinedTestDispatcher
 import kotlinx.coroutines.test.runTest
 import org.junit.Assert.assertEquals
@@ -11,7 +12,7 @@ import org.junit.Test
 
 class MockTowerBridgeTest {
 
-    private fun newBridge(testDispatcher: UnconfinedTestDispatcher) =
+    private fun newBridge(testDispatcher: TestDispatcher) =
         MockTowerBridge(DeterministicTowerSimulator(), testDispatcher)
 
     private fun frame(transcript: String = "prepare tomorrow mission plan") = TowerRequestFrame(

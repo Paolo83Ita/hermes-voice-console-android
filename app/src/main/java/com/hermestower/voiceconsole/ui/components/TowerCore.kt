@@ -314,7 +314,7 @@ private fun DrawScope.stream(
     val particles = 8
     val travel = shaftTop * 0.62f // from the shaft top toward the screen top
     for (i in 0 until particles) {
-        val p = if (animated) phase(t, HermesMotion.STREAM_MS.toFloat(), offsetMs = i * HermesMotion.STREAM_MS / particles)
+        val p = if (animated) phase(t, HermesMotion.STREAM_MS.toFloat(), offsetMs = (i * HermesMotion.STREAM_MS / particles).toFloat())
         else i.toFloat() / particles
         val yPos = shaftTop - travel * p
         val x = cx + sin(p * 4f * Math.PI + i).toFloat() * shaftW * 0.35f

@@ -36,7 +36,7 @@ The central animated Tower is an **instrument**: it renders only real states of 
 
 ```
 DORMANT            → IDLE
-IDLE               → WAKE_DETECTED, TRANSCRIBING, LISTENING, PRIVACY_MUTED, DISCONNECTED, DEGRADED, ERROR, UPDATE_AVAILABLE
+IDLE               → WAKE_DETECTED, TRANSCRIBING, LISTENING, CONTACTING_TOWER, PRIVACY_MUTED, DISCONNECTED, DEGRADED, ERROR, UPDATE_AVAILABLE
 WAKE_DETECTED      → LISTENING, IDLE, PRIVACY_MUTED, ERROR, DISCONNECTED
 LISTENING          → TRANSCRIBING, IDLE, PRIVACY_MUTED, ERROR, DISCONNECTED
 TRANSCRIBING       → UNDERSTANDING_LOCAL, CONTACTING_TOWER, IDLE, PRIVACY_MUTED, ERROR, DISCONNECTED
@@ -52,11 +52,12 @@ PRIVACY_MUTED      → IDLE
 UPDATE_AVAILABLE   → IDLE
 ```
 
-Three universal rules complete the table (implemented in code):
+Four universal rules complete the table (implemented in code):
 
 1. **Any state → DORMANT** (power off is always legal).
 2. **Any state except DORMANT → PRIVACY_MUTED** (the Owner can always silence the console).
 3. **Any state except DORMANT → IDLE** (Owner override / barge-in / recovery to rest — e.g. a new submission while SPEAKING or CONTACTING_TOWER returns the console to rest before re-entering the pipeline).
+4. **Any state → itself** (idempotent re-entry: power off while DORMANT, muting while already PRIVACY_MUTED, re-entering IDLE — all legal no-ops). IDLE → CONTACTING_TOWER exists for text-injected requests and queue flushes that start from rest, with no acoustic front-end phase.
 
 Everything not listed is illegal and throws. Unit tests assert: every state appears, all driver paths used in the simulation are legal, illegal pairs are rejected.
 

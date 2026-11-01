@@ -2,10 +2,12 @@ package com.hermestower.voiceconsole.core.state
 
 /**
  * Authoritative legal-transition table, mirrored exactly from docs/UI_STATE_MACHINE.md §3.
- * Three universal rules complete the table:
+ * Four universal rules complete the table:
  *   1. any state -> DORMANT (power off is always legal)
  *   2. any state except DORMANT -> PRIVACY_MUTED (the Owner can always silence the console)
  *   3. any state except DORMANT -> IDLE (Owner override / barge-in / recovery to rest)
+ *   4. any state -> itself (idempotent re-entry: power off while DORMANT, mute while
+ *      muted, re-entering IDLE — all legal no-ops)
  */
 object ConsoleStateMachine {
 
@@ -13,8 +15,8 @@ object ConsoleStateMachine {
         ConsoleState.DORMANT to setOf(ConsoleState.IDLE),
         ConsoleState.IDLE to setOf(
             ConsoleState.WAKE_DETECTED, ConsoleState.TRANSCRIBING, ConsoleState.LISTENING,
-            ConsoleState.PRIVACY_MUTED, ConsoleState.DISCONNECTED, ConsoleState.DEGRADED,
-            ConsoleState.ERROR, ConsoleState.UPDATE_AVAILABLE,
+            ConsoleState.CONTACTING_TOWER, ConsoleState.PRIVACY_MUTED, ConsoleState.DISCONNECTED,
+            ConsoleState.DEGRADED, ConsoleState.ERROR, ConsoleState.UPDATE_AVAILABLE,
         ),
         ConsoleState.WAKE_DETECTED to setOf(
             ConsoleState.LISTENING, ConsoleState.IDLE, ConsoleState.PRIVACY_MUTED,
@@ -65,7 +67,7 @@ object ConsoleStateMachine {
     )
 
     fun canTransition(from: ConsoleState, to: ConsoleState): Boolean {
-        if (from == to) return false
+        if (from == to) return true // universal rule 4: idempotent re-entry
         if (to == ConsoleState.DORMANT) return true
         if (from != ConsoleState.DORMANT && to == ConsoleState.PRIVACY_MUTED) return true
         if (from != ConsoleState.DORMANT && to == ConsoleState.IDLE) return true

@@ -2,6 +2,7 @@ package com.hermestower.voiceconsole.store
 
 import com.hermestower.voiceconsole.domain.SecureConfigurationStore
 import com.hermestower.voiceconsole.domain.SessionController
+import com.hermestower.voiceconsole.domain.SessionController.Session
 import java.time.Instant
 import java.util.UUID
 
