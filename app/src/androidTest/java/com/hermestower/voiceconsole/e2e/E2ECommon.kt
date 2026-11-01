@@ -1,10 +1,11 @@
 package com.hermestower.voiceconsole.e2e
 
-import androidx.compose.ui.test.AndroidComposeTestRule
+import androidx.compose.ui.test.junit4.AndroidComposeTestRule
 import androidx.compose.ui.test.onAllNodesWithText
 import androidx.compose.ui.test.onNodeWithContentDescription
 import androidx.compose.ui.test.onNodeWithText
 import androidx.compose.ui.test.performClick
+import androidx.compose.ui.test.waitUntil
 import androidx.test.ext.junit.rules.ActivityScenarioRule
 import com.hermestower.voiceconsole.app.AppGraph
 import com.hermestower.voiceconsole.app.AppGraphHolder

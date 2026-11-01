@@ -41,11 +41,11 @@ class E2EVoiceFlowTest {
     fun e2e_11_submitLocalRequest_handledLocally() {
         graph().driver.setRequestedMode(com.hermestower.voiceconsole.core.mode.OperatingMode.LOCAL)
         graph().driver.submitText("hello")
-        val turn = awaitTurn {
+        val turn = awaitTurn(predicate = {
             it.role == ConversationTurn.Role.HERMES &&
                 it.source == ConversationTurn.Source.LOCAL &&
                 it.delivery == ConversationTurn.Delivery.DELIVERED
-        }
+        })
         assertTrue("no local reply produced", turn != null)
     }
 
@@ -69,7 +69,7 @@ class E2EVoiceFlowTest {
         val deadline = System.currentTimeMillis() + 15_000
         while (System.currentTimeMillis() < deadline && !graph().store.currentState().isPipelineActive) Thread.sleep(50)
         graph().driver.stopSpeaking()
-        val idle = awaitTurn({ it.role == ConversationTurn.Role.OWNER }, 5_000)
+        val idle = awaitTurn(predicate = { it.role == ConversationTurn.Role.OWNER }, timeoutMs = 5_000)
         assertTrue(idle != null)
         // The console must be back at rest (IDLE) after cancellation.
         val deadline2 = System.currentTimeMillis() + 10_000
@@ -100,9 +100,9 @@ class E2EVoiceFlowTest {
             graph().store.connection.value.status != ConnectionStatus.BridgeStatus.DISCONNECTED
         ) Thread.sleep(100)
         graph().driver.submitText("tell me a joke")
-        val queued = awaitTurn({
+        val queued = awaitTurn(predicate = {
             it.role == ConversationTurn.Role.OWNER && it.delivery == ConversationTurn.Delivery.QUEUED
-        }, 30_000)
+        }, timeoutMs = 30_000)
         assertTrue("no queued turn appeared", queued != null)
         // Truthfulness: a queued request must never be shown as completed.
         assertTrue(queued!!.delivery != ConversationTurn.Delivery.DELIVERED)
@@ -116,12 +116,12 @@ class E2EVoiceFlowTest {
         val d0 = System.currentTimeMillis() + 10_000
         while (System.currentTimeMillis() < d0 && graph().store.connection.value.status != ConnectionStatus.BridgeStatus.DISCONNECTED) Thread.sleep(100)
         graph().driver.submitText("tell me a joke")
-        awaitTurn({ it.role == ConversationTurn.Role.OWNER && it.delivery == ConversationTurn.Delivery.QUEUED }, 30_000)
+        awaitTurn(predicate = { it.role == ConversationTurn.Role.OWNER && it.delivery == ConversationTurn.Delivery.QUEUED }, timeoutMs = 30_000)
         // Reconnect: clearing the fault triggers handshake + queue flush (validated before delivery).
         graph().driver.clearFault()
-        val flushed = awaitTurn({
+        val flushed = awaitTurn(predicate = {
             it.role == ConversationTurn.Role.OWNER && it.delivery == ConversationTurn.Delivery.DELIVERED && it.note == null
-        }, 60_000) ?: awaitTurn({ it.role == ConversationTurn.Role.HERMES && it.source == ConversationTurn.Source.TOWER }, 60_000)
+        }, timeoutMs = 60_000) ?: awaitTurn(predicate = { it.role == ConversationTurn.Role.HERMES && it.source == ConversationTurn.Source.TOWER }, timeoutMs = 60_000)
         assertTrue("queued request was never validated and delivered after reconnect", flushed != null)
         assertTrue(graph().store.connection.value.status == ConnectionStatus.BridgeStatus.CONNECTED)
     }

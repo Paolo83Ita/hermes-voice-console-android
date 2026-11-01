@@ -1,10 +1,11 @@
 package com.hermestower.voiceconsole.e2e
 
-import androidx.compose.ui.test.assertExists
 import androidx.compose.ui.test.junit4.createAndroidComposeRule
 import androidx.compose.ui.test.onNodeWithText
 import androidx.compose.ui.test.performClick
+import androidx.compose.ui.test.waitUntil
 import androidx.test.ext.junit.runners.AndroidJUnit4
+import org.junit.runner.RunWith
 import androidx.test.platform.app.InstrumentationRegistry
 import com.hermestower.voiceconsole.app.AppGraphHolder
 import com.hermestower.voiceconsole.core.state.ConsoleState
@@ -69,7 +70,7 @@ class E2EAppearancePersistenceTest {
 
     @Test
     fun e2e_40_recreateActivity_stateRestored() {
-        compose.activityRule.scenario.recreate()
+        compose.activityScenarioRule.scenario.recreate()
         compose.waitForIdle()
         compose.onNodeWithText("HERMES").assertExists()
         // Settings survive recreation (in-memory store re-applied from persistence).
@@ -80,7 +81,7 @@ class E2EAppearancePersistenceTest {
     fun e2e_41_42_restartApplication_configurationPersists() {
         // Persist a known setting, then restart the activity (application restart semantics).
         graph().store.updateSettings { it.copy(captionsEnabled = false) }
-        compose.activityRule.scenario.close()
+        compose.activityScenarioRule.scenario.close()
         androidx.test.core.app.ActivityScenario.launch(MainActivity::class.java)
         compose.waitForIdle()
         compose.waitUntil(15_000) { !graph().store.settings.value.captionsEnabled }
