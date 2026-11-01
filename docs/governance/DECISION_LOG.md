@@ -80,3 +80,22 @@ artifact served by the in-app localhost mock server; the catalog lists real-worl
 (whisper-tiny, piper, gemma-class) in non-downloadable states. No real large model is
 downloaded in Graph 2; no model file is committed; real-model qualification is
 QUALIFICATION_PENDING_DEVICE.
+
+## Graph 3 decisions (2026-11-02)
+
+### D-G3-001 · MONUMENTAL_ORACLE_TOWER_VISUAL_REFOUNDATION
+- STATUS: OWNER_AUTHORIZED_FOR_IMPLEMENTATION
+- SUPERSEDES: V0_1_MINIMAL_TECHNO_GREEK_VISUAL_DIRECTION (evidence preserved; superseded baseline)
+- PRESERVES: all valid functional, security, state, test and build foundations (REUSE_AND_EXTEND)
+- BASIS: Owner verdict in the Graph 3 mission; attached reference is direction-only and never shipped.
+- CONSEQUENCES: every screen converges on the Monumental material system; Material 3 remains functional-only;
+  the pinned E2E invariant "exactly one exact-text HERMES node" is preserved by design.
+
+### D-G3-002 · HYBRID_ASSET_PIPELINE
+- Layered WebP static depth (L0/L1/L2/L7) + Compose Canvas dynamics (L3..L9) + vector sigils.
+- Rejected: Compose-only Canvas, Rive/Lottie (no license-compatible need), AGSL (post physical qualification),
+  single screenshot (forbidden). Emitted layers total 28 KB compressed, ~24.5 MB decoded (within budget).
+
+### D-G3-003 · PER_REGION_BURN_IN_SAFEGUARD
+- Five region drivers (frieze/core/seals/transcript/medallions), ≤4 dp, 25 s cadence,
+  disabled by reduced motion or Owner switch. Replaces the whole-console V0.1 drift.

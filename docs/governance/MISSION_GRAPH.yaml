@@ -55,3 +55,27 @@ Graph 1 nodes (N0–N8) are CLOSED — see Graph 1 records and `CHECKPOINT_INDEX
 | G2-N14_docs | 13 Graph 2 docs, benchmark baseline, Xiaomi package | G2-N13 |
 | G2-N15_convergence | Secret-clean scan, PR, 15 gates, merge to main, final main build + E2E | G2-N14 |
 | G2-N16_terminality | Terminal Receipt + terminality calculation | G2-N15 |
+
+graph3:
+  id: HVC_GRAPH_3_MONUMENTAL_ORACLE_TOWER_VISUAL_REFOUNDATION
+  version: "1.0"
+  project: hermes-voice-console-android
+  owner: Paolo Lombisani
+  executor: GLM 5.3 Flash
+  mission_mode: CONTINUE_FROM_GRAPH_2_REMOTE_AUTHORITY
+  working_branch: graph-3/monumental-oracle-tower-visual-refoundation
+  starting_sha: bc186db54ec017ed20306801e71cf5577bc62edd
+  depends_on: graph2_terminality (GRAPH_2_CONDITIONALLY_COMPLETE_WITH_EMULATOR_ENVIRONMENT_LIMITATION, bc186db)
+  decision: MONUMENTAL_ORACLE_TOWER_VISUAL_REFOUNDATION
+  supersedes: V0_1_MINIMAL_TECHNO_GREEK_VISUAL_DIRECTION (semantic supersession, evidence preserved)
+  preservation_contract: REUSE_AND_EXTEND
+  waves: [W1_visual_foundations, W2_oracle_core, W3_main_console, W4_shared_components,
+          W5_graph2_screen_integration, W6_remaining_screens, W7_perf_a11y_repair,
+          W8_cloud_build_and_test, W9_packaging]
+  gates:
+    - preview pack verified before production UI change (VERIFIED, 11/11 renders)
+    - existing functional tests stay green
+    - carried frontier: verify CP-G2-022 E2E repairs
+    - secret scan clean
+    - no merge to main without Owner approval
+  updated: "2026-11-02"

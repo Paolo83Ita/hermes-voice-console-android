@@ -30,3 +30,9 @@ Graph 2 checkpoint ledger (continued):
 | CP-G2-017..020 | 5b54b48 → fb610ce | e2e workflow rewrite, disk/userdata/budget, migration typed-crash repair, explicit adb install + heredoc fix |
 | CP-G2-021 | a9657f0 | POSIX-sh-safe instrumentation runner (dash killed `set -o pipefail` before am instrument) |
 | CP-G2-022 | (this commit) | E2E root-cause repairs (drawer HERMES dedup, display UOE guard) + Graph 2 terminal receipt + convergence |
+
+Graph 3 checkpoints (branch graph-3/monumental-oracle-tower-visual-refoundation, from bc186db):
+
+| Checkpoint | Commit | Content |
+| --- | --- | --- |
+| CP-G3-001 | (this commit) | bootstrap: workflow triggers for graph-3, MISSION_GRAPH/DECISION_LOG/WORK_LOG Graph 3 sections |

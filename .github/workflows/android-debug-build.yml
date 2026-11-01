@@ -5,6 +5,7 @@ on:
     branches:
       - foundation/v0.1-cloud-build
       - graph-2/model-manager-tower-connection-e2e
+      - graph-3/monumental-oracle-tower-visual-refoundation
       - main
   workflow_dispatch:
 

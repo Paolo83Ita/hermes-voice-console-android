@@ -151,3 +151,13 @@ TEST: run 41341134805 (89/89 unit, lint, APK 46dcf2b8…); run 41341134806 artif
 FILES: docs/receipts/GRAPH_2_TERMINAL_RECEIPT.md; AppNav.kt; AndroidDeviceHealthMonitor.kt
 COMMIT: CP-G2-022 (recorded in git log at commit time)
 NEXT: Graph 3 branch creation after checkpoint + remote read-back.
+
+# WORK LOG — GRAPH 3 (branch graph-3/monumental-oracle-tower-visual-refoundation)
+
+NODE G3-N01 — graph2 boundary + branch creation (2026-11-02)
+FINDING: Graph 2 closed at GRAPH_2_CONDITIONALLY_COMPLETE_WITH_EMULATOR_ENVIRONMENT_LIMITATION
+(CP-G2-022, bc186db); remote read-back: graph-2=bc186db, main=e7ab101 untouched.
+ACTION: created graph-3/monumental-oracle-tower-visual-refoundation from bc186db, pushed,
+read-back verified. STARTING_SHA=bc186db54ec017ed20306801e71cf5577bc62edd.
+COMMIT: (branch ops) — CP-G3-001 follows.
+NEXT: design gap analysis + preview pack before production UI change.
