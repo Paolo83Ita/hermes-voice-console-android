@@ -107,7 +107,7 @@ class LocalTowerMockServer(
                 val path = parts[1].substringBefore('?')
                 when {
                     path.startsWith("/artifacts/") -> serveArtifact(path.removePrefix("/artifacts/"), headers, out)
-                    else -> serveTower(path, headers, out)
+                    else -> serveTower(parts[0], path, headers, out)
                 }
             }
         } catch (_: SocketException) {
@@ -129,7 +129,7 @@ class LocalTowerMockServer(
         }
     }
 
-    private fun serveTower(path: String, headers: Map<String, String>, out: OutputStream) {
+    private fun serveTower(method: String, path: String, headers: Map<String, String>, out: OutputStream) {
         headers["authorization"]?.let { lastAuthHeader[path] = it }
         val behavior = behaviors[path] ?: Behavior.OK
         when (behavior) {
@@ -160,8 +160,27 @@ class LocalTowerMockServer(
                 out.flush()
                 // handler exits: socket closes with far fewer bytes than promised
             }
-            else -> writeJson(out, 200, okJson(path))
+            else -> {
+                if (method == "POST" && path.contains("request")) {
+                    writeNdjson(out, ndjsonRequestEvents())
+                } else {
+                    writeJson(out, 200, okJson(path))
+                }
+            }
         }
+    }
+
+    /** POST /request answers with the proposed contract event stream (NDJSON). */
+    private fun ndjsonRequestEvents(): String = listOf(
+        """{"protocol":"$protocolVersion","type":"ACK","stage":"ACCEPTED","timestamp":"2026-11-01T00:00:00Z"}""",
+        """{"protocol":"$protocolVersion","type":"PROGRESS","stage":"ROUTED","timestamp":"2026-11-01T00:00:00Z"}""",
+        """{"protocol":"$protocolVersion","type":"DELTA","deltaText":"Hello ","timestamp":"2026-11-01T00:00:00Z"}""",
+        """{"protocol":"$protocolVersion","type":"FINAL","finalText":"Hello from the mock Tower.","state":"COMPLETED","receiptRef":"rcp-sim-0001","timestamp":"2026-11-01T00:00:00Z"}""",
+    ).joinToString("\n")
+
+    private fun writeNdjson(out: OutputStream, body: String) {
+        val bytes = body.toByteArray(StandardCharsets.UTF_8)
+        writeStatus(out, 200, "OK", mapOf("Content-Type" to "application/x-ndjson"), bytes, 0, bytes.size)
     }
 
     private fun okJson(path: String): String = when {
