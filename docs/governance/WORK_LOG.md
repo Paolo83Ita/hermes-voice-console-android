@@ -188,3 +188,23 @@ REHYDRATION_PACK delta, APK receipt).
 TEST: cloud artifacts verified by download + hash; secret scan of source package 0 findings.
 COMMIT: CP-G3-003 (recorded at commit time)
 NEXT: retry outcome → Graph 3 terminal receipt + terminality calculation.
+
+NODE G3-N08 — E2E retry ledger + cleartext repair (2026-11-02)
+FINDING: dispatch retry run 41349811483 completed the FULL suite with NO process crash —
+30/30 reported: 14 passed / 16 failed. Both CP-G2-022 repairs VERIFIED on-device
+(fresh-install ✓, cancel-response ✓ (former crash point), recreate ✓, restart-persist ✓,
+clean-exit ✓, all 4 KeystoreVault tests ✓; zero duplicate-HERMES assertions).
+The 16 failures typed into 3 classes: (a) ×9 download-state timeouts
+"Timed out waiting for <artifact> in [DOWNLOADED]; last=FAILED"; (b) ×6 "Failed to
+inject touch input" (emulator input-dispatch flakes); (c) ×3 "Activity never becomes
+DESTROYED" timeouts + ×1 queue-validation follow-on.
+ROOT CAUSE (a): API 30+ default network security policy blocks cleartext HTTP — the
+in-process local mock server is http://127.0.0.1:<port> → downloads end FAILED.
+REPAIR (CP-G3-004): res/xml/network_security_config.xml — base-config cleartext=false,
+cleartext permitted ONLY for 127.0.0.1/localhost (real Tower transport stays HTTPS/WSS);
+manifest wired. Local build green.
+CLASSES (b)/(c): emulator-environment flakes (software rendering input/lifecycle
+slowness) — no assertion weakened; the next run's ledger decides.
+TEST: run 41349811483 artifact 13103201619 (full ledger archived); local build 102/102.
+COMMIT: CP-G3-004 (recorded at commit time)
+NEXT: cloud cycle on CP-G3-004 → Graph 3 terminal receipt.

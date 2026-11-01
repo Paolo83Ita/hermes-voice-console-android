@@ -1,0 +1,18 @@
+<?xml version="1.0" encoding="utf-8"?>
+<!--
+  GRAPH 3 E2E evidence repair (run 41349811483 ledger: all model-download tests
+  ended in state FAILED on-device).
+  Root cause: API 30+ default network security policy blocks cleartext HTTP, and the
+  deterministic LOCAL mock server (deterministic model-download pipeline and the
+  local Tower mock) is reached over http://127.0.0.1:<port>.
+  Policy: cleartext is permitted ONLY for the loopback hosts above; every other
+  destination keeps the platform default (blocked). The real Tower transport
+  (V0.4) is HTTPS/WSS and is unaffected by this configuration.
+-->
+<network-security-config>
+    <base-config cleartextTrafficPermitted="false" />
+    <domain-config cleartextTrafficPermitted="true">
+        <domain includeSubdomains="false">127.0.0.1</domain>
+        <domain includeSubdomains="false">localhost</domain>
+    </domain-config>
+</network-security-config>
