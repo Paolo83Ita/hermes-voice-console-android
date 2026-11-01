@@ -18,13 +18,11 @@ jobs:
           distribution: temurin
           java-version: '17'
 
-      - name: Set up Android SDK
-        uses: android-actions/setup-android@v3
-
-      - name: Install pinned SDK packages
+      - name: Accept licenses and install pinned SDK packages (preinstalled SDK)
         run: |
-          sdkmanager --install "platform-tools" "platforms;android-35" "build-tools;35.0.0" > /dev/null
-          yes | sdkmanager --licenses > /dev/null || true
+          yes | "$ANDROID_HOME/cmdline-tools/latest/bin/sdkmanager" --licenses > /dev/null || true
+          yes | "$ANDROID_HOME/cmdline-tools/latest/bin/sdkmanager" --install "platform-tools" "platforms;android-35" "build-tools;35.0.0" > /dev/null
+          "$ANDROID_HOME/cmdline-tools/latest/bin/sdkmanager" --list_installed | grep -E "platforms;android-35|build-tools;35.0.0|platform-tools"
 
       - name: Set up Gradle caching
         uses: gradle/actions/setup-gradle@v4
