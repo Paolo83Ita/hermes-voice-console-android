@@ -1,0 +1,113 @@
+name: android-e2e
+
+on:
+  push:
+    branches:
+      - graph-2/model-manager-tower-connection-e2e
+      - main
+  workflow_dispatch:
+
+permissions:
+  contents: read
+
+jobs:
+  emulator-e2e:
+    runs-on: ubuntu-latest
+    timeout-minutes: 75
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+
+      - name: Set up JDK 17
+        uses: actions/setup-java@v4
+        with:
+          distribution: temurin
+          java-version: '17'
+
+      - name: Accept licenses and install pinned SDK packages (preinstalled SDK)
+        run: |
+          yes | "$ANDROID_HOME/cmdline-tools/latest/bin/sdkmanager" --licenses > /dev/null || true
+          yes | "$ANDROID_HOME/cmdline-tools/latest/bin/sdkmanager" --install "platform-tools" "platforms;android-35" "build-tools;35.0.0" "emulator" "system-images;android-34;google_apis;x86_64" > /dev/null
+          "$ANDROID_HOME/cmdline-tools/latest/bin/sdkmanager" --list_installed | grep -E "platforms;android-35|build-tools;35.0.0|system-images;android-34"
+
+      - name: Set up Gradle caching
+        uses: gradle/actions/setup-gradle@v4
+
+      - name: Build application and test APKs
+        run: ./gradlew --no-daemon --console=plain :app:assembleDebug :app:assembleDebugAndroidTest
+
+      - name: Run emulator end-to-end suite (API 34, x86_64, headless)
+        uses: reactivecircus/android-emulator-runner@v2
+        with:
+          api-level: 34
+          target: google_apis
+          arch: x86_64
+          force-avd-creation: false
+          emulator-options: -no-window -gpu swiftshader_indirect -noaudio -no-boot-anim -camera-back none
+          disable-animations: true
+          script: |
+            adb devices
+            timeout 3000 ./gradlew --no-daemon --console=plain :app:connectedDebugAndroidTest
+
+      - name: Capture failure evidence (screenshots + UI hierarchy + logcat tail)
+        if: failure()
+        run: |
+          mkdir -p failure-evidence || true
+          adb devices || true
+          adb exec-out screencap -p > failure-evidence/screen.png 2>/dev/null || true
+          adb shell uiautomator dump /sdcard/window_dump.xml 2>/dev/null && adb pull /sdcard/window_dump.xml failure-evidence/ 2>/dev/null || true
+          adb logcat -d -t 4000 > failure-evidence/logcat-tail.txt 2>/dev/null || true
+          du -sh failure-evidence || true
+
+      - name: Secret-clean evidence scan (no sensitive values in reports)
+        if: always()
+        run: |
+          if [ -d app/build/outputs/androidTest-results ]; then
+            python3 - <<'EOF'
+            import pathlib, re, sys
+            patterns = [re.compile(p) for p in (r"github_pat_[A-Za-z0-9_]+", r"ghp_[A-Za-z0-9]+", r"PAIRING_CODE\s*=\s*\S", r"Bearer [A-Za-z0-9._-]{16,}")]
+            hits = []
+            for f in pathlib.Path("app/build/outputs/androidTest-results").rglob("*"):
+                if f.is_file():
+                    try:
+                        text = f.read_text(errors="ignore")
+                    except Exception:
+                        continue
+                    for p in patterns:
+                        if p.search(text):
+                            hits.append(str(f))
+            if hits:
+                print("SENSITIVE-VALUE HITS:", hits)
+                sys.exit(1)
+            print("secret-clean evidence scan: PASS")
+            EOF
+          else
+            echo "no androidTest-results directory (test step failed before reports)"
+          fi
+
+      - name: Upload connected-test results
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: hermes-voice-console-e2e-results-${{ github.sha }}
+          path: |
+            app/build/outputs/androidTest-results/
+            app/build/reports/androidTests/
+          if-no-files-found: ignore
+          retention-days: 14
+
+      - name: Upload failure evidence
+        if: failure()
+        uses: actions/upload-artifact@v4
+        with:
+          name: hermes-voice-console-e2e-failure-evidence-${{ github.sha }}
+          path: failure-evidence/
+          if-no-files-found: ignore
+          retention-days: 14
+
+      - name: Shut down emulator cleanly
+        if: always()
+        run: |
+          adb emu kill 2>/dev/null || true
+          sleep 3
+          adb devices || true
