@@ -161,3 +161,30 @@ ACTION: created graph-3/monumental-oracle-tower-visual-refoundation from bc186db
 read-back verified. STARTING_SHA=bc186db54ec017ed20306801e71cf5577bc62edd.
 COMMIT: (branch ops) — CP-G3-001 follows.
 NEXT: design gap analysis + preview pack before production UI change.
+
+NODE G3-N02..N04 — design phase + waves 1-4 (2026-11-02)
+FINDING: preview pack verified before production change (mission gate). The local
+toolchain (JDK17 + SDK 35, restored after sandbox recycle) caught 5 real compile errors
+before the cloud run; local build green with 102/102 unit tests.
+ACTION: CP-G3-002 (6959c07) — waves 1-4 + design docs + preview pack + governance.
+Waves 5/6 converge via preserved Chrome API (all Graph 2 screens restyled, zero logic change).
+TEST: local assembleDebug + 102/102 unit tests + kt_sanity PASS + secret scan 0.
+COMMIT: CP-G3-002 = 6959c07 (read-back verified)
+NEXT: cloud evidence, remaining doc convergence, packaging, terminal receipt.
+
+NODE G3-N07 — cloud build evidence + APK + first E2E attempt (2026-11-02)
+FINDING: android-debug-build run 41347497836 @ 6959c07 SUCCESS — cloud unit tests
+102/102, lint archived, APK 58,781,684 B sha256 4b69416d…c31572 (receipt:
+docs/receipts/GRAPH_3_DEBUG_APK_RECEIPT.md; local artifact cross-checked).
+android-e2e push run 41347497809 = ENVIRONMENT FLAKE: emulator booted (flag=1, 858 s)
+then its system services died (cmd → settings/input: Broken pipe; runner exit 224)
+BEFORE any install or instrumentation; no results artifact, empty failure evidence.
+Not a code failure — classified per mission §19 as emulator-environment failure.
+ACTION: one bounded workflow_dispatch retry (run 41349811483, same commit, mission §19
+allows bounded retries); documentation convergence committed (VISUAL_DIRECTION
+supersession header, UI_STATE_MACHINE Graph 3 mapping, PRODUCT_VISION/REQUIREMENTS/
+ARCHITECTURE/RISK_REGISTER/DEVELOPMENT_ROADMAP/SECURITY addenda, CURRENT_PROJECT_TRUTH,
+REHYDRATION_PACK delta, APK receipt).
+TEST: cloud artifacts verified by download + hash; secret scan of source package 0 findings.
+COMMIT: CP-G3-003 (recorded at commit time)
+NEXT: retry outcome → Graph 3 terminal receipt + terminality calculation.

@@ -98,3 +98,26 @@ Secret/device scan: 0 findings in working tree and full git history (scripts/sec
   carried by the next cloud E2E run (Graph 3 Wave 8 gate).
 - Real Tower integration: STILL never claimed (mock + deterministic simulator only).
 - Physical Xiaomi: QUALIFICATION_PENDING_DEVICE. Merge to main: OWNER_APPROVAL_PENDING.
+
+---
+
+# GRAPH 3 TRUTH (appended 2026-11-02; supersedes nothing above — additive)
+
+- Branch: graph-3/monumental-oracle-tower-visual-refoundation (STARTING_SHA bc186db).
+- Decision: MONUMENTAL_ORACLE_TOWER_VISUAL_REFOUNDATION — OWNER_AUTHORIZED_FOR_IMPLEMENTATION;
+  V0.1 direction superseded for identity (evidence preserved).
+- Design phase: DESIGN_GAP_ANALYSIS + 11-preview pack VERIFIED (nonblank 11/11, dimensions
+  exact, 0 overflow, contrast 8/8 PASS, state-truthfulness + AMOLED review recorded),
+  V0.1-vs-Graph3 comparison rendered. Preview pack: design/monumental/preview/.
+- Waves 1–4 implemented (CP-G3-002, 6959c07): monumental token system, pure OracleCoreModel
+  (13 unit tests), layered Oracle Core renderer (WebP L0/L1/L2/L7 + Canvas dynamics),
+  monumental console (frieze/core/lower), chrome re-expression; all screens converge via
+  preserved Chrome API. Pinned E2E strings preserved; single exact-text HERMES invariant kept.
+- LOCAL verification: JDK17+SDK toolchain — assembleDebug OK, unit tests 102/102
+  (89 G2 + 13 G3), secret scan 0 findings.
+- Cloud verification on 6959c07: android-debug-build + android-e2e triggered
+  (runs recorded in the git-era ledger at final receipt time).
+- Explicitly NOT true yet: cloud build results for CP-G3-002 (pending), E2E green
+  (repair frontier from CP-G2-022 pending verification), V0.3 cloud APK (pending),
+  physical Xiaomi qualification (QUALIFICATION_PENDING_DEVICE), merge to main
+  (OWNER_APPROVAL_PENDING).

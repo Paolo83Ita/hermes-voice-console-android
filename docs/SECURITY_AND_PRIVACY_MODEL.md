@@ -67,3 +67,13 @@
 ## 8. Incident handling
 
 Suspected compromise (unexplained states, unknown pairing, leaked material): disconnect bridge, enable privacy mute, export redacted diagnostics, revoke pairing Tower-side, reset local data, and re-pair after the Tower side is verified. Factory reset is the last resort and is treated as a full unpair.
+
+
+---
+
+# Graph 3 note — visual assets and privacy (2026-11-02)
+
+The Monumental asset pipeline introduces only LOCAL, generated, original visual resources
+(WebP depth layers, vector sigils). No asset fetches at runtime, no network-permission
+change, no user data in visuals, no secrets in resources (asset manifest records provenance
+and hashes). The Owner reference image is a design direction only and is NOT shipped.

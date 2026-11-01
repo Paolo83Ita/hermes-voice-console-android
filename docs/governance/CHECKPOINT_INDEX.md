@@ -36,3 +36,5 @@ Graph 3 checkpoints (branch graph-3/monumental-oracle-tower-visual-refoundation,
 | Checkpoint | Commit | Content |
 | --- | --- | --- |
 | CP-G3-001 | (this commit) | bootstrap: workflow triggers for graph-3, MISSION_GRAPH/DECISION_LOG/WORK_LOG Graph 3 sections |
+
+| CP-G3-002 | 6959c07 | Waves 1–4: foundations, Oracle Core, console, chrome; docs+preview pack; local 102/102 tests |

@@ -76,3 +76,16 @@ The central visual state machine renders only truthful states (DORMANT, IDLE, WA
 ## 10. Out of scope for V0.1
 
 Root, bootloader unlock, custom ROM or recovery; real Tower connectivity or credentials; real microphone capture; local model downloads or qualification claims; kiosk lockdown as a controlled capability; production pairing; enclosure electronics beyond passive mounting. These are scheduled in DEVELOPMENT_ROADMAP.md.
+
+
+---
+
+# Graph 3 addendum — visual identity (2026-11-02)
+
+The product's visual identity is **a live window into the central core of Hermes Tower**:
+a monumental techno-Hellenic temple housing a mechanical oracle, obsidian and carved dark
+stone, aged bronze machinery, electric-cyan energy, golden inscriptions and an original
+messenger language for real system events. Voice is expressed through architecture —
+resonance, portal luminosity, moving rings, illuminated colonnades — never a face or lips.
+The console remains truthful: every state, seal, path and number on screen maps to real
+console state.

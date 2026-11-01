@@ -91,3 +91,17 @@ Everything not listed is illegal and throws. Unit tests assert: every state appe
 - DISCONNECTED / DEGRADED always co-display the effective mode DISCONNECTED_SAFE and the requested mode if different.
 - REQUEST_QUEUED shows the real queue count from the store.
 - PRIVACY_MUTED is unmistakable: dimmed screen, mic-slash emblem, state chip, and TalkBack announcement all agree.
+
+
+---
+
+# GRAPH 3 — Monumental visual mapping (2026-11-02)
+
+The fifteen-state truthful machine is unchanged. Its visual expression is now the
+layered Oracle Core: the per-state layer/motion/luminance contract lives in
+`docs/graph3/ORACLE_CORE_STATE_SPEC.md` §2 (previews: `design/monumental/preview/`).
+The renderer is `ui/monumental/OracleCore.kt`; the pure mapping is
+`ui/monumental/OracleCoreModel.kt` (unit-tested in `OracleCoreModelTest`). Truthfulness
+invariants INV-CORE-01..05 are stated in the same spec — no messenger paths without real
+events, real queue counts, broken/dashed/fractured links for DISCONNECTED/DEGRADED/ERROR,
+amplitude-driven SPEAKING luminosity only, closed input gates for PRIVACY_MUTED.

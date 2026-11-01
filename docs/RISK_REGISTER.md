@@ -32,3 +32,12 @@ Likelihood / Impact: L (low), M (medium), H (high).
 
 - A risk becomes a work item when Likelihood AND Impact are both ≥ M and the stage it blocks has started.
 - Closed risks are archived with the evidence, never deleted.
+
+
+| ID | Risk (Graph 3) | Type | Mitigation |
+|---|---|---|---|
+| R-G3-01 | Redesign regresses Graph 2 E2E | REGRESSION | Chrome API signatures preserved; pinned strings preserved; E2E suite is the Wave 8 gate |
+| R-G3-02 | Bitmap layers inflate memory | PERFORMANCE | 4 layers ≈ 24.5 MB decoded, within the 48 MB budget; LOW profile skips bitmaps entirely |
+| R-G3-03 | OLED burn-in from monumental brightness | HARDWARE | state-budgeted luminance + per-region drift + scheduled dimming (AMOLED_AND_BURN_IN_SAFETY.md) |
+| R-G3-04 | Emulator cycle too slow for iteration | ENVIRONMENT | local JDK17+SDK build chain verifies compile/tests before every push |
+| R-G3-05 | E2E repair frontier from Graph 2 not green yet | QUALITY | CP-G2-022 root causes fixed; next cloud E2E run verifies; suite rules unchanged |

@@ -76,3 +76,12 @@ Exit: soak report clean; enclosure design frozen.
 - No root, no Tower repository changes, no secrets in source.
 - A candidate becomes "qualified" only via recorded on-device evidence.
 - Every stage ends with: ZIP archive + checkpoint report + updated registers.
+
+
+## V0.3 — Monumental Oracle Tower (Graph 3, 2026-11-02)
+
+Visual refoundation per the Owner-authorized MONUMENTAL_ORACLE_TOWER decision: layered
+Oracle Core, command frieze, architectural chrome across all screens, messenger language,
+quality profiles + thermal policy, AMOLED per-region safeguard, hybrid asset pipeline.
+Functionality, security and tests carried unchanged from Graph 2 (REUSE_AND_EXTEND).
+Physical Xiaomi qualification remains the next Owner-controlled phase.

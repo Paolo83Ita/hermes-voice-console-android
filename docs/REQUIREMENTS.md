@@ -123,3 +123,26 @@
 6. Reduced-motion mode exists; static elements account for burn-in.
 7. No unsupported hardware claim; no technology marked qualified without a physical device test.
 8. Documentation matches implementation; known limitations explicit.
+
+
+---
+
+# Graph 3 requirements (visual refoundation, 2026-11-02)
+
+- FR-G3-01 The main console presents the Oracle Core as the dominant subject (~59% of the
+  portrait composition), framed by a monumental command frieze (top) and the transcript /
+  control area (bottom) — composition budget per `docs/graph3/MOBILE_COMPOSITION_SPEC.md`.
+- FR-G3-02 Every one of the 15 truthful states drives the core's layers per
+  `ORACLE_CORE_STATE_SPEC.md` §2; reduced motion renders the same parameters frozen.
+- FR-G3-03 The messenger system uses original winged geometric sigils bound to real
+  events; role labels are limited to LOCAL CORE / TOWER / PRIMARY / VALIDATOR / JUDGE /
+  SPECIALIST; real model names only from the real catalog with their real state.
+- FR-G3-04 Three quality profiles LOW / BALANCED (default) / HIGH with thermal-aware
+  automatic downgrade using real device temperature reads; no invented metrics
+  (TARGET_PENDING_DEVICE_QUALIFICATION until Xiaomi read-back).
+- FR-G3-05 AMOLED safety: per-region burn-in drift (≤4 dp), state-budgeted luminance
+  (resting bronze ≤0.55), no permanent white header, scheduled dimming + black idle option.
+- FR-G3-06 All Graph 2 functionality, tests, semantics and pinned strings are preserved;
+  the redesign must not regress the E2E suite (Graph 2's CP-G2-022 repairs verified here).
+- FR-G3-07 Materials: obsidian, aged bronze, carved stone, selective marble; energy roles
+  cyan core / tower blue / local cyan-gold / amber / red-bronze (others only for real roles).

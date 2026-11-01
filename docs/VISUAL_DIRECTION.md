@@ -1,5 +1,15 @@
 # VISUAL DIRECTION — techno-Greek identity, Marble Light vs Obsidian Night
 
+> **SUPERSEDED FOR VISUAL IDENTITY (2026-11-02, Graph 3):**
+> `V0_1_MINIMAL_TECHNO_GREEK_VISUAL_DIRECTION` → STATUS: OWNER_REJECTED_FOR_VISUAL_IDENTITY.
+> The Owner verdict found it too minimal, sparse, flat, generic, card-oriented, visually
+> lightweight, dependent on a simple column, and distant from the Hermes Tower reference.
+> The authorized direction is **MONUMENTAL ORACLE TOWER** — see
+> `docs/graph3/MONUMENTAL_ORACLE_TOWER_VISUAL_SYSTEM.md`, `docs/graph3/DESIGN_GAP_ANALYSIS.md`
+> and the verified preview pack `design/monumental/preview/`. This document is preserved
+> unmodified below as the superseded baseline; its contrast measurements, accessibility
+> discipline and palettes remain valid technical elements carried into Graph 3.
+
 | | |
 |---|---|
 | Owner | Paolo Lombisani |

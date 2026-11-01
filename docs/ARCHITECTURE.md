@@ -112,3 +112,25 @@ Extraction happens when a second consumer exists (e.g., instrumented tests or a 
 - JVM unit tests for state machine, router, bridge, contract serialization, redaction, and the full scripted pipeline (`kotlinx-coroutines-test`).
 - Instrumented tests and on-device benchmarks begin in V0.2 with the physical qualification program.
 - Static analysis: Android lint at build time; ktlint proposed at V0.2 adoption (not added in V0.1 to keep the un-compiled toolchain surface minimal and honest).
+
+
+---
+
+# Graph 3 architecture addendum (2026-11-02)
+
+New UI layer `ui/monumental/`:
+
+| Unit | Role |
+|---|---|
+| MonumentalColor.kt | authorized material/energy/text tokens (CompositionLocal) |
+| MonumentalType.kt | lapidary display typography tokens |
+| VisualQuality.kt | LOW/BALANCED/HIGH budgets + thermal ladder (pure Kotlin) |
+| BurnIn.kt | per-region AMOLED safeguard (pure logic + Modifier) |
+| OracleCoreModel.kt | PURE 15-state → visual-parameter mapping (unit-tested) |
+| OracleCore.kt | layered renderer L0..L9; WebP depth layers + Canvas dynamics |
+| MonumentalChrome.kt | seals/panels/medallions (new components) |
+
+ui/components/Chrome.kt keeps its public API; internals now render the Monumental
+material language, converging every Graph 2 screen without functional changes.
+The asset pipeline decision (hybrid WebP+Canvas+vector) and the asset manifest live in
+`docs/graph3/ASSET_PIPELINE_DECISION.md` and `docs/graph3/ASSET_MANIFEST.json`.
