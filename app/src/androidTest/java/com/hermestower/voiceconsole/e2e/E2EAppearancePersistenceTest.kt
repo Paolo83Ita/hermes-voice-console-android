@@ -69,7 +69,7 @@ class E2EAppearancePersistenceTest {
 
     @Test
     fun e2e_40_recreateActivity_stateRestored() {
-        compose.activityScenarioRule.scenario.recreate()
+        compose.activityRule.scenario.recreate()
         compose.waitForIdle()
         compose.onNodeWithText("HERMES").assertExists()
         // Settings survive recreation (in-memory store re-applied from persistence).
@@ -80,7 +80,7 @@ class E2EAppearancePersistenceTest {
     fun e2e_41_42_restartApplication_configurationPersists() {
         // Persist a known setting, then restart the activity (application restart semantics).
         graph().store.updateSettings { it.copy(captionsEnabled = false) }
-        compose.activityScenarioRule.scenario.close()
+        compose.activityRule.scenario.close()
         androidx.test.core.app.ActivityScenario.launch(MainActivity::class.java)
         compose.waitForIdle()
         compose.waitUntil(15_000) { !graph().store.settings.value.captionsEnabled }
