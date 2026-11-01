@@ -39,13 +39,14 @@ CI: GitHub Actions workflow `android-debug-build` (`.github/workflows/android-de
 runs on every push to the working branch and via workflow_dispatch; uploads the APK, test
 results and lint report as artifacts named with the commit SHA.
 
-## State at last update (2026-11-01)
+## State at last update (2026-11-01, post-N8)
 
-- Local build green: 33/33 unit tests pass; APK produced and hashed locally (validation only).
-- Cloud build: see CURRENT_PROJECT_TRUTH.md §2 for the authoritative result and receipt.
+- Local build green: 33/33 unit tests pass; local APK hashed (validation only).
+- Cloud build green: run 41296592392, commit 505047e9 — CI 33/33; APK artifact + SHA-256 in
+  `docs/governance/APK_RECEIPT_V0.1.md` (APK_CREATED, APK_HASHED, APK_BOUND_TO_COMMIT).
 - Secret scan: 0 findings (tree + history).
 - Open: physical Xiaomi qualification (Owner-run; docs/INSTALL_XIAOMI.md),
-  real Tower integration (V0.4), real voice front-end (V0.2+).
+  real Tower integration (V0.4), real voice front-end (V0.2+), Owner merge to main.
 
 ## Next exact actions (if resuming)
 

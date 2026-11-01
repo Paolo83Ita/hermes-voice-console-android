@@ -34,19 +34,29 @@ Secret/device scan: 0 findings in working tree and full git history (scripts/sec
   `WORK_LOG.md` N4).
 - Local APK (validation artifact, NOT the deliverable): `app-debug.apk`, 56 MB,
   sha256 `163d700a29161d78714dccbd13c22d3710ec1aaa6401854de082a2f913357557`.
-  The authoritative APK is the one produced by the GitHub Actions cloud build.
+- CLOUD build (authoritative): GitHub Actions run 41296592392 (workflow `android-debug-build`),
+  commit `505047e9e05351a74b2b400ccca6442c364118ff` → **CLOUD_BUILD_PASSED**, iteration 2/3
+  (run 41296487511 CLOUD_BUILD_FAILED: setup-android action's internal license prompt hit EOF;
+  repair = preinstalled runner SDK + yes-piped license acceptance). CI tests: **33 tests,
+  0 failures** (test-results artifact) — UNIT_TEST_EXECUTED (CI). `lintDebug` executed,
+  non-blocking — ANDROID_LINT_EXECUTED.
+- Cloud APK (the Owner-installable deliverable): 57,848,596 bytes,
+  sha256 `f7a767354e241961928f1b536ec71c23e005920f55b7e7a791b29cc126cd0be7` — APK_CREATED,
+  APK_HASHED, APK_BOUND_TO_COMMIT (full receipt: `APK_RECEIPT_V0.1.md`). Also copied to the
+  local deliverables folder as `hermes-voice-console-debug-v0.1-505047e.apk`.
 
 ## 3. Repository truth
 
 - Private repo `Paolo83Ita/hermes-voice-console-android` exists (API-verified: private=true,
-  default branch setting `main`, token has admin+push). Working branch:
-  `foundation/v0.1-cloud-build`. `main` untouched by the graph (G-006).
+  token has admin+push). Working branch `foundation/v0.1-cloud-build` pushed and read-back
+  verified (remote head = local HEAD). `main` does not exist yet: the repo default-branch
+  setting currently resolves to the working branch; the Owner creates/merges `main` after
+  device qualification (G-006, INV-07).
 
 ## 4. Explicitly NOT true yet
 
-- No cloud build has run at the time of writing (N5 pending) → CLOUD_BUILD_PASSED pending.
-- No cloud-built APK exists yet → APK_CREATED / APK_HASHED / APK_BOUND_TO_COMMIT pending.
-- No device installation or device read-back → QUALIFICATION_PENDING_DEVICE.
+- No device installation or device read-back yet → QUALIFICATION_PENDING_DEVICE
+  (Owner runbook: `docs/INSTALL_XIAOMI.md`; checklist §7 Q-40..Q-48).
 - Tower integration is mock-only (MockTowerBridge + DeterministicTowerSimulator) —
   TOWER_REAL_INTEGRATION never claimed.
 - Microphone capture, real STT, real TTS, wake word: intentionally INACTIVE in V0.1

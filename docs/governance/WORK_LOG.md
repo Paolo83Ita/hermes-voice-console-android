@@ -63,10 +63,50 @@ FILES: 15 source/doc files + 3 wrapper files (full list in the graph-1/repair co
 COMMIT: graph-1/repair
 NEXT: cloud build.
 
-NODE N5 — cloud build (placeholder — updated with the run result after execution)
-FINDING: pending first cloud run.
-ACTION: push branch; workflow android-debug-build executes on ubuntu-latest.
-TEST: to be recorded (CLOUD_BUILD_PASSED / CLOUD_BUILD_FAILED + iterations used).
-FILES: .github/workflows/android-debug-build.yml
-COMMIT: graph-1/ci
+NODE N5 — cloud build
+FINDING (iteration 1/3): run 41296487511 — CLOUD_BUILD_FAILED at the "Set up Android SDK"
+step: android-actions/setup-android@v3's internal license acceptance ran `sdkmanager
+--licenses` without stdin; the runner's cmdline-tools 16.0 prompts interactively, hits EOF,
+exit 1. Not a project defect.
+ACTION (material change, iteration 2/3): dropped the action; used the preinstalled runner
+SDK with `yes`-piped license acceptance + pinned package install; kept JDK 17, wrapper,
+gates, artifacts (G-007 amended).
+TEST: run 41296592392 — CLOUD_BUILD_PASSED. CI tests 33/33 green; lintDebug executed
+(non-blocking); three artifacts uploaded, names bound to the commit SHA.
+FILES: .github/workflows/android-debug-build.yml (commit 505047e9)
+COMMIT: graph-1/ci (8038bfd) + graph-1/ci-fix (505047e9)
 NEXT: APK receipt.
+
+NODE N6 — APK receipt
+FINDING: artifact hermes-voice-console-debug-apk-505047e9… (id 13080210671) = app-debug.apk,
+57,848,596 bytes, sha256 f7a767354e241961928f1b536ec71c23e005920f55b7e7a791b29cc126cd0be7.
+Local-vs-cloud hash difference attributed to ephemeral per-runner debug keys + build
+metadata (expected; both APKs identical in size and build inputs).
+ACTION: receipt written; APK copied to the local deliverables folder as
+hermes-voice-console-debug-v0.1-505047e.apk.
+TEST: SHA-256 recomputed from the downloaded artifact bytes.
+FILES: docs/governance/APK_RECEIPT_V0.1.md, docs/governance/CURRENT_PROJECT_TRUTH.md
+COMMIT: graph-1/receipt
+NEXT: Xiaomi readiness.
+
+NODE N7 — Xiaomi qualification readiness
+FINDING: Foundation checklist Q-01..Q-04 expectations superseded by Owner-confirmed device
+identity (11 Lite 5G NE · 2109119DG · HyperOS 2.0.4.0 · Android 14); no V0.1 install section
+existed.
+ACTION: added docs/INSTALL_XIAOMI.md (Owner runbook, hash verification, no-root install,
+11-step first-launch walk, read-back template); extended DEVICE_QUALIFICATION_CHECKLIST.md
+with §7 Q-40..Q-48 and refreshed superseded expectations.
+TEST: CHECKER read-back of both documents; every APK claim matches APK_RECEIPT_V0.1.md.
+FILES: docs/INSTALL_XIAOMI.md, docs/DEVICE_QUALIFICATION_CHECKLIST.md
+COMMIT: graph-1/qualification
+NEXT: final report.
+
+NODE N8 — final truth + packaging
+FINDING: all Graph 1 nodes COMPLETE; no active blocker; device qualification remains
+QUALIFICATION_PENDING_DEVICE by design (Owner-controlled).
+ACTION: refreshed ZIP (source + docs + mockups + workflows; no build outputs, no
+git metadata, no secrets); final scan re-run; report delivered in chat.
+TEST: zip listing + secret scan 0 findings + git log verification.
+FILES: download/hermes-voice-console-android-v0.1.1-graph1.zip (deliverables folder)
+COMMIT: graph-1/final (SHA recorded at commit time; see git log)
+NEXT: Owner — install per INSTALL_XIAOMI.md; report read-back; then Owner merges main.

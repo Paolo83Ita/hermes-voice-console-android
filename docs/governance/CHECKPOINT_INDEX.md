@@ -19,4 +19,6 @@ Graph 1 checkpoints (branch `foundation/v0.1-cloud-build`, pushed to private ori
 | graph-1/qualification | Owner install runbook + device checklist refresh | DOCUMENT_CREATED |
 | graph-1/final | Truth refresh, blockers closed, ZIP refresh | DOCUMENT_CREATED |
 
-Exact SHAs are recorded in `WORK_LOG.md` at the moment each checkpoint was created.
+Exact SHAs: repair=dfabeeb · governance=6b4cef8 · ci=8038bfd · ci-fix=505047e9 ·
+receipt/qualification/final = see the git log of `foundation/v0.1-cloud-build` (recorded
+progressively in WORK_LOG.md; a file cannot contain its own commit SHA).
