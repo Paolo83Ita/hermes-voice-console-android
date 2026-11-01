@@ -29,10 +29,10 @@ class DefaultModelRollbackController(
     private val registry: ModelInstallationRegistry,
 ) : ModelRollbackController {
 
-    private fun backupPath(entry: ModelCatalogEntry): Path? {
-        val current = storage.installedFile(entry) ?: return null
-        return current.resolveSibling(current.fileName.toString() + ".prev")
-    }
+    private fun backupPath(entry: ModelCatalogEntry): Path? =
+        // Identity-based: the backup must survive version changes (the previous
+        // version's filename differs from the current one's by design).
+        runCatching { storage.componentDir(entry).resolve("${entry.identity}.pkg.prev") }.getOrNull()
 
     override fun snapshotFor(entry: ModelCatalogEntry): Boolean {
         val current = storage.installedFile(entry) ?: return false

@@ -13,6 +13,7 @@ import java.nio.file.StandardCopyOption
  */
 interface ModelStorageManager {
     fun preflight(neededBytes: Long): StoragePreflight
+    fun componentDir(entry: ModelCatalogEntry): Path
     fun tempDir(): Path
     fun installAtomically(entry: ModelCatalogEntry, tempFile: Path): Path
     fun installedFile(entry: ModelCatalogEntry): Path?
@@ -32,7 +33,11 @@ class DefaultModelStorageManager(
     private val reserveBytes: Long = DefaultVoicePackResolver.INSTALL_RESERVE_BYTES,
 ) : ModelStorageManager {
 
+    override fun componentDir(entry: ModelCatalogEntry): Path =
+        root.resolve(entry.storageLocation.removePrefix("filesDir/").trim('/'))
+
     override fun preflight(neededBytes: Long): StoragePreflight {
+        runCatching { Files.createDirectories(root) }
         val free = Files.getFileStore(root).usableSpace
         val required = neededBytes + reserveBytes
         return StoragePreflight(

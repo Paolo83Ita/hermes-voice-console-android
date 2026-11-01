@@ -84,14 +84,27 @@ class DefaultModelDownloadManager(
     }
 
     override fun pause(identity: String) {
-        synchronized(jobs) { jobs.remove(identity)?.cancel() }
         val f = flowFor(identity)
+        // Pausing is only meaningful while bytes are in flight; a completed or
+        // failed download is left in its truthful state.
+        if (f.value.state != ModelInstallState.DOWNLOADING) return
+        synchronized(jobs) { jobs.remove(identity)?.cancel() }
         f.value = f.value.copy(state = ModelInstallState.DOWNLOAD_PAUSED)
     }
 
     override fun resume(entry: ModelCatalogEntry, url: String) {
         val partial = partialFile(entry)
         val resumeFrom = if (partial != null && Files.exists(partial)) Files.size(partial) else 0
+        if (resumeFrom >= entry.downloadSizeBytes) {
+            // Nothing left to fetch: the artifact is already fully on disk.
+            flowFor(entry.identity).value = flowFor(entry.identity).value.copy(
+                state = ModelInstallState.DOWNLOADED,
+                bytesDownloaded = resumeFrom,
+                totalBytes = resumeFrom,
+            )
+            registry.markState(entry.identity, ModelInstallState.DOWNLOADED, "already complete")
+            return
+        }
         launchDownload(entry, url, resumeFrom = resumeFrom)
     }
 
@@ -183,6 +196,11 @@ class DefaultModelDownloadManager(
             input.use { ins ->
                 out.use { ch ->
                     while (true) {
+                        if (!coroutineContext.isActive) {
+                            // Paused or cancelled: stop writing immediately; the
+                            // partial stays for a resume, never for activation.
+                            throw CancellationException2("download paused/cancelled at $written bytes")
+                        }
                         val read = ins.read(buffer)
                         if (read < 0) break
                         ch.write(java.nio.ByteBuffer.wrap(buffer, 0, read))

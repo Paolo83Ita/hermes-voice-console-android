@@ -36,8 +36,10 @@ interface TowerProfileStore {
 data class ExportedProfile(
     val exportedFormatVersion: String,
     val profile: TowerConnectionProfile,
-    val pairingSecret: String = "PAIRING_SECRET_REQUIRED",
-    val accessToken: String = "ACCESS_TOKEN_REQUIRED",
+    // Required (no defaults): a secret-clean export must ALWAYS carry the explicit
+    // placeholder strings, whatever JSON settings the receiver uses.
+    val pairingSecret: String,
+    val accessToken: String,
 )
 
 sealed class ImportResult {
@@ -123,7 +125,7 @@ class FileTowerProfileStore(
         if (extracted.exportedFormatVersion != EXPORT_FORMAT_VERSION) {
             return ImportResult.Rejected("Unsupported export format '${extracted.exportedFormatVersion}'.")
         }
-        if (extracted.pairingSecret != PLACEHOLDER_PAIRING && extracted.accessToken != PLACEHOLDER_TOKEN) {
+        if (extracted.pairingSecret != PLACEHOLDER_PAIRING || extracted.accessToken != PLACEHOLDER_TOKEN) {
             // Refuse to import a file that claims to carry a real secret: secrets never travel in exports.
             return ImportResult.Rejected("Refused: export files must be secret-clean; no real secret is accepted on import.")
         }

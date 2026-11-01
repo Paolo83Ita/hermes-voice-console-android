@@ -35,7 +35,7 @@ class LocalTowerMockServer(
         DISCONNECT_ON_CONNECT, // closes the socket immediately after accept
     }
 
-    data class Artifact(val bytes: ByteArray, val delayMs: Long = 0)
+    data class Artifact(val bytes: ByteArray, val delayMs: Long = 0, val chunkDelayMs: Long = 0)
 
     private val socket: ServerSocket = ServerSocket(0, 64, java.net.InetAddress.getByName("127.0.0.1"))
     @Volatile private var running = true
@@ -199,6 +199,7 @@ class LocalTowerMockServer(
         }
         if (artifact.delayMs > 0) Thread.sleep(artifact.delayMs)
         val bytes = artifact.bytes
+        val chunkDelay = artifact.chunkDelayMs
         val range = headers["range"]?.removePrefix("bytes=")
         if (range != null && range.contains('-')) {
             val startStr = range.substringBefore('-')
@@ -215,13 +216,42 @@ class LocalTowerMockServer(
                 "Content-Range" to "bytes $start-$end/${bytes.size}",
                 "Accept-Ranges" to "bytes",
             )
-            writeStatus(out, 206, "Partial Content", header, bytes, start.toInt(), len)
+            writeHeaderOnly(out, 206, "Partial Content", header, len)
+            writeBodyChunked(out, bytes, start.toInt(), len, chunkDelay)
         } else {
             val header = mapOf(
                 "Content-Type" to "application/octet-stream",
                 "Accept-Ranges" to "bytes",
             )
-            writeStatus(out, 200, "OK", header, bytes, 0, bytes.size)
+            writeHeaderOnly(out, 200, "OK", header, bytes.size)
+            writeBodyChunked(out, bytes, 0, bytes.size, chunkDelay)
+        }
+    }
+
+    private fun writeHeaderOnly(out: OutputStream, status: Int, reason: String, headers: Map<String, String>, len: Int) {
+        val sb = StringBuilder()
+        sb.append("HTTP/1.1 ").append(status).append(' ').append(reason).append("\r\n")
+        headers.forEach { (k, v) -> sb.append(k).append(": ").append(v).append("\r\n") }
+        sb.append("Content-Length: ").append(len).append("\r\n")
+        sb.append("Connection: close\r\n\r\n")
+        out.write(sb.toString().toByteArray(StandardCharsets.US_ASCII))
+        out.flush()
+    }
+
+    private fun writeBodyChunked(out: OutputStream, bytes: ByteArray, off: Int, len: Int, chunkDelayMs: Long) {
+        if (chunkDelayMs <= 0) {
+            if (len > 0) out.write(bytes, off, len)
+            out.flush()
+            return
+        }
+        val chunk = 8 * 1024
+        var written = 0
+        while (written < len) {
+            val n = minOf(chunk, len - written)
+            out.write(bytes, off + written, n)
+            out.flush()
+            written += n
+            Thread.sleep(chunkDelayMs)
         }
     }
 

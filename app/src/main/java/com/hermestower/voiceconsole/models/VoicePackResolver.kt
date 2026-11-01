@@ -47,7 +47,10 @@ class DefaultVoicePackResolver : VoicePackResolver {
         val warnings = VoicePackPolicyResolver.gatesFor(profile, resources).toMutableList()
         val resolved = mutableListOf<ResolvedComponent>()
 
-        val candidates = (policy.required + policy.optional)
+        // The local LLM stays visible in EVERY profile: when the profile forbids it,
+        // the entry is shown with route TOWER instead of disappearing from the plan.
+        val candidateTypes = policy.required + policy.optional + setOf(ModelComponentType.LOCAL_LLM)
+        val candidates = candidateTypes
             .flatMap { type -> catalog.ofComponent(type).ifEmpty { emptyList() } }
         for (entry in candidates) {
             val compat = compatibility(entry, resources)

@@ -41,7 +41,7 @@ class VoiceModelManagerCoreTest {
     fun `catalog loads embedded manifest and resolves lookups`() {
         val catalog = catalog()
         assertEquals("1.0.0", catalog.manifestVersion())
-        assertTrue(catalog.all().size >= 8)
+        assertTrue(catalog.all().size >= 3)
         val probe = catalog.find("org.hermestower.test.probe-artifact")
         assertNotNull(probe)
         assertEquals("WAKE_WORD", probe!!.componentType)

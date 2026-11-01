@@ -43,7 +43,8 @@ class SelfTestCenterTest {
     fun setUp() {
         dir = Files.createTempDirectory("hermes-selftest")
         val registryFile = dir.resolve("registry.json")
-        val storage = DefaultModelStorageManager(dir.resolve("models"))
+        val storageRoot = java.nio.file.Files.createDirectories(dir.resolve("models"))
+        val storage = DefaultModelStorageManager(storageRoot)
         val registry = FileInstallationRegistry(registryFile)
         val profileStore = FileTowerProfileStore(dir.resolve("tower_profile.json"), InMemorySecretVault())
         val vault = InMemorySecretVault()

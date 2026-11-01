@@ -121,9 +121,8 @@ class RealTowerBridge(
             emit(errorEvent(frame.requestId, BridgeError.INVALID_REQUEST, "Duplicate request id refused.", retryable = false))
             return@flow
         }
-        emit(
-            TowerEventFrame(type = TowerEventFrame.ACK, requestId = frame.requestId, stage = "SENT", timestamp = Instant.now().toString()),
-        )
+        // The Tower's ACK frame (from the response stream) is the authoritative
+        // acknowledgement; no local pre-ACK is emitted.
         val secret = profileStore.secretFor(profile.profileId)
         try {
             val response = withContext(ioDispatcher) { postRequest(profile, frame, secret) }

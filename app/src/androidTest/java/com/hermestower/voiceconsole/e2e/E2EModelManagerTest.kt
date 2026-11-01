@@ -77,7 +77,7 @@ class E2EModelManagerTest {
             awaitState(entry.identity, ModelInstallState.DOWNLOADED)
             // E2E-25 pause + resume (resume re-opens with Range on a second artifact).
             val big = DeterministicTestArtifact.generate("e2e-resume", 256 * 1024)
-            server.putArtifact("e2e-resume", LocalTowerMockServer.Artifact(big))
+            server.putArtifact("e2e-resume", LocalTowerMockServer.Artifact(big, chunkDelayMs = 12))
             val bigEntry = entry.copy(identity = "org.hermestower.test.e2e-resume", sha256 = ModelSha256.ofBytes(big), downloadSizeBytes = big.size.toLong(), installedSizeBytes = big.size.toLong())
             graph().modelDownloads.start(bigEntry, "${server.baseUrl}/artifacts/e2e-resume")
             val deadline = System.currentTimeMillis() + 20_000

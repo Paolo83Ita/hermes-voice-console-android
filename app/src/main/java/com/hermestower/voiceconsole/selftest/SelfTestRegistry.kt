@@ -363,13 +363,15 @@ object SelfTestRegistry {
                 }
             },
             def("ST-31", "Voice-pack recommendation", SelfTestCategory.MODELS, setOf(SelfTestMode.QUICK, SelfTestMode.STANDARD, SelfTestMode.FULL, SelfTestMode.VOICE_FOUNDATION_ONLY)) { s ->
-                val recommendation = s.resolver.recommend(VoiceModelProfile.HYBRID_BALANCED, s.deviceResources(), s.catalog)
-                val llm = recommendation.components.first { it.componentType == ModelComponentType.LOCAL_LLM.name }
-                val probe = recommendation.components.first { it.identity == PROBE_ID }
-                if (llm.route == "TOWER" && probe.downloadAllowed && recommendation.requiresExplicitConfirmation) {
-                    SelfTestState.PASS to "recommendation deterministic; LLM on Tower; probe downloadable; confirmation required."
+                val towerFirst = s.resolver.recommend(VoiceModelProfile.TOWER_FIRST, s.deviceResources(), s.catalog)
+                val hybrid = s.resolver.recommend(VoiceModelProfile.HYBRID_BALANCED, s.deviceResources(), s.catalog)
+                val llmTower = towerFirst.components.first { it.componentType == ModelComponentType.LOCAL_LLM.name }
+                val llmHybrid = hybrid.components.first { it.componentType == ModelComponentType.LOCAL_LLM.name }
+                val probe = hybrid.components.first { it.identity == PROBE_ID }
+                if (llmTower.route == "TOWER" && llmHybrid.route == "LOCAL" && probe.downloadAllowed && hybrid.requiresExplicitConfirmation) {
+                    SelfTestState.PASS to "recommendation deterministic; TOWER_FIRST routes LLM to Tower, HYBRID keeps it local; probe downloadable; confirmation required."
                 } else {
-                    SelfTestState.FAIL to "recommendation unexpected (llm=${llm.route}, probe=${probe.downloadAllowed})."
+                    SelfTestState.FAIL to "recommendation unexpected (tower=${llmTower.route}, hybrid=${llmHybrid.route}, probe=${probe.downloadAllowed})."
                 }
             },
             def("ST-32", "Test-artifact download", SelfTestCategory.MODELS, ALL_MINUS_QUICK) { s ->
@@ -384,7 +386,7 @@ object SelfTestRegistry {
             def("ST-33", "Download pause and resume", SelfTestCategory.MODELS, setOf(SelfTestMode.FULL)) { s ->
                 withServer(s) { server, _, _ ->
                     val bytes = DeterministicTestArtifact.generate("st-33", 256 * 1024)
-                    server.putArtifact("st-33", LocalTowerMockServer.Artifact(bytes))
+                    server.putArtifact("st-33", LocalTowerMockServer.Artifact(bytes, chunkDelayMs = 15))
                     val entry = probeEntry(hash = ModelSha256.ofBytes(bytes), size = bytes.size, identity = "org.hermestower.test.st-33")
                     s.downloads.start(entry, "${server.baseUrl}/artifacts/st-33")
                     awaitProgress(s, entry.identity, 16 * 1024)
@@ -402,7 +404,7 @@ object SelfTestRegistry {
             def("ST-34", "Download cancellation", SelfTestCategory.MODELS, setOf(SelfTestMode.STANDARD, SelfTestMode.FULL)) { s ->
                 withServer(s) { server, _, _ ->
                     val bytes = DeterministicTestArtifact.generate("st-34", 1024 * 1024)
-                    server.putArtifact("st-34", LocalTowerMockServer.Artifact(bytes, delayMs = 300))
+                    server.putArtifact("st-34", LocalTowerMockServer.Artifact(bytes, delayMs = 300, chunkDelayMs = 15))
                     val entry = probeEntry(hash = ModelSha256.ofBytes(bytes), size = bytes.size, identity = "org.hermestower.test.st-34")
                     s.downloads.start(entry, "${server.baseUrl}/artifacts/st-34")
                     awaitState(s, entry.identity, ModelInstallState.DOWNLOADING)

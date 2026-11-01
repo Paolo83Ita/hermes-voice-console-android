@@ -131,7 +131,7 @@ class ModelDownloadLifecycleTest {
     @Test
     fun `pause then resume completes with Range request`() = runBlocking {
         val big = DeterministicTestArtifact.generate("resumable", 512 * 1024)
-        server.putArtifact("resumable", LocalTowerMockServer.Artifact(big))
+        server.putArtifact("resumable", LocalTowerMockServer.Artifact(big, chunkDelayMs = 12))
         val e = entry().copy(
             identity = "org.hermestower.test.resumable",
             downloadSizeBytes = big.size.toLong(),
