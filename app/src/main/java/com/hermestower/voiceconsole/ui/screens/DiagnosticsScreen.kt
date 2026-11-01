@@ -33,7 +33,7 @@ import kotlinx.coroutines.launch
  * simulation controls, redacted log export. No secret values anywhere (SEC-06).
  */
 @Composable
-fun DiagnosticsScreen(graph: AppGraph) {
+fun DiagnosticsScreen(graph: AppGraph, onOpenStudio: () -> Unit = {}, onOpenSelfTest: () -> Unit = {}) {
     val c = hermesColors
     val scope = androidx.compose.runtime.rememberCoroutineScope()
     val healthState = remember { graph.health.snapshot() }
@@ -50,6 +50,10 @@ fun DiagnosticsScreen(graph: AppGraph) {
         verticalArrangement = Arrangement.spacedBy(12.dp),
     ) {
         Text("Diagnostics", style = HermesType.screenTitle, color = c.ink)
+        Row(horizontalArrangement = Arrangement.spacedBy(8.dp)) {
+            TextButton(onClick = onOpenStudio) { Text("Open Tower Connection Studio →") }
+            TextButton(onClick = onOpenSelfTest) { Text("Run Self-Test →") }
+        }
 
         SectionCard(title = "Device (real values)") {
             Text("Manufacturer: ${healthState.manufacturer}", style = HermesType.body, color = c.ink)

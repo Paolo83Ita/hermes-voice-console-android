@@ -34,7 +34,7 @@ import kotlinx.coroutines.launch
  * contacted in V0.1 and no credential exists (D-005, SEC-01).
  */
 @Composable
-fun ConnectionScreen(graph: AppGraph) {
+fun ConnectionScreen(graph: AppGraph, onOpenStudio: () -> Unit = {}) {
     val c = hermesColors
     val connection by graph.store.connection.collectAsStateWithLifecycle()
     val scope = androidx.compose.runtime.rememberCoroutineScope()
@@ -50,6 +50,9 @@ fun ConnectionScreen(graph: AppGraph) {
         verticalArrangement = Arrangement.spacedBy(12.dp),
     ) {
         Text("Connection", style = HermesType.screenTitle, color = c.ink)
+        TextButton(onClick = onOpenStudio) {
+            Text("Open Hermes Tower Connection Studio →")
+        }
 
         SectionCard(title = "Tower endpoint") {
             OutlinedTextField(

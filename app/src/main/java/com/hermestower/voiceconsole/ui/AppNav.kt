@@ -14,12 +14,15 @@ import androidx.compose.foundation.verticalScroll
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.Menu
 import androidx.compose.material.icons.outlined.BugReport
+import androidx.compose.material.icons.outlined.FactCheck
 import androidx.compose.material.icons.outlined.History
 import androidx.compose.material.icons.outlined.Info
 import androidx.compose.material.icons.outlined.Link
 import androidx.compose.material.icons.outlined.Mic
+import androidx.compose.material.icons.outlined.Memory
 import androidx.compose.material.icons.outlined.Palette
 import androidx.compose.material.icons.outlined.Psychology
+import androidx.compose.material.icons.outlined.Router
 import androidx.compose.material.icons.outlined.Waves
 import androidx.compose.material3.DrawerValue
 import androidx.compose.material3.ExperimentalMaterial3Api
@@ -54,6 +57,9 @@ import com.hermestower.voiceconsole.ui.screens.ConnectionScreen
 import com.hermestower.voiceconsole.ui.screens.DiagnosticsScreen
 import com.hermestower.voiceconsole.ui.screens.HistoryScreen
 import com.hermestower.voiceconsole.ui.screens.LocalIntelligenceScreen
+import com.hermestower.voiceconsole.ui.screens.ModelManagerScreen
+import com.hermestower.voiceconsole.ui.screens.SelfTestScreen
+import com.hermestower.voiceconsole.ui.screens.TowerStudioScreen
 import com.hermestower.voiceconsole.ui.screens.VoiceAudioScreen
 import com.hermestower.voiceconsole.ui.theme.HermesType
 import com.hermestower.voiceconsole.ui.theme.hermesColors
@@ -62,14 +68,17 @@ import kotlinx.coroutines.launch
 private data class Destination(val route: String, val label: String, val icon: ImageVector)
 
 private val destinations = listOf(
-    Destination("console", "Voice Console", Icons.Outlined.Waves),
-    Destination("history", "Conversation History", Icons.Outlined.History),
-    Destination("connection", "Connection", Icons.Outlined.Link),
-    Destination("voice", "Voice & Audio", Icons.Outlined.Mic),
-    Destination("intelligence", "Local Intelligence", Icons.Outlined.Psychology),
-    Destination("appearance", "Appearance", Icons.Outlined.Palette),
-    Destination("diagnostics", "Diagnostics", Icons.Outlined.BugReport),
-    Destination("about", "About & Safety", Icons.Outlined.Info),
+    Destination(AppRoutes.CONSOLE, "Voice Console", Icons.Outlined.Waves),
+    Destination(AppRoutes.HISTORY, "Conversation History", Icons.Outlined.History),
+    Destination(AppRoutes.CONNECTION, "Connection", Icons.Outlined.Link),
+    Destination(AppRoutes.TOWER_STUDIO, "Hermes Tower Connection", Icons.Outlined.Router),
+    Destination(AppRoutes.VOICE, "Voice & Audio", Icons.Outlined.Mic),
+    Destination(AppRoutes.MODEL_MANAGER, "Voice Models", Icons.Outlined.Memory),
+    Destination(AppRoutes.INTELLIGENCE, "Local Intelligence", Icons.Outlined.Psychology),
+    Destination(AppRoutes.APPEARANCE, "Appearance", Icons.Outlined.Palette),
+    Destination(AppRoutes.DIAGNOSTICS, "Diagnostics", Icons.Outlined.BugReport),
+    Destination(AppRoutes.SELF_TEST, "Self-Test Center", Icons.Outlined.FactCheck),
+    Destination(AppRoutes.ABOUT, "About & Safety", Icons.Outlined.Info),
 )
 
 /** Navigation shell (FR-30..FR-37): drawer over all eight surfaces, console is home. */
@@ -80,7 +89,7 @@ fun AppNav(graph: AppGraph) {
     val navController = rememberNavController()
     val drawerState = rememberDrawerState(DrawerValue.Closed)
     val backStack by navController.currentBackStackEntryAsState()
-    val currentRoute = backStack?.destination?.route ?: "console"
+    val currentRoute = backStack?.destination?.route ?: AppRoutes.CONSOLE
     val current = destinations.firstOrNull { it.route == currentRoute } ?: destinations.first()
     val scope = rememberCoroutineScope()
 
@@ -97,7 +106,7 @@ fun AppNav(graph: AppGraph) {
                 ) {
                     Text("HERMES", style = HermesType.brand, color = c.bronze, modifier = Modifier.padding(top = 12.dp))
                     Text(
-                        "VOICE CONSOLE — V0.1",
+                        "VOICE CONSOLE — V0.2",
                         style = HermesType.sectionLabel,
                         color = c.inkSecondary,
                         modifier = Modifier.padding(top = 4.dp),
@@ -153,19 +162,22 @@ fun AppNav(graph: AppGraph) {
         ) { padding ->
             NavHost(
                 navController = navController,
-                startDestination = "console",
+                startDestination = AppRoutes.CONSOLE,
                 modifier = Modifier
                     .fillMaxSize()
                     .padding(padding),
             ) {
-                composable("console") { ConsoleScreen(graph, onOpenHistory = { navController.navigate("history") { launchSingleTop = true } }) }
-                composable("history") { HistoryScreen(graph) }
-                composable("connection") { ConnectionScreen(graph) }
-                composable("voice") { VoiceAudioScreen(graph) }
-                composable("intelligence") { LocalIntelligenceScreen(graph) }
-                composable("appearance") { AppearanceScreen(graph) }
-                composable("diagnostics") { DiagnosticsScreen(graph) }
-                composable("about") { AboutSafetyScreen(graph) }
+                composable(AppRoutes.CONSOLE) { ConsoleScreen(graph, onOpenHistory = { navController.navigate(AppRoutes.HISTORY) { launchSingleTop = true } }) }
+                composable(AppRoutes.HISTORY) { HistoryScreen(graph) }
+                composable(AppRoutes.CONNECTION) { ConnectionScreen(graph, onOpenStudio = { navController.navigate(AppRoutes.TOWER_STUDIO) { launchSingleTop = true } }) }
+                composable(AppRoutes.TOWER_STUDIO) { TowerStudioScreen(graph) }
+                composable(AppRoutes.VOICE) { VoiceAudioScreen(graph) }
+                composable(AppRoutes.MODEL_MANAGER) { ModelManagerScreen(graph) }
+                composable(AppRoutes.INTELLIGENCE) { LocalIntelligenceScreen(graph) }
+                composable(AppRoutes.APPEARANCE) { AppearanceScreen(graph) }
+                composable(AppRoutes.DIAGNOSTICS) { DiagnosticsScreen(graph, onOpenStudio = { navController.navigate(AppRoutes.TOWER_STUDIO) { launchSingleTop = true } }, onOpenSelfTest = { navController.navigate(AppRoutes.SELF_TEST) { launchSingleTop = true } }) }
+                composable(AppRoutes.SELF_TEST) { SelfTestScreen(graph) }
+                composable(AppRoutes.ABOUT) { AboutSafetyScreen(graph) }
             }
         }
     }

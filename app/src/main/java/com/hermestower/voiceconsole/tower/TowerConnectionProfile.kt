@@ -29,6 +29,8 @@ data class TowerConnectionProfile(
     val consequentialConfirmationRequired: Boolean = true,
     val certificatePolicy: String = "SYSTEM",
     val certificateFingerprintReference: String = "",
+    val diagnosticsVerbosity: String = "REDACTED_SUMMARY",
+    val localTowerRoutingThreshold: Float = 0.55f,
     val createdAt: String,
     val updatedAt: String,
     val lastValidationAt: String? = null,
