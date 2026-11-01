@@ -5,7 +5,6 @@ import androidx.compose.ui.test.junit4.createAndroidComposeRule
 import androidx.compose.ui.test.onAllNodesWithText
 import androidx.compose.ui.test.onNodeWithText
 import androidx.compose.ui.test.performClick
-import androidx.compose.ui.test.waitUntil
 import com.hermestower.voiceconsole.models.DeterministicTestArtifact
 import com.hermestower.voiceconsole.models.ModelInstallState
 import com.hermestower.voiceconsole.models.ModelSha256

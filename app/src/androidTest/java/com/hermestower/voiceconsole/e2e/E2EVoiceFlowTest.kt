@@ -53,11 +53,11 @@ class E2EVoiceFlowTest {
     fun e2e_12_13_submitTowerRequest_receivesStreamedFinalResponse() {
         graph().driver.setRequestedMode(com.hermestower.voiceconsole.core.mode.OperatingMode.TOWER)
         graph().driver.submitText("tell me about the hermes tower")
-        val reply = awaitTurn {
+        val reply = awaitTurn(predicate = {
             it.role == ConversationTurn.Role.HERMES &&
                 it.source == ConversationTurn.Source.TOWER &&
                 it.delivery == ConversationTurn.Delivery.DELIVERED
-        }
+        })
         assertTrue("no tower reply produced", reply != null)
         assertTrue("no receipt bound to the delivered reply", reply!!.receiptRef != null)
     }
