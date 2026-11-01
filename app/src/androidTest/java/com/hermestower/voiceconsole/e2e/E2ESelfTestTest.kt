@@ -9,6 +9,7 @@ import com.hermestower.voiceconsole.selftest.SelfTestState
 import com.hermestower.voiceconsole.ui.MainActivity
 import org.junit.Assert.assertFalse
 import org.junit.Assert.assertTrue
+import org.junit.Before
 import org.junit.Rule
 import org.junit.Test
 import org.junit.runner.RunWith
@@ -33,6 +34,11 @@ class E2ESelfTestTest {
             Thread.sleep(250)
         }
         throw AssertionError("Self-Test did not finish within ${timeoutMs} ms")
+    }
+
+    @Before
+    fun freezeAnimations() {
+        compose.freezeAnimationsForTest()
     }
 
     @Test

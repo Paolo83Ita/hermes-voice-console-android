@@ -13,6 +13,13 @@ import androidx.test.platform.app.InstrumentationRegistry
 
 typealias HermesComposeRule = AndroidComposeTestRule<ActivityScenarioRule<MainActivity>, MainActivity>
 
+/** Freeze the compose clock: the console ships infinite animations, which would
+ *  otherwise keep the test rule from ever reaching idle. State-driven waitUntil
+ *  conditions still work (they read StateFlows, not the clock). */
+fun HermesComposeRule.freezeAnimationsForTest() {
+    mainClock.autoAdvance = false
+}
+
 /** Shared E2E helpers: graph access and drawer navigation. */
 object E2E {
     fun graph(): AppGraph = AppGraphHolder.graph(InstrumentationRegistry.getInstrumentation().targetContext)

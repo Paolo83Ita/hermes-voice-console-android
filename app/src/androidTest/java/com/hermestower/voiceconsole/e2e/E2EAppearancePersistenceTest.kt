@@ -15,6 +15,7 @@ import org.junit.Assert.assertFalse
 import org.junit.Assert.assertNotNull
 import org.junit.Assert.assertNull
 import org.junit.Assert.assertTrue
+import org.junit.Before
 import org.junit.Rule
 import org.junit.Test
 
@@ -30,6 +31,11 @@ class E2EAppearancePersistenceTest {
     val compose: HermesComposeRule = createAndroidComposeRule(MainActivity::class.java)
 
     private fun graph() = E2E.graph()
+
+    @Before
+    fun freezeAnimations() {
+        compose.freezeAnimationsForTest()
+    }
 
     @Test
     fun e2e_35_36_switchMarbleLightAndObsidianNight() {

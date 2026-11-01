@@ -14,6 +14,7 @@ import com.hermestower.voiceconsole.ui.MainActivity
 import org.junit.Assert.assertEquals
 import org.junit.Assert.assertNotNull
 import org.junit.Assert.assertTrue
+import org.junit.Before
 import org.junit.Rule
 import org.junit.Test
 import org.junit.runner.RunWith
@@ -39,6 +40,11 @@ class E2EModelManagerTest {
             Thread.sleep(100)
         }
         throw AssertionError("Timed out waiting for $identity in ${states.toList()}; last=${graph().modelDownloads.progress(identity).value.state}")
+    }
+
+    @Before
+    fun freezeAnimations() {
+        compose.freezeAnimationsForTest()
     }
 
     @Test

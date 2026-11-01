@@ -9,6 +9,7 @@ import com.hermestower.voiceconsole.core.state.ConversationTurn
 import com.hermestower.voiceconsole.ui.MainActivity
 import org.junit.Assert.assertEquals
 import org.junit.Assert.assertTrue
+import org.junit.Before
 import org.junit.Rule
 import org.junit.Test
 import org.junit.runner.RunWith
@@ -35,6 +36,11 @@ class E2EVoiceFlowTest {
             Thread.sleep(120)
         }
         return null
+    }
+
+    @Before
+    fun freezeAnimations() {
+        compose.freezeAnimationsForTest()
     }
 
     @Test

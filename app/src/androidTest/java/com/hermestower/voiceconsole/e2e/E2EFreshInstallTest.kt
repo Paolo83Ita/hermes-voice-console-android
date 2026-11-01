@@ -12,6 +12,7 @@ import kotlinx.coroutines.runBlocking
 import org.junit.Assert.assertEquals
 import org.junit.Assert.assertNotNull
 import org.junit.Assert.assertTrue
+import org.junit.Before
 import org.junit.Rule
 import org.junit.Test
 import org.junit.runner.RunWith
@@ -27,6 +28,11 @@ class E2EFreshInstallTest {
 
     @get:Rule
     val compose: HermesComposeRule = createAndroidComposeRule(MainActivity::class.java)
+
+    @Before
+    fun freezeAnimations() {
+        compose.freezeAnimationsForTest()
+    }
 
     @Test
     fun e2e_01_02_freshInstallAndFirstLaunch_showWorkingConsole() {
