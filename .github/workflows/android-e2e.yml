@@ -76,8 +76,17 @@ jobs:
             echo "Installing androidTest APK..."
             adb install -r -t app/build/outputs/apk/androidTest/debug/app-debug-androidTest.apk
             echo "Running instrumentation (E2E-01..45 + secure storage)..."
-            set -o pipefail
-            timeout 3600 adb shell am instrument -w -r com.hermestower.voiceconsole.test/androidx.test.runner.AndroidJUnitRunner | tee instrumentation-output.txt
+            # emulator-runner executes this script with /bin/sh (dash). The previous
+            # bash-only `set -o pipefail` exited 2 before am instrument could start.
+            # POSIX-safe: capture to file, echo it, classify the result.
+            timeout 3600 adb shell am instrument -w -r com.hermestower.voiceconsole.test/androidx.test.runner.AndroidJUnitRunner > instrumentation-output.txt 2>&1
+            cat instrumentation-output.txt
+            if grep -q 'OK ([0-9][0-9]* tests)' instrumentation-output.txt; then
+              echo 'INSTRUMENTATION_PASSED'
+            else
+              echo 'INSTRUMENTATION_FAILED_OR_INCOMPLETE'
+              exit 1
+            fi
 
       - name: Upload connected-test results
         if: always()
