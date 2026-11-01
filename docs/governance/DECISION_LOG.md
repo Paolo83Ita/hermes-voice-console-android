@@ -47,3 +47,36 @@ DECISION: GitHub Actions `ubuntu-latest`, Temurin JDK 17, android-actions/setup-
 `assembleDebug` + `testDebugUnitTest` as gates, `lintDebug` executed non-blocking with
 report artifact, APK + test results + lint report uploaded as artifacts named with the
 commit SHA. RATIONALE: reproducible, hash-bound, no secrets needed inside the workflow.
+
+---
+
+# Graph 2 decisions (G2-xxx)
+
+### G2-001 — main established from verified Graph 1 authority (2026-11-01)
+DECISION: per GRAPH 2 brief §21 (latest Owner decision, supersedes G-006), remote `main`
+was created at `e7ab101ecde0dd093edd27b94bbb969822063d26` via the GitHub refs API
+(new ref, no history rewrite, no force-push), local `main` fast-forwarded ffe6749→e7ab101,
+fresh remote read-back performed, and `graph-2/model-manager-tower-connection-e2e`
+created from that verified main.
+EVIDENCE: API branch list shows main e7ab101; local merge was --ff-only.
+
+### G2-002 — default-branch switch blocked by token scope (2026-11-01)
+DECISION: attempt to set repo default_branch to main returned 403
+"Resource not accessible by personal access token" (missing Administration scope).
+NOT an auth expiry → execution continues with default branch unchanged
+(`foundation/v0.1-cloud-build`); `main` is still the PR base and merge target.
+If still blocked after merge, the default-branch switch is an Owner manual step
+(recorded in Terminal Receipt). Typed as a scope constraint, not a blocker.
+
+### G2-003 — zero new runtime dependencies for Graph 2 (2026-11-01)
+DECISION: RealTowerBridge uses `HttpURLConnection`; the deterministic mock Tower server is a
+hand-rolled `ServerSocket` fixture; secure storage is a direct AndroidKeyStore AES-256-GCM
+vault. Only androidx.test / espresso / compose-ui-test are added, test-scope only.
+RATIONALE: minimal supply-chain surface, deterministic tests, JVM-executable connection tests.
+
+### G2-004 — model artifacts: generated test fixture only (2026-11-01)
+DECISION: the download path is qualified with a small deterministic in-repo-generated test
+artifact served by the in-app localhost mock server; the catalog lists real-world candidates
+(whisper-tiny, piper, gemma-class) in non-downloadable states. No real large model is
+downloaded in Graph 2; no model file is committed; real-model qualification is
+QUALIFICATION_PENDING_DEVICE.

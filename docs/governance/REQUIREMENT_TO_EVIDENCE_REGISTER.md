@@ -20,3 +20,24 @@ requirements for which GRAPH 1 holds physical evidence, with typed evidence clas
 | Device qualification | Install + read-back on Xiaomi 11 Lite 5G NE | — | QUALIFICATION_PENDING_DEVICE |
 
 Test totals (physical, 2026-11-01): 33 `@Test` in 6 classes; 33 executed, 0 failed (local JVM).
+
+---
+
+# GRAPH 2 REQUIREMENTS (VM-*, TC-*, SC-*, MG-*) — evidence appended as nodes complete
+
+| Req | Requirement (short) | Evidence | Status |
+| --- | --- | --- | --- |
+| VM-01..11 | Voice Model Manager contracts (catalog, resolver, download, verify, storage, qualification, activation, rollback, registry, resource reader, policy) | — | PENDING |
+| VM-STATE | 18 model states; no silent download; explicit confirmation gate | — | PENDING |
+| VM-UI | Settings→Voice Models and Local Intelligence (A–F sections) | — | PENDING |
+| TC-01 | TowerConnectionProfile typed schema (26 fields) + config states | — | PENDING |
+| TC-02 | Deterministic validation + typed test outcomes; never CONNECTED on validation-only | — | PENDING |
+| TC-03 | Secrets in Keystore-backed vault; secret-clean export/import | — | PENDING |
+| TC-04 | TowerBridge boundary: versioned contract, mock + real adapter + local deterministic server | — | PENDING |
+| TC-UI | Settings→Hermes Tower Connection; Basic/Advanced split; 11 actions | — | PENDING |
+| SC-01 | Self-Test Center ST-01..ST-45 with typed results and modes | — | PENDING |
+| SC-02 | In-app automated test architecture (JVM + instrumentation + Compose) | — | PENDING |
+| MG-01 | V0.1→V0.2 versioned settings migration (fresh/partial/corrupt/unknown/rollback) | — | PENDING |
+| E2E-01..45 | Android emulator end-to-end flow, terminal state ANDROID_EMULATOR_E2E_PASSED | — | PENDING |
+| APK-G2 | 0.2.0-debug APK created, hashed, bound to commit | — | PENDING |
+| GATE-01..15 | Graph 2 mandatory gates | — | PENDING |

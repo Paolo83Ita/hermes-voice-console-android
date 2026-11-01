@@ -110,3 +110,24 @@ TEST: zip listing + secret scan 0 findings + git log verification.
 FILES: download/hermes-voice-console-android-v0.1.1-graph1.zip (deliverables folder)
 COMMIT: graph-1/final (SHA recorded at commit time; see git log)
 NEXT: Owner — install per INSTALL_XIAOMI.md; report read-back; then Owner merges main.
+
+---
+
+# WORK LOG — GRAPH 2 (branch graph-2/model-manager-tower-connection-e2e)
+
+NODE G2-N01 — Graph 1 remote read-back
+FINDING: repo private=true; branches: foundation/v0.1-cloud-build e7ab101 only; commit
+e7ab101 verified; run 41297120173 android-debug-build completed SUCCESS on e7ab101; ledger
+1F/2S confirmed (8038bfd failure, 505047e success, e7ab101 success); authoritative APK
+(run 41296592392 @ 505047e) hash re-verified locally: f7a76735…cd0be7, 57,848,596 bytes —
+exact match. No PRs. main did NOT exist.
+ACTION: accepted Graph 1 authority as physically verified.
+COMMIT: (read-back only)
+NEXT: main authority.
+
+NODE G2-N02 — main authority + Graph 2 branch
+FINDING: PAT lacks Administration scope → default-branch PATCH 403 (G2-002, non-blocking).
+ACTION: created remote main at e7ab101 (refs API); local main ff to e7ab101; created and
+pushed graph-2/model-manager-tower-connection-e2e; fresh read-back: 3 branches all e7ab101.
+COMMIT: (branch ops only) — CP-G2-001
+NEXT: governance update.

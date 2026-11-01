@@ -2,15 +2,32 @@
 
 ```yaml
 graph:
-  id: HVC_GRAPH_1_PRIVATE_REPOSITORY_CLOUD_BUILD
-  version: "1.0"
+  id: HVC_GRAPH_2_MODEL_MANAGER_TOWER_CONNECTION_AND_E2E
+  version: "2.0"
   project: hermes-voice-console-android
   owner: Paolo Lombisani
   executor: GLM 5.3 Flash
-  mission_mode: CONTINUE_EXISTING_PROJECT
+  mission_mode: CONTINUE_FROM_GRAPH_1_REMOTE_AUTHORITY
   repository: { owner: Paolo83Ita, name: hermes-voice-console-android, visibility: PRIVATE }
-  default_branch: main          # untouched by graph (Owner merges)
-  working_branch: foundation/v0.1-cloud-build
+  default_branch_note: >-
+    main exists (established by Graph 2 at e7ab101 from the verified Graph 1
+    authority). Repo default-branch setting remains foundation/v0.1-cloud-build
+    because the PAT lacks repo administration scope (G2-002); convergence to
+    main happens via merge, default switch is an Owner manual step if still blocked.
+  authority_branch: main            # established from verified Graph 1 commit e7ab101
+  graph1_branch: foundation/v0.1-cloud-build
+  working_branch: graph-2/model-manager-tower-connection-e2e
+  target_version: 0.2.0-debug
+  graph1_authority:
+    final_remote_commit: e7ab101ecde0dd093edd27b94bbb969822063d26
+    final_workflow_run: "41297120173"
+    final_cloud_build: SUCCESS
+    authoritative_apk:
+      run: "41296592392"
+      commit: 505047e9e05351a74b2b400ccca6442c364118ff
+      size_bytes: 57848596
+      sha256: f7a767354e241961928f1b536ec71c23e005920f55b7e7a791b29cc126cd0be7
+    unit_tests: { executed: 33, failures: 0 }
   updated: "2026-11-01"
 ```
 
@@ -18,14 +35,23 @@ Node statuses are tracked with timestamps in `WORK_LOG.md` (single active Node C
 Bundle rule) and summarized in `CURRENT_PROJECT_TRUTH.md`. This file records the graph
 identity and node topology only, to avoid dual-maintained status duplicates.
 
+Graph 1 nodes (N0–N8) are CLOSED — see Graph 1 records and `CHECKPOINT_INDEX.md`.
+
 | Node | Objective | Depends on |
 | --- | --- | --- |
-| N0_workspace_reconciliation | Physically verify every Foundation Run claim | — |
-| N1_governance_install | 10 authority files under docs/governance/ | N0 |
-| N2_git_foundation | Working branch, mode normalization, secret scan | N1 |
-| N3_repo_convergence | Push complete project to private repo + read-back | N2, N4 |
-| N4_build_readiness | Wrapper + local toolchain + static checks + local green build | N2 |
-| N5_cloud_build | Execute Actions debug build, repair ≤3 iterations | N3 |
-| N6_apk_receipt | Retrieve artifact, SHA-256, commit binding, receipt | N5 |
-| N7_xiaomi_readiness | Owner install runbook + device checklist refresh | N6 |
-| N8_final_report | Truth refresh, ZIP refresh, checkpoint report | N7 |
+| G2-N01_graph1_readback | Physical remote read-back of Graph 1 (repo privacy, branches, commit, run, APK hash) | — |
+| G2-N02_main_authority | Establish main at e7ab101, fresh read-back, create graph-2 branch | G2-N01 |
+| G2-N03_governance_update | Mission Graph 2.0, truth delta, decision log, evidence register skeleton | G2-N02 |
+| G2-N04_model_manager | Voice Model Manager foundation (catalog, resolver, download, install, activation, rollback) + JVM tests | G2-N03 |
+| G2-N05_tower_studio | TowerConnectionProfile, validator, secure vault, RealTowerBridge adapter, local mock server + JVM tests | G2-N04 |
+| G2-N06_self_test_center | 45 deterministic self-tests (ST-01..ST-45), modes, engine + UI | G2-N05 |
+| G2-N07_migration | Versioned V0.1→V0.2 settings migration + tests | G2-N05 |
+| G2-N08_ui | Model Manager / Tower Studio / Self-Test Center Compose UI + navigation | G2-N04..06 |
+| G2-N09_test_arch | Instrumentation + Compose UI + E2E suite (E2E-01..E2E-45) | G2-N08 |
+| G2-N10_workflows | android-debug-build update + android-e2e.yml (emulator API 34/35) | G2-N09 |
+| G2-N11_cloud_qual | Unit + lint + assembleDebug qualification runs, repair ≤3 | G2-N10 |
+| G2-N12_e2e_qual | Emulator E2E runs, evidence-based repair ≤3 per failure class | G2-N11 |
+| G2-N13_apk | V0.2 debug APK, SHA-256, APK receipt | G2-N12 |
+| G2-N14_docs | 13 Graph 2 docs, benchmark baseline, Xiaomi package | G2-N13 |
+| G2-N15_convergence | Secret-clean scan, PR, 15 gates, merge to main, final main build + E2E | G2-N14 |
+| G2-N16_terminality | Terminal Receipt + terminality calculation | G2-N15 |

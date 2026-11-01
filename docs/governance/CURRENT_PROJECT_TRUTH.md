@@ -61,3 +61,21 @@ Secret/device scan: 0 findings in working tree and full git history (scripts/sec
   TOWER_REAL_INTEGRATION never claimed.
 - Microphone capture, real STT, real TTS, wake word: intentionally INACTIVE in V0.1
   (Inactive* stubs; manifest permissions declared but not requested at runtime).
+
+---
+
+# GRAPH 2 TRUTH (appended 2026-11-01; supersedes §3 for main/branch facts)
+
+## 5. Graph 2 baseline (physical read-back)
+
+- Graph 1 authority accepted after physical verification: private repo, commit e7ab101,
+  run 41297120173 SUCCESS, authoritative APK hash f7a76735… re-verified locally.
+- `main` established at e7ab101 (refs API, new ref); local main ff'd; read-back: 3 branches
+  all e7ab101. Default-branch switch to main blocked by PAT scope (403) — G2-002.
+- Working branch: graph-2/model-manager-tower-connection-e2e (pushed, e7ab101).
+
+## 6. Graph 2 explicit NOT-true-yet (will be updated per node)
+
+- Voice Model Manager, Tower Connection Studio, Self-Test Center: PENDING (this graph).
+- Real Tower connectivity: still never claimed; mock + configurable real adapter only.
+- Emulator E2E: PENDING. V0.2 APK: PENDING. Physical Xiaomi: QUALIFICATION_PENDING_DEVICE.
