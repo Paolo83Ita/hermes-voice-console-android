@@ -7,6 +7,11 @@ import com.hermestower.voiceconsole.core.state.ConsoleSettings
 /**
  * Non-sensitive UI settings persistence (decision D-004).
  * No credential ever passes through here (SEC-01); secrets have their own contract.
+ *
+ * Reads are type-tolerant: after a versioned migration the same file may hold a
+ * value written as string (migration) or native Boolean/Float (this repository).
+ * A wrong-typed value falls back to the default instead of crashing the app
+ * (emulator E2E finding, fixed in Graph 2).
  */
 class SettingsRepository(context: Context) {
 
@@ -16,15 +21,15 @@ class SettingsRepository(context: Context) {
     fun load(): ConsoleSettings {
         val d = ConsoleSettings()
         return ConsoleSettings(
-            darkTheme = prefs.getBoolean(K_DARK, d.darkTheme),
-            followSystemTheme = prefs.getBoolean(K_FOLLOW, d.followSystemTheme),
-            reducedMotion = prefs.getBoolean(K_REDUCED, d.reducedMotion),
-            animationIntensity = prefs.getFloat(K_INTENSITY, d.animationIntensity),
-            burnInGuard = prefs.getBoolean(K_BURNIN, d.burnInGuard),
-            keepScreenOn = prefs.getBoolean(K_SCREEN_ON, d.keepScreenOn),
-            captionsEnabled = prefs.getBoolean(K_CAPTIONS, d.captionsEnabled),
-            brightnessScrim = prefs.getFloat(K_SCRIM, d.brightnessScrim),
-            speakingRate = prefs.getFloat(K_RATE, d.speakingRate),
+            darkTheme = prefs.tolerantBool(K_DARK, d.darkTheme),
+            followSystemTheme = prefs.tolerantBool(K_FOLLOW, d.followSystemTheme),
+            reducedMotion = prefs.tolerantBool(K_REDUCED, d.reducedMotion),
+            animationIntensity = prefs.tolerantFloat(K_INTENSITY, d.animationIntensity),
+            burnInGuard = prefs.tolerantBool(K_BURNIN, d.burnInGuard),
+            keepScreenOn = prefs.tolerantBool(K_SCREEN_ON, d.keepScreenOn),
+            captionsEnabled = prefs.tolerantBool(K_CAPTIONS, d.captionsEnabled),
+            brightnessScrim = prefs.tolerantFloat(K_SCRIM, d.brightnessScrim),
+            speakingRate = prefs.tolerantFloat(K_RATE, d.speakingRate),
         )
     }
 
@@ -43,6 +48,20 @@ class SettingsRepository(context: Context) {
     }
 
     fun clear() = prefs.edit().clear().apply()
+
+    private fun SharedPreferences.tolerantBool(key: String, default: Boolean): Boolean =
+        when (val raw = all[key]) {
+            is Boolean -> raw
+            is String -> raw.toBooleanStrictOrNull() ?: default
+            else -> default
+        }
+
+    private fun SharedPreferences.tolerantFloat(key: String, default: Float): Float =
+        when (val raw = all[key]) {
+            is Float -> raw
+            is String -> raw.toFloatOrNull() ?: default
+            else -> default
+        }
 
     private companion object {
         const val K_DARK = "dark_theme"
