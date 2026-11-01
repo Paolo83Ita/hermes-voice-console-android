@@ -184,7 +184,7 @@ class RealTowerBridge(
         conn.doOutput = true
         conn.setRequestProperty("Content-Type", "application/json")
         conn.setRequestProperty("Idempotency-Key", frame.requestId)
-        if (!secret.isNullOrEmpty()) conn.setRequestProperty("Authorization", "Bearer " + String(secret))
+        if (secret != null && secret.isNotEmpty()) conn.setRequestProperty("Authorization", "Bearer " + String(secret))
         try {
             conn.outputStream.use { it.write(json.encodeToString(TowerRequestFrame.serializer(), frame).toByteArray()) }
             val code = conn.responseCode
