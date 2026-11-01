@@ -70,7 +70,7 @@ class FileTowerProfileStore(
     override fun state(): ConnectionConfigState = cachedState
 
     override fun saveDraft(profile: TowerConnectionProfile): TowerProfileWriteResult {
-        val report = TowerProfileValidator.validate(profile, vault.contains(secretKey(profile.profileId)), clock().toString())
+        val report = TowerProfileValidator.validate(profile, vault.contains(VaultKeys.secretKeyFor(profile.profileId)), clock().toString())
         val stateToStore = if (report.passed) ConnectionConfigState.DRAFT else ConnectionConfigState.INVALID
         writeWithBackup(profile.copy(updatedAt = clock().toString(), lastValidationAt = clock().toString()))
         cachedState = stateToStore
@@ -78,7 +78,7 @@ class FileTowerProfileStore(
     }
 
     override fun saveValidated(profile: TowerConnectionProfile): TowerProfileWriteResult {
-        val report = TowerProfileValidator.validate(profile, vault.contains(secretKey(profile.profileId)), clock().toString())
+        val report = TowerProfileValidator.validate(profile, vault.contains(VaultKeys.secretKeyFor(profile.profileId)), clock().toString())
         if (!report.passed) {
             cachedState = ConnectionConfigState.INVALID
             return TowerProfileWriteResult.Rejected(report.issues.joinToString("; ") { it.toString() })
@@ -181,7 +181,7 @@ class FileTowerProfileStore(
 
     private fun readJson(path: Path): TowerConnectionProfile? = try {
         if (!Files.exists(path)) null
-        else json.decodeFromString(TowerConnectionProfile.serializer(), Files.readString(path))
+        else json.decodeFromString(TowerConnectionProfile.serializer(), String(Files.readAllBytes(path), Charsets.UTF_8))
     } catch (_: Exception) {
         null
     }
@@ -189,7 +189,7 @@ class FileTowerProfileStore(
     private fun writeJson(path: Path, profile: TowerConnectionProfile) {
         Files.createDirectories(path.parent)
         val tmp = path.resolveSibling(path.fileName.toString() + ".tmp")
-        Files.writeString(tmp, json.encodeToString(TowerConnectionProfile.serializer(), profile))
+        Files.write(tmp, json.encodeToString(TowerConnectionProfile.serializer(), profile).toByteArray(Charsets.UTF_8))
         Files.move(tmp, path, StandardCopyOption.REPLACE_EXISTING, StandardCopyOption.ATOMIC_MOVE)
     }
 

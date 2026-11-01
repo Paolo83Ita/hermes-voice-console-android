@@ -83,7 +83,7 @@ object TowerConnectionTester {
             conn = urlOf(profile).openConnection() as HttpURLConnection
             conn.connectTimeout = profile.requestTimeoutMs
             conn.readTimeout = profile.requestTimeoutMs
-            if (!secret.isNullOrEmpty()) conn.setRequestProperty("Authorization", "Bearer " + String(secret))
+            if (secret != null && secret.isNotEmpty()) conn.setRequestProperty("Authorization", "Bearer " + String(secret))
             conn.setRequestProperty("Accept", "application/json")
             try {
                 conn.connect()
@@ -168,7 +168,7 @@ object TowerConnectionTester {
         val conn = url.openConnection() as HttpURLConnection
         conn.connectTimeout = profile.requestTimeoutMs
         conn.readTimeout = profile.requestTimeoutMs
-        if (!secret.isNullOrEmpty()) conn.setRequestProperty("Authorization", "Bearer " + String(secret))
+        if (secret != null && secret.isNotEmpty()) conn.setRequestProperty("Authorization", "Bearer " + String(secret))
         val code = conn.responseCode
         val body = if (code in 200..299) conn.inputStream.bufferedReader().use { it.readText() } else ""
         conn.disconnect()

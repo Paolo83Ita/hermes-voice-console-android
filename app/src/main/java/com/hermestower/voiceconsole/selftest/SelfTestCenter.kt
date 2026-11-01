@@ -2,7 +2,7 @@ package com.hermestower.voiceconsole.selftest
 
 import com.hermestower.voiceconsole.models.ModelCatalogEntry
 import com.hermestower.voiceconsole.models.ModelComponentType
-import com.hermestower.voiceconsole.models.ModelDownloadManager
+import com.hermestower.voiceconsole.models.DefaultModelDownloadManager
 import com.hermestower.voiceconsole.models.ModelInstallationRegistry
 import com.hermestower.voiceconsole.models.ModelQualificationRunner
 import com.hermestower.voiceconsole.models.ModelRollbackController
@@ -60,7 +60,7 @@ data class SelfTestSubjects(
     val resolver: VoicePackResolver,
     val storage: ModelStorageManager,
     val registry: ModelInstallationRegistry,
-    val downloads: ModelDownloadManager,
+    val downloads: DefaultModelDownloadManager,
     val qualificationRunner: ModelQualificationRunner,
     val activation: ModelActivationController,
     val rollback: ModelRollbackController,
@@ -181,7 +181,7 @@ class SelfTestCenter(
     fun exportSecretCleanReport(): String = buildString {
         appendLine("Hermes Voice Console — Self-Test Report (secret-clean)")
         appendLine("app: ${subjects.appVersion}  commit: ${subjects.commitReference ?: "unrecorded"}")
-        appendLine("environment: ${subjects.environment}  vault: ${subjects.vault.available().displayLabel}")
+        appendLine("environment: ${if (subjects.isAndroidRuntime) "android-runtime" else "in-app"}  vault: ${subjects.vault.available().displayLabel}")
         appendLine()
         _results.value.toSortedMap().forEach { (id, r) ->
             appendLine(

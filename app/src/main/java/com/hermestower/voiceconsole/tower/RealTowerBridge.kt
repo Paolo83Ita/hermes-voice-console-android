@@ -102,7 +102,7 @@ class RealTowerBridge(
             TowerConnectionTester.Outcome.STREAMING_UNAVAILABLE ->
                 failure(BridgeError.CAPACITY, report.detail, retryable = true, tls = report.tlsStatus)
             TowerConnectionTester.Outcome.TLS_FAILED -> {
-                _connection.update { it.copy(status = ConnectionStatus.BridgeStatus.ERROR, tls = ConnectionStatus.TlsStatus.FAILED) }
+                _connection.update { it.copy(status = ConnectionStatus.BridgeStatus.DISCONNECTED, tls = ConnectionStatus.TlsStatus.FAILED) }
                 BridgeResult.Failure(BridgeError.TRANSPORT, report.detail, retryable = false)
             }
             else -> failure(BridgeError.TRANSPORT, report.detail, retryable = true, tls = report.tlsStatus)
@@ -116,11 +116,10 @@ class RealTowerBridge(
             return@flow
         }
         // Duplicate protection: same requestId refused locally, server-side 409 also mapped.
-        synchronized(seenIdempotencyKeys) {
-            if (!seenIdempotencyKeys.add(frame.requestId)) {
-                emit(errorEvent(frame.requestId, BridgeError.INVALID_REQUEST, "Duplicate request id refused.", retryable = false))
-                return@flow
-            }
+        val duplicate = synchronized(seenIdempotencyKeys) { !seenIdempotencyKeys.add(frame.requestId) }
+        if (duplicate) {
+            emit(errorEvent(frame.requestId, BridgeError.INVALID_REQUEST, "Duplicate request id refused.", retryable = false))
+            return@flow
         }
         emit(
             TowerEventFrame(type = TowerEventFrame.ACK, requestId = frame.requestId, stage = "SENT", timestamp = Instant.now().toString()),
@@ -206,7 +205,7 @@ class RealTowerBridge(
     private fun failure(error: BridgeError, message: String, retryable: Boolean, tls: String = "NOT_REACHED"): BridgeResult<Unit> {
         _connection.update {
             it.copy(
-                status = ConnectionStatus.BridgeStatus.ERROR,
+                status = ConnectionStatus.BridgeStatus.DISCONNECTED,
                 tls = when (tls) {
                     "TLS_OK" -> ConnectionStatus.TlsStatus.ACTIVE
                     "NOT_ENCRYPTED" -> ConnectionStatus.TlsStatus.UNKNOWN

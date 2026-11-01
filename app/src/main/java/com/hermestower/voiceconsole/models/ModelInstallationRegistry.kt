@@ -135,7 +135,7 @@ class FileInstallationRegistry(
 
     private fun readAll(): List<InstallationRecord> {
         if (!Files.exists(file)) return emptyList()
-        val text = Files.readString(file)
+        val text = String(Files.readAllBytes(file), Charsets.UTF_8)
         if (text.isBlank()) return emptyList()
         return runCatching {
             json.decodeFromString(ListSerializer(InstallationRecord.serializer()), text)
@@ -145,7 +145,7 @@ class FileInstallationRegistry(
     private fun writeAll(records: List<InstallationRecord>) {
         Files.createDirectories(file.parent)
         val tmp = file.resolveSibling(file.fileName.toString() + ".tmp")
-        Files.writeString(tmp, json.encodeToString(ListSerializer(InstallationRecord.serializer()), records))
+        Files.write(tmp, json.encodeToString(ListSerializer(InstallationRecord.serializer()), records).toByteArray(Charsets.UTF_8))
         Files.move(tmp, file, StandardCopyOption.REPLACE_EXISTING, StandardCopyOption.ATOMIC_MOVE)
     }
 

@@ -9,6 +9,7 @@ import com.hermestower.voiceconsole.core.state.ConsoleState
 import com.hermestower.voiceconsole.core.state.ConsoleStateMachine
 import com.hermestower.voiceconsole.core.state.ConnectionStatus
 import com.hermestower.voiceconsole.models.DeterministicTestArtifact
+import com.hermestower.voiceconsole.models.ModelCatalogEntry
 import com.hermestower.voiceconsole.models.ModelComponentType
 import com.hermestower.voiceconsole.models.ModelInstallState
 import com.hermestower.voiceconsole.models.ModelSha256
@@ -29,6 +30,7 @@ import kotlinx.coroutines.flow.take
 import kotlinx.coroutines.flow.toList
 import kotlinx.coroutines.runBlocking
 import kotlinx.coroutines.withTimeout
+import java.time.Duration
 import java.time.Instant
 
 /**
@@ -109,7 +111,7 @@ object SelfTestRegistry {
             def("ST-05", "Mock Tower handshake", SelfTestCategory.TOWER, setOf(SelfTestMode.QUICK, SelfTestMode.STANDARD, SelfTestMode.FULL, SelfTestMode.CONNECTIVITY_ONLY)) { s ->
                 val server = s.serverFactory()
                 try {
-                    val bridge = RealTowerBridge(s.profileStore, dispatcher = kotlinx.coroutines.Dispatchers.IO)
+                    val bridge = RealTowerBridge(s.profileStore, ioDispatcher = kotlinx.coroutines.Dispatchers.IO)
                     val profile = mockHttpProfile(server)
                     s.profileStore.setSecret(profile.profileId, "st-secret".toCharArray())
                     bridge.configure(profile)
@@ -160,7 +162,7 @@ object SelfTestRegistry {
                 val server = s.serverFactory()
                 try {
                     server.setBehavior("/tower/api", LocalTowerMockServer.Behavior.DISCONNECT_ON_CONNECT)
-                    val bridge = RealTowerBridge(s.profileStore, dispatcher = kotlinx.coroutines.Dispatchers.IO)
+                    val bridge = RealTowerBridge(s.profileStore, ioDispatcher = kotlinx.coroutines.Dispatchers.IO)
                     bridge.configure(mockHttpProfile(server))
                     val result = runBlocking { withTimeout(10_000) { bridge.handshake() } }
                     if (result is com.hermestower.voiceconsole.domain.BridgeResult.Failure &&
@@ -178,7 +180,7 @@ object SelfTestRegistry {
                 val server = s.serverFactory()
                 try {
                     server.setBehavior("/tower/api", LocalTowerMockServer.Behavior.DISCONNECT_ON_CONNECT)
-                    val bridge = RealTowerBridge(s.profileStore, dispatcher = kotlinx.coroutines.Dispatchers.IO)
+                    val bridge = RealTowerBridge(s.profileStore, ioDispatcher = kotlinx.coroutines.Dispatchers.IO)
                     bridge.configure(mockHttpProfile(server))
                     runBlocking { withTimeout(10_000) { bridge.handshake() } }
                     server.setBehavior("/tower/api", LocalTowerMockServer.Behavior.OK)
@@ -600,7 +602,7 @@ object SelfTestRegistry {
     ): Pair<SelfTestState, String> {
         val server = s.serverFactory()
         try {
-            val bridge = RealTowerBridge(s.profileStore, dispatcher = kotlinx.coroutines.Dispatchers.IO)
+            val bridge = RealTowerBridge(s.profileStore, ioDispatcher = kotlinx.coroutines.Dispatchers.IO)
             val profile = mockHttpProfile(server)
             s.profileStore.setSecret(profile.profileId, "st-secret".toCharArray())
             bridge.configure(profile)

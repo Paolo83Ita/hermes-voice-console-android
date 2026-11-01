@@ -205,10 +205,10 @@ class LocalTowerMockServer(
             val endStr = range.substringAfter('-', "")
             val start = startStr.toLongOrNull() ?: 0L
             if (start >= bytes.size) {
-                writeStatus(out, 416, "Range Not Satisfiable", emptyMap(), ByteArray(0))
+                writeStatus(out, 416, "Range Not Satisfiable", emptyMap(), ByteArray(0), 0, 0)
                 return
             }
-            val end = if (endStr.isBlank()) bytes.size - 1 else minOf(endStr.toLongOrNull() ?: (bytes.size - 1), bytes.size - 1)
+            val end = if (endStr.isBlank()) (bytes.size - 1).toLong() else minOf(endStr.toLongOrNull() ?: (bytes.size - 1).toLong(), (bytes.size - 1).toLong())
             val len = (end - start + 1).toInt()
             val header = mapOf(
                 "Content-Type" to "application/octet-stream",
