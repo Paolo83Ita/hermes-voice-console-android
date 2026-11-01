@@ -88,11 +88,14 @@ class DefaultModelDownloadManager(
         // Pausing is only meaningful while bytes are in flight; a completed or
         // failed download is left in its truthful state.
         if (f.value.state != ModelInstallState.DOWNLOADING) return
-        synchronized(jobs) { jobs.remove(identity)?.cancel() }
+        val job = synchronized(jobs) { jobs.remove(identity) }
+        job?.cancel()
+        joinQuietly(job)
         f.value = f.value.copy(state = ModelInstallState.DOWNLOAD_PAUSED)
     }
 
     override fun resume(entry: ModelCatalogEntry, url: String) {
+        joinQuietly(synchronized(jobs) { jobs[entry.identity] })
         val partial = partialFile(entry)
         val resumeFrom = if (partial != null && Files.exists(partial)) Files.size(partial) else 0
         if (resumeFrom >= entry.downloadSizeBytes) {
@@ -109,11 +112,22 @@ class DefaultModelDownloadManager(
     }
 
     override fun cancel(identity: String) {
-        synchronized(jobs) { jobs.remove(identity)?.cancel() }
+        val job = synchronized(jobs) { jobs.remove(identity) }
+        job?.cancel()
+        joinQuietly(job)
         val f = flowFor(identity)
         val partial = partialFileByIdentity(identity)
         if (partial != null) Files.deleteIfExists(partial)
         f.value = f.value.copy(state = ModelInstallState.DOWNLOAD_APPROVAL_REQUIRED, bytesDownloaded = 0, error = "Cancelled by user.")
+    }
+
+    /** Bounded join: guarantees the writer has stopped before the partial is read or deleted. */
+    private fun joinQuietly(job: Job?) {
+        if (job == null) return
+        val deadline = System.currentTimeMillis() + 3_000
+        while (!job.isCompleted && System.currentTimeMillis() < deadline) {
+            Thread.sleep(5)
+        }
     }
 
     private fun partialFile(entry: ModelCatalogEntry): Path? =
