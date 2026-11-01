@@ -46,6 +46,8 @@ data class ConsoleSettings(
     val captionsEnabled: Boolean = true,
     val brightnessScrim: Float = 0f,
     val speakingRate: Float = 1.0f,
+    /** GRAPH 3: LOW / BALANCED / HIGH visual quality profile (mission §14). */
+    val visualQuality: String = "BALANCED",
 )
 
 /**

@@ -1,0 +1,220 @@
+{
+  "pages": [
+    {
+      "page": "p01_console_idle.png",
+      "expected": [
+        1080,
+        2400
+      ],
+      "overflow": {
+        "outside": [],
+        "scrollers": []
+      },
+      "rendered_bytes": 870130,
+      "nonblack_ratio": 0.8063,
+      "nonwhite_ratio": 1.0,
+      "blank": false
+    },
+    {
+      "page": "p02_console_listening.png",
+      "expected": [
+        1080,
+        2400
+      ],
+      "overflow": {
+        "outside": [],
+        "scrollers": []
+      },
+      "rendered_bytes": 966688,
+      "nonblack_ratio": 0.8063,
+      "nonwhite_ratio": 1.0,
+      "blank": false
+    },
+    {
+      "page": "p03_console_tower.png",
+      "expected": [
+        1080,
+        2400
+      ],
+      "overflow": {
+        "outside": [],
+        "scrollers": []
+      },
+      "rendered_bytes": 929893,
+      "nonblack_ratio": 0.8063,
+      "nonwhite_ratio": 1.0,
+      "blank": false
+    },
+    {
+      "page": "p04_console_speaking.png",
+      "expected": [
+        1080,
+        2400
+      ],
+      "overflow": {
+        "outside": [],
+        "scrollers": []
+      },
+      "rendered_bytes": 985069,
+      "nonblack_ratio": 0.8068,
+      "nonwhite_ratio": 1.0,
+      "blank": false
+    },
+    {
+      "page": "p05_console_disconnected.png",
+      "expected": [
+        1080,
+        2400
+      ],
+      "overflow": {
+        "outside": [],
+        "scrollers": []
+      },
+      "rendered_bytes": 869274,
+      "nonblack_ratio": 0.8063,
+      "nonwhite_ratio": 1.0,
+      "blank": false
+    },
+    {
+      "page": "p06_model_manager.png",
+      "expected": [
+        1080,
+        2400
+      ],
+      "overflow": {
+        "outside": [],
+        "scrollers": []
+      },
+      "rendered_bytes": 435963,
+      "nonblack_ratio": 0.4203,
+      "nonwhite_ratio": 1.0,
+      "blank": false
+    },
+    {
+      "page": "p07_tower_studio.png",
+      "expected": [
+        1080,
+        2400
+      ],
+      "overflow": {
+        "outside": [],
+        "scrollers": []
+      },
+      "rendered_bytes": 425979,
+      "nonblack_ratio": 0.4784,
+      "nonwhite_ratio": 1.0,
+      "blank": false
+    },
+    {
+      "page": "p08_self_test.png",
+      "expected": [
+        1080,
+        2400
+      ],
+      "overflow": {
+        "outside": [],
+        "scrollers": []
+      },
+      "rendered_bytes": 392248,
+      "nonblack_ratio": 0.4191,
+      "nonwhite_ratio": 1.0,
+      "blank": false
+    },
+    {
+      "page": "p09_navigation.png",
+      "expected": [
+        1080,
+        2400
+      ],
+      "overflow": {
+        "outside": [],
+        "scrollers": []
+      },
+      "rendered_bytes": 335390,
+      "nonblack_ratio": 0.7158,
+      "nonwhite_ratio": 1.0,
+      "blank": false
+    },
+    {
+      "page": "p10_quality_profiles.png",
+      "expected": [
+        1080,
+        2400
+      ],
+      "overflow": {
+        "outside": [],
+        "scrollers": []
+      },
+      "rendered_bytes": 332801,
+      "nonblack_ratio": 0.1504,
+      "nonwhite_ratio": 1.0,
+      "blank": false
+    },
+    {
+      "page": "p11_landscape.png",
+      "expected": [
+        2400,
+        1080
+      ],
+      "overflow": {
+        "outside": [],
+        "scrollers": []
+      },
+      "rendered_bytes": 710520,
+      "nonblack_ratio": 0.4818,
+      "nonwhite_ratio": 1.0,
+      "blank": false
+    }
+  ],
+  "contrast": [
+    {
+      "pair": "frieze title gold on obsidian",
+      "ratio": 9.75,
+      "min": 4.5,
+      "verdict": "PASS"
+    },
+    {
+      "pair": "body ink on panel",
+      "ratio": 15.22,
+      "min": 7.0,
+      "verdict": "PASS"
+    },
+    {
+      "pair": "secondary ink on panel",
+      "ratio": 7.21,
+      "min": 4.5,
+      "verdict": "PASS"
+    },
+    {
+      "pair": "cyan caption on deep",
+      "ratio": 12.65,
+      "min": 7.0,
+      "verdict": "PASS"
+    },
+    {
+      "pair": "gold seal label on stone",
+      "ratio": 9.11,
+      "min": 4.5,
+      "verdict": "PASS"
+    },
+    {
+      "pair": "amber queue on obsidian",
+      "ratio": 8.76,
+      "min": 4.5,
+      "verdict": "PASS"
+    },
+    {
+      "pair": "red-bronze mute label",
+      "ratio": 4.24,
+      "min": 3.0,
+      "verdict": "PASS"
+    },
+    {
+      "pair": "tower blue label on deep",
+      "ratio": 6.26,
+      "min": 4.5,
+      "verdict": "PASS"
+    }
+  ],
+  "overall": "PASS"
+}

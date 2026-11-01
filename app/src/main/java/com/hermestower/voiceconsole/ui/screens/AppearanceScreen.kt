@@ -21,21 +21,26 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.unit.dp
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import com.hermestower.voiceconsole.app.AppGraph
+import com.hermestower.voiceconsole.ui.components.ModeChip
 import com.hermestower.voiceconsole.ui.components.SectionCard
 import com.hermestower.voiceconsole.ui.components.TruthBadge
+import com.hermestower.voiceconsole.ui.monumental.MonumentalType
+import com.hermestower.voiceconsole.ui.monumental.VisualQuality
+import com.hermestower.voiceconsole.ui.monumental.monumentalColors
 import com.hermestower.voiceconsole.ui.theme.HermesType
 import com.hermestower.voiceconsole.ui.theme.MarbleLightColors
 import com.hermestower.voiceconsole.ui.theme.ObsidianNightColors
 import com.hermestower.voiceconsole.ui.theme.hermesColors
 
 /**
- * S6 Appearance (FR-35): Marble Light / Obsidian Night, brightness scrim,
- * animation intensity, reduced motion, burn-in protection, screen rest note,
- * kiosk note (V0.7).
+ * S6 Appearance (FR-35) — GRAPH 3 architectural forge.
+ * Adds the Monumental quality profile selector (LOW / BALANCED / HIGH, mission §14)
+ * on top of the preserved theme, brightness, motion and display-safety controls.
  */
 @Composable
 fun AppearanceScreen(graph: AppGraph) {
     val c = hermesColors
+    val m = monumentalColors
     val settings by graph.store.settings.collectAsStateWithLifecycle()
 
     Column(
@@ -46,6 +51,35 @@ fun AppearanceScreen(graph: AppGraph) {
         verticalArrangement = Arrangement.spacedBy(12.dp),
     ) {
         Text("Appearance", style = HermesType.screenTitle, color = c.ink)
+        Text("ARCHITECTURAL FORGE · VISUAL CALIBRATION CHAMBER", style = MonumentalType.sealSub, color = m.gold)
+
+        SectionCard(title = "Visual quality (Monumental core)") {
+            Row(horizontalArrangement = Arrangement.spacedBy(8.dp)) {
+                VisualQuality.entries.forEach { q ->
+                    ModeChip(
+                        label = q.id,
+                        selected = VisualQuality.from(settings.visualQuality) == q,
+                        enabled = true,
+                        onClick = { graph.store.updateSettings { s -> s.copy(visualQuality = q.id) } },
+                    )
+                }
+            }
+            Text(
+                when (VisualQuality.from(settings.visualQuality)) {
+                    VisualQuality.LOW -> "LOW: static or nearly static core, no glow, effect cadence 5–15 fps. Intended for thermal pressure and reduced motion."
+                    VisualQuality.BALANCED -> "BALANCED (default): 30 fps complex animation target, moderate particles, layered assets, limited glow."
+                    VisualQuality.HIGH -> "HIGH: richer particles and more ring layers. Only after physical-device qualification; falls back automatically under pressure."
+                },
+                style = HermesType.bodySecondary,
+                color = c.inkSecondary,
+                modifier = Modifier.padding(top = 6.dp),
+            )
+            Text(
+                "Thermal policy uses real device temperature reads; TARGET_PENDING_DEVICE_QUALIFICATION until Xiaomi measurements exist.",
+                style = HermesType.bodySecondary,
+                color = m.inkDim,
+            )
+        }
 
         SectionCard(title = "Theme") {
             Row(horizontalArrangement = Arrangement.spacedBy(8.dp)) {
@@ -63,7 +97,7 @@ fun AppearanceScreen(graph: AppGraph) {
                 )
             }
             Text(
-                "Obsidian Night is the default identity (decision D-009): lowest power draw, lowest burn-in stress and correct night ambience for an always-on AMOLED console. Marble Light is the daylight / inspection theme.",
+                "Obsidian Night is the default identity (decision D-009) and the base of the Monumental Oracle Tower identity: lowest power draw, lowest burn-in stress and correct night ambience for an always-on AMOLED console. Marble Light is the daylight / inspection theme.",
                 style = HermesType.bodySecondary,
                 color = c.inkSecondary,
             )
@@ -77,7 +111,7 @@ fun AppearanceScreen(graph: AppGraph) {
                 valueRange = 0f..0.6f,
             )
             Text(
-                "Prototype of FR-41: a truthful dimming overlay. Real screen-brightness control and the scheduled screen rest / black idle mode arrive in V0.2.",
+                "A truthful dimming overlay (FR-41). Scheduled screen rest and the black idle option are specified in FR-42 (AMOLED_AND_BURN_IN_SAFETY.md).",
                 style = HermesType.bodySecondary,
                 color = c.inkSecondary,
             )
@@ -100,7 +134,7 @@ fun AppearanceScreen(graph: AppGraph) {
 
         SectionCard(title = "Display safety") {
             SettingRow(
-                label = "Burn-in protection (bounded ≤ 8 dp drift, 20–60 s cadence)",
+                label = "Burn-in protection (per-region bounded drift, 25 s cadence)",
                 checked = settings.burnInGuard,
                 enabled = true,
                 onToggle = { graph.store.updateSettings { s -> s.copy(burnInGuard = it) } },
@@ -112,7 +146,7 @@ fun AppearanceScreen(graph: AppGraph) {
                 onToggle = { graph.store.updateSettings { s -> s.copy(keepScreenOn = it) } },
             )
             Text(
-                "Scheduled screen rest and the optional black idle mode are specified in FR-42 and scheduled for V0.2. Thermal monitoring runs in Diagnostics today.",
+                "The Graph 3 safeguard drifts title, core, seals, transcript and medallions independently (AMOLED_AND_BURN_IN_SAFETY.md §2).",
                 style = HermesType.bodySecondary,
                 color = c.inkSecondary,
             )
@@ -121,7 +155,7 @@ fun AppearanceScreen(graph: AppGraph) {
         SectionCard(title = "Kiosk behavior") {
             TruthBadge("CONTROLLED CAPABILITY — V0.7", c.inkSecondary)
             Text(
-                "Kiosk lockdown (single-app, owner-controlled exit) is deliberately out of V0.1: it requires an explicit Owner decision and enclosure-finalized testing (FR-46).",
+                "Kiosk lockdown (single-app, owner-controlled exit) is deliberately deferred: it requires an explicit Owner decision and enclosure-finalized testing (FR-46).",
                 style = HermesType.bodySecondary,
                 color = c.inkSecondary,
             )

@@ -30,6 +30,7 @@ class SettingsRepository(context: Context) {
             captionsEnabled = prefs.tolerantBool(K_CAPTIONS, d.captionsEnabled),
             brightnessScrim = prefs.tolerantFloat(K_SCRIM, d.brightnessScrim),
             speakingRate = prefs.tolerantFloat(K_RATE, d.speakingRate),
+            visualQuality = prefs.tolerantString(K_VISUAL_QUALITY, d.visualQuality),
         )
     }
 
@@ -44,6 +45,7 @@ class SettingsRepository(context: Context) {
             .putBoolean(K_CAPTIONS, settings.captionsEnabled)
             .putFloat(K_SCRIM, settings.brightnessScrim)
             .putFloat(K_RATE, settings.speakingRate)
+            .putString(K_VISUAL_QUALITY, settings.visualQuality)
             .apply()
     }
 
@@ -53,6 +55,12 @@ class SettingsRepository(context: Context) {
         when (val raw = all[key]) {
             is Boolean -> raw
             is String -> raw.toBooleanStrictOrNull() ?: default
+            else -> default
+        }
+
+    private fun SharedPreferences.tolerantString(key: String, default: String): String =
+        when (val raw = all[key]) {
+            is String -> raw
             else -> default
         }
 
@@ -73,5 +81,6 @@ class SettingsRepository(context: Context) {
         const val K_CAPTIONS = "captions_enabled"
         const val K_SCRIM = "brightness_scrim"
         const val K_RATE = "speaking_rate"
+        const val K_VISUAL_QUALITY = "visual_quality"
     }
 }
