@@ -22,3 +22,11 @@ Graph 1 checkpoints (branch `foundation/v0.1-cloud-build`, pushed to private ori
 Exact SHAs: repair=dfabeeb · governance=6b4cef8 · ci=8038bfd · ci-fix=505047e9 ·
 receipt/qualification/final = see the git log of `foundation/v0.1-cloud-build` (recorded
 progressively in WORK_LOG.md; a file cannot contain its own commit SHA).
+
+Graph 2 checkpoint ledger (continued):
+
+| Checkpoint | Commit | Content |
+| --- | --- | --- |
+| CP-G2-017..020 | 5b54b48 → fb610ce | e2e workflow rewrite, disk/userdata/budget, migration typed-crash repair, explicit adb install + heredoc fix |
+| CP-G2-021 | a9657f0 | POSIX-sh-safe instrumentation runner (dash killed `set -o pipefail` before am instrument) |
+| CP-G2-022 | (this commit) | E2E root-cause repairs (drawer HERMES dedup, display UOE guard) + Graph 2 terminal receipt + convergence |

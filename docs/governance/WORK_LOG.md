@@ -131,3 +131,23 @@ ACTION: created remote main at e7ab101 (refs API); local main ff to e7ab101; cre
 pushed graph-2/model-manager-tower-connection-e2e; fresh read-back: 3 branches all e7ab101.
 COMMIT: (branch ops only) — CP-G2-001
 NEXT: governance update.
+
+NODE G2-N17 — instrumentation executed + typed terminality (2026-11-02 run)
+FINDING: CP-G2-021 POSIX repair worked — run 41341134806 booted the emulator (~21 min),
+explicit adb install of both APKs succeeded, am instrument ran for the first time:
+30 tests reported (5 passed / 18 failed), then the app process CRASHED at
+e2e_14_cancelActiveResponse (UnsupportedOperationException: context.display on the
+application context inside AndroidDeviceHealthMonitor.snapshot via the local
+conversation pipeline), killing 7 more tests. Every console-assertion failure shows the
+same primary defect: two exact-text "HERMES" nodes (console header + always-composed
+drawer sheet) break onNodeWithText("HERMES") (expects exactly 1).
+ACTION: two evidence-driven root-cause repairs (CP-G2-022): drawer header → single
+distinct "HERMES TOWER"; DeviceHealthMonitor display read → runCatching-null truthful
+degradation. Graph 2 closed at
+GRAPH_2_CONDITIONALLY_COMPLETE_WITH_EMULATOR_ENVIRONMENT_LIMITATION; E2E-green proof
+handed to the next cloud run (Graph 3 Wave 8); merge to main remains Owner-blocked.
+TEST: run 41341134805 (89/89 unit, lint, APK 46dcf2b8…); run 41341134806 artifacts
+(results 13098643226, failure evidence 13098564795); remote read-back.
+FILES: docs/receipts/GRAPH_2_TERMINAL_RECEIPT.md; AppNav.kt; AndroidDeviceHealthMonitor.kt
+COMMIT: CP-G2-022 (recorded in git log at commit time)
+NEXT: Graph 3 branch creation after checkpoint + remote read-back.

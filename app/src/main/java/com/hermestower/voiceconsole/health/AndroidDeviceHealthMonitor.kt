@@ -28,7 +28,11 @@ class AndroidDeviceHealthMonitor(private val context: Context) : DeviceHealthMon
         // it is exposed via the sticky ACTION_BATTERY_CHANGED broadcast (tenths of °C).
         val temperature = context.registerReceiver(null, IntentFilter(Intent.ACTION_BATTERY_CHANGED))
             ?.getIntExtra(BatteryManager.EXTRA_TEMPERATURE, Int.MIN_VALUE)
-        val display: Display? = context.display
+        // Application contexts are not associated with a display on API 30+; asking
+        // for one throws UnsupportedOperationException and killed the E2E process
+        // (emulator run 41341134806, e2e_14). Degrade truthfully instead: null means
+        // "unavailable on this context" — the same contract as every other field.
+        val display: Display? = runCatching { context.display }.getOrNull()
 
         return DeviceHealthMonitor.DeviceHealthSnapshot(
             manufacturer = Build.MANUFACTURER,

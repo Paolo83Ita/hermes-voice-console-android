@@ -79,3 +79,22 @@ Secret/device scan: 0 findings in working tree and full git history (scripts/sec
 - Voice Model Manager, Tower Connection Studio, Self-Test Center: PENDING (this graph).
 - Real Tower connectivity: still never claimed; mock + configurable real adapter only.
 - Emulator E2E: PENDING. V0.2 APK: PENDING. Physical Xiaomi: QUALIFICATION_PENDING_DEVICE.
+
+---
+
+# GRAPH 2 TERMINAL TRUTH (appended 2026-11-02 run; supersedes §6 above)
+
+- Terminal state: **GRAPH_2_CONDITIONALLY_COMPLETE_WITH_EMULATOR_ENVIRONMENT_LIMITATION**
+  (receipt: `docs/receipts/GRAPH_2_TERMINAL_RECEIPT.md`).
+- Branch head: a9657f0 (CP-G2-021) + CP-G2-022 (repairs + this convergence).
+- Build authority: run 41341134805 @ a9657f0 — unit tests **89/89**, lint executed,
+  APK 58,604,732 B sha256 46dcf2b8…d8dc7f. Earlier preserved authority: 9ea0c6c.
+- Emulator E2E: EXECUTED for the first time (run 41341134806): boot ✓, explicit adb
+  install ✓, am instrument ✓; 30 reported: 5✓ 18✗, 7 killed by process crash.
+- Root causes found + repaired at CP-G2-022: (1) duplicate exact-text "HERMES" node
+  (console header + always-composed drawer) → drawer now "HERMES TOWER"; (2)
+  AndroidDeviceHealthMonitor context.display UnsupportedOperationException on
+  application context → runCatching-null (truthful unavailable). E2E-green proof is
+  carried by the next cloud E2E run (Graph 3 Wave 8 gate).
+- Real Tower integration: STILL never claimed (mock + deterministic simulator only).
+- Physical Xiaomi: QUALIFICATION_PENDING_DEVICE. Merge to main: OWNER_APPROVAL_PENDING.

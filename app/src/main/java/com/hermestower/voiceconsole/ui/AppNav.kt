@@ -104,7 +104,11 @@ fun AppNav(graph: AppGraph) {
                         .padding(16.dp),
                     horizontalAlignment = Alignment.CenterHorizontally,
                 ) {
-                    Text("HERMES", style = HermesType.brand, color = c.bronze, modifier = Modifier.padding(top = 12.dp))
+                    // Graph 2 E2E finding (run 41341134806): an exact-text "HERMES"
+                    // node in the always-composed drawer sheet duplicated the console
+                    // header node and broke every onNodeWithText("HERMES") assertion.
+                    // The drawer header is a single distinct string instead.
+                    Text("HERMES TOWER", style = HermesType.brand, color = c.bronze, modifier = Modifier.padding(top = 12.dp))
                     Text(
                         "VOICE CONSOLE — V0.2",
                         style = HermesType.sectionLabel,
