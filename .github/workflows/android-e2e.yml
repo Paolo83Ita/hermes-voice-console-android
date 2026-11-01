@@ -82,6 +82,11 @@ jobs:
             # POSIX-safe: capture to file, echo it, classify the result.
             timeout 3600 adb shell am instrument -w -r com.hermestower.voiceconsole.test/androidx.test.runner.AndroidJUnitRunner > instrumentation-output.txt 2>&1
             cat instrumentation-output.txt
+            # Evidence capture INSIDE the script step: the runner tears the emulator
+            # down before the separate failure-evidence step can run, which produced
+            # empty evidence on every failure so far (runs 41349811483 / 41356511688).
+            adb logcat -d -t 6000 > e2e-logcat-tail.txt 2>/dev/null || true
+            adb exec-out screencap -p > e2e-final-screen.png 2>/dev/null || true
             if grep -q 'OK ([0-9][0-9]* tests)' instrumentation-output.txt; then
               echo 'INSTRUMENTATION_PASSED'
             else
@@ -98,6 +103,8 @@ jobs:
             app/build/outputs/androidTest-results/
             app/build/reports/androidTests/
             instrumentation-output.txt
+            e2e-logcat-tail.txt
+            e2e-final-screen.png
           if-no-files-found: ignore
           retention-days: 14
 

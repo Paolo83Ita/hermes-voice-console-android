@@ -208,3 +208,18 @@ slowness) — no assertion weakened; the next run's ledger decides.
 TEST: run 41349811483 artifact 13103201619 (full ledger archived); local build 102/102.
 COMMIT: CP-G3-004 (recorded at commit time)
 NEXT: cloud cycle on CP-G3-004 → Graph 3 terminal receipt.
+
+NODE G3-N09 — cleartext repair verdict + evidence-pipeline repair (2026-11-02)
+FINDING: CP-G3-004 cycle — build run SUCCESS; E2E run 41356511688 identical ledger
+(30 reported, 14✓/16✗, downloads still "last=FAILED"). Cleartext policy alone did not
+fix the download class → hypothesis NOT confirmed; no blind code change (mission §18:
+evidence-driven, ≤3 substantive repairs per class, attempt 1 spent).
+ROOT CAUSE OF EMPTY EVIDENCE: android-emulator-runner tears down the emulator in its
+post-run phase BEFORE the separate failure-evidence step executes — every failure so
+far archived zero-byte evidence.
+ACTION (repair attempt 2 for the class — evidence instrumentation, no assertion change):
+logcat tail (6000 lines) + final screenshot captured INSIDE the script step, uploaded
+with the results artifact; then the next cycle yields the real downloader error.
+TEST: YAML valid; local build chain unaffected.
+COMMIT: CP-G3-005 (recorded at commit time)
+NEXT: evidence-driven repair attempt 3 for the download class (final within budget).
