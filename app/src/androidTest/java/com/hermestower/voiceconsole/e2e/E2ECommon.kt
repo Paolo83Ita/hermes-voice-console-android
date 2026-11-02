@@ -44,9 +44,19 @@ fun HermesComposeRule.openDrawerAndNavigate(destinationLabel: String, screenAnch
     onNodeWithContentDescription("Open navigation drawer").performClick()
     waitUntil(15_000) { onAllNodesWithText(destinationLabel, substring = true).fetchSemanticsNodes().isNotEmpty() }
     onAllNodesWithText(destinationLabel, substring = true)[0].performClick()
-    mainClock.advanceTimeUntil(20_000) {
-        onAllNodesWithText(screenAnchor, substring = true).fetchSemanticsNodes().isNotEmpty()
+    // RUN 41485512432 REPAIR: mainClock.advanceTimeUntil { semantics query } throws
+    // IllegalStateException — its condition runs on the MAIN thread during frame
+    // execution, and semantic queries involve Espresso synchronization, which is
+    // forbidden there. Instead: advance the frozen clock in bounded VIRTUAL steps
+    // and run the anchor query on the TEST thread BETWEEN steps (same virtual-time
+    // discipline, no sleeps, no logic bypass; 200 × 100 ms = 20 s virtual bound).
+    var advanced = 0L
+    while (advanced < 20_000L) {
+        mainClock.advanceTimeBy(100)
+        advanced += 100
+        if (onAllNodesWithText(screenAnchor, substring = true).fetchSemanticsNodes().isNotEmpty()) return
     }
+    error("destination screen anchor '$screenAnchor' did not compose within 20 s of virtual time")
 }
 
 fun HermesComposeRule.waitForText(text: String, timeoutMs: Long = 20_000) {

@@ -9,6 +9,8 @@ import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.BoxWithConstraints
+import androidx.compose.foundation.layout.WindowInsets
+import androidx.compose.foundation.layout.safeDrawing
 import androidx.compose.foundation.layout.defaultMinSize
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
@@ -16,6 +18,7 @@ import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.heightIn
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
+import androidx.compose.foundation.layout.windowInsetsPadding
 import androidx.compose.foundation.rememberScrollState
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.foundation.verticalScroll
@@ -231,7 +234,13 @@ fun AppNav(graph: AppGraph) {
         Column(
             Modifier
                 .fillMaxSize()
-                .background(m.obsidianDeep),
+                .background(m.obsidianDeep)
+                // CP-G4-012a (Owner field report): with edge-to-edge enabled the
+                // content drew UNDER the system status bar (clock/signal) and the
+                // gesture bar. safeDrawing keeps the full-bleed obsidian background
+                // (applied above) while clearing status bar, cutout, navigation bar
+                // and IME — the keyboard-open chat-focused layout (§18) comes free.
+                .windowInsetsPadding(WindowInsets.safeDrawing),
         ) {
             // compact architectural top bar (console draws its own frieze instead)
             if (currentRoute != AppRoutes.CONSOLE) {

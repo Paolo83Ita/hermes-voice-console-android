@@ -8,6 +8,7 @@ import com.hermestower.voiceconsole.core.state.ConnectionStatus
 import com.hermestower.voiceconsole.core.state.ConversationTurn
 import com.hermestower.voiceconsole.ui.MainActivity
 import org.junit.Assert.assertEquals
+import org.junit.Assert.fail
 import org.junit.Assert.assertTrue
 import org.junit.Before
 import org.junit.Rule
@@ -138,7 +139,7 @@ class E2EVoiceFlowTest {
         val d0 = System.currentTimeMillis() + 10_000
         while (System.currentTimeMillis() < d0 && graph().store.connection.value.status != ConnectionStatus.BridgeStatus.DISCONNECTED) Thread.sleep(100)
         graph().driver.submitText("tell me a joke")
-        awaitTurn(predicate = { it.role == ConversationTurn.Role.OWNER && it.delivery == ConversationTurn.Delivery.QUEUED }, timeoutMs = 30_000, afterId = baselineId)
+        val queuedTurn = awaitTurn(predicate = { it.role == ConversationTurn.Role.OWNER && it.delivery == ConversationTurn.Delivery.QUEUED }, timeoutMs = 30_000, afterId = baselineId)
         // Reconnect: clearing the fault triggers handshake + queue flush (validated before delivery).
         graph().driver.clearFault()
         // The handshake is asynchronous on a real dispatcher: wait (bounded, observable state)
@@ -150,7 +151,27 @@ class E2EVoiceFlowTest {
         val flushed = awaitTurn(predicate = {
             it.role == ConversationTurn.Role.OWNER && it.delivery == ConversationTurn.Delivery.DELIVERED && it.note == null
         }, timeoutMs = 60_000, afterId = baselineId) ?: awaitTurn(predicate = { it.role == ConversationTurn.Role.HERMES && it.source == ConversationTurn.Source.TOWER }, timeoutMs = 60_000, afterId = baselineId)
-        assertTrue("queued request was never validated and delivered after reconnect", flushed != null)
+        if (flushed == null) {
+            // CP-G4-007 attempt-2 diagnostics (run 41485512432 showed the flush
+            // still not delivering on the emulator despite the JVM repro passing):
+            // dump the driver's own event log + exact state ON FAILURE so the next
+            // repair is evidence-driven, not speculative.
+            val diag = StringBuilder("e2e_19_20 flush diagnostics:\n")
+                .append("  connection=").append(graph().store.connection.value.status).append('\n')
+                .append("  consoleState=").append(graph().store.currentState()).append('\n')
+                .append("  effectiveMode=").append(graph().store.effectiveMode.value).append('\n')
+                .append("  queueCount=").append(graph().store.queueCount.value).append('\n')
+            graph().store.turns.value.takeLast(6).forEach { t ->
+                diag.append("  turn id=").append(t.id).append(" role=").append(t.role)
+                    .append(" src=").append(t.source).append(" delivery=").append(t.delivery)
+                    .append(" note=").append(t.note).append('\n')
+            }
+            graph().events.recent(30).forEach { e ->
+                diag.append("  event ").append(e.type).append(": ").append(e.detail).append('\n')
+            }
+            println(diag)
+            fail("queued request was never validated and delivered after reconnect\n$diag")
+        }
         assertEquals(ConnectionStatus.BridgeStatus.CONNECTED, graph().store.connection.value.status)
     }
 }
