@@ -1,0 +1,11 @@
+<?xml version="1.0" encoding="utf-8"?>
+<!--
+  GRAPH 4 NODE 0: adaptive launcher icon, unqualified folder (minSdk 30 makes the
+  v26 qualifier unnecessary). The monochrome layer (Android 13 themed icons) is a
+  single-glyph silhouette of the same mark: fluted column + beacon diamond.
+-->
+<adaptive-icon xmlns:android="http://schemas.android.com/apk/res/android">
+    <background android:drawable="@color/launcher_background" />
+    <foreground android:drawable="@drawable/ic_launcher_foreground" />
+    <monochrome android:drawable="@drawable/ic_launcher_monochrome" />
+</adaptive-icon>

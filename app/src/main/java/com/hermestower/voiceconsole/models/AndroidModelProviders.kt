@@ -24,9 +24,10 @@ class AndroidDeviceResourceReader(private val context: Context) : DeviceResource
         val caps = cm.getNetworkCapabilities(cm.activeNetwork)
         val bm = context.getSystemService(Context.BATTERY_SERVICE) as BatteryManager
         val pw = context.getSystemService(Context.POWER_SERVICE) as PowerManager
-        val thermal = if (Build.VERSION.SDK_INT >= 30) {
-            runCatching { pw.currentThermalStatus }.getOrNull()
-        } else null
+        // GRAPH 4 NODE 0: minSdk 30 already guarantees currentThermalStatus (API 29+);
+        // the SDK_INT guard was dead code (ObsoleteSdkInt). runCatching keeps the
+        // truthful "unavailable" degradation on exotic OEM builds.
+        val thermal = runCatching { pw.currentThermalStatus }.getOrNull()
         return DeviceResources(
             deviceModel = Build.MODEL ?: "unknown",
             androidVersion = Build.VERSION.SDK_INT,
@@ -67,7 +68,12 @@ object AndroidModelProviders {
     }
 
     fun storageManager(context: Context): ModelStorageManager =
-        DefaultModelStorageManager(DefaultModelStorageManager.defaultRoot(context.filesDir))
+        // GRAPH 4 NODE 0: context enables the StorageManager.getAllocatableBytes
+        // preflight upgrade and the max(2 GB, 15%) safe-reserve policy (NODE 6 §7).
+        DefaultModelStorageManager(
+            DefaultModelStorageManager.defaultRoot(context.filesDir),
+            context = context,
+        )
 
     fun registry(context: Context): ModelInstallationRegistry =
         FileInstallationRegistry(File(context.filesDir, "models/installation_registry.json").toPath())

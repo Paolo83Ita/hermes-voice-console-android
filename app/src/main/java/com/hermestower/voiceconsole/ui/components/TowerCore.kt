@@ -2,9 +2,6 @@ package com.hermestower.voiceconsole.ui.components
 
 import androidx.compose.foundation.Canvas
 import androidx.compose.runtime.Composable
-import androidx.compose.runtime.getValue
-import androidx.compose.runtime.produceState
-import androidx.compose.runtime.withFrameNanos
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.geometry.Offset
 import androidx.compose.ui.geometry.Size
@@ -18,6 +15,7 @@ import androidx.compose.ui.graphics.lerp
 import androidx.compose.ui.semantics.contentDescription
 import androidx.compose.ui.semantics.semantics
 import com.hermestower.voiceconsole.core.state.ConsoleState
+import com.hermestower.voiceconsole.ui.runtime.rememberAnimationFrameTimeMs
 import com.hermestower.voiceconsole.ui.theme.HermesColors
 import com.hermestower.voiceconsole.ui.theme.HermesMotion
 import kotlin.math.abs
@@ -38,16 +36,10 @@ fun TowerCore(
     colors: HermesColors,
     modifier: Modifier = Modifier,
 ) {
-    val timeMs by produceState(0L, state, reducedMotion) {
-        if (reducedMotion) {
-            value = 0L
-        } else {
-            val startNanos = withFrameNanos { it }
-            while (true) {
-                withFrameNanos { now -> value = (now - startNanos) / 1_000_000L }
-            }
-        }
-    }
+    // GRAPH 4 NODE 0 — lifecycle-safe frame controller (CP-G4-002): replaces the
+    // produceState+withFrameNanos loop lint could not verify
+    // (ProduceStateDoesNotAssignValue). Reduced motion keeps the static frame.
+    val timeMs = rememberAnimationFrameTimeMs(running = !reducedMotion)
     Canvas(
         modifier = modifier.semantics { contentDescription = state.accessibility },
     ) {

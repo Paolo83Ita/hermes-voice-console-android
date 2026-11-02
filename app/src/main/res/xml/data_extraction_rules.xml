@@ -1,0 +1,26 @@
+<?xml version="1.0" encoding="utf-8"?>
+<!--
+  GRAPH 4 NODE 0 (CP-G4-002) — Android 12+ backup and device-transfer policy.
+  INV-G4-03: no production token, access credential, pairing secret, model file,
+  cached artifact or diagnostic export may leave the device through cloud backup
+  or device-to-device transfer. allowBackup remains "false"; these rules make the
+  same guarantee explicit for dataExtractionRules consumers and any future policy
+  change, excluding every storage domain the app writes (models, partials,
+  registry, receipts, archives, databases, shared preferences).
+-->
+<data-extraction-rules>
+    <cloud-backup>
+        <exclude domain="root" />
+        <exclude domain="file" />
+        <exclude domain="database" />
+        <exclude domain="sharedpref" />
+        <exclude domain="external" />
+    </cloud-backup>
+    <device-transfer>
+        <exclude domain="root" />
+        <exclude domain="file" />
+        <exclude domain="database" />
+        <exclude domain="sharedpref" />
+        <exclude domain="external" />
+    </device-transfer>
+</data-extraction-rules>

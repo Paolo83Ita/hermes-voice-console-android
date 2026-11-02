@@ -6,6 +6,7 @@ on:
       - foundation/v0.1-cloud-build
       - graph-2/model-manager-tower-connection-e2e
       - graph-3/monumental-oracle-tower-visual-refoundation
+      - graph-4/real-voice-pairing-archive-e2e
       - main
   workflow_dispatch:
 
@@ -38,8 +39,11 @@ jobs:
       - name: Build debug APK and run unit tests
         run: ./gradlew --no-daemon --console=plain :app:assembleDebug :app:testDebugUnitTest
 
-      - name: Lint (executed, non-blocking; report archived)
-        run: ./gradlew --no-daemon --console=plain :app:lintDebug || true
+      - name: Lint gate (blocking on errors — GRAPH 4 NODE 0 CP-G4-002)
+        # abortOnError=true in app/build.gradle.kts: 0 lint errors is terminal truth;
+        # any NEW lint error fails this workflow. Warnings are classified
+        # individually in docs/lint/LINT_WARNING_CLASSIFICATION.md.
+        run: ./gradlew --no-daemon --console=plain :app:lintDebug
 
       - name: Compute APK SHA-256
         run: |

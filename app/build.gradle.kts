@@ -36,7 +36,13 @@ android {
         jvmTarget = "17"
     }
     lint {
-        abortOnError = false
+        // GRAPH 4 NODE 0 (CP-G4-002): lint truth is a build gate. Errors fail the
+        // build (Lint gate: 0 errors at ca8980b→CP-G4-002; any NEW error must fail
+        // the workflow). Warnings stay non-fatal and are classified individually in
+        // docs/lint/LINT_WARNING_CLASSIFICATION.md — no blanket suppression.
+        abortOnError = true
+        warningsAsErrors = false
+        checkReleaseBuilds = false
     }
 }
 

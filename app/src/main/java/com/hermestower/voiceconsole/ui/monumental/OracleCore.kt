@@ -2,9 +2,6 @@ package com.hermestower.voiceconsole.ui.monumental
 
 import androidx.compose.foundation.Canvas
 import androidx.compose.runtime.Composable
-import androidx.compose.runtime.getValue
-import androidx.compose.runtime.produceState
-import androidx.compose.runtime.withFrameNanos
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.geometry.Offset
 import androidx.compose.ui.geometry.Size
@@ -19,6 +16,7 @@ import androidx.compose.ui.graphics.lerp
 import androidx.compose.ui.semantics.contentDescription
 import androidx.compose.ui.semantics.semantics
 import com.hermestower.voiceconsole.core.state.ConsoleState
+import com.hermestower.voiceconsole.ui.runtime.rememberAnimationFrameTimeMs
 import kotlin.math.abs
 import kotlin.math.cos
 import kotlin.math.sin
@@ -44,16 +42,13 @@ fun OracleCore(
     stateLabelOverride: String? = null,
 ) {
     val budget = QualityBudgets.of(quality)
-    val timeMs by produceState(0L, state, reducedMotion, quality) {
-        if (reducedMotion || quality == VisualQuality.LOW) {
-            value = 0L
-        } else {
-            val startNanos = withFrameNanos { it }
-            while (true) {
-                withFrameNanos { now -> value = (now - startNanos) / 1_000_000L }
-            }
-        }
-    }
+    // GRAPH 4 NODE 0 — lifecycle-safe frame controller (CP-G4-002): replaces the
+    // produceState+withFrameNanos loop lint could not verify
+    // (ProduceStateDoesNotAssignValue). Motion runs unless reduced-motion or the
+    // LOW quality profile requests the static OLED-safe frame.
+    val timeMs = rememberAnimationFrameTimeMs(
+        running = !reducedMotion && quality != VisualQuality.LOW,
+    )
     // GRAPH 3 hybrid pipeline (ASSET_PIPELINE_DECISION.md): static architectural
     // depth comes from generated WebP layers; all state-driven energy is drawn by
     // one Canvas on top. LOW profile draws the flat Canvas fallback instead.

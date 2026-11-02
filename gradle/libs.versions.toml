@@ -1,3 +1,6 @@
+# GRAPH 4 NODE 0: every version below is INTENTIONALLY PINNED — see
+# docs/DEPENDENCY_PINNING.md. GradleDependency/AndroidGradlePluginVersion lint
+# warnings about newer versions are accepted; upgrades happen in a dedicated node.
 [versions]
 agp = "8.7.3"
 kotlin = "2.0.21"
