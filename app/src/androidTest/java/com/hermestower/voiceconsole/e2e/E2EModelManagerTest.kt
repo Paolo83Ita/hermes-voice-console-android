@@ -39,7 +39,14 @@ class E2EModelManagerTest {
             if (graph().modelDownloads.progress(identity).value.state in states) return
             Thread.sleep(100)
         }
-        throw AssertionError("Timed out waiting for $identity in ${states.toList()}; last=${graph().modelDownloads.progress(identity).value.state}")
+        val p = graph().modelDownloads.progress(identity).value
+        // Surface the downloader's own error text — without it the on-device failure
+        // reason was invisible (runs 41349811483 / 41356511688 / 41362428842).
+        throw AssertionError(
+            "Timed out waiting for $identity in ${states.toList()}; last=${p.state}" +
+                "; bytes=${p.bytesDownloaded}/${p.totalBytes}" +
+                (p.error?.let { "; error=$it" } ?: "; no error text"),
+        )
     }
 
     @Before

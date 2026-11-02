@@ -223,3 +223,15 @@ with the results artifact; then the next cycle yields the real downloader error.
 TEST: YAML valid; local build chain unaffected.
 COMMIT: CP-G3-005 (recorded at commit time)
 NEXT: evidence-driven repair attempt 3 for the download class (final within budget).
+
+NODE G3-N10 — download-class diagnostic repair (2026-11-02/03)
+FINDING: CP-G3-005 evidence fix worked (results artifact 324 KB with real logcat +
+final screenshot, run 41362428842) — but the 6000-line tail window missed the Model
+Manager timeframe (tests run mid-suite; only the last KeystoreVault minutes were
+captured). Ledger unchanged: 30 reported, 14✓/16✗ — the download class still ends
+FAILED with its reason trapped inside the download flow.
+ACTION (repair attempt 2, diagnostics): awaitState now surfaces the downloader's own
+error text + byte counters in the assertion ("error=…; bytes=x/y") — decisive evidence
+on the next cycle, no assertion weakened. Local build green (app + androidTest + unit).
+COMMIT: CP-G3-006
+NEXT: cloud cycle → read the surfaced error → attempt 3 (final for this class) if needed.
