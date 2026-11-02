@@ -111,7 +111,10 @@ class PairingPayloadParser(
             .filter { it.contains('=') }
             .associate { p ->
                 val kv = p.split("=", limit = 2)
-                java.net.URLDecoder.decode(kv[0], Charsets.UTF_8) to java.net.URLDecoder.decode(kv[1], Charsets.UTF_8)
+                // URLDecoder.decode(String, Charset) exists only from API 33
+                // (lint NewApi on minSdk 30); the String-charset overload exists
+                // since API 1 and UTF-8 is always supported (never throws here).
+                urlDecodeUtf8(kv[0]) to urlDecodeUtf8(kv[1])
             }
 
         val environment = params["env"]?.takeIf { it.isNotBlank() }
@@ -182,6 +185,15 @@ class PairingPayloadParser(
 }
 
 class PairingRejectException(val reject: PairingReject) : Exception(reject.toString())
+
+/** API-30-compatible UTF-8 percent-decoding (the Charset overload is API 33+).
+ *  UTF-8 is guaranteed present on every Android runtime: decoding never throws. */
+private fun urlDecodeUtf8(value: String): String =
+    try {
+        java.net.URLDecoder.decode(value, "UTF-8")
+    } catch (_: java.io.UnsupportedEncodingException) {
+        value // unreachable on Android; truthful passthrough keeps the parser total
+    }
 
 /**
  * Deterministic mock pairing client (§16): versioned client interface ONLY.
