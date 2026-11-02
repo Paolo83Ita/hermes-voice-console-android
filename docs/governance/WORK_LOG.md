@@ -330,3 +330,28 @@ COMMIT: CP-G4-004 (recorded at commit time)
 NEXT: cloud build evidence at CP-G4-004 → NODE 3 remaining recovery cases
 (process-kill/restart resume paths) → NODE 4 local LLM adapter → NODE 5 guided
 pairing (TOWER GATE).
+
+NODE G4-N04 — cloud evidence at CP-G4-004 + CP-G4-005 voice pipeline foundation (2026-11-02)
+FINDING: android-debug-build run 41459906150 @ 213182a (CP-G4-004) SUCCESS — cloud
+JUnit 126/126 (0 failures/errors/ignored), APK 58,950,857 B (size identical to the
+local build; sha256 7ed066e0… — signing timestamps differ from local, expected),
+lint report artifact archived. android-e2e @ 213182a and both workflows @ c2ebd88
+(CP-G4-005) in progress at session close — evidence to be read back next session;
+no terminality claimed on unfinished runs.
+ACTION (CP-G4-005, NODE 3 §8–§10): typed voice seam layer — AudioFrameSource
+(physically stoppable, INV-G4-10), VadEngine, SttEngine (§9 typed states, partial/
+final transcript, confidence, typed SttError), TtsEngine (§10 states + fallback
+tiers); VoicePipelineController (push-to-talk turn: capture→VAD→in-flight
+STT→deterministic router→LOCAL/TOWER execution→TTS→typed history record;
+privacy mute physically stops capture and refuses turns; mid-turn mute verified to
+stop frames within one frame; barge-in/cancel typed; no-speech 3–10 s truthful;
+frames consumed in-flight, never retained — INV-G4-09; "Handled locally"/"Sent to
+Hermes Tower" attribution — no silent routing); EnergyVadEngine (real RMS VAD,
+Silero remains primary pending runtime); AndroidSystemTtsEngine (REAL system TTS,
+§10 tier 2); MicPermissionFlow (typed consent states + rationale strings).
+TEST: 136/136 green (10 new voice tests); lint 0 errors / 31 warnings unchanged;
+secret scan 0; commit c2ebd88 pushed + read back (exact).
+COMMIT: c2ebd88 (CP-G4-005)
+NEXT: android-e2e read-back for 213182a/c2ebd88 → Android AudioRecord frame source
++ console UI wiring (visible indicator, mute control) → vosk/silero/piper runtime
+adapters → NODE 4 local LLM adapter → NODE 5 TOWER GATE pairing.

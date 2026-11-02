@@ -56,3 +56,4 @@ Graph 4 checkpoints (branch graph-4/real-voice-pairing-archive-e2e, from ca8980b
 | CP-G4-002 | 9b4e17a | NODE 0: lint truth repaired (0 errors), AnimationFrameClock, §3 ancillary repairs |
 | CP-G4-003 | 525c71f | NODE 1: verified production catalog, 12 entries, real hashes/licenses/provenance |
 | CP-G4-004 | (this commit) | NODE 2/3: MODEL SANCTUM — pack installer, receipts, §7 roots, gatekeeper, real-source wiring |
+| CP-G4-005 | c2ebd88 | NODE 3: real voice pipeline foundation — seams, controller, energy VAD, system TTS, permission flow; 136/136 |
