@@ -127,3 +127,26 @@ Recovery: second sample (afe3e08 run) + third sample (749e746 run) on fresh
 runners will separate flake from regression by reproducibility. If the identical
 failure set reproduces on two fresh runners, it escalates to a typed repair
 node (do NOT reclassify as environment).
+
+
+## 8. SECOND SAMPLE CONFIRMATION (afe3e08 run 41461749711, completed)
+
+- Identical outcome: "There were 13 failures", FIRST failure byte-identical
+  (MARBLE LIGHT touch-injection, E2EAppearancePersistenceTest.kt:45).
+- No source change between the two samples (docs-only commit afe3e08) and no
+  AppNav/AppearanceScreen change since the Graph 3 green run (git log
+  ca8980b..213182a on those files is EMPTY).
+- The failure COUNT matches the Graph 3 terminal residual ledger EXACTLY:
+  "13 residual typed (emulator input/lifecycle flakes + 1 queue-reconnect
+  question)" — GRAPH_3_TERMINAL_RECEIPT.
+
+### Final classification for 213182a AND afe3e08 E2E
+
+`E2E_FAILED_TEST` — but the failure set is the KNOWN Graph 3 residual flake
+set, deterministic on this emulator environment (API 34 google_apis x86_64 on
+KVM runners), NOT a new Graph 4 regression. Recovery node (typed, next
+session): E2E-ROBUSTNESS repair — selector hardening (unique anchors instead
+of substring-onIndex0, scroll-before-click, drawer-always-composed awareness),
+then re-run; success criterion: residual set shrinks below 13 on two fresh
+runners. No terminality claim on in-flight runs (adbc16c E2E + 749e746
+build/E2E read back next session).

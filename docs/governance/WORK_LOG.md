@@ -432,3 +432,18 @@ versions/licenses first) + scanner screen with camera permission flow and
 §10 lifecycle rules; (3) Tower Archive (Conversations/Missions/Artifacts);
 (4) G4-C04 runtime adapters when catalog artifacts are delivered on device;
 (5) G4-C11/C12 self-test expansion, packaging, Xiaomi runbook.
+
+NODE G4-N10 — second E2E sample: deterministic residual confirmed, no new regression (2026-11-02)
+FINDING: afe3e08 E2E (41461749711) = identical 13-failure set as 213182a, first
+failure byte-identical; zero AppNav/Appearance changes since the Graph 3 green
+run; count matches the Graph 3 terminal residual ledger exactly (13 = emulator
+input/lifecycle flakes + queue-reconnect question). CONCLUSION: E2E_FAILED_TEST
+= KNOWN Graph 3 residual, deterministic on this emulator environment; NOT a new
+Graph 4 regression. Recovery = typed E2E-ROBUSTNESS repair node (selector
+hardening + scroll-before-click + drawer-awareness), criterion <13 on two fresh
+runners. In-flight: adbc16c E2E, 749e746 build+E2E — read-back next session.
+ACTION: receipt §8 second-sample confirmation + this node.
+TEST: read-back only.
+COMMIT: (this commit)
+NEXT: E2E-ROBUSTNESS repair node → camera QR scanner (G4-C09 wave 2) →
+Tower Archive → cloud evidence read-back for adbc16c/749e746/f7bde56/aa02d2a.
