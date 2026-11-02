@@ -20,6 +20,7 @@
     <string name="dest_connect">Conectar con Hermes Tower</string>
     <string name="dest_connection">Conexión</string>
     <string name="dest_console">Consola de voz</string>
+    <string name="dest_history">Historial de consola</string>
     <string name="dest_diagnostics">Diagnóstico</string>
     <string name="dest_intelligence">Inteligencia local</string>
     <string name="dest_models">Modelos y voz</string>

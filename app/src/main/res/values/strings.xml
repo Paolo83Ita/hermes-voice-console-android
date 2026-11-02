@@ -20,6 +20,7 @@
     <string name="dest_connect">Connect to Hermes Tower</string>
     <string name="dest_connection">Connection</string>
     <string name="dest_console">Voice Console</string>
+    <string name="dest_history">Console History</string>
     <string name="dest_diagnostics">Diagnostics</string>
     <string name="dest_intelligence">Local Intelligence</string>
     <string name="dest_models">Models and Voice</string>

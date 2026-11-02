@@ -16,9 +16,10 @@ object AppRoutes {
     const val MODEL_MANAGER = "model_manager"
     const val TOWER_STUDIO = "tower_studio"
     const val SELF_TEST = "self_test"
+    const val ARCHIVE = "archive"
 
     val all: Set<String> = setOf(
         CONSOLE, HISTORY, CONNECTION, VOICE, INTELLIGENCE, APPEARANCE,
-        DIAGNOSTICS, ABOUT, MODEL_MANAGER, TOWER_STUDIO, SELF_TEST,
+        DIAGNOSTICS, ABOUT, MODEL_MANAGER, TOWER_STUDIO, SELF_TEST, ARCHIVE,
     )
 }

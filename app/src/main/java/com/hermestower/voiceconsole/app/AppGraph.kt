@@ -75,6 +75,10 @@ class AppGraph(context: Context) {
     val session = DefaultSessionController()
     val secureStore = InMemorySecureConfigurationStore()
 
+    // ---- Tower Archive (GRAPH 4 CP-G4-011, Owner §14): deterministic mock —
+    // the real Tower stays the authority; SIMULATED labels are mandatory. ----
+    val towerArchive = com.hermestower.voiceconsole.archive.MockTowerArchive()
+
     // ---- Voice Model Manager (GRAPH 2 §4–6) ----
     val deviceResourceReader = AndroidDeviceResourceReader(context)
     val modelCatalog = AndroidModelProviders.loadCatalog(context)

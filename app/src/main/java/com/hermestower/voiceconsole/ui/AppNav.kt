@@ -62,6 +62,7 @@ import com.hermestower.voiceconsole.app.AppGraph
 import com.hermestower.voiceconsole.ui.monumental.MonumentalType
 import com.hermestower.voiceconsole.ui.monumental.monumentalColors
 import com.hermestower.voiceconsole.ui.screens.AboutSafetyScreen
+import com.hermestower.voiceconsole.ui.screens.ArchiveScreen
 import com.hermestower.voiceconsole.ui.screens.AppearanceScreen
 import com.hermestower.voiceconsole.ui.screens.ConsoleScreen
 import com.hermestower.voiceconsole.ui.screens.ConnectionScreen
@@ -81,7 +82,8 @@ private data class Destination(val route: String, val labelRes: Int, val icon: I
 
 private val destinations = listOf(
     Destination(AppRoutes.CONSOLE, com.hermestower.voiceconsole.R.string.dest_console, Icons.Outlined.Waves),
-    Destination(AppRoutes.HISTORY, com.hermestower.voiceconsole.R.string.dest_archive, Icons.Outlined.History),
+    Destination(AppRoutes.HISTORY, com.hermestower.voiceconsole.R.string.dest_history, Icons.Outlined.History),
+    Destination(AppRoutes.ARCHIVE, com.hermestower.voiceconsole.R.string.dest_archive, Icons.Outlined.History),
     Destination(AppRoutes.CONNECTION, com.hermestower.voiceconsole.R.string.dest_connection, Icons.Outlined.Link),
     Destination(AppRoutes.TOWER_STUDIO, com.hermestower.voiceconsole.R.string.dest_connect, Icons.Outlined.Router),
     Destination(AppRoutes.VOICE, com.hermestower.voiceconsole.R.string.dest_voice_audio, Icons.Outlined.Mic),
@@ -93,19 +95,21 @@ private val destinations = listOf(
     Destination(AppRoutes.ABOUT, com.hermestower.voiceconsole.R.string.dest_about, Icons.Outlined.Info),
 )
 
-/** GRAPH 4 G4-C07 (Owner delta §11): primary then secondary destinations. */
+/** GRAPH 4 G4-C07 (Owner delta §11): primary then secondary destinations.
+ *  CP-G4-011 (§14): Tower Archive joins PRIMARY. */
 private val primaryDestinations = listOf(
-    AppRoutes.CONSOLE, AppRoutes.HISTORY, AppRoutes.TOWER_STUDIO,
+    AppRoutes.CONSOLE, AppRoutes.ARCHIVE, AppRoutes.TOWER_STUDIO,
     AppRoutes.MODEL_MANAGER, AppRoutes.SELF_TEST,
 )
 private val secondaryDestinations = listOf(
-    AppRoutes.CONNECTION, AppRoutes.VOICE, AppRoutes.INTELLIGENCE,
-    AppRoutes.APPEARANCE, AppRoutes.DIAGNOSTICS, AppRoutes.ABOUT,
+    AppRoutes.HISTORY, AppRoutes.CONNECTION, AppRoutes.VOICE,
+    AppRoutes.INTELLIGENCE, AppRoutes.APPEARANCE, AppRoutes.DIAGNOSTICS, AppRoutes.ABOUT,
 )
 
 private fun subtitleFor(route: String): String = when (route) {
     AppRoutes.CONSOLE -> "ORACLE CORE"
-    AppRoutes.HISTORY -> "ARCHIVE CHAMBER"
+    AppRoutes.HISTORY -> "CONSOLE MEMORY"
+    AppRoutes.ARCHIVE -> "ARCHIVE CHAMBER"
     AppRoutes.CONNECTION -> "TOWER GATE"
     AppRoutes.TOWER_STUDIO -> "TOWER GATE · TRANSPORT CHAMBER"
     AppRoutes.VOICE -> "RESONANCE CHAMBER"
@@ -276,6 +280,7 @@ fun AppNav(graph: AppGraph) {
                     )
                 }
                 composable(AppRoutes.HISTORY) { HistoryScreen(graph) }
+                composable(AppRoutes.ARCHIVE) { ArchiveScreen(graph.towerArchive) }
                 composable(AppRoutes.CONNECTION) { ConnectionScreen(graph, onOpenStudio = { navController.navigate(AppRoutes.TOWER_STUDIO) { launchSingleTop = true } }) }
                 composable(AppRoutes.TOWER_STUDIO) { TowerStudioScreen(graph) }
                 composable(AppRoutes.VOICE) { VoiceAudioScreen(graph) }
