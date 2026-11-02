@@ -164,6 +164,14 @@ class VoicePipelineController(
         val source = sourceFactory()
         activeSource = source
         source.start()
+        // G4-C02: a typed microphone failure (permission/busy/init) must end the
+        // turn truthfully — never as NO_SPEECH, which would claim capture ran.
+        (source as? MicDiagnostics)?.lastFailure?.let { micFailure ->
+            return record(
+                "", null, VoiceTurnRecord.ROUTE_NONE, VoiceTurnRecord.ATTRIBUTION_NONE,
+                null, false, "MIC_${micFailure.kind.name}", VoicePipelineState.FAILED,
+            )
+        }
         _state.value = VoicePipelineState.LISTENING
         var speechSeen = false
         var sttOutput: SttOutput = stt.state.value

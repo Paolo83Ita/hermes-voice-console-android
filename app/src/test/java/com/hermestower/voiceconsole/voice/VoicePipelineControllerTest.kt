@@ -287,4 +287,55 @@ class VoicePipelineControllerTest {
         assertTrue(MicPermissionFlow.RATIONALE.contains("never stored"))
         assertTrue(MicPermissionFlow.RATIONALE.contains("privacy mute"))
     }
+
+    /** Source that fails typed at start (G4-C02 contract), like a real AudioRecord. */
+    private class FailedMicSource(kind: MicFailureKind) : AudioFrameSource, MicDiagnostics {
+        override val isActive = false
+        override var lastFailure: MicSourceException? = MicSourceException(kind, "scripted $kind")
+        override fun start() {}
+        override fun stop() {}
+        override suspend fun read(): AudioFrame? = null
+    }
+
+    @Test
+    fun `typed mic permission failure ends the turn as MIC_PERMISSION_DENIED, never NO_SPEECH`() = runBlocking {
+        val stt = FakeStt("mai trascritto")
+        var towerCalled = false
+        val c = VoicePipelineController(
+            sourceFactory = { FailedMicSource(MicFailureKind.PERMISSION_DENIED) },
+            vad = EnergyVadEngine(),
+            stt = stt,
+            tts = FakeTts(),
+            router = RuleBasedIntentRouter(),
+            modeProvider = { OperatingMode.HYBRID },
+            connectivityProvider = { Connectivity.OK },
+            localExecutor = { "ok" },
+            towerExecutor = { towerCalled = true; "tower" },
+            framePollDelayMs = 1,
+        )
+        val result = c.listenOnce()
+        assertEquals("MIC_PERMISSION_DENIED", result.errorCode)
+        assertEquals(VoicePipelineState.FAILED, c.state.value)
+        assertEquals(0, stt.acceptedFrames)
+        assertFalse(towerCalled) // no Tower contact on a local hardware failure
+    }
+
+    @Test
+    fun `typed mic busy failure is surfaced verbatim`() = runBlocking {
+        val c = VoicePipelineController(
+            sourceFactory = { FailedMicSource(MicFailureKind.DEVICE_BUSY) },
+            vad = EnergyVadEngine(),
+            stt = FakeStt("x"),
+            tts = null,
+            router = RuleBasedIntentRouter(),
+            modeProvider = { OperatingMode.HYBRID },
+            connectivityProvider = { Connectivity.OK },
+            localExecutor = { "ok" },
+            towerExecutor = { "tower" },
+            framePollDelayMs = 1,
+        )
+        val result = c.listenOnce()
+        assertEquals("MIC_DEVICE_BUSY", result.errorCode)
+        assertEquals(VoiceTurnRecord.ROUTE_NONE, result.route)
+    }
 }
