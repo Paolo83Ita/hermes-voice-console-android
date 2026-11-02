@@ -447,3 +447,33 @@ TEST: read-back only.
 COMMIT: (this commit)
 NEXT: E2E-ROBUSTNESS repair node → camera QR scanner (G4-C09 wave 2) →
 Tower Archive → cloud evidence read-back for adbc16c/749e746/f7bde56/aa02d2a.
+
+NODE G4-N11 — CP-G4-007b/012a: repairs, sandbox-rollback recovery, status-bar fix (2026-11-03)
+FINDING: (1) E2E run 41485512432 @ e10c490 changed the failure mode of all 12
+navigation tests from ComposeTimeoutException to IllegalStateException
+("Functions that involve synchronization … cannot be run from the main
+thread") — the CP-G4-007 repair's semantics query inside
+mainClock.advanceTimeUntil executes on the MAIN thread where Espresso-linked
+sync is forbidden. (2) e2e_19_20 STILL failed with id-scoped predicates → the
+flush does not deliver on the emulator despite the JVM virtual-time repro
+passing; attempt-3 must be evidence-driven (the test now dumps the driver
+event log + connection/state/queue/turns on failure). (3) SANDBOX ROLLBACK:
+the local filesystem restored itself to an afe3e08-era snapshot mid-session;
+remote tip 09963ce re-verified via ls-remote and the local repo hard-reset to
+it (fast-forward restore — no history rewrite, no force-push); SDK+JDK17
+rebuilt in the persistent area; gradle mirror init recreated. (4) OWNER FIELD
+REPORT: the app content drew UNDER the system status bar (clock/signal) —
+enableEdgeToEdge with zero insets handling anywhere in the UI.
+ACTION: aeb69a3 — (a) AppNav root windowInsetsPadding(WindowInsets.safeDrawing):
+full-bleed obsidian background preserved, content clears status bar, cutout,
+nav bar and IME (keyboard-open chat-focused layout per §18 included);
+(b) openDrawerAndNavigate advanced the frozen clock via bounded
+advanceTimeBy(100ms) loop with the anchor query on the test thread BETWEEN
+steps, explicit named-anchor error on timeout; (c) e2e_19_20 failure now
+carries driver-event diagnostics (attempt-2 evidence step; no logic bypass).
+TEST: 221/221 unit green; lint 0 errors / 34 warnings; androidTest compiles.
+COMMIT: aeb69a3 (pushed, read back exact)
+NEXT: cloud E2E verdict for aeb69a3 → update E2E_FAILURE_LEDGER verdicts;
+19_20 root cause from the diagnostics dump (attempt 3 of 3 for RC-3);
+then CP-G4-009 real model delivery + QR scanner wave 2; governance
+convergence at each checkpoint.
