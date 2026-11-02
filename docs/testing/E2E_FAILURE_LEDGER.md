@@ -86,3 +86,21 @@ load), not as a test verdict.
 2. Cloud `android-e2e` @ same commit = the complete-suite rerun. Success criterion
    (typed in the CP-G4-007 checkpoint): 30/30 PASS, or any residual individually re-classified
    in this ledger with a new materially-different repair attempt (max 3 per root-cause class).
+
+---
+
+## ADDENDUM — CP-G4-007 attempts 2–3 (runs 41485512432 / 41503065076 / 41514356403 / 41527072357)
+
+Per-failure verdicts after the instrumented reruns (Owner §2: no residual without evidence):
+
+| Failure class | Evidence chain | Final classification | Disposition |
+| --- | --- | --- | --- |
+| e2e_19_20 queue-reconnect (F-06) | Run 41527072357 FLUSH diagnostics: `FLUSH: trigger state=TRANSCRIBING active=true queued=1` → `skip: pipeline active`. The pipeline's offline-queue branch called `transition(REQUEST_QUEUED)` while TRANSCRIBING — an ILLEGAL edge silently ignored since Graph 1 — so the state stayed pipeline-active and EVERY reconnect flush skipped (turns id=3 and id=6 both stuck QUEUED). The JVM repro passed only because virtual time had already drained the display delay. | **APPLICATION_DEFECT (STATE_SYNCHRONIZATION_DEFECT)** — latent since Graph 1; exposed only by the instrumented E2E | **REPAIRED**: TRANSCRIBING→REQUEST_QUEUED and IDLE→REQUEST_QUEUED edges added (ConsoleStateMachine), pinned by QueueStateMachineTest (4 tests); flush trigger/begin/skip/error events are now typed and redaction-safe |
+| e2e_01_02 selector rot (F-01) | Run 41503065076: test no longer fails | TEST_IMPLEMENTATION_DEFECT | **CLOSED — repaired (selector re-pinned to current anchors)** |
+| 11 navigation failures (F-02..05,07..14) | Attempt 1 (virtual-time advance) removed the never-composes class; run 41514356403's anchor-timeout semantics dump showed console-only texts after a "successful" row click → the drawer-open transition frozen at its closed offset leaves rows at OFF-SCREEN window coordinates where touch injection is silently dropped; clicks before layout placement land on unplaced nodes. Attempt 3 (78b92c2) pumps the drawer-open animation until the row is physically on-screen (physical click preserved per §3.4), falls back to the accessible OnClick semantics action (§3.3), adds a post-anchor settle window (layout before clicks) and dual-clock pumping waits. | TEST_IMPLEMENTATION_DEFECT (frozen-clock harness physics) + candidate EMULATOR_INPUT_INJECTION_LIMITATION if any residual remains after 78b92c2's cloud run | Attempt 3 of 3 executed; verdict = cloud E2E at 78b92c2+state-fix commit |
+| e2e_31/32/34 zero-results | Run 41514356403: awaitCompletion polled before the run coroutine flipped `running` | TEST_IMPLEMENTATION_DEFECT (startup race) | **REPAIRED** (wait-for-start then wait-for-end) |
+
+Rule 3 compliance: three materially different repair attempts per class were used only where
+stated; no assertion was weakened at any point (predicates were tightened, anchors made
+compile-time-required, diagnostics added). The "Process system isn't responding" dialog on the
+software emulator remains an environment observation, not a verdict.

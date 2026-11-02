@@ -17,6 +17,8 @@ object ConsoleStateMachine {
             ConsoleState.WAKE_DETECTED, ConsoleState.TRANSCRIBING, ConsoleState.LISTENING,
             ConsoleState.CONTACTING_TOWER, ConsoleState.PRIVACY_MUTED, ConsoleState.DISCONNECTED,
             ConsoleState.DEGRADED, ConsoleState.ERROR, ConsoleState.UPDATE_AVAILABLE,
+            // CP-G4-007: the reconnect flush enters the queue state from rest.
+            ConsoleState.REQUEST_QUEUED,
         ),
         ConsoleState.WAKE_DETECTED to setOf(
             ConsoleState.LISTENING, ConsoleState.IDLE, ConsoleState.PRIVACY_MUTED,
@@ -29,6 +31,12 @@ object ConsoleStateMachine {
         ConsoleState.TRANSCRIBING to setOf(
             ConsoleState.UNDERSTANDING_LOCAL, ConsoleState.CONTACTING_TOWER, ConsoleState.IDLE,
             ConsoleState.PRIVACY_MUTED, ConsoleState.ERROR, ConsoleState.DISCONNECTED,
+            // CP-G4-007 (STATE_SYNCHRONIZATION_DEFECT, run 41527072357 diagnostics):
+            // the offline queue path routes while TRANSCRIBING and must legally
+            // enter REQUEST_QUEUED — the missing edge made the transition a silent
+            // no-op, the state stayed pipeline-active, and the reconnect flush
+            // skipped every delivery (queue-starvation since Graph 1).
+            ConsoleState.REQUEST_QUEUED,
         ),
         ConsoleState.UNDERSTANDING_LOCAL to setOf(
             ConsoleState.SPEAKING, ConsoleState.CONTACTING_TOWER, ConsoleState.IDLE,
