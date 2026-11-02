@@ -9,19 +9,20 @@ Issued: 2026-11-02 · Graph 3 · branch `graph-3/monumental-oracle-tower-visual-
 | Version | 0.3.0-graph3 (versionCode lineage per app/build.gradle.kts version metadata) |
 | Build type | debug (debug-signed; no production signing material anywhere in the pipeline) |
 | applicationId | com.hermestower.voiceconsole |
-| Producing workflow | `android-debug-build`, run **41347497836** (GitHub-hosted, private repo) |
-| Bound commit | `6959c071f4bb4fa096f45bf614d517172ae793a5` (CP-G3-002) |
+| Producing workflow | `android-debug-build`, run **41375246590** (GitHub-hosted, private repo) |
+| Bound commit | `85cdc0e` (CP-G3-007; superseded binding 6959c07/run 41347497836 sha256 4b69416d…c31572) |
 | Bound branch | graph-3/monumental-oracle-tower-visual-refoundation |
-| Size | **58,781,684 bytes** |
-| SHA-256 | `4b69416dbffafa57407c8d33e16aa1fd487020e1497f47004a499c4574c31572` |
-| Verification | artifact 13099962750 downloaded; hash computed locally from the artifact bytes |
-| Local cross-check | identical source builds 58,781,684 B locally (same tree at 6959c07) |
-| Unit tests in run | **102/102 passed** (artifact 13100172102) |
-| Lint | executed, report archived (artifact 13099863196) |
+| Size | **58,782,349 bytes** (app-debug.apk; verify against local sha256sum output) |
+| SHA-256 | `0639ae6ed50f3ec3a065625a40106125a6d103bdf8a639df826bb04b155cbc3a` |
+| Verification | artifact 13111350792 downloaded; hash computed locally from the artifact bytes |
+| Local cross-check | same source tree built locally pre-push (unit tests 102/102) |
+| Unit tests in run | **102/102 passed** (artifact 13110324833) |
+| Lint | executed, report archived (artifact 13111540367) |
 
 ## Binding
 
-commit 6959c07 ← branch graph-3/... ← run 41347497836 ← APK 4b69416d…c31572.
+commit 85cdc0e ← branch graph-3/... ← run 41375246590 ← APK 0639ae6e…b155cbc3a.
+Superseded chain: CP-G3-002 binding 6959c07/run 41347497836/4b69416d…c31572 (receipt history).
 Graph 2 preserved authority chain: 9ea0c6c → a9657f0 → bc186db (terminal receipt).
 
 ## Status (typed)

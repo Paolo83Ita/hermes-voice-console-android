@@ -121,3 +121,25 @@ Secret/device scan: 0 findings in working tree and full git history (scripts/sec
   (repair frontier from CP-G2-022 pending verification), V0.3 cloud APK (pending),
   physical Xiaomi qualification (QUALIFICATION_PENDING_DEVICE), merge to main
   (OWNER_APPROVAL_PENDING).
+
+---
+
+# GRAPH 3 TERMINAL TRUTH (appended 2026-11-03; additive)
+
+- Terminal state: **GRAPH_3_CONDITIONALLY_COMPLETE_WITH_EMULATOR_LIMITATION**
+  (receipt: `docs/receipts/GRAPH_3_TERMINAL_RECEIPT.md`).
+- Branch head: 85cdc0e (CP-G3-007) + CP-G3-008 (this convergence). Chain:
+  bc186db → 84c3114 → 6959c07 → de4e54e → 21a57c6 → fcea6bc → 6a92942 → 85cdc0e.
+- Visual identity: MONUMENTAL_ORACLE_TOWER (OWNER_AUTHORIZED) implemented — layered
+  Oracle Core, command frieze, architectural chrome on every screen, messenger language,
+  quality profiles, per-region AMOLED safeguard, hybrid WebP+Canvas asset pipeline.
+  V0.1 minimal direction superseded (evidence preserved).
+- Cloud authority: run 41375246590 @ 85cdc0e — unit tests 102/102, lint archived,
+  APK 58,782,349 B sha256 0639ae6e…b155cbc3a (receipt: GRAPH_3_DEBUG_APK_RECEIPT.md).
+- Emulator E2E: 5 full-content cycles; trajectory 5✓/18✗/7-crashed → 17✓/13✗. Genuine
+  on-device root causes found AND fixed: duplicate exact-text HERMES node,
+  context.display UOE process crash, Files.getFileStore unsupported on ART (downloads).
+  Residual 13: emulator input/lifecycle environment flakes + 1 queue-reconnect question.
+  NOT claimed green.
+- Real Tower: STILL mock/simulator only (TOWER_REAL_INTEGRATION never claimed).
+- Physical Xiaomi: QUALIFICATION_PENDING_DEVICE. Merge to main: OWNER_APPROVAL_PENDING.

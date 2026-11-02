@@ -252,3 +252,17 @@ TEST: run 41368013409 artifact (stack with error=getFileStore); local build.
 COMMIT: CP-G3-007
 NEXT: cloud cycle → expected: 9 download-class tests flip to pass; remaining
 touch-injection/destroy-timeout classes are emulator-environment flakes.
+
+NODE G3-N12 — final cycle + terminality (2026-11-03)
+FINDING: cycle 5 (85cdc0e / run 41375246654) — E2E 17✓/13✗; all 9 download-class tests
+PASS (24_25_26 pause/resume/hash, 27_28_29 install/activate/read-back, 30 rollback).
+Cumulative E2E trajectory across the graph: +12 tests vs the Graph 2 baseline, zero
+regressions, two real on-device defects fixed beyond the two inherited ones.
+ACTION: typed terminality GRAPH_3_CONDITIONALLY_COMPLETE_WITH_EMULATOR_LIMITATION;
+GRAPH_3_TERMINAL_RECEIPT.md written; truth/checkpoints/mission-graph converged;
+final source package + APK copies staged in the deliverables folder.
+TEST: run 41375246654 artifacts (build SUCCESS, 102/102, APK 0639ae6e…); E2E ledger §3.
+COMMIT: CP-G3-008 (recorded at commit time)
+NEXT (Owner): review receipts → approve merge to main → physical Xiaomi qualification
+phase (INSTALL_XIAOMI.md) as the next dependency-released graph; E2E frontier (nav
+flakes + e2e_19_20) carried with full evidence.

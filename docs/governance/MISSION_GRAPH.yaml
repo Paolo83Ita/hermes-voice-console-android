@@ -75,7 +75,11 @@ graph3:
   gates:
     - preview pack verified before production UI change (VERIFIED, 11/11 renders)
     - existing functional tests stay green
-    - carried frontier: verify CP-G2-022 E2E repairs
+    - carried frontier: verify CP-G2-022 E2E repairs (VERIFIED by E2E cycles 2-5)
     - secret scan clean
     - no merge to main without Owner approval
-  updated: "2026-11-02"
+  terminal_state: GRAPH_3_CONDITIONALLY_COMPLETE_WITH_EMULATOR_LIMITATION
+  terminal_receipt: docs/receipts/GRAPH_3_TERMINAL_RECEIPT.md
+  e2e_trajectory: "5/30(+7 crashed) -> 14 -> 14 -> 17/30 passing"
+  apk: { run: "41375246590", commit: 85cdc0e, sha256: 0639ae6ed50f3ec3a065625a40106125a6d103bdf8a639df826bb04b155cbc3a, size_bytes: 58782349 }
+  updated: "2026-11-03"
