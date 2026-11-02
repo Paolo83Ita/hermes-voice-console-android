@@ -37,13 +37,17 @@ class E2EFreshInstallTest {
     @Test
     fun e2e_01_02_freshInstallAndFirstLaunch_showWorkingConsole() {
         compose.onNodeWithText("HERMES").assertIsDisplayed()
-        compose.waitForText("wake · inject text · stop voice")
+        // CP-G4-007: the 'wake · inject text · stop voice' hero caption was
+        // replaced at adbc16c by the PTT medallion + first-class composer +
+        // engine truth row (Owner-authorized redesign). Pin to the CURRENT
+        // console anchors: the engine truth row and the composer hint.
+        compose.waitForText("push-to-talk (system recognizer)")
+        compose.waitForText("Write a message…")
     }
 
     @Test
     fun e2e_03_04_onboardingWithoutCredentials_mockModeSelected() {
-        compose.openDrawerAndNavigate("Connection")
-        compose.waitForText("Open Hermes Tower Connection Studio")
+        compose.openDrawerAndNavigate("Connection", "Open Hermes Tower Connection Studio")
         compose.onNodeWithText("Open Hermes Tower Connection Studio").performClick()
         compose.waitForText("Reset to Mock mode")
         compose.onNodeWithText("Reset to Mock mode").performClick()
@@ -56,8 +60,7 @@ class E2EFreshInstallTest {
 
     @Test
     fun e2e_05_06_07_openStudio_validateAndSaveMockProfile() {
-        compose.openDrawerAndNavigate("Hermes Tower Connection")
-        compose.waitForText("Connect Hermes Tower")
+        compose.openDrawerAndNavigate("Connect to Hermes Tower", "Connect Hermes Tower")
         compose.onNodeWithText("Save and connect").performClick()
         compose.waitUntil(15_000) { E2E.graph().profileStore.state() == ConnectionConfigState.VALIDATED }
         assertEquals(ConnectionConfigState.VALIDATED, E2E.graph().profileStore.state())
@@ -65,8 +68,7 @@ class E2EFreshInstallTest {
 
     @Test
     fun e2e_08_readBackSavedProfile() {
-        compose.openDrawerAndNavigate("Hermes Tower Connection")
-        compose.waitForText("Connect Hermes Tower")
+        compose.openDrawerAndNavigate("Connect to Hermes Tower", "Connect Hermes Tower")
         compose.onNodeWithText("Save and connect").performClick()
         compose.waitUntil(15_000) { E2E.graph().profileStore.load() != null }
         val profile = E2E.graph().profileStore.load()
@@ -77,8 +79,7 @@ class E2EFreshInstallTest {
 
     @Test
     fun e2e_09_10_mockConnectionTest_connectedOnlyAfterHandshake() {
-        compose.openDrawerAndNavigate("Hermes Tower Connection")
-        compose.waitForText("Connect Hermes Tower")
+        compose.openDrawerAndNavigate("Connect to Hermes Tower", "Connect Hermes Tower")
         compose.onNodeWithText("Test connection").performClick()
         compose.waitForText("Connection test: CONNECTION_PASSED")
         // CONNECTED appears only after the accepted handshake — drive the real bridge now.

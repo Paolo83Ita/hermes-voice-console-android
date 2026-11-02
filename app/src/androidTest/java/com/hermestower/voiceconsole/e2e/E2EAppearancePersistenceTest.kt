@@ -39,9 +39,10 @@ class E2EAppearancePersistenceTest {
 
     @Test
     fun e2e_35_36_switchMarbleLightAndObsidianNight() {
-        compose.openDrawerAndNavigate("Appearance")
-        compose.waitForText("Appearance")
-        // Marble Light = light theme (darkTheme false); Obsidian Night = dark theme (darkTheme true).
+        compose.openDrawerAndNavigate("Appearance", "MARBLE LIGHT")
+        // MARBLE LIGHT is hard-coded in AppearanceScreen and the screen is a
+        // fully-composed scroll Column — zero nodes here means the navigation
+        // never happened (the CP-G4-007 frozen-clock evidence).
         compose.onFirstNodeWithText("MARBLE LIGHT").performClick()
         compose.waitUntil(10_000) { !graph().store.settings.value.darkTheme }
         assertFalse(graph().store.settings.value.darkTheme)
@@ -52,8 +53,7 @@ class E2EAppearancePersistenceTest {
 
     @Test
     fun e2e_37_enableReducedMotion() {
-        compose.openDrawerAndNavigate("Appearance")
-        compose.waitForText("Appearance")
+        compose.openDrawerAndNavigate("Appearance", "MARBLE LIGHT")
         compose.onFirstNodeWithText("Reduced motion").performClick()
         compose.waitUntil(10_000) { graph().store.settings.value.reducedMotion }
         assertTrue(graph().store.settings.value.reducedMotion)
@@ -99,8 +99,7 @@ class E2EAppearancePersistenceTest {
         val profileId = "profile-e2e-secret"
         graph().profileStore.setSecret(profileId, "e2e-secret-value".toCharArray())
         assertNotNull(graph().profileStore.secretFor(profileId))
-        compose.openDrawerAndNavigate("Hermes Tower Connection")
-        compose.waitForText("Connect Hermes Tower")
+        compose.openDrawerAndNavigate("Connect to Hermes Tower", "Connect Hermes Tower")
         compose.onNodeWithText("Clear sensitive values").performClick()
         compose.waitForText("Sensitive values cleared")
         assertNull(graph().vault.get(VaultKeys.secretKeyFor(profileId)))

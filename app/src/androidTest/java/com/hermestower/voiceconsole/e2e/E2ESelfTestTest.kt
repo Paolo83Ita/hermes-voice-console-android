@@ -43,8 +43,7 @@ class E2ESelfTestTest {
 
     @Test
     fun e2e_31_33_runQuickSelfTest_verifyTypedResults() {
-        compose.openDrawerAndNavigate("Self-Test Center")
-        compose.waitForText("Run Quick")
+        compose.openDrawerAndNavigate("Self-Test Center", "Run Quick")
         compose.onNodeWithText("Run Quick").performClick()
         awaitCompletion(180_000)
         val results = graph().selfTestCenter.results.value
@@ -62,8 +61,7 @@ class E2ESelfTestTest {
 
     @Test
     fun e2e_32_runFullSelfTest_allPassOnEmulator() {
-        compose.openDrawerAndNavigate("Self-Test Center")
-        compose.waitForText("Run Full")
+        compose.openDrawerAndNavigate("Self-Test Center", "Run Full")
         compose.onNodeWithText("Run Full").performClick()
         awaitCompletion(480_000)
         val results = graph().selfTestCenter.results.value
@@ -74,8 +72,7 @@ class E2ESelfTestTest {
 
     @Test
     fun e2e_34_exportSecretCleanReport() {
-        compose.openDrawerAndNavigate("Self-Test Center")
-        compose.waitForText("Run Quick")
+        compose.openDrawerAndNavigate("Self-Test Center", "Run Quick")
         compose.onNodeWithText("Run Quick").performClick()
         awaitCompletion(180_000)
         compose.onNodeWithText("Export Secret-Clean Report").performClick()

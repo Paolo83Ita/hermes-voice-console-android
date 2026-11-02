@@ -7,6 +7,7 @@ import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.rememberScrollState
+import androidx.compose.foundation.selection.toggleable
 import androidx.compose.foundation.verticalScroll
 import androidx.compose.material3.Slider
 import androidx.compose.material3.Switch
@@ -14,6 +15,7 @@ import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.getValue
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.semantics.Role
 import androidx.compose.ui.unit.dp
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import com.hermestower.voiceconsole.app.AppGraph
@@ -129,12 +131,24 @@ internal fun SettingRow(
     onToggle: (Boolean) -> Unit,
 ) {
     val c = hermesColors
+    // CP-G4-007 accessibility-semantics repair (Owner §3): the WHOLE row is the
+    // control — toggleable with Role.Switch so the label text carries the toggle
+    // action (merged semantics). TalkBack announces label + state together and
+    // E2E may click the label. The Switch is state-display only (onCheckedChange
+    // null = no separate click target, Material accessibility guidance).
     Row(
-        Modifier.fillMaxWidth(),
+        Modifier
+            .fillMaxWidth()
+            .toggleable(
+                value = checked,
+                enabled = enabled,
+                role = Role.Switch,
+                onValueChange = onToggle,
+            ),
         horizontalArrangement = Arrangement.SpaceBetween,
         verticalAlignment = androidx.compose.ui.Alignment.CenterVertically,
     ) {
         Text(label, style = HermesType.body, color = c.ink, modifier = Modifier.weight(1f))
-        Switch(checked = checked, onCheckedChange = onToggle, enabled = enabled)
+        Switch(checked = checked, onCheckedChange = null, enabled = enabled)
     }
 }

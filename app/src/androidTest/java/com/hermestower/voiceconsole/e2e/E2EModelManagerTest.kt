@@ -56,8 +56,7 @@ class E2EModelManagerTest {
 
     @Test
     fun e2e_21_22_openModelManager_runVoicePackRecommendation() {
-        compose.openDrawerAndNavigate("Voice Models")
-        compose.waitForText("A. Recommended setup")
+        compose.openDrawerAndNavigate("Models and Voice", "A. Recommended setup")
         compose.onNodeWithText("Hybrid balanced").performClick()
         compose.waitForText("Apply Recommended Configuration")
         compose.onNodeWithText("A. Recommended setup").assertIsDisplayed()
@@ -67,8 +66,7 @@ class E2EModelManagerTest {
 
     @Test
     fun e2e_23_chooseManualMode() {
-        compose.openDrawerAndNavigate("Voice Models")
-        compose.waitForText("A. Recommended setup")
+        compose.openDrawerAndNavigate("Models and Voice", "A. Recommended setup")
         compose.onNodeWithText("Manual advanced").performClick()
         compose.waitForText("Apply Recommended Configuration")
         compose.onNodeWithText("Apply Recommended Configuration").performClick()

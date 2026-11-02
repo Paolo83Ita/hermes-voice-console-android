@@ -29,10 +29,14 @@ class E2EVoiceFlowTest {
 
     private fun graph() = E2E.graph()
 
-    private fun awaitTurn(predicate: (ConversationTurn) -> Boolean, timeoutMs: Long = 30_000): ConversationTurn? {
+    private fun awaitTurn(
+        predicate: (ConversationTurn) -> Boolean,
+        timeoutMs: Long = 30_000,
+        afterId: Long = Long.MIN_VALUE,
+    ): ConversationTurn? {
         val deadline = System.currentTimeMillis() + timeoutMs
         while (System.currentTimeMillis() < deadline) {
-            graph().store.turns.value.firstOrNull(predicate)?.let { return it }
+            graph().store.turns.value.firstOrNull { it.id > afterId && predicate(it) }?.let { return it }
             Thread.sleep(120)
         }
         return null
@@ -100,6 +104,9 @@ class E2EVoiceFlowTest {
 
     @Test
     fun e2e_17_18_queueNonConsequentialWhileOffline_queuedNotShownAsCompleted() {
+        // CP-G4-007: the AppGraph is a process-wide singleton — scope predicates
+        // to turns created by THIS test so earlier tests' history cannot satisfy them.
+        val baselineId = graph().store.turns.value.maxOf { it.id }
         graph().driver.setFault(BridgeFault.DISCONNECT_AT_ACK)
         val deadline = System.currentTimeMillis() + 10_000
         while (System.currentTimeMillis() < deadline &&
@@ -108,7 +115,7 @@ class E2EVoiceFlowTest {
         graph().driver.submitText("tell me a joke")
         val queued = awaitTurn(predicate = {
             it.role == ConversationTurn.Role.OWNER && it.delivery == ConversationTurn.Delivery.QUEUED
-        }, timeoutMs = 30_000)
+        }, timeoutMs = 30_000, afterId = baselineId)
         assertTrue("no queued turn appeared", queued != null)
         // Truthfulness: a queued request must never be shown as completed.
         assertTrue(queued!!.delivery != ConversationTurn.Delivery.DELIVERED)
@@ -117,18 +124,33 @@ class E2EVoiceFlowTest {
 
     @Test
     fun e2e_19_20_reconnect_validatesQueuedRequestBeforeDelivery() {
+        // CP-G4-007 ROOT-CAUSE REPAIR (runs 41459906172/41461749711/41470976708):
+        // the unscoped OWNER/DELIVERED/note==null predicate matched an EARLIER
+        // test's flushed turn in the shared process-wide store instantly, and the
+        // immediately-following CONNECTED assertion raced the real handshake
+        // (deterministic failure, NOT an application defect — the flush path is
+        // proven correct on virtual time by QueueReconnectFlushReproTest).
+        // Repair: scope predicates to this test's turns + bounded observable-state
+        // wait for CONNECTED (no uncontrolled sleeps; assertions unchanged in strength).
+        val baselineId = graph().store.turns.value.maxOf { it.id }
         // Precondition: something queued while offline.
         graph().driver.setFault(BridgeFault.DISCONNECT_AT_ACK)
         val d0 = System.currentTimeMillis() + 10_000
         while (System.currentTimeMillis() < d0 && graph().store.connection.value.status != ConnectionStatus.BridgeStatus.DISCONNECTED) Thread.sleep(100)
         graph().driver.submitText("tell me a joke")
-        awaitTurn(predicate = { it.role == ConversationTurn.Role.OWNER && it.delivery == ConversationTurn.Delivery.QUEUED }, timeoutMs = 30_000)
+        awaitTurn(predicate = { it.role == ConversationTurn.Role.OWNER && it.delivery == ConversationTurn.Delivery.QUEUED }, timeoutMs = 30_000, afterId = baselineId)
         // Reconnect: clearing the fault triggers handshake + queue flush (validated before delivery).
         graph().driver.clearFault()
+        // The handshake is asynchronous on a real dispatcher: wait (bounded, observable state)
+        // for CONNECTED BEFORE asserting it — the previous version raced it and failed.
+        val connectedDeadline = System.currentTimeMillis() + 20_000
+        while (System.currentTimeMillis() < connectedDeadline &&
+            graph().store.connection.value.status != ConnectionStatus.BridgeStatus.CONNECTED
+        ) Thread.sleep(100)
         val flushed = awaitTurn(predicate = {
             it.role == ConversationTurn.Role.OWNER && it.delivery == ConversationTurn.Delivery.DELIVERED && it.note == null
-        }, timeoutMs = 60_000) ?: awaitTurn(predicate = { it.role == ConversationTurn.Role.HERMES && it.source == ConversationTurn.Source.TOWER }, timeoutMs = 60_000)
+        }, timeoutMs = 60_000, afterId = baselineId) ?: awaitTurn(predicate = { it.role == ConversationTurn.Role.HERMES && it.source == ConversationTurn.Source.TOWER }, timeoutMs = 60_000, afterId = baselineId)
         assertTrue("queued request was never validated and delivered after reconnect", flushed != null)
-        assertTrue(graph().store.connection.value.status == ConnectionStatus.BridgeStatus.CONNECTED)
+        assertEquals(ConnectionStatus.BridgeStatus.CONNECTED, graph().store.connection.value.status)
     }
 }

@@ -4,6 +4,7 @@ import androidx.compose.foundation.background
 import androidx.compose.foundation.border
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
+import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.fillMaxSize
@@ -217,9 +218,15 @@ private fun ThemeSwatch(
     colors: com.hermestower.voiceconsole.ui.theme.HermesColors,
     onClick: () -> Unit,
 ) {
+    // CP-G4-007 accessibility-semantics repair (Owner §3): the whole swatch card
+    // is the control — the label text merges into a clickable node (onClickLabel
+    // names the action for TalkBack; E2E may click the label). The USE/ACTIVE
+    // affordance below stays as the visible selected-state badge.
     Column(
         horizontalAlignment = androidx.compose.ui.Alignment.CenterHorizontally,
-        modifier = Modifier.padding(4.dp),
+        modifier = Modifier
+            .padding(4.dp)
+            .clickable(onClickLabel = label, onClick = onClick),
     ) {
         Box(
             Modifier
