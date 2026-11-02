@@ -28,6 +28,15 @@ class E2ESelfTestTest {
     private fun graph() = E2E.graph()
 
     private fun awaitCompletion(timeoutMs: Long) {
+        // CP-G4-007 attempt-3 race repair: `run()` flips `running` inside a
+        // launched coroutine — a poll that arrives before the coroutine starts
+        // saw `running == false` and returned with zero results (run 41514356403,
+        // e2e_31_33 "results empty"). First wait (bounded) for the run to START,
+        // then wait for completion.
+        val startedDeadline = System.currentTimeMillis() + 10_000
+        while (System.currentTimeMillis() < startedDeadline && !graph().selfTestCenter.running.value) {
+            Thread.sleep(50)
+        }
         val deadline = System.currentTimeMillis() + timeoutMs
         while (System.currentTimeMillis() < deadline) {
             if (!graph().selfTestCenter.running.value) return

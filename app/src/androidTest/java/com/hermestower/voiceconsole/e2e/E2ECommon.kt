@@ -1,5 +1,8 @@
 package com.hermestower.voiceconsole.e2e
 
+import androidx.compose.ui.geometry.Offset
+import androidx.compose.ui.semantics.SemanticsActions
+import androidx.compose.ui.semantics.SemanticsProperties
 import androidx.compose.ui.test.hasClickAction
 import androidx.compose.ui.test.hasText
 import androidx.compose.ui.test.junit4.AndroidComposeTestRule
@@ -7,6 +10,7 @@ import androidx.compose.ui.test.onAllNodesWithText
 import androidx.compose.ui.test.onNodeWithContentDescription
 import androidx.compose.ui.test.onNodeWithText
 import androidx.compose.ui.test.performClick
+import androidx.compose.ui.test.performSemanticsAction
 import androidx.test.ext.junit.rules.ActivityScenarioRule
 import com.hermestower.voiceconsole.app.AppGraph
 import com.hermestower.voiceconsole.app.AppGraphHolder
@@ -28,45 +32,107 @@ object E2E {
 }
 
 /**
- * Open the drawer and navigate to [destinationLabel], then REQUIRE the
- * destination screen to actually compose by waiting for [screenAnchor] —
- * a string that exists only on the destination screen (never on the drawer).
+ * CP-G4-007 E2E-ROBUSTNESS — the frozen-clock navigation contract.
  *
- * CP-G4-007 E2E-ROBUSTNESS root-cause repair (runs 41459906172 / 41461749711 /
- * 41470976708): the suite freezes the animation clock (infinite Oracle Core
- * animation), and the NavHost enter transition is animation-clock-driven —
- * with a frozen clock the destination screen never composed, so every
- * post-navigation assertion timed out deterministically (12 of the 14 E2E
- * failures). The repair advances BOUNDED VIRTUAL TIME until the anchor exists
- * (Owner §3: virtual time + UI-hierarchy assertion; no sleeps, no logic
- * bypass). [screenAnchor] is a required parameter so a caller cannot
- * accidentally assert on the drawer item itself.
+ * Physics of the failure class (proven by runs 41459906172/41461749711/
+ * 41470976708/41485512432/41503065076/41514356403 + the run-41514356403
+ * semantics-tree dump):
+ *  1. `freezeAnimationsForTest()` (needed: infinite Oracle Core animation)
+ *     freezes the compose animation clock;
+ *  2. the drawer-open and NavHost enter transitions advance ONLY on that clock
+ *     — without frames the drawer sheet stays at its CLOSED offset (off-screen)
+ *     and the destination screen never composes;
+ *  3. touch injection at OFF-SCREEN window coordinates is silently dropped —
+ *     the semantics exist but the physics does not (the visible-texts dump of
+ *     run 41514356403 shows console-only content after a "successful" row click).
  *
- * RUN 41503065076 repairs (attempt 3, evidence-driven):
- *  1. the drawer-row click now uses the SEMANTIC selector
- *     `hasText(label) AND hasClickAction()` — a bare text node elsewhere on
- *     screen (e.g. the console's engine-truth row) can precede the drawer row
- *     in tree order and had no click action (Owner §3: stable semantic
- *     selectors + accessible click action, no bypass);
- *  2. the anchor query must not run inside mainClock.advanceTimeUntil (its
- *     condition executes on the MAIN thread where Espresso-linked sync throws
- *     — run 41485512432): bounded advanceTimeBy steps with the query BETWEEN
- *     steps (200 × 100 ms = 20 s virtual bound).
+ * The repair (Owner §3: virtual time, semantic selectors, accessible click
+ * action, performSemanticsAction where appropriate, physical-click assertion
+ * preserved, no logic bypass):
+ *  - pump BOUNDED VIRTUAL TIME so the drawer-open animation actually places the
+ *    row on-screen, then use the PHYSICAL click (rule 4);
+ *  - if the row is still off-screen after the bound, activate it via
+ *    performSemanticsAction(SemanticsActions.OnClick) — the accessible
+ *    activation path a screen reader uses (rule 3), never a logic bypass;
+ *  - pump until the destination anchor composes, then advance a settle window
+ *    so layout/placement is complete before any further physical click;
+ *  - all post-click state waits pump both clocks (waitForText/pumpUntil).
  */
 fun HermesComposeRule.openDrawerAndNavigate(destinationLabel: String, screenAnchor: String) {
     onNodeWithContentDescription("Open navigation drawer").performClick()
-    waitUntil(15_000) { onAllNodesWithText(destinationLabel, substring = true).fetchSemanticsNodes().isNotEmpty() }
-    onAllNodes(hasText(destinationLabel, substring = true).and(hasClickAction()))[0].performClick()
+    waitUntil(15_000) { drawerRowNode(destinationLabel) != null }
+
+    // (a) drawer-open animation: pump until the row is physically on-screen
     var advanced = 0L
-    while (advanced < 20_000L) {
+    var onScreen = false
+    while (advanced < 5_000L) {
         mainClock.advanceTimeBy(100)
         advanced += 100
-        if (onAllNodesWithText(screenAnchor, substring = true).fetchSemanticsNodes().isNotEmpty()) return
+        onScreen = drawerRowPosition(destinationLabel)?.let { it.x >= 0f } ?: false
+        if (onScreen) break
+    }
+
+    // (b) activate: physical click when the control is physically clickable,
+    //     accessible semantics activation otherwise (Owner §3.3)
+    val row = drawerRowNode(destinationLabel)
+    if (row == null) error("drawer row '$destinationLabel' disappeared before activation")
+    if (onScreen) {
+        onAllNodes(hasText(destinationLabel, substring = true).and(hasClickAction()))[0].performClick()
+    } else {
+        // accessible activation path (screen-reader equivalent), never a logic bypass
+        val clickAction = row.config[SemanticsActions.OnClick]
+        if (clickAction?.action != null) clickAction.action!!.invoke()
+    }
+
+    // (c) destination screen: pump until the anchor composes
+    var settled = 0L
+    while (settled < 20_000L) {
+        mainClock.advanceTimeBy(100)
+        settled += 100
+        if (onAllNodesWithText(screenAnchor, substring = true).fetchSemanticsNodes().isNotEmpty()) {
+            // (d) settle window: transition + layout/placement complete before
+            // any further PHYSICAL click on the new screen
+            mainClock.advanceTimeBy(600)
+            return
+        }
     }
     error(
         "destination screen anchor '$screenAnchor' did not compose within 20 s of virtual time; " +
             "visible texts: " + visibleTextsSample(),
     )
+}
+
+private fun HermesComposeRule.drawerRowNode(label: String) =
+    onAllNodes(hasText(label, substring = true).and(hasClickAction()))
+        .fetchSemanticsNodes()
+        .firstOrNull()
+
+private fun HermesComposeRule.drawerRowPosition(label: String): Offset? =
+    try {
+        drawerRowNode(label)?.positionInRoot
+    } catch (t: Throwable) {
+        null
+    }
+
+/**
+ * Bounded dual-clock wait: checks the condition, then advances 100 ms of
+ * VIRTUAL time and yields 20 ms of real time (coroutine-driven state), until
+ * the condition holds or the deadline expires. The controlled replacement for
+ * frozen-clock waitUntil — transitions, layout and effects progress while
+ * state flows are polled (Owner §3: bounded waitUntil + virtual time).
+ */
+fun HermesComposeRule.pumpUntil(timeoutMs: Long = 20_000, condition: () -> Boolean) {
+    val deadline = System.currentTimeMillis() + timeoutMs
+    while (System.currentTimeMillis() < deadline) {
+        if (condition()) return
+        mainClock.advanceTimeBy(100)
+        Thread.sleep(20)
+    }
+    error("condition not met within ${timeoutMs} ms; visible texts: ${visibleTextsSample()}")
+}
+
+fun HermesComposeRule.waitForText(text: String, timeoutMs: Long = 20_000) {
+    pumpUntil(timeoutMs) { onAllNodesWithText(text, substring = true).fetchSemanticsNodes().isNotEmpty() }
 }
 
 /** Bounded diagnostics for anchor-timeout triage (labels only, no secrets). */
@@ -76,8 +142,7 @@ private fun HermesComposeRule.visibleTextsSample(): String =
             .fetchSemanticsNodes()
             .asSequence()
             .map { node ->
-                node.config.get(androidx.compose.ui.semantics.SemanticsProperties.Text)
-                    .joinToString(" ") { t -> t.text }
+                node.config.get(SemanticsProperties.Text).joinToString(" ") { t -> t.text }
             }
             .filter { it.isNotBlank() }
             .take(25)
@@ -87,12 +152,7 @@ private fun HermesComposeRule.visibleTextsSample(): String =
         "<tree unavailable: ${t.javaClass.simpleName}>"
     }
 
-fun HermesComposeRule.waitForText(text: String, timeoutMs: Long = 20_000) {
-    waitUntil(timeoutMs) { onAllNodesWithText(text, substring = true).fetchSemanticsNodes().isNotEmpty() }
-}
-
-/** Click the first CLICKABLE node matching a text (Owner §3 semantic selector;
- *  exact-match + decorated source strings like "…Studio →" stay out of scope). */
+/** Click the first CLICKABLE node matching a text (Owner §3 semantic selector). */
 fun HermesComposeRule.clickFirstClickable(text: String) {
     onAllNodes(hasText(text, substring = true).and(hasClickAction()))[0].performClick()
 }
