@@ -135,6 +135,62 @@ class ScriptedConsoleDriver(
         pipelineJob = scope.launch { runPipeline(text.trim(), sttConfidence = 0.9f) }
     }
 
+    /**
+     * GRAPH 4 G4-C03: a REAL user utterance (typed or recognized from speech)
+     * enters the pipeline here — one single routing/attribution/history path
+     * for voice and text (Owner binding delta §1/§13).
+     */
+    fun submitUtterance(text: String, sttConfidence: Float) {
+        if (text.isBlank()) return
+        if (store.privacyMuted.value) {
+            store.setStatusNote("Request ignored: privacy mute is engaged.")
+            events.log("TURN", "ignored while privacy muted")
+            return
+        }
+        if (store.currentState() == ConsoleState.DORMANT) return
+        pipelineJob?.cancel()
+        tts.interrupt()
+        store.transition(ConsoleState.IDLE)
+        pipelineJob = scope.launch { runPipeline(text.trim(), sttConfidence = sttConfidence) }
+    }
+
+    /** GRAPH 4 G4-C03 (§5): repeat the last spoken response on demand. */
+    fun repeatLastSpoken() {
+        if (store.currentState() == ConsoleState.DORMANT) return
+        val last = store.turns.value.lastOrNull {
+            it.role == ConversationTurn.Role.HERMES && it.delivery == ConversationTurn.Delivery.DELIVERED
+        }
+        if (last == null) {
+            store.setStatusNote("Nothing has been spoken yet.")
+            return
+        }
+        pipelineJob?.cancel()
+        tts.interrupt()
+        store.transition(ConsoleState.IDLE)
+        pipelineJob = scope.launch {
+            // Legal path to SPEAKING: IDLE→TRANSCRIBING→UNDERSTANDING_LOCAL→SPEAKING
+            // (the state machine has no IDLE→SPEAKING shortcut by design).
+            if (store.transition(ConsoleState.TRANSCRIBING) == null) return@launch
+            if (store.transition(ConsoleState.UNDERSTANDING_LOCAL) == null) {
+                store.transition(ConsoleState.IDLE)
+                return@launch
+            }
+            speakAndFinish(last.text, store.settings.value.captionsEnabled)
+        }
+    }
+
+    /** GRAPH 4 G4-C03 (§5): stop listening, cancel the current turn, interrupt speech. */
+    fun cancelCurrentTurn() {
+        pipelineJob?.cancel()
+        pipelineJob = null
+        tts.interrupt()
+        if (store.currentState() != ConsoleState.IDLE && store.currentState() != ConsoleState.DORMANT) {
+            store.transition(ConsoleState.IDLE)
+        }
+        store.setSpeakingAmplitude(0f)
+        events.log("TURN", "cancelled by Owner")
+    }
+
     fun setPrivacyMuted(muted: Boolean) {
         store.setPrivacyMuted(muted)
         if (muted) {

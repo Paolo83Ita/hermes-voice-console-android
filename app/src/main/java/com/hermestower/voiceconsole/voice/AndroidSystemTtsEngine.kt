@@ -62,9 +62,24 @@ class AndroidSystemTtsEngine(private val context: Context) : TtsEngine {
             return
         }
         _state.value = TtsOutput(TtsState.SYNTHESIZING, spokenText = text)
+        // G4-C03 truthfulness: SPEAKING must END when the audio ends. The
+        // utterance listener closes the state honestly (OWNER delta §5: never
+        // show SPEAKING when no TTS engine is producing audio).
+        engine.setOnUtteranceProgressListener(object : android.speech.tts.UtteranceProgressListener() {
+            override fun onStart(utteranceId: String?) {
+                _state.value = TtsOutput(TtsState.SPEAKING, spokenText = text)
+            }
+            override fun onDone(utteranceId: String?) {
+                if (ready) _state.value = TtsOutput(TtsState.READY)
+            }
+            @Deprecated("Deprecated in Java")
+            override fun onError(utteranceId: String?) {
+                _state.value = TtsOutput(TtsState.FAILED, error = "system TTS utterance failed")
+            }
+        })
         val result = engine.speak(text, TextToSpeech.QUEUE_FLUSH, null, "hermes-turn")
         _state.value = if (result == TextToSpeech.SUCCESS) {
-            TtsOutput(TtsState.SPEAKING, spokenText = text)
+            TtsOutput(TtsState.SYNTHESIZING, spokenText = text) // onStart flips to SPEAKING
         } else {
             TtsOutput(TtsState.FAILED, error = "system TTS speak returned $result")
         }

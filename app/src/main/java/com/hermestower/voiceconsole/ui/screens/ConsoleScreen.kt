@@ -1,5 +1,8 @@
 package com.hermestower.voiceconsole.ui.screens
 
+import android.app.Activity
+import androidx.activity.compose.rememberLauncherForActivityResult
+import androidx.activity.result.contract.ActivityResultContracts
 import androidx.compose.foundation.background
 import androidx.compose.foundation.border
 import androidx.compose.foundation.layout.Arrangement
@@ -16,11 +19,13 @@ import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.rememberScrollState
 import androidx.compose.foundation.shape.CircleShape
 import androidx.compose.foundation.shape.RoundedCornerShape
+import androidx.compose.foundation.text.KeyboardOptions
 import androidx.compose.foundation.verticalScroll
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.Menu
 import androidx.compose.material.icons.filled.Mic
 import androidx.compose.material.icons.filled.MicOff
+import androidx.compose.material.icons.filled.Replay
 import androidx.compose.material.icons.filled.Stop
 import androidx.compose.material.icons.outlined.History
 import androidx.compose.material.icons.outlined.Send
@@ -31,6 +36,7 @@ import androidx.compose.material3.OutlinedTextField
 import androidx.compose.material3.Text
 import androidx.compose.material3.TextButton
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.DisposableEffect
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
@@ -40,14 +46,18 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Brush
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.graphics.vector.ImageVector
+import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.semantics.LiveRegionMode
 import androidx.compose.ui.semantics.contentDescription
 import androidx.compose.ui.semantics.liveRegion
 import androidx.compose.ui.semantics.semantics
+import androidx.compose.ui.text.input.ImeAction
 import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.unit.dp
+import androidx.core.app.ActivityCompat
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import com.hermestower.voiceconsole.app.AppGraph
+import com.hermestower.voiceconsole.app.MicUiState
 import com.hermestower.voiceconsole.core.mode.OperatingMode
 import com.hermestower.voiceconsole.core.state.ConsoleState
 import com.hermestower.voiceconsole.core.state.ConnectionStatus
@@ -93,6 +103,27 @@ fun ConsoleScreen(
 
     var showDialog by remember { mutableStateOf(false) }
     var injectText by remember { mutableStateOf("") }
+
+    // ---- GRAPH 4 G4-C03: real microphone path (Owner delta §5) ----
+    val micState by graph.voiceCoordinator.micState.collectAsStateWithLifecycle()
+    val lastRefusal by graph.voiceCoordinator.lastRefusal.collectAsStateWithLifecycle()
+
+    // Foreground-only capture (§4): leaving the screen physically stops the mic.
+    DisposableEffect(Unit) {
+        onDispose { graph.voiceCoordinator.onConsolePaused() }
+    }
+
+    val context = LocalContext.current
+    val micPermissionLauncher = rememberLauncherForActivityResult(
+        ActivityResultContracts.RequestPermission(),
+    ) { granted ->
+        val rationale = ActivityCompat.shouldShowRequestPermissionRationale(
+            context as Activity,
+            android.Manifest.permission.RECORD_AUDIO,
+        )
+        graph.voiceCoordinator.onMicPermissionResult(granted, rationale)
+        if (granted) graph.voiceCoordinator.onPushToTalkPress()
+    }
 
     // GRAPH 3 per-region burn-in safeguard (mission §15; replaces whole-console drift).
     val burnStep = rememberBurnInStep(settings.burnInGuard, settings.reducedMotion)
@@ -189,9 +220,17 @@ fun ConsoleScreen(
                         )
                     }
                     StatusPill(
-                        label = if (muted) "MUTED" else "MIC",
-                        dotColor = if (muted) m.redBronze else m.cyanCore,
-                        description = if (muted) "Privacy mute engaged, microphone disabled" else "Microphone path simulated until voice pack activation",
+                        label = if (muted) "MUTED" else if (micState == MicUiState.LISTENING) "MIC LIVE" else "MIC",
+                        dotColor = when {
+                            muted -> m.redBronze
+                            micState == MicUiState.LISTENING -> m.cyanCore
+                            else -> m.bronzeLight
+                        },
+                        description = when {
+                            muted -> "Privacy mute engaged, microphone physically disconnected"
+                            micState == MicUiState.LISTENING -> "System recognizer is capturing — push-to-talk active"
+                            else -> "Microphone ready for push-to-talk; capture runs only during a turn"
+                        },
                     )
                 }
                 }
@@ -238,6 +277,28 @@ fun ConsoleScreen(
                         .semantics { liveRegion = LiveRegionMode.Polite },
                 )
             }
+            // Typed refusal from the voice coordinator (mute/permission/unavailable).
+            if (!lastRefusal.isNullOrEmpty()) {
+                Text(
+                    lastRefusal!!,
+                    style = MonumentalType.bodySecondary,
+                    color = m.redBronze,
+                    modifier = Modifier
+                        .padding(horizontal = 18.dp, vertical = 2.dp)
+                        .semantics { liveRegion = LiveRegionMode.Assertive },
+                )
+            }
+            // Typed refusal from the voice coordinator (mute/permission/unavailable).
+            if (!lastRefusal.isNullOrEmpty()) {
+                Text(
+                    lastRefusal!!,
+                    style = MonumentalType.bodySecondary,
+                    color = m.redBronze,
+                    modifier = Modifier
+                        .padding(horizontal = 18.dp, vertical = 2.dp)
+                        .semantics { liveRegion = LiveRegionMode.Assertive },
+                )
+            }
 
             // ---- lower area: transcript panel (architectural panel) ----
             Column(
@@ -275,6 +336,16 @@ fun ConsoleScreen(
                 if (draft != null) {
                     Text("you: “${draft}”", style = MonumentalType.bodySecondary, color = m.inkSecondary)
                 }
+                if (micState == MicUiState.LISTENING) {
+                    Text(
+                        "listening — speak now (capture is live)",
+                        style = MonumentalType.bodySecondary,
+                        color = m.cyanCore,
+                        modifier = Modifier
+                            .padding(top = 4.dp)
+                            .semantics { liveRegion = LiveRegionMode.Polite },
+                    )
+                }
                 if (turns.isEmpty() && draft == null) {
                     Text(
                         "No conversation yet. Wake the console or inject a line of text — everything shown is the simulator's real output.",
@@ -284,6 +355,64 @@ fun ConsoleScreen(
                 }
                 TextButton(onClick = onOpenHistory) {
                     Text("Conversation archive →", style = MonumentalType.bodySecondary, color = m.inkSecondary)
+                }
+            }
+
+            // ---- first-class text chat composer (GRAPH 4 Owner delta §12) ----
+            Column(
+                Modifier
+                    .padding(horizontal = 14.dp, vertical = 4.dp)
+                    .fillMaxWidth()
+                    .background(Brush.linearGradient(listOf(m.obsidianPanel, m.obsidianRaised)), RoundedCornerShape(10.dp))
+                    .border(1.5.dp, m.bronzeEdge, RoundedCornerShape(10.dp))
+                    .padding(8.dp),
+            ) {
+                OutlinedTextField(
+                    value = draft.orEmpty(),
+                    onValueChange = { graph.store.setTranscriptDraft(it.take(MAX_CHAT_CHARS)) },
+                    modifier = Modifier
+                        .fillMaxWidth()
+                        .semantics { contentDescription = "Write a message" },
+                    placeholder = { Text("Write a message…", style = MonumentalType.bodySecondary, color = m.inkDim) },
+                    minLines = 1,
+                    maxLines = 4,
+                    keyboardOptions = KeyboardOptions(imeAction = ImeAction.Send),
+                    textStyle = MonumentalType.body.copy(color = m.ink),
+                )
+                Row(
+                    Modifier.fillMaxWidth(),
+                    horizontalArrangement = Arrangement.spacedBy(8.dp, Alignment.End),
+                    verticalAlignment = Alignment.CenterVertically,
+                ) {
+                    if (draft.orEmpty().length > CHAT_COUNTER_THRESHOLD) {
+                        Text(
+                            "${draft.orEmpty().length}/${MAX_CHAT_CHARS}",
+                            style = MonumentalType.sealSub,
+                            color = m.inkDim,
+                        )
+                    }
+                    TextButton(onClick = {
+                        graph.voiceCoordinator.stopCapture("composer mic")
+                        graph.voiceCoordinator.onPushToTalkPressWithPermission { micPermissionLauncher.launch(android.Manifest.permission.RECORD_AUDIO) }
+                    }) {
+                        Text("speak instead", style = MonumentalType.bodySecondary, color = m.inkSecondary)
+                    }
+                    TextButton(onClick = {
+                        graph.driver.cancelCurrentTurn()
+                    }) {
+                        Text("stop", style = MonumentalType.bodySecondary, color = m.inkSecondary)
+                    }
+                    TextButton(
+                        onClick = {
+                            val text = draft.orEmpty().trim()
+                            if (text.isNotEmpty()) {
+                                graph.driver.submitText(text) // sending clears the draft (§15)
+                            }
+                        },
+                        enabled = draft.orEmpty().isNotBlank(),
+                    ) {
+                        Text("send", color = m.cyanCore)
+                    }
                 }
             }
 
@@ -318,17 +447,58 @@ fun ConsoleScreen(
                         m = m,
                     )
                 }
-                Spacer(Modifier.size(10.dp))
+                Spacer(Modifier.size(8.dp))
+                // ---- central push-to-talk medallion (G4-C03 §5) ----
+                IconButton(onClick = {
+                    when (micState) {
+                        MicUiState.PERMISSION_REQUIRED, MicUiState.DENIED ->
+                            micPermissionLauncher.launch(android.Manifest.permission.RECORD_AUDIO)
+                        MicUiState.PERMANENTLY_DENIED -> graph.driver.setPrivacyMuted(false)
+                        else -> {
+                            if (micState == MicUiState.LISTENING) graph.voiceCoordinator.stopCapture("push-to-talk released")
+                            else graph.voiceCoordinator.onPushToTalkPress()
+                        }
+                    }
+                }) {
+                    MedallionDisc(
+                        cd = "Push to talk: capture one voice turn",
+                        icon = if (micState == MicUiState.LISTENING) Icons.Filled.Stop else Icons.Filled.Mic,
+                        tint = if (micState == MicUiState.LISTENING) m.cyanCore else m.gold,
+                        m = m,
+                        big = true,
+                    )
+                }
+                Spacer(Modifier.size(8.dp))
+                IconButton(onClick = { graph.driver.repeatLastSpoken() }) {
+                    MedallionDisc(
+                        cd = "Repeat last spoken response",
+                        icon = Icons.Filled.Replay,
+                        tint = m.bronzeLight,
+                        m = m,
+                    )
+                }
+                Spacer(Modifier.size(8.dp))
+                IconButton(onClick = {
+                    graph.voiceCoordinator.stopCapture("stop pressed")
+                    graph.driver.stopSpeaking()
+                }) {
+                    MedallionDisc(
+                        cd = "Stop listening and speaking",
+                        icon = Icons.Filled.Stop,
+                        tint = m.bronzeLight,
+                        m = m,
+                    )
+                }
+                Spacer(Modifier.size(8.dp))
                 IconButton(onClick = { graph.driver.injectWake() }) {
                     MedallionDisc(
                         cd = "Simulate wake word and canned utterance",
                         icon = Icons.Outlined.Send,
                         tint = m.gold,
                         m = m,
-                        big = true,
                     )
                 }
-                Spacer(Modifier.size(10.dp))
+                Spacer(Modifier.size(8.dp))
                 IconButton(onClick = { showDialog = true }) {
                     MedallionDisc(
                         cd = "Inject a line of text instead of speaking",
@@ -337,23 +507,15 @@ fun ConsoleScreen(
                         m = m,
                     )
                 }
-                Spacer(Modifier.size(10.dp))
-                IconButton(onClick = { graph.driver.stopSpeaking() }) {
-                    MedallionDisc(
-                        cd = "Stop speaking",
-                        icon = Icons.Filled.Stop,
-                        tint = m.bronzeLight,
-                        m = m,
-                    )
-                }
             }
+            // ---- engine truth row (§5: engines are named, simulation labeled) ----
             Text(
-                "wake · inject text · stop voice — no microphone capture until a voice pack is activated",
+                "mic: push-to-talk (system recognizer) · text: first-class · voice out: Android system TTS · offline STT + natural voice: pending Models and Voice · tower: SIMULATED until Tower Graph 1.7",
                 style = MonumentalType.sealSub,
                 color = m.inkDim,
                 modifier = Modifier
                     .fillMaxWidth()
-                    .padding(top = 6.dp),
+                    .padding(horizontal = 12.dp, vertical = 6.dp),
                 textAlign = TextAlign.Center,
             )
         }
@@ -391,6 +553,9 @@ fun ConsoleScreen(
         )
     }
 }
+
+private const val MAX_CHAT_CHARS = 2000
+private const val CHAT_COUNTER_THRESHOLD = 1600
 
 @Composable
 private fun MedallionDisc(

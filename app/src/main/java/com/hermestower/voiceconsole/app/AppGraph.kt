@@ -33,10 +33,18 @@ import com.hermestower.voiceconsole.tower.PrivateFileVaultStore
 import com.hermestower.voiceconsole.tower.RealTowerBridge
 import com.hermestower.voiceconsole.towersim.LocalTowerMockServer
 import com.hermestower.voiceconsole.tts.MockTextToSpeechEngine
+import com.hermestower.voiceconsole.tts.SystemTtsDomainAdapter
+import com.hermestower.voiceconsole.voice.AndroidMicHandleFactory
+import com.hermestower.voiceconsole.voice.AndroidSystemSttEngine
+import com.hermestower.voiceconsole.voice.AndroidSystemTtsEngine
+import com.hermestower.voiceconsole.voice.AudioRecordFrameSource
+import com.hermestower.voiceconsole.voice.EnergyVadEngine
+import com.hermestower.voiceconsole.voice.InactiveFrameSttEngine
 import com.hermestower.voiceconsole.voice.InactiveSpeechToTextEngine
 import com.hermestower.voiceconsole.voice.InactiveVoiceActivityDetector
 import com.hermestower.voiceconsole.voice.InactiveWakeWordEngine
 import com.hermestower.voiceconsole.voice.NoAudioCaptureEngine
+import com.hermestower.voiceconsole.voice.VoicePipelineController
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.SupervisorJob
@@ -129,10 +137,55 @@ class AppGraph(context: Context) {
     val speechToTextEngine = InactiveSpeechToTextEngine()
 
     val localEngine = MockLocalConversationEngine()
-    val tts = MockTextToSpeechEngine()
+
+    // ---- GRAPH 4 G4-C02/C03: REAL voice path (Owner delta §5) ----
+    // Microphone permission is checked physically before any hardware access.
+    val micPermissionGranted: () -> Boolean = {
+        androidx.core.content.ContextCompat.checkSelfPermission(
+            context,
+            android.Manifest.permission.RECORD_AUDIO,
+        ) == android.content.pm.PackageManager.PERMISSION_GRANTED
+    }
+    val micHandleFactory = AndroidMicHandleFactory(hasPermission = micPermissionGranted)
+
+    // Real Android system TTS: the console SPEAKS with real audio (tier 2 of
+    // the §10 fallback chain; the natural Piper voice is G4-C07 after
+    // qualification). No TTS engine on device → honest text-only degradation.
+    val voiceTts = AndroidSystemTtsEngine(context)
+    val consoleTts: com.hermestower.voiceconsole.domain.TextToSpeechEngine =
+        SystemTtsDomainAdapter(voiceTts)
+
+    // Real system speech recognizer (STT while the offline frame path is
+    // pending G4-C07 runtime delivery). One owner of the microphone at a time:
+    // the system recognizer captures by itself, AudioRecord stays closed.
+    val systemStt = AndroidSystemSttEngine(context)
+
+    // Frame-based pipeline (G4-C02) kept wired for the offline STT path and
+    // the Self-Test Center; its Tower executor is honestly unavailable until
+    // the TowerGraph 1.7 contract exists (no invented endpoints).
+    val router = RuleBasedIntentRouter()
+    val voiceController = VoicePipelineController(
+        sourceFactory = { AudioRecordFrameSource(micHandleFactory, permissionGranted = micPermissionGranted) },
+        vad = EnergyVadEngine(),
+        stt = InactiveFrameSttEngine(),
+        tts = voiceTts,
+        router = router,
+        modeProvider = { store.requestedMode.value },
+        connectivityProvider = {
+            when (store.connection.value.status) {
+                com.hermestower.voiceconsole.core.state.ConnectionStatus.BridgeStatus.CONNECTED ->
+                    com.hermestower.voiceconsole.core.routing.Connectivity.OK
+                com.hermestower.voiceconsole.core.state.ConnectionStatus.BridgeStatus.CONNECTING ->
+                    com.hermestower.voiceconsole.core.routing.Connectivity.DEGRADED
+                else -> com.hermestower.voiceconsole.core.routing.Connectivity.DISCONNECTED
+            }
+        },
+        localExecutor = { text -> localEngine.respond(text) { "" }.text },
+        towerExecutor = { _ -> null },
+    )
+
     val simulator = DeterministicTowerSimulator()
     val bridge = MockTowerBridge(simulator)
-    val router = RuleBasedIntentRouter()
 
     val diagnostics = RedactedDiagnosticsExporter(
         events = events,
@@ -146,7 +199,7 @@ class AppGraph(context: Context) {
         router = router,
         localEngine = localEngine,
         bridge = bridge,
-        tts = tts,
+        tts = consoleTts,
         events = events,
         session = session,
         statusProvider = {
@@ -156,6 +209,18 @@ class AppGraph(context: Context) {
                 append(health.statusSummary())
             }
         },
+    )
+
+    // G4-C03: real microphone path coordinator (single state authority, single
+    // routing/history path — voice and text share everything).
+    val voiceCoordinator = ConsoleVoiceCoordinator(
+        scope = scope,
+        store = store,
+        driver = driver,
+        systemStt = systemStt,
+        hasMicPermission = micPermissionGranted,
+        keyValueStore = keyValueStore,
+        events = events,
     )
 
     fun start() {
@@ -174,6 +239,13 @@ class AppGraph(context: Context) {
         bridge.configure(TowerEndpoint.MOCK)
         driver.start()
         driver.boot()
+        // Préchauffe: system TTS init is async — start it at boot so the first
+        // answer can really speak (no fake SPEAKING while not ready).
+        voiceTts.load()
+        // INV-G4-10: privacy mute is a PHYSICAL gate on every capture path.
+        scope.launch {
+            store.privacyMuted.collect { voiceController.setMuted(it) }
+        }
         events.log(
             "APP",
             "graph started (mock bridge; v$APP_VERSION; migration→v${migrationReport.toSchema} fresh=${migrationReport.freshInstall}; " +

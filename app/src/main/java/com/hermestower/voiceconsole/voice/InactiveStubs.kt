@@ -43,3 +43,20 @@ class InactiveSpeechToTextEngine : SpeechToTextEngine {
     override val state: StateFlow<SpeechToTextEngine.State> = _state.asStateFlow()
     override fun transcribe(chunks: Flow<AudioCaptureEngine.AudioChunk>): Flow<SpeechToTextEngine.Transcript> = emptyFlow()
 }
+
+/**
+ * GRAPH 4 G4-C03: voice-seam STT that is honestly NOT INSTALLED. The frame
+ * pipeline (VoicePipelineController) refuses turns with a typed
+ * STT_NOT_INSTALLED error while the offline recognizer (vosk) is pending
+ * delivery/qualification — the console truthfully falls back to the system
+ * recognizer path or text input.
+ */
+class InactiveFrameSttEngine : SttEngine {
+    private val _state = MutableStateFlow(SttOutput(SttState.NOT_INSTALLED))
+    override val state: StateFlow<SttOutput> = _state
+    override fun load() { _state.value = SttOutput(SttState.NOT_INSTALLED) }
+    override fun unload() { _state.value = SttOutput(SttState.UNLOADED) }
+    override fun accept(frame: AudioFrame): SttOutput = _state.value
+    override fun finalizeTranscript(): SttOutput = _state.value
+    override fun reset() {}
+}

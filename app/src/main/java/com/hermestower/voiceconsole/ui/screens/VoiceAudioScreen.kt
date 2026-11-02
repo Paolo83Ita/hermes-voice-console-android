@@ -33,7 +33,7 @@ fun VoiceAudioScreen(graph: AppGraph) {
     val wakeState = graph.wakeWordEngine.state.collectAsStateWithLifecycle()
     val vadState = graph.voiceActivityDetector.state.collectAsStateWithLifecycle()
     val sttState = graph.speechToTextEngine.state.collectAsStateWithLifecycle()
-    val ttsState = graph.tts.state.collectAsStateWithLifecycle()
+    val ttsState = graph.voiceTts.state.collectAsStateWithLifecycle()
 
     Column(
         Modifier
@@ -77,9 +77,13 @@ fun VoiceAudioScreen(graph: AppGraph) {
 
         SectionCard(title = "Text-to-speech") {
             Row(horizontalArrangement = Arrangement.spacedBy(8.dp)) {
-                TruthBadge("MOCK TTS — ACTIVE (V0.1)", c.ok)
-                TruthBadge("SYSTEM TTS — V0.3 FALLBACK", c.inkSecondary)
-                TruthBadge("ENGINE: ${ttsState.value.name}", c.inkSecondary)
+                when (ttsState.value.state) {
+                    com.hermestower.voiceconsole.voice.TtsState.READY,
+                    com.hermestower.voiceconsole.voice.TtsState.SPEAKING,
+                    com.hermestower.voiceconsole.voice.TtsState.SYNTHESIZING -> TruthBadge("SYSTEM TTS — ACTIVE (REAL AUDIO)", c.ok)
+                    else -> TruthBadge("SYSTEM TTS — UNAVAILABLE (text-only)", c.warn)
+                }
+                TruthBadge("ENGINE: ${ttsState.value.state.name}", c.inkSecondary)
             }
             Text("Speaking speed: ${"%.2f".format(settings.speakingRate)}×", style = HermesType.body, color = c.ink)
             Slider(
