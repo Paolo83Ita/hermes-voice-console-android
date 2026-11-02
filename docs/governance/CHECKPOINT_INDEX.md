@@ -57,3 +57,4 @@ Graph 4 checkpoints (branch graph-4/real-voice-pairing-archive-e2e, from ca8980b
 | CP-G4-003 | 525c71f | NODE 1: verified production catalog, 12 entries, real hashes/licenses/provenance |
 | CP-G4-004 | (this commit) | NODE 2/3: MODEL SANCTUM — pack installer, receipts, §7 roots, gatekeeper, real-source wiring |
 | CP-G4-005 | c2ebd88 | NODE 3: real voice pipeline foundation — seams, controller, energy VAD, system TTS, permission flow; 136/136 |
+| CP-G4-005R | (this commit) | pending-E2E read-back: remote tip afe3e08 verified = local; cloud builds 213182a/c2ebd88/afe3e08 SUCCESS (136/136 cloud JUnit, APK f241704…, lint 0 err/32 warn); c2ebd88 E2E = E2E_BLOCKED_EMULATOR_ENVIRONMENT (adb install broken pipe ×5, zero tests ran, KVM present); two E2E runs still active → E2E_RESULT_UNAVAILABLE; receipt docs/receipts/CP-G4-005-READBACK-RECEIPT.md |

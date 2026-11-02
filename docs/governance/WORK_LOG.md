@@ -355,3 +355,26 @@ COMMIT: c2ebd88 (CP-G4-005)
 NEXT: android-e2e read-back for 213182a/c2ebd88 → Android AudioRecord frame source
 + console UI wiring (visible indicator, mute control) → vosk/silero/piper runtime
 adapters → NODE 4 local LLM adapter → NODE 5 TOWER GATE pairing.
+
+NODE G4-N05 — CP-G4-005R pending-E2E read-back (2026-11-02)
+FINDING: remote graph-4 tip = afe3e08 = local HEAD (exact ls-remote match, clean
+tree, nothing to recreate). Cloud android-debug-build SUCCESS at all three
+reported commits; afe3e08 artifacts re-verified from download: 136/136 cloud
+JUnit (16 XML files, 0 failures/errors/skipped), lint 0 errors / 32 warnings
+(+1 warning vs CP-G4-004 — classification pending, gate is zero errors), APK
+59,000,000-B class sha256 f2417045…c512ae. E2E: c2ebd88 run 41460745698 FAILED
+at adb install — five attempts, all "cmd: Failure calling service package:
+Broken pipe (32)", streamed-install last line, ZERO instrumentation tests
+executed, boot polling normal (KVM PRESENT on this runner — Graph 2 no-KVM
+limitation no longer applies) → classified E2E_BLOCKED_EMULATOR_ENVIRONMENT
+(infrastructure, not source, not test). 213182a (41459906172) and afe3e08
+(41461749711) E2E runs physically active at read-back → E2E_RESULT_UNAVAILABLE,
+conservative polling only, no workflow change needed (fresh-runner retries).
+ACTION: receipt docs/receipts/CP-G4-005-READBACK-RECEIPT.md + this convergence.
+TEST: read-back only — no source changed in this step.
+COMMIT: CP-G4-005R (recorded at commit time)
+NEXT: G4-C02 Android AudioRecord frame source + mic lifecycle (16 kHz mono PCM16,
+PUSH_TO_TALK default, typed init/busy/permission/read failures, full test
+matrix) → G4-C03 Main Console voice wiring + first-class text chat (Owner
+binding delta) → runtime adapters → monumental refinement → compact navigation
+→ five-language localization → pairing/archive/self-test/packaging.
