@@ -12,15 +12,26 @@ import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.rememberScrollState
 import androidx.compose.foundation.verticalScroll
+import androidx.activity.ComponentActivity
+import androidx.compose.foundation.layout.FlowRow
+import androidx.compose.foundation.layout.ExperimentalLayoutApi
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Slider
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.getValue
+import androidx.compose.runtime.mutableStateOf
+import androidx.compose.runtime.remember
+import androidx.compose.runtime.setValue
+import android.app.Activity
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.platform.LocalContext
+import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.unit.dp
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import com.hermestower.voiceconsole.app.AppGraph
+import com.hermestower.voiceconsole.locale.AppLanguage
+import com.hermestower.voiceconsole.R as Res
 import com.hermestower.voiceconsole.ui.components.ModeChip
 import com.hermestower.voiceconsole.ui.components.SectionCard
 import com.hermestower.voiceconsole.ui.components.TruthBadge
@@ -37,6 +48,7 @@ import com.hermestower.voiceconsole.ui.theme.hermesColors
  * Adds the Monumental quality profile selector (LOW / BALANCED / HIGH, mission §14)
  * on top of the preserved theme, brightness, motion and display-safety controls.
  */
+@OptIn(ExperimentalLayoutApi::class)
 @Composable
 fun AppearanceScreen(graph: AppGraph) {
     val c = hermesColors
@@ -152,6 +164,41 @@ fun AppearanceScreen(graph: AppGraph) {
             )
         }
 
+SectionCard(title = stringResource(Res.string.settings_language_title)) {
+            Text(
+                stringResource(Res.string.language_note),
+                style = HermesType.bodySecondary,
+                color = c.inkSecondary,
+            )
+            val context = LocalContext.current
+            var currentLang by remember { mutableStateOf(AppLanguage.stored(context)) }
+            FlowRow(horizontalArrangement = Arrangement.spacedBy(8.dp)) {
+                LanguageChip(
+                    code = AppLanguage.FOLLOW_SYSTEM,
+                    label = stringResource(Res.string.lang_follow_system),
+                    selected = currentLang == AppLanguage.FOLLOW_SYSTEM,
+                    onSelect = {
+                        AppLanguage.apply(context, AppLanguage.FOLLOW_SYSTEM)
+                        currentLang = AppLanguage.FOLLOW_SYSTEM
+                        (context as? Activity)?.recreate()
+                    },
+                )
+                listOf("it" to Res.string.lang_it, "en" to Res.string.lang_en, "es" to Res.string.lang_es, "fr" to Res.string.lang_fr, "de" to Res.string.lang_de)
+                    .forEach { (code, res) ->
+                        LanguageChip(
+                            code = code,
+                            label = stringResource(res),
+                            selected = currentLang == code,
+                            onSelect = {
+                                AppLanguage.apply(context, code)
+                                currentLang = code
+                                (context as? Activity)?.recreate()
+                            },
+                        )
+                    }
+            }
+        }
+
         SectionCard(title = "Kiosk behavior") {
             TruthBadge("CONTROLLED CAPABILITY — V0.7", c.inkSecondary)
             Text(
@@ -201,4 +248,15 @@ private fun ThemeSwatch(
             Text(if (selected) "ACTIVE" else "USE", style = HermesType.pill)
         }
     }
+}
+
+@OptIn(ExperimentalLayoutApi::class)
+@Composable
+private fun LanguageChip(
+    code: String,
+    label: String,
+    selected: Boolean,
+    onSelect: () -> Unit,
+) {
+    ModeChip(label = label, selected = selected, enabled = true, onClick = onSelect)
 }

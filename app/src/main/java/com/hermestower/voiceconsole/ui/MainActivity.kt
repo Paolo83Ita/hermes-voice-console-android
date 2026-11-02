@@ -18,6 +18,12 @@ import com.hermestower.voiceconsole.ui.theme.HermesTheme
  */
 class MainActivity : ComponentActivity() {
 
+    // G4-C08: per-app language override (Android 11/12 fallback path; 13+ uses
+    // the official LocaleManager inside AppLanguage.apply).
+    override fun attachBaseContext(newBase: android.content.Context) {
+        super.attachBaseContext(com.hermestower.voiceconsole.locale.AppLanguage.wrapContext(newBase))
+    }
+
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         enableEdgeToEdge()

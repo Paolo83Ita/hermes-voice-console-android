@@ -47,6 +47,7 @@ import androidx.compose.ui.graphics.Brush
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.graphics.vector.ImageVector
 import androidx.compose.ui.platform.LocalContext
+import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.semantics.LiveRegionMode
 import androidx.compose.ui.semantics.contentDescription
 import androidx.compose.ui.semantics.liveRegion
@@ -200,36 +201,36 @@ fun ConsoleScreen(
                 ) {
                     StatusPill(
                         label = when (connection.status) {
-                            ConnectionStatus.BridgeStatus.CONNECTED -> "BRIDGE OK"
-                            ConnectionStatus.BridgeStatus.CONNECTING -> "BRIDGE…"
-                            ConnectionStatus.BridgeStatus.DISCONNECTED -> "OFFLINE"
-                            ConnectionStatus.BridgeStatus.UNCONFIGURED -> "MOCK"
+                            ConnectionStatus.BridgeStatus.CONNECTED -> stringResource(com.hermestower.voiceconsole.R.string.pill_connected)
+                            ConnectionStatus.BridgeStatus.CONNECTING -> stringResource(com.hermestower.voiceconsole.R.string.pill_connecting)
+                            ConnectionStatus.BridgeStatus.DISCONNECTED -> stringResource(com.hermestower.voiceconsole.R.string.pill_offline)
+                            ConnectionStatus.BridgeStatus.UNCONFIGURED -> stringResource(com.hermestower.voiceconsole.R.string.pill_mock)
                         },
                         dotColor = when (connection.status) {
                             ConnectionStatus.BridgeStatus.CONNECTED -> m.cyanCore
                             ConnectionStatus.BridgeStatus.CONNECTING -> m.amber
                             else -> m.redBronze
                         },
-                        description = "Tower bridge: ${connection.status.name.lowercase()}, endpoint ${connection.endpointLabel}",
+                        description = stringResource(com.hermestower.voiceconsole.R.string.desc_bridge_fmt, connection.status.name.lowercase(), connection.endpointLabel),
                     )
                     if (queueCount > 0) {
                         StatusPill(
-                            label = "QUEUED ×$queueCount",
+                            label = stringResource(com.hermestower.voiceconsole.R.string.pill_queued_fmt, queueCount),
                             dotColor = m.amber,
-                            description = "$queueCount requests queued for the Tower",
+                            description = stringResource(com.hermestower.voiceconsole.R.string.desc_queued_fmt, queueCount),
                         )
                     }
                     StatusPill(
-                        label = if (muted) "MUTED" else if (micState == MicUiState.LISTENING) "MIC LIVE" else "MIC",
+                        label = if (muted) stringResource(com.hermestower.voiceconsole.R.string.pill_muted) else if (micState == MicUiState.LISTENING) stringResource(com.hermestower.voiceconsole.R.string.pill_mic_live) else stringResource(com.hermestower.voiceconsole.R.string.pill_mic),
                         dotColor = when {
                             muted -> m.redBronze
                             micState == MicUiState.LISTENING -> m.cyanCore
                             else -> m.bronzeLight
                         },
                         description = when {
-                            muted -> "Privacy mute engaged, microphone physically disconnected"
-                            micState == MicUiState.LISTENING -> "System recognizer is capturing — push-to-talk active"
-                            else -> "Microphone ready for push-to-talk; capture runs only during a turn"
+                            muted -> stringResource(com.hermestower.voiceconsole.R.string.desc_muted)
+                            micState == MicUiState.LISTENING -> stringResource(com.hermestower.voiceconsole.R.string.desc_mic_live)
+                            else -> stringResource(com.hermestower.voiceconsole.R.string.desc_mic_ready)
                         },
                     )
                 }
@@ -311,10 +312,10 @@ fun ConsoleScreen(
                     .padding(12.dp),
             ) {
                 Row(horizontalArrangement = Arrangement.spacedBy(8.dp)) {
-                    Text("LOCAL CORE", style = MonumentalType.sealSub, color = m.localGold)
-                    Text("TOWER", style = MonumentalType.sealSub, color = m.towerBlue)
+                    Text(stringResource(com.hermestower.voiceconsole.R.string.local_core_label), style = MonumentalType.sealSub, color = m.localGold)
+                    Text(stringResource(com.hermestower.voiceconsole.R.string.tower_label), style = MonumentalType.sealSub, color = m.towerBlue)
                     Text(
-                        "attribution is real — local answers never claim the Tower",
+                        stringResource(com.hermestower.voiceconsole.R.string.attribution_note),
                         style = MonumentalType.sealSub,
                         color = m.inkDim,
                     )
@@ -338,7 +339,7 @@ fun ConsoleScreen(
                 }
                 if (micState == MicUiState.LISTENING) {
                     Text(
-                        "listening — speak now (capture is live)",
+                        stringResource(com.hermestower.voiceconsole.R.string.listening_hint),
                         style = MonumentalType.bodySecondary,
                         color = m.cyanCore,
                         modifier = Modifier
@@ -348,17 +349,18 @@ fun ConsoleScreen(
                 }
                 if (turns.isEmpty() && draft == null) {
                     Text(
-                        "No conversation yet. Wake the console or inject a line of text — everything shown is the simulator's real output.",
+                        stringResource(com.hermestower.voiceconsole.R.string.no_conversation),
                         style = MonumentalType.bodySecondary,
                         color = m.inkSecondary,
                     )
                 }
                 TextButton(onClick = onOpenHistory) {
-                    Text("Conversation archive →", style = MonumentalType.bodySecondary, color = m.inkSecondary)
+                    Text(stringResource(com.hermestower.voiceconsole.R.string.archive_link), style = MonumentalType.bodySecondary, color = m.inkSecondary)
                 }
             }
 
             // ---- first-class text chat composer (GRAPH 4 Owner delta §12) ----
+            val composerCd = stringResource(com.hermestower.voiceconsole.R.string.composer_cd)
             Column(
                 Modifier
                     .padding(horizontal = 14.dp, vertical = 4.dp)
@@ -372,8 +374,8 @@ fun ConsoleScreen(
                     onValueChange = { graph.store.setTranscriptDraft(it.take(MAX_CHAT_CHARS)) },
                     modifier = Modifier
                         .fillMaxWidth()
-                        .semantics { contentDescription = "Write a message" },
-                    placeholder = { Text("Write a message…", style = MonumentalType.bodySecondary, color = m.inkDim) },
+                        .semantics { contentDescription = composerCd },
+                    placeholder = { Text(stringResource(com.hermestower.voiceconsole.R.string.composer_hint), style = MonumentalType.bodySecondary, color = m.inkDim) },
                     minLines = 1,
                     maxLines = 4,
                     keyboardOptions = KeyboardOptions(imeAction = ImeAction.Send),
@@ -395,12 +397,12 @@ fun ConsoleScreen(
                         graph.voiceCoordinator.stopCapture("composer mic")
                         graph.voiceCoordinator.onPushToTalkPressWithPermission { micPermissionLauncher.launch(android.Manifest.permission.RECORD_AUDIO) }
                     }) {
-                        Text("speak instead", style = MonumentalType.bodySecondary, color = m.inkSecondary)
+                        Text(stringResource(com.hermestower.voiceconsole.R.string.composer_speak_instead), style = MonumentalType.bodySecondary, color = m.inkSecondary)
                     }
                     TextButton(onClick = {
                         graph.driver.cancelCurrentTurn()
                     }) {
-                        Text("stop", style = MonumentalType.bodySecondary, color = m.inkSecondary)
+                        Text(stringResource(com.hermestower.voiceconsole.R.string.composer_stop), style = MonumentalType.bodySecondary, color = m.inkSecondary)
                     }
                     TextButton(
                         onClick = {
@@ -411,7 +413,7 @@ fun ConsoleScreen(
                         },
                         enabled = draft.orEmpty().isNotBlank(),
                     ) {
-                        Text("send", color = m.cyanCore)
+                        Text(stringResource(com.hermestower.voiceconsole.R.string.composer_send), color = m.cyanCore)
                     }
                 }
             }
@@ -441,7 +443,7 @@ fun ConsoleScreen(
             ) {
                 IconButton(onClick = { graph.driver.setPrivacyMuted(!muted) }) {
                     MedallionDisc(
-                        cd = if (muted) "Disable privacy mute" else "Engage privacy mute",
+                        cd = if (muted) stringResource(com.hermestower.voiceconsole.R.string.mute_cd_on) else stringResource(com.hermestower.voiceconsole.R.string.mute_cd_off),
                         icon = if (muted) Icons.Filled.MicOff else Icons.Filled.Mic,
                         tint = if (muted) m.redBronze else m.bronzeLight,
                         m = m,
@@ -461,7 +463,7 @@ fun ConsoleScreen(
                     }
                 }) {
                     MedallionDisc(
-                        cd = "Push to talk: capture one voice turn",
+                        cd = stringResource(com.hermestower.voiceconsole.R.string.ptt_cd),
                         icon = if (micState == MicUiState.LISTENING) Icons.Filled.Stop else Icons.Filled.Mic,
                         tint = if (micState == MicUiState.LISTENING) m.cyanCore else m.gold,
                         m = m,
@@ -471,7 +473,7 @@ fun ConsoleScreen(
                 Spacer(Modifier.size(8.dp))
                 IconButton(onClick = { graph.driver.repeatLastSpoken() }) {
                     MedallionDisc(
-                        cd = "Repeat last spoken response",
+                        cd = stringResource(com.hermestower.voiceconsole.R.string.repeat_cd),
                         icon = Icons.Filled.Replay,
                         tint = m.bronzeLight,
                         m = m,
@@ -483,7 +485,7 @@ fun ConsoleScreen(
                     graph.driver.stopSpeaking()
                 }) {
                     MedallionDisc(
-                        cd = "Stop listening and speaking",
+                        cd = stringResource(com.hermestower.voiceconsole.R.string.stop_cd),
                         icon = Icons.Filled.Stop,
                         tint = m.bronzeLight,
                         m = m,
@@ -492,7 +494,7 @@ fun ConsoleScreen(
                 Spacer(Modifier.size(8.dp))
                 IconButton(onClick = { graph.driver.injectWake() }) {
                     MedallionDisc(
-                        cd = "Simulate wake word and canned utterance",
+                        cd = stringResource(com.hermestower.voiceconsole.R.string.sim_wake_cd),
                         icon = Icons.Outlined.Send,
                         tint = m.gold,
                         m = m,
@@ -501,7 +503,7 @@ fun ConsoleScreen(
                 Spacer(Modifier.size(8.dp))
                 IconButton(onClick = { showDialog = true }) {
                     MedallionDisc(
-                        cd = "Inject a line of text instead of speaking",
+                        cd = stringResource(com.hermestower.voiceconsole.R.string.inject_cd),
                         icon = Icons.Outlined.History,
                         tint = m.bronzeLight,
                         m = m,
@@ -510,7 +512,7 @@ fun ConsoleScreen(
             }
             // ---- engine truth row (§5: engines are named, simulation labeled) ----
             Text(
-                "mic: push-to-talk (system recognizer) · text: first-class · voice out: Android system TTS · offline STT + natural voice: pending Models and Voice · tower: SIMULATED until Tower Graph 1.7",
+                stringResource(com.hermestower.voiceconsole.R.string.engine_row),
                 style = MonumentalType.sealSub,
                 color = m.inkDim,
                 modifier = Modifier
@@ -585,6 +587,25 @@ private fun MedallionDisc(
     }
 }
 
+
+private fun stateLabelRes(state: ConsoleState): Int = when (state) {
+    ConsoleState.DORMANT -> com.hermestower.voiceconsole.R.string.state_DORMANT
+    ConsoleState.IDLE -> com.hermestower.voiceconsole.R.string.state_IDLE
+    ConsoleState.WAKE_DETECTED -> com.hermestower.voiceconsole.R.string.state_WAKE_DETECTED
+    ConsoleState.LISTENING -> com.hermestower.voiceconsole.R.string.state_LISTENING
+    ConsoleState.TRANSCRIBING -> com.hermestower.voiceconsole.R.string.state_TRANSCRIBING
+    ConsoleState.UNDERSTANDING_LOCAL -> com.hermestower.voiceconsole.R.string.state_UNDERSTANDING_LOCAL
+    ConsoleState.CONTACTING_TOWER -> com.hermestower.voiceconsole.R.string.state_CONTACTING_TOWER
+    ConsoleState.TOWER_PROCESSING -> com.hermestower.voiceconsole.R.string.state_TOWER_PROCESSING
+    ConsoleState.SPEAKING -> com.hermestower.voiceconsole.R.string.state_SPEAKING
+    ConsoleState.REQUEST_QUEUED -> com.hermestower.voiceconsole.R.string.state_REQUEST_QUEUED
+    ConsoleState.DISCONNECTED -> com.hermestower.voiceconsole.R.string.state_DISCONNECTED
+    ConsoleState.DEGRADED -> com.hermestower.voiceconsole.R.string.state_DEGRADED
+    ConsoleState.ERROR -> com.hermestower.voiceconsole.R.string.state_ERROR
+    ConsoleState.PRIVACY_MUTED -> com.hermestower.voiceconsole.R.string.state_PRIVACY_MUTED
+    ConsoleState.UPDATE_AVAILABLE -> com.hermestower.voiceconsole.R.string.state_UPDATE_AVAILABLE
+}
+
 @Composable
 private fun StateOverlayChip(
     state: ConsoleState,
@@ -599,7 +620,7 @@ private fun StateOverlayChip(
         ConsoleState.DISCONNECTED, ConsoleState.PRIVACY_MUTED -> m.inkSecondary
         else -> m.cyanCore
     }
-    val modeNote = if (effectiveMode != requestedMode) " · effective ${effectiveMode.label}" else ""
+    val modeNote = if (effectiveMode != requestedMode) stringResource(com.hermestower.voiceconsole.R.string.effective_note_fmt, effectiveMode.label) else ""
     Column(
         modifier
             .background(m.obsidianPanel.copy(alpha = 0.92f), RoundedCornerShape(8.dp))
@@ -608,9 +629,9 @@ private fun StateOverlayChip(
             .semantics { liveRegion = LiveRegionMode.Polite },
         horizontalAlignment = Alignment.CenterHorizontally,
     ) {
-        Text(state.label, style = MonumentalType.stateLabel, color = chipColor)
+        Text(stringResource(stateLabelRes(state)), style = MonumentalType.stateLabel, color = chipColor)
         Text(
-            "mode ${effectiveMode.label}$modeNote",
+            stringResource(com.hermestower.voiceconsole.R.string.mode_note_fmt, effectiveMode.label, modeNote),
             style = MonumentalType.sealSub,
             color = m.inkSecondary,
             modifier = Modifier.padding(top = 2.dp),

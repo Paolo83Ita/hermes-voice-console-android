@@ -378,3 +378,34 @@ PUSH_TO_TALK default, typed init/busy/permission/read failures, full test
 matrix) → G4-C03 Main Console voice wiring + first-class text chat (Owner
 binding delta) → runtime adapters → monumental refinement → compact navigation
 → five-language localization → pairing/archive/self-test/packaging.
+
+NODE G4-N06/07/08 — G4-C02/C03/C07/C08 wave (2026-11-02)
+FINDING: sandbox recycled (Android SDK gone, Maven 429) — restored SDK+JDK17
+into the PERSISTENT area (/home/z/my-project/android-sdk, jdk17) and rebuilt the
+out-of-repo Aliyun-mirror init script; commits 090040d (G4-C02), adbc16c (G4-C03)
+pushed and read back exact. Two E2E runs (213182a/afe3e08) were still active at
+CP-G4-005R — re-read-back pending at next cloud evidence step.
+ACTION: G4-C02 REAL AudioRecord source (AndroidMicHandleFactory VOICE_RECOGNITION
+16k mono PCM16 with getMinBufferSize negotiation; bounded drop-oldest queue;
+physically immediate stop with one-shot release + queue clear; typed
+PERMISSION/BUSY/INIT/FORMAT/READ failures; idempotent double start/stop) wired
+into VoicePipelineController (MIC_* typed errors never shown as NO_SPEECH).
+G4-C03 ConsoleVoiceCoordinator: LISTENING only while the system recognizer
+physically captures; system STT (EXTRA_PREFER_OFFLINE, partial → live draft,
+final → driver.submitUtterance = SAME routing/attribution/history as text per
+Owner delta §1/§13); real Android system TTS with UtteranceProgressListener
+(SPEAKING ends when audio ends — delta §5); first-class chat composer (draft
+persisted to KeyValueStore across restarts §15, send clears, counter, stop);
+PTT/repeat-last/unified-stop medallions; foreground-only capture.
+G4-C07 compact navigation: DrawerWidthPolicy pure (min(max(60%,248), min(2/3,360)))
++ rebuilt drawer HEADER/PRIMARY/SECONDARY/FOOTER, 48dp targets, two-line labels.
+G4-C08 wave 1: 75-key five-language resources (Owner §14 anchors), AppLanguage
+(LocaleManager API33+ official; attachBaseContext fallback 30–32), Settings→
+Language persistent + reversible, LocalizationParityTest (GATE-05).
+TEST: 178/178 unit green (41 new this wave); lint 0 errors (34 warn + 1 info —
+warning classification doc update pending next pass); secret scan 0; local APK
+59,927,205 B sha 931bc31c…
+COMMIT: (this commit)
+NEXT: E2E re-read-back for 213182a/afe3e08 + cloud build of this commit →
+G4-C04 runtime adapters (vosk/piper delivery-dependent) → Tower Gate pairing
+client + QR scanner (Owner delta) → Tower Archive → G4-C11/C12 packaging.
