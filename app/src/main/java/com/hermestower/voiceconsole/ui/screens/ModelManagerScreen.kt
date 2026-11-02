@@ -7,27 +7,32 @@ import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.rememberScrollState
 import androidx.compose.foundation.verticalScroll
+import androidx.compose.material3.AlertDialog
 import androidx.compose.material3.Button
 import androidx.compose.material3.FilterChip
 import androidx.compose.material3.Text
 import androidx.compose.material3.TextButton
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.getValue
+import androidx.compose.runtime.mutableStateMapOf
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
+import androidx.compose.runtime.rememberCoroutineScope
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.unit.dp
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import com.hermestower.voiceconsole.app.AppGraph
+import com.hermestower.voiceconsole.models.ComponentFallback
 import com.hermestower.voiceconsole.models.DeterministicTestArtifact
-import com.hermestower.voiceconsole.models.ModelComponentType
+import com.hermestower.voiceconsole.models.ModelInstallState
 import com.hermestower.voiceconsole.models.ModelSha256
 import com.hermestower.voiceconsole.models.VoiceModelProfile
 import com.hermestower.voiceconsole.towersim.LocalTowerMockServer
 import com.hermestower.voiceconsole.ui.components.SectionCard
 import com.hermestower.voiceconsole.ui.theme.HermesType
 import com.hermestower.voiceconsole.ui.theme.hermesColors
+import kotlinx.coroutines.launch
 
 private fun formatBytes(bytes: Long): String = when {
     bytes >= 1L shl 30 -> "%.1f GB".format(bytes.toDouble() / (1L shl 30))
@@ -37,14 +42,17 @@ private fun formatBytes(bytes: Long): String = when {
 }
 
 /**
- * Settings → Voice Models and Local Intelligence (GRAPH 2 §6).
- * Sections: A recommended setup · B installed components · C available components
- * · D advanced actions · E modes · F Tower-only fallback. Nothing downloads or
- * activates silently: every action is an explicit button with a visible result.
+ * MODEL SANCTUM — Models and Voice (GRAPH 4 §6/§7, refounding the Graph 2 Voice
+ * Model Manager). The screen is a live window into the real delivery engine:
+ * recommended minimal pack with a full preflight summary and explicit confirmation,
+ * per-component attribute sheets with provenance and fallback contracts, and every
+ * lifecycle action wired to the verified catalog sources. Nothing downloads or
+ * activates silently; the optional local LLM is never part of the pack.
  */
 @Composable
 fun ModelManagerScreen(graph: AppGraph) {
     val c = hermesColors
+    val scope = rememberCoroutineScope()
     var selectedProfile by remember { mutableStateOf(VoiceModelProfile.TOWER_FIRST) }
     var recommendation by remember { mutableStateOf<com.hermestower.voiceconsole.models.VoicePackRecommendation?>(null) }
     var statusNote by remember { mutableStateOf<String?>(null) }
@@ -56,6 +64,19 @@ fun ModelManagerScreen(graph: AppGraph) {
         )
     }
     var registryTick by remember { mutableStateOf(0) }
+    var packRunning by remember { mutableStateOf(false) }
+    var packEvents by remember { mutableStateOf<List<String>>(emptyList()) }
+    var packConfirmOpen by remember { mutableStateOf(false) }
+    val expanded = remember { mutableStateMapOf<String, Boolean>() }
+    val diagnosticsOpen = remember { mutableStateOf(false) }
+    // GRAPH 4 §6: the pack plan and its preflight summary are computed once per
+    // registry change and shared by the pack card and the confirmation dialog.
+    val packResources = remember { graph.deviceResourceReader.read() }
+    val computedPlan = remember(registryTick) {
+        graph.modelPackInstaller.plan(VoiceModelProfile.HYBRID_BALANCED, packResources, graph.modelCatalog)
+    }
+    val computedSummary = remember(registryTick) { graph.modelPackInstaller.summarize(computedPlan, packResources) }
+
     val progressById = if (registryTick >= 0) {
         graph.modelCatalog.all().associate { it.identity to graph.modelDownloads.progress(it.identity).collectAsStateWithLifecycle() }
     } else emptyMap()
@@ -67,7 +88,8 @@ fun ModelManagerScreen(graph: AppGraph) {
             .padding(16.dp),
         verticalArrangement = Arrangement.spacedBy(12.dp),
     ) {
-        Text("Voice Models & Local Intelligence", style = HermesType.screenTitle, color = c.ink)
+        Text("MODEL SANCTUM", style = HermesType.screenTitle, color = c.ink)
+        Text("Models and Voice", style = HermesType.sectionLabel, color = c.bronze)
         Text(
             "Local intelligence is optional and independent per component; complex, uncertain and " +
                 "consequential reasoning always belongs to Hermes Tower. No model is downloaded without " +
@@ -125,6 +147,72 @@ fun ModelManagerScreen(graph: AppGraph) {
             }
         }
 
+        // ---------- RECOMMENDED VOICE PACK (GRAPH 4 §6 bulk action) ----------
+        SectionCard(title = "INSTALL RECOMMENDED VOICE PACK") {
+            val plan = computedPlan
+            val summary = computedSummary
+            val included = plan.includedItems
+
+            Text("RECOMMENDED SETUP — minimal voice pack for this device (profile: Hybrid balanced)", style = HermesType.sectionLabel, color = c.bronze)
+            if (included.isEmpty()) {
+                Text(
+                    "No additional components are required right now: everything the minimal pack needs is already installed or bundled.",
+                    style = HermesType.bodySecondary, color = c.inkSecondary,
+                )
+            } else {
+                Text("Will be installed (${included.size}):", style = HermesType.body, color = c.ink)
+                included.forEach { item ->
+                    Text(
+                        "• ${item.entry?.displayName} v${item.entry?.version} — download ${formatBytes(item.entry?.downloadSizeBytes ?: 0)}",
+                        style = HermesType.body, color = c.ink,
+                    )
+                }
+            }
+            plan.items.filter { it.role == "BUNDLED_RUNTIME" }.forEach {
+                Text("• ${it.entry?.displayName} — ${it.reason}", style = HermesType.bodySecondary, color = c.inkSecondary)
+            }
+            plan.items.filter { it.role == "ALREADY_INSTALLED" }.forEach {
+                Text("• ${it.entry?.displayName} — ${it.reason}", style = HermesType.bodySecondary, color = c.inkSecondary)
+            }
+            summary.blockedItems.forEach { (name, reason) ->
+                Text("⚠ $name — $reason", style = HermesType.bodySecondary, color = c.warn)
+            }
+            Text(
+                "Download total: ${formatBytes(summary.totalDownloadBytes)} · installed total: ${formatBytes(summary.totalInstalledBytes)} · " +
+                    "peak temporary storage: ${formatBytes(summary.peakTempBytes)}",
+                style = HermesType.body, color = c.ink,
+            )
+            Text(
+                "Free-space reserve kept: ${formatBytes(summary.reserveBytes)} (greater of 2 GB and 15% of available) — " +
+                    "minimum free required: ${formatBytes(summary.minimumFreeRequiredBytes)}",
+                style = HermesType.body, color = c.ink,
+            )
+            Text("Expected duration: ${summary.durationRangeText}", style = HermesType.body, color = c.ink)
+            Text(summary.wifiAdvice, style = HermesType.bodySecondary, color = c.inkSecondary)
+            Text(summary.chargingAdvice, style = HermesType.bodySecondary, color = c.inkSecondary)
+            Text(summary.thermalAdvice, style = HermesType.bodySecondary, color = c.inkSecondary)
+            Text("Licenses: ${summary.licenses.joinToString()}", style = HermesType.bodySecondary, color = c.inkSecondary)
+            if (summary.optionalItems.isNotEmpty()) {
+                Text(
+                    "Optional and NOT included (never auto-downloaded): ${summary.optionalItems.joinToString()} — including the local LLM; complex reasoning stays on Hermes Tower.",
+                    style = HermesType.bodySecondary, color = c.inkSecondary,
+                )
+            }
+            Row(horizontalArrangement = Arrangement.spacedBy(8.dp), modifier = Modifier.padding(top = 4.dp)) {
+                Button(
+                    enabled = !packRunning && included.isNotEmpty(),
+                    onClick = { packConfirmOpen = true },
+                ) { Text("Install Recommended Voice Pack") }
+            }
+            if (packEvents.isNotEmpty()) {
+                Column(Modifier.padding(top = 4.dp)) {
+                    packEvents.takeLast(4).forEach {
+                        Text(it, style = HermesType.bodySecondary, color = c.energy)
+                    }
+                }
+            }
+        }
+
         // ---------- B. Installed voice components ----------
         SectionCard(title = "B. Installed voice components") {
             val installed = graph.modelRegistry.snapshot().filter { it.state != "REMOVED" }
@@ -134,7 +222,7 @@ fun ModelManagerScreen(graph: AppGraph) {
                     style = HermesType.bodySecondary, color = c.inkSecondary,
                 )
             }
-            ModelComponentType.entries.forEach { type ->
+            com.hermestower.voiceconsole.models.ModelComponentType.entries.forEach { type ->
                 val records = installed.filter { it.componentType == type.name }
                 if (records.isNotEmpty()) {
                     Text(type.displayLabel, style = HermesType.sectionLabel, color = c.bronze)
@@ -152,10 +240,14 @@ fun ModelManagerScreen(graph: AppGraph) {
             }
         }
 
-        // ---------- C + D. Available components with advanced actions ----------
+        // ---------- C. Available components ----------
         SectionCard(title = "C. Available components") {
             graph.modelCatalog.all().forEach { entry ->
                 val progress = progressById[entry.identity]?.value
+                val record = graph.modelRegistry.record(entry.identity)
+                val isExpanded = expanded[entry.identity] == true
+                val updateAvailable = record != null && record.version != entry.version
+
                 Text(entry.displayName, style = HermesType.sectionLabel, color = c.bronze)
                 Text(
                     "${entry.identity} · v${entry.version} · ${entry.provider} · ${entry.license}" +
@@ -165,18 +257,28 @@ fun ModelManagerScreen(graph: AppGraph) {
                         if (entry.italianSupported) " · Italian: yes" else " · Italian: no",
                     style = HermesType.bodySecondary, color = c.inkSecondary,
                 )
+                Text(
+                    "Classification: ${entry.entryClassification}" +
+                        (if (entry.optionalComponent) " · OPTIONAL (never auto-downloaded)" else " · required-class") +
+                        " · state: ${record?.state ?: entry.state}" +
+                        (if (record?.active == true) " · ACTIVE" else ""),
+                    style = HermesType.bodySecondary, color = c.inkSecondary,
+                )
+                if (updateAvailable) {
+                    Text(
+                        "Update available: installed v${record?.version} → catalog v${entry.version}.",
+                        style = HermesType.body, color = c.energy,
+                    )
+                }
                 val rec = recommendation
                 val resolved = rec?.components?.firstOrNull { it.identity == entry.identity }
                 Text(
                     "Compatibility: ${resolved?.compatible ?: false}" +
-                        (resolved?.incompatibilityReason?.let { " ($it)" } ?: "") +
-                        " · qualification state: ${entry.state}",
+                        (resolved?.incompatibilityReason?.let { " ($it)" } ?: ""),
                     style = HermesType.bodySecondary, color = c.inkSecondary,
                 )
                 progress?.let {
-                    if (it.state == com.hermestower.voiceconsole.models.ModelInstallState.DOWNLOADING ||
-                        it.state == com.hermestower.voiceconsole.models.ModelInstallState.DOWNLOAD_PAUSED
-                    ) {
+                    if (it.state == ModelInstallState.DOWNLOADING || it.state == ModelInstallState.DOWNLOAD_PAUSED) {
                         Text(
                             "Download: ${it.state.displayLabel} ${it.bytesDownloaded}/${it.totalBytes} bytes (${(it.fraction * 100).toInt()}%)",
                             style = HermesType.body, color = c.ink,
@@ -185,15 +287,41 @@ fun ModelManagerScreen(graph: AppGraph) {
                     it.error?.let { err -> Text("Last download event: $err", style = HermesType.bodySecondary, color = c.warn) }
                 }
 
-                // ---------- D. Advanced actions ----------
+                if (isExpanded) {
+                    // ---- Full attribute sheet (GRAPH 4 §6, all fields) ----
+                    AttributeLine("Component type", entry.componentTypeEnum().displayLabel)
+                    AttributeLine("Version", entry.version)
+                    AttributeLine("Provider", entry.provider)
+                    AttributeLine("License", entry.license + (entry.licenseUrl?.let { " ($it)" } ?: ""))
+                    AttributeLine("Installed status", record?.let { "${it.state} (v${it.version})" } ?: "not installed")
+                    AttributeLine("Qualification status", record?.lastQualificationAt?.let { "qualified at $it" } ?: entry.state)
+                    AttributeLine("Download size", formatBytes(entry.downloadSizeBytes))
+                    AttributeLine("Installed size", formatBytes(entry.installedSizeBytes))
+                    AttributeLine("RAM estimate", formatBytes(entry.ramEstimateBytes))
+                    AttributeLine("Expected usage mode", "${entry.latencyClass} latency · runs locally in its storage root")
+                    AttributeLine("Italian support", if (entry.italianSupported) "yes" else "no (${entry.languages.joinToString()})")
+                    AttributeLine("Runtime format", entry.format)
+                    AttributeLine("Quantization", entry.quantization)
+                    AttributeLine("Storage destination", entry.storageLocation)
+                    AttributeLine("Update availability", if (updateAvailable) "v${record?.version} installed, v${entry.version} available" else "current")
+                    AttributeLine("Active state", if (record?.active == true) "ACTIVE" else "inactive")
+                    AttributeLine("Fallback", ComponentFallback.forType(entry.componentType))
+                    AttributeLine("Upstream", entry.upstreamRepo ?: "n/a")
+                    AttributeLine("Revision binding", entry.revisionBinding ?: "n/a")
+                    AttributeLine("Runtime requirement", entry.runtimeRequirement ?: "none")
+                    AttributeLine("Provenance", entry.provenanceNote ?: "not yet verified")
+                    entry.knownLimitations.forEach { Text("• $it", style = HermesType.bodySecondary, color = c.inkSecondary) }
+                }
+
+                // ---------- D. Lifecycle actions (all wired to the real engine) ----------
                 Row(horizontalArrangement = Arrangement.spacedBy(4.dp)) {
                     TextButton(
-                        enabled = resolved?.downloadAllowed == true &&
-                            progress?.state != com.hermestower.voiceconsole.models.ModelInstallState.DOWNLOADING,
+                        enabled = resolved?.downloadAllowed != false &&
+                            entry.entryClassification == "VERIFIED_DOWNLOADABLE" &&
+                            progress?.state != ModelInstallState.DOWNLOADING && !packRunning,
                         onClick = {
                             if (entry.identity == PROBE_IDENTITY) {
-                                // The only downloadable artifact in V0.2: the deterministic test probe,
-                                // generated locally and served by the in-process mock server (127.0.0.1).
+                                // The only mock-served artifact: the deterministic test probe.
                                 val server = LocalTowerMockServer()
                                 val bytes = DeterministicTestArtifact.generate("hermes-test-artifact-v1", 4096)
                                 server.putArtifact("hermes-test-artifact-v1", LocalTowerMockServer.Artifact(bytes))
@@ -204,22 +332,27 @@ fun ModelManagerScreen(graph: AppGraph) {
                                 )
                                 statusNote = "Probe download started from the local test server (port ${server.port})."
                             } else {
-                                statusNote = "Download not available for ${entry.identity}: ${resolved?.downloadBlockReason ?: "no verified binary published yet"}."
+                                graph.modelDownloads.start(entry, entry.sourceUri)
+                                statusNote = "Download started from the verified catalog source: ${entry.sourceUri}."
                             }
                             registryTick++
                         },
                     ) { Text("Download") }
                     TextButton(onClick = { graph.modelDownloads.pause(entry.identity); statusNote = "Download paused (${entry.identity})." }) { Text("Pause") }
                     TextButton(
-                        enabled = entry.identity == PROBE_IDENTITY,
                         onClick = {
-                            val port = graph.keyValueStore.getString("probe_server_port")?.toIntOrNull()
-                            if (port != null) {
-                                val bytes = DeterministicTestArtifact.generate("hermes-test-artifact-v1", 4096)
-                                graph.modelDownloads.resume(entry.copy(sha256 = ModelSha256.ofBytes(bytes)), "http://127.0.0.1:$port/artifacts/hermes-test-artifact-v1")
-                                statusNote = "Download resumed (${entry.identity})."
+                            if (entry.identity == PROBE_IDENTITY) {
+                                val port = graph.keyValueStore.getString("probe_server_port")?.toIntOrNull()
+                                if (port != null) {
+                                    val bytes = DeterministicTestArtifact.generate("hermes-test-artifact-v1", 4096)
+                                    graph.modelDownloads.resume(entry.copy(sha256 = ModelSha256.ofBytes(bytes)), "http://127.0.0.1:$port/artifacts/hermes-test-artifact-v1")
+                                    statusNote = "Download resumed (${entry.identity})."
+                                } else {
+                                    statusNote = "No resumable local download server recorded."
+                                }
                             } else {
-                                statusNote = "No resumable local download server recorded."
+                                graph.modelDownloads.resume(entry, entry.sourceUri)
+                                statusNote = "Download resumed from the verified source (${entry.identity})."
                             }
                         },
                     ) { Text("Resume") }
@@ -228,8 +361,28 @@ fun ModelManagerScreen(graph: AppGraph) {
                         statusNote = if (graph.modelDownloads.verifiedExisting(entry)) "Installed file hash verified."
                         else "No verified installed file for ${entry.identity}."
                     }) { Text("Verify") }
+                    TextButton(onClick = { expanded[entry.identity] = !isExpanded }) { Text(if (isExpanded) "Hide details" else "Details") }
                 }
                 Row(horizontalArrangement = Arrangement.spacedBy(4.dp)) {
+                    TextButton(
+                        enabled = !packRunning,
+                        onClick = {
+                            val resources = graph.deviceResourceReader.read()
+                            scope.launch {
+                                if (graph.modelDownloads.verifiedExisting(entry)) {
+                                    val q = graph.modelQualification.qualify(entry)
+                                    val a = if (q.qualified) graph.modelActivation.activate(entry) else null
+                                    statusNote = "Already verified — qualification ${if (q.qualified) "PASSED" else "FAILED"}" +
+                                        (a?.let { " · activation ${if (it.success) "ACTIVE" else "REFUSED: ${it.reason}"}" } ?: "")
+                                    registryTick++
+                                } else {
+                                    val outcome = graph.modelPackInstaller.installComponent(entry, resources) { statusNote = it }
+                                    statusNote = "Install ${entry.displayName}: ${if (outcome.success) "COMPLETED" else "FAILED"} — ${outcome.reason}"
+                                    registryTick++
+                                }
+                            }
+                        },
+                    ) { Text("Install") }
                     TextButton(onClick = {
                         val result = graph.modelQualification.qualify(entry)
                         statusNote = "Qualification ${entry.identity}: ${if (result.qualified) "PASSED" else "FAILED"} — " + result.checks.joinToString { "${it.name}=${it.passed}" }
@@ -255,6 +408,52 @@ fun ModelManagerScreen(graph: AppGraph) {
                         registryTick++
                     }) { Text("Remove") }
                 }
+                Row(horizontalArrangement = Arrangement.spacedBy(4.dp)) {
+                    TextButton(
+                        enabled = entry.entryClassification == "VERIFIED_DOWNLOADABLE" && entry.identity != PROBE_IDENTITY && !packRunning,
+                        onClick = {
+                            graph.modelDownloads.cancel(entry.identity)
+                            val removed = graph.modelRollback.removalCleanup(entry)
+                            graph.modelDownloads.start(entry, entry.sourceUri)
+                            statusNote = "Re-download ${entry.displayName}: previous copy ${if (removed) "removed" else "was absent"}, fetching from the verified source."
+                            registryTick++
+                        },
+                    ) { Text("Re-download") }
+                    TextButton(
+                        enabled = entry.identity != PROBE_IDENTITY && !packRunning,
+                        onClick = {
+                            if (graph.modelDownloads.verifiedExisting(entry)) {
+                                statusNote = "Repair ${entry.displayName}: installed file hash intact — no repair needed."
+                            } else {
+                                graph.modelDownloads.cancel(entry.identity)
+                                graph.modelDownloads.start(entry, entry.sourceUri)
+                                statusNote = "Repair ${entry.displayName}: hash invalid or missing — fetching from the verified source."
+                            }
+                            registryTick++
+                        },
+                    ) { Text("Repair") }
+                    TextButton(
+                        enabled = updateAvailable && !packRunning,
+                        onClick = {
+                            graph.modelDownloads.start(entry, entry.sourceUri)
+                            statusNote = "Update ${entry.displayName}: v${record?.version} → v${entry.version} (previous version is preserved automatically)."
+                            registryTick++
+                        },
+                    ) { Text("Update") }
+                    TextButton(onClick = { diagnosticsOpen.value = !diagnosticsOpen.value }) { Text("Open diagnostics") }
+                }
+            }
+
+            if (diagnosticsOpen.value) {
+                Text("Diagnostics — storage roots (bytes used):", style = HermesType.sectionLabel, color = c.bronze)
+                graph.modelStorage.rootsUsage().forEach { (root, bytes) ->
+                    Text("• $root: ${formatBytes(bytes)}", style = HermesType.bodySecondary, color = c.inkSecondary)
+                }
+                val receipts = com.hermestower.voiceconsole.models.ReceiptWriter.listReceipts(graph.modelStorage.receiptsDir())
+                Text(
+                    "Installation receipts: ${if (receipts.isEmpty()) "none yet" else "${receipts.size} written (latest: ${receipts.last()})"}",
+                    style = HermesType.bodySecondary, color = c.inkSecondary,
+                )
             }
         }
 
@@ -282,6 +481,61 @@ fun ModelManagerScreen(graph: AppGraph) {
             Text("Status: $it", style = HermesType.body, color = c.energy)
         }
     }
+
+    // ---------- Pack confirmation (explicit, with the full summary) ----------
+    if (packConfirmOpen) {
+        val summary = computedSummary
+        val plan = computedPlan
+        AlertDialog(
+            onDismissRequest = { packConfirmOpen = false },
+            title = { Text("Install recommended voice pack?") },
+            text = {
+                Column {
+                    Text(
+                        "${plan?.includedItems?.size ?: 0} components · ${formatBytes(summary?.totalDownloadBytes ?: 0)} download · " +
+                            "${formatBytes(summary?.totalInstalledBytes ?: 0)} installed · reserve ${formatBytes(summary?.reserveBytes ?: 0)} kept free.",
+                    )
+                    Text("Licenses: ${summary?.licenses?.joinToString()}")
+                    Text("Optional components (including the local LLM) are NOT part of this pack.")
+                    Text("You can pause, cancel or remove each component afterwards.")
+                }
+            },
+            confirmButton = {
+                TextButton(onClick = {
+                    packConfirmOpen = false
+                    val p = computedPlan
+                    val resources = graph.deviceResourceReader.read()
+                    packRunning = true
+                    packEvents = listOf("Pack install started (${p.includedItems.size} components).")
+                    scope.launch {
+                        val result = graph.modelPackInstaller.installPack(p, resources) { event ->
+                            packEvents = packEvents + event
+                        }
+                        statusNote = if (result.success) {
+                            "Recommended voice pack INSTALLED — pack receipt ${result.packReceiptId}."
+                        } else {
+                            "Voice pack stopped truthfully: " + result.outcomes.lastOrNull()?.reason.orEmpty()
+                        }
+                        packRunning = false
+                        registryTick++
+                    }
+                }) { Text("Install") }
+            },
+            dismissButton = {
+                TextButton(onClick = { packConfirmOpen = false }) { Text("Cancel") }
+            },
+        )
+    }
+}
+
+@Composable
+private fun AttributeLine(label: String, value: String) {
+    val c = hermesColors
+    Text(
+        "$label: $value",
+        style = HermesType.bodySecondary,
+        color = c.inkSecondary,
+    )
 }
 
 internal const val PROBE_IDENTITY = "org.hermestower.test.probe-artifact"

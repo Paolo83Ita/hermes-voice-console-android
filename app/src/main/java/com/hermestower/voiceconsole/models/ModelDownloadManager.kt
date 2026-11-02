@@ -234,7 +234,9 @@ class DefaultModelDownloadManager(
     /**
      * Verification step (hash), separated from download so tests can drive
      * success and mismatch independently. On success moves state to HASH_VERIFIED
-     * and leaves the temp file for atomic installation.
+     * and leaves the temp file for atomic installation. On mismatch the partial is
+     * QUARANTINED with its facts (GRAPH 4 §7) — evidence is preserved, never
+     * silently destroyed — and the state is FAILED.
      */
     fun verifyHash(entry: ModelCatalogEntry): Boolean {
         val f = flowFor(entry.identity)
@@ -247,8 +249,10 @@ class DefaultModelDownloadManager(
             registry.markState(entry.identity, ModelInstallState.HASH_VERIFIED, null)
             true
         } else {
-            val msg = "Hash mismatch: expected ${entry.sha256.take(12)}…, actual ${actual?.take(12) ?: "none"}… — partial file deleted."
-            if (partial != null) Files.deleteIfExists(partial)
+            val quarantined = if (partial != null) storage.quarantinePartial(entry.identity, partial, entry.sha256, actual) else null
+            val msg = "Hash mismatch: expected ${entry.sha256.take(12)}…, actual ${actual?.take(12) ?: "none"}…" +
+                (quarantined?.let { " — partial quarantined." } ?: " — partial removed.")
+            if (quarantined == null) partial?.let { Files.deleteIfExists(it) }
             f.value = f.value.copy(state = ModelInstallState.FAILED, error = msg)
             registry.markState(entry.identity, ModelInstallState.FAILED, msg)
             false

@@ -266,3 +266,67 @@ COMMIT: CP-G3-008 (recorded at commit time)
 NEXT (Owner): review receipts → approve merge to main → physical Xiaomi qualification
 phase (INSTALL_XIAOMI.md) as the next dependency-released graph; E2E frontier (nav
 flakes + e2e_19_20) carried with full evidence.
+
+NODE G4-N01 — Graph 4 bootstrap + lint truth repair (2026-11-02)
+FINDING: fresh read-back confirmed Graph 3 terminal state (graph-3 tip ca8980b, APK
+79864d54… byte-verified, 102/102, 2 lint errors ProduceStateDoesNotAssignValue +
+36 warnings). Branch graph-4/real-voice-pairing-archive-e2e created, pushed, read
+back; 225-file mode-only sandbox artifact classified and restored (no work lost).
+ACTION: CP-G4-001 bootstrap + CURRENT_PROJECT_TRUTH_GRAPH4_PRE.md. CP-G4-002
+NODE 0: both lint errors root-caused (state assignment inside nested
+withFrameNanos callback invisible to Compose lint) → dedicated lifecycle-safe
+AnimationFrameClock (LaunchedEffect + mutableLongStateOf, hoisted tick,
+cancellation on disposal); ancillary §3 repairs (dataExtractionRules, monochrome
+icon, getAllocatableBytes preflight with max(2GB,15%) reserve, SDK_INT cleanup,
+dependency pinning doc, blocking lint gate). 106/106 green.
+TEST: lintDebug 0 errors / 31 warnings (each warning individually classified).
+COMMIT: 33e7bb6, 9b4e17a (both remote-read-back verified)
+
+NODE G4-N02 — verified production model catalog (2026-11-02)
+FINDING: every production placeholder eliminated; 12-entry catalog with real
+sources, real SHA-256s and honest classifications (silero VAD 5.1.2, vosk
+small-it-0.22, piper IT riccardo-x-low + paola-medium via k2-fsa tts-models,
+gtcrn denoiser, openWakeWord deps + hey-jarvis fixture, Qwen2.5-0.5B
+RUNTIME-gated, custom IT wake word = CANDIDATE_PENDING_DISCOVERY, probe =
+TEST_FIXTURE_ONLY, Gemma REJECTED).
+ACTION: CP-G4-003 — catalog fields (entryClassification, upstreamRepo,
+revisionBinding, licenseUrl, provenanceNote, recommended, optionalComponent),
+CatalogIntegrity audit + resolver classification gate + 10 tests incl.
+shipped-manifest audit. Re-verified gtcrn asset live on 2026-11-02 session
+resume: HTTP 200, 535,638 bytes, sha256 e77603ac… EXACT match (a 9-byte local
+"Not Found" stub was a transient download artifact, not a catalog defect).
+TEST: 116/116 green; lint 0 errors.
+COMMIT: 525c71f (remote-read-back verified = local HEAD at session start)
+
+NODE G4-N03 — MODEL SANCTUM: Model Delivery Center refound (2026-11-02)
+FINDING: Graph 2 screen downloaded only the mock-served probe; engine had
+pause/resume/hash/atomic-install but no real-source wiring, no §7 roots, no
+receipts, no bulk pack.
+ACTION (CP-G4-004): §7 storage roots (catalog/tmp/staging/active/previous/
+quarantine/logs/receipts) + quarantine-on-hash-mismatch with facts sidecar +
+previous-version evidence copies (COPY semantics — Graph 2 rollback contract and
+its tests untouched); DownloadGatekeeper (offline/severe-thermal BLOCK,
+moderate/metered/power-saving WARN); secret-free MODEL_INSTALLATION_RECEIPT +
+pack receipts (atomic writes, structured pipeline steps); VoicePackInstaller
+(plan/summarize/installPack/installComponent — honest wake-word gap, bundled
+runtime naming, NO optional components, sequential receipted pipeline with
+registry read-back before activation); MODEL SANCTUM screen refound (§6 all
+attributes + fallback contracts, real-source Download/Resume/Re-download/
+Repair/Update wiring, expandable attribute sheets, diagnostics panel, bulk
+INSTALL RECOMMENDED VOICE PACK with full preflight summary + explicit
+confirmation dialog).
+TEST: 126/126 green (10 new: planning honesty incl. shipped-catalog pack plan,
+summary math + labeled duration, gatekeeper matrix, receipted happy path with
+registry read-back, truthful stop + quarantine on hash mismatch, receipt secret
+policy, previous-version preservation, quarantine sidecar, already-installed
+classification, fallback contract); lint 0 errors / 31 warnings (unchanged);
+local assembleDebug green — APK 58,950,857 B sha256 bda3b0df…; secret scan 0.
+Toolchain note: sandbox SDK/JDK re-provisioned from scratch (cmdline-tools,
+platform 35, build-tools 35.0.0, Temurin JDK 17 with jlink via
+org.gradle.java.home in the OUT-OF-REPO ~/.gradle/gradle.properties; Aliyun/
+Tencent mirror injection via out-of-repo init script to survive Maven Central
+429 rate limiting — committed build files and CI untouched).
+COMMIT: CP-G4-004 (recorded at commit time)
+NEXT: cloud build evidence at CP-G4-004 → NODE 3 remaining recovery cases
+(process-kill/restart resume paths) → NODE 4 local LLM adapter → NODE 5 guided
+pairing (TOWER GATE).

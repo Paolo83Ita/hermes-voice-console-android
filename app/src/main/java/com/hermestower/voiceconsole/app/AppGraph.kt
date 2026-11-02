@@ -16,6 +16,7 @@ import com.hermestower.voiceconsole.models.DefaultModelActivationController
 import com.hermestower.voiceconsole.models.DefaultModelDownloadManager
 import com.hermestower.voiceconsole.models.DefaultModelQualificationRunner
 import com.hermestower.voiceconsole.models.DefaultModelRollbackController
+import com.hermestower.voiceconsole.models.DefaultVoicePackInstaller
 import com.hermestower.voiceconsole.models.DefaultVoicePackResolver
 import com.hermestower.voiceconsole.privacy.LogRedactor
 import com.hermestower.voiceconsole.selftest.SelfTestCenter
@@ -76,6 +77,17 @@ class AppGraph(context: Context) {
     val modelActivation = DefaultModelActivationController(modelRegistry, modelQualification)
     val modelRollback = DefaultModelRollbackController(modelStorage, modelRegistry)
     val modelResolver = DefaultVoicePackResolver()
+
+    // GRAPH 4 NODE 2 (§6/§7): MODEL SANCTUM — recommended-pack planner, preflight
+    // summary and receipted sequential installer. Optional components (LLM,
+    // alternatives, denoiser) are never part of the pack plan.
+    val modelPackInstaller = DefaultVoicePackInstaller(
+        downloads = modelDownloads,
+        qualification = modelQualification,
+        activation = modelActivation,
+        registry = modelRegistry,
+        storage = modelStorage,
+    )
 
     // ---- Tower Connection Studio (GRAPH 2 §7–10) ----
     val vault = KeystoreVault(PrivateFileVaultStore(File(context.filesDir, "tower_vault.bin")))

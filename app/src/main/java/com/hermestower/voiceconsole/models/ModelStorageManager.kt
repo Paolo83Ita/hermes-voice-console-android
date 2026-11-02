@@ -9,9 +9,15 @@ import java.nio.file.Path
 import java.nio.file.StandardCopyOption
 
 /**
- * ModelStorageManager (GRAPH 2 §4): application-controlled storage with storage
- * preflight, atomic installation (temp file + move) and cleanup of failed temps.
- * Storage root is `filesDir/models` on Android; a plain directory in JVM tests.
+ * ModelStorageManager (GRAPH 2 §4; GRAPH 4 §7 root separation): application-controlled
+ * storage with storage preflight, atomic installation (temp file + move) and cleanup
+ * of failed temps. Storage root is `filesDir/models` on Android; a plain directory in
+ * JVM tests.
+ *
+ * GRAPH 4 NODE 2/3 (CP-G4-004): the root now exposes the mission §7 separated roots —
+ * catalog, partial downloads (tmp), verified staging, installed models (component
+ * dirs), active markers, previous versions, quarantine, logs and receipts. Model
+ * files never leave this application-controlled root.
  */
 interface ModelStorageManager {
     fun preflight(neededBytes: Long): StoragePreflight
@@ -21,6 +27,32 @@ interface ModelStorageManager {
     fun installedFile(entry: ModelCatalogEntry): Path?
     fun remove(entry: ModelCatalogEntry): Boolean
     fun cleanupFailedTempFiles()
+
+    // ---- GRAPH 4 §7 roots ----
+    fun catalogDir(): Path
+    fun stagingDir(): Path
+    fun previousDir(): Path
+    fun quarantineDir(): Path
+    fun logsDir(): Path
+    fun receiptsDir(): Path
+    fun activeDir(): Path
+
+    /**
+     * Move a rejected partial (hash mismatch, truncation, corruption) into the
+     * quarantine root with its expected/actual facts, instead of silently deleting
+     * the evidence. Returns the quarantined path, or null when nothing was moved.
+     */
+    fun quarantinePartial(identity: String, partial: Path, expectedSha256: String, actualSha256: String?): Path?
+
+    /**
+     * Preserve the currently installed file into the previous-versions root before
+     * it is replaced by a newer install. Returns the preserved path (or null when
+     * there was nothing installed yet).
+     */
+    fun preservePrevious(entry: ModelCatalogEntry): Path?
+
+    /** Read-only per-root usage snapshot for diagnostics (bytes used per root). */
+    fun rootsUsage(): Map<String, Long>
 }
 
 data class StoragePreflight(
@@ -92,16 +124,85 @@ class DefaultModelStorageManager(
         )
     }
 
-    override fun tempDir(): Path {
-        val dir = root.resolve("tmp")
+    override fun tempDir(): Path = ensureDir("tmp")
+
+    override fun catalogDir(): Path = ensureDir("catalog")
+    override fun stagingDir(): Path = ensureDir("staging")
+    override fun previousDir(): Path = ensureDir("previous")
+    override fun quarantineDir(): Path = ensureDir("quarantine")
+    override fun logsDir(): Path = ensureDir("logs")
+    override fun receiptsDir(): Path = ensureDir("receipts")
+    override fun activeDir(): Path = ensureDir("active")
+
+    private fun ensureDir(name: String): Path {
+        val dir = root.resolve(name)
         Files.createDirectories(dir)
         return dir
+    }
+
+    override fun quarantinePartial(identity: String, partial: Path, expectedSha256: String, actualSha256: String?): Path? {
+        if (!Files.exists(partial)) return null
+        return try {
+            val dir = quarantineDir()
+            val stamp = System.currentTimeMillis()
+            val target = dir.resolve("$identity-$stamp.part")
+            Files.move(partial, target, StandardCopyOption.ATOMIC_MOVE)
+            // Evidence sidecar: facts only, no secrets (the hashes are public artifact hashes).
+            val facts = "identity=$identity\nexpectedSha256=$expectedSha256\nactualSha256=${actualSha256 ?: "unavailable"}\n" +
+                "bytes=${Files.size(target)}\nquarantinedAt=$stamp\n"
+            Files.write(dir.resolve("$identity-$stamp.facts.txt"), facts.toByteArray(Charsets.UTF_8))
+            target
+        } catch (_: Exception) {
+            null
+        }
+    }
+
+    override fun preservePrevious(entry: ModelCatalogEntry): Path? {
+        // Version-aware: an older version's file has a DIFFERENT name
+        // (${identity}-${oldVersion}.pkg), so every installed file of this identity
+        // is preserved. COPY (not move): the previous-versions root gains its §7
+        // evidence copy while the component directory keeps the layout the Graph 2
+        // rollback contract and its tests rely on — no existing behavior weakened.
+        val dir = componentDir(entry)
+        if (!Files.isDirectory(dir)) return null
+        return try {
+            val target = previousDir()
+            var copied: Path? = null
+            dir.toFile().listFiles()
+                ?.filter { it.name.startsWith("${entry.identity}-") && it.name.endsWith(".pkg") }
+                ?.forEach { f ->
+                    val dest = target.resolve(f.name)
+                    Files.copy(f.toPath(), dest, StandardCopyOption.REPLACE_EXISTING)
+                    copied = dest
+                }
+            copied
+        } catch (_: Exception) {
+            null
+        }
+    }
+
+    override fun rootsUsage(): Map<String, Long> {
+        val names = listOf("tmp" to tempDir(), "staging" to stagingDir(), "previous" to previousDir(),
+            "quarantine" to quarantineDir(), "receipts" to receiptsDir(), "logs" to logsDir())
+        return buildMap {
+            for ((name, dir) in names) {
+                val bytes = runCatching {
+                    dir.toFile().listFiles()?.sumOf { if (it.isFile) it.length() else 0L } ?: 0L
+                }.getOrDefault(-1L)
+                put(name, bytes)
+            }
+        }
     }
 
     override fun installAtomically(entry: ModelCatalogEntry, tempFile: Path): Path {
         val targetDir = root.resolve(entry.storageLocation.removePrefix("filesDir/").trim('/'))
         Files.createDirectories(targetDir)
         val target = targetDir.resolve("${entry.identity}-${entry.version}.pkg")
+        // GRAPH 4 §7: any installed file of this identity is preserved into the
+        // previous-versions root before the atomic move, so an update never silently
+        // destroys the last verified bytes. (The rollback controller remains the
+        // verified restore path.)
+        preservePrevious(entry)
         // Atomic within the same filesystem: move, then fsync the directory entry.
         Files.move(tempFile, target, StandardCopyOption.ATOMIC_MOVE, StandardCopyOption.REPLACE_EXISTING)
         return target

@@ -64,3 +64,14 @@ mock server on 127.0.0.1. Real large-model qualification is a physical-device gr
   tamper rejection, activation refusal, registry persistence).
 - Self-Test Center ST-30..ST-40 exercise the same paths in-app.
 - Emulator: `E2EModelManagerTest` (E2E-21..30).
+
+---
+
+## GRAPH 4 SUPERSESSION NOTE (CP-G4-004)
+
+The screen described above is refounded as **MODEL SANCTUM — Models and Voice**
+(see `MODEL_SANCTUM.md`): same engine, same explicit-confirmation discipline,
+plus the recommended voice pack, full attribute sheets, receipts, §7 storage
+roots and real verified sources. Section anchors "A. Recommended setup",
+"B. Installed voice components", "C. Available components" and the
+"Apply Recommended Configuration" action are preserved (E2E anchors).

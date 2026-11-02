@@ -47,3 +47,12 @@ Graph 3 checkpoints (branch graph-3/monumental-oracle-tower-visual-refoundation,
 | CP-G3-007 | (this commit) | preflight getFileStore → File.usableSpace (Android-supported); REAL download root cause fixed |
 
 | CP-G3-008 | (this commit) | terminality + terminal receipt + truth convergence + final package |
+
+Graph 4 checkpoints (branch graph-4/real-voice-pairing-archive-e2e, from ca8980b):
+
+| Checkpoint | Commit | Content |
+| --- | --- | --- |
+| CP-G4-001 | 33e7bb6 | bootstrap: verified read-back, branch creation, CURRENT_PROJECT_TRUTH_GRAPH4_PRE |
+| CP-G4-002 | 9b4e17a | NODE 0: lint truth repaired (0 errors), AnimationFrameClock, §3 ancillary repairs |
+| CP-G4-003 | 525c71f | NODE 1: verified production catalog, 12 entries, real hashes/licenses/provenance |
+| CP-G4-004 | (this commit) | NODE 2/3: MODEL SANCTUM — pack installer, receipts, §7 roots, gatekeeper, real-source wiring |
