@@ -54,7 +54,11 @@ class DefaultVoicePackResolver : VoicePackResolver {
             .flatMap { type -> catalog.ofComponent(type).ifEmpty { emptyList() } }
         for (entry in candidates) {
             val compat = compatibility(entry, resources)
-            var downloadAllowed = compat.compatible && entry.licenseApproved && entry.sha256 != ZERO_HASH
+            // GRAPH 4 NODE 1: only VERIFIED_DOWNLOADABLE entries with a real hash may
+            // ever be downloaded in production (CatalogIntegrity contract, INV-G4-04/11).
+            var downloadAllowed = compat.compatible && entry.licenseApproved &&
+                entry.sha256 != ZERO_HASH && entry.sha256.isNotBlank() &&
+                entry.entryClassification == "VERIFIED_DOWNLOADABLE"
             var blockReason: String? = null
             when {
                 !compat.compatible -> { downloadAllowed = false; blockReason = compat.reason }
@@ -65,7 +69,14 @@ class DefaultVoicePackResolver : VoicePackResolver {
                         warnings += "License review pending for ${entry.displayName} (${entry.license})."
                     }
                 }
-                entry.sha256 == ZERO_HASH -> {
+                entry.entryClassification != "VERIFIED_DOWNLOADABLE" -> {
+                    downloadAllowed = false
+                    blockReason = "Not downloadable: catalog classification is ${entry.entryClassification} (no verified production source yet)."
+                    if (!warnings.any { it.contains(entry.identity) }) {
+                        warnings += "${entry.displayName}: awaiting a verified production source (classification ${entry.entryClassification})."
+                    }
+                }
+                entry.sha256 == ZERO_HASH || entry.sha256.isBlank() -> {
                     downloadAllowed = false
                     blockReason = "Awaiting qualified artifact: no verified binary is published for this candidate yet."
                     if (!warnings.any { it.contains(entry.identity) }) {

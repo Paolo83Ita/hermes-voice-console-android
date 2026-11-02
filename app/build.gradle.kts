@@ -28,6 +28,13 @@ android {
         compose = true
         buildConfig = true
     }
+    sourceSets {
+        // GRAPH 4 NODE 1: expose the shipped asset catalog to JVM unit tests so
+        // CatalogIntegrityTest can audit the REAL production manifest (not a copy).
+        getByName("test") {
+            resources.srcDir("src/main/assets")
+        }
+    }
     compileOptions {
         sourceCompatibility = JavaVersion.VERSION_17
         targetCompatibility = JavaVersion.VERSION_17
