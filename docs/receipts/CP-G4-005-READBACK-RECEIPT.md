@@ -100,3 +100,30 @@ Continue Graph 4 in the mandated order from `afe3e08`:
    from the same evidence rules as §3.
 
 CHECKPOINT: CP-G4-005R (this receipt + governance convergence commit).
+
+
+## 7. ADDENDUM (same session, post-push read-back of pending runs)
+
+| Commit | Run ID | Outcome | Classification |
+| --- | --- | --- | --- |
+| `213182a` | 41459906172 | `completed failure` — install SUCCEEDED this time; suite RAN (Time 1,524 s); **13 failures** | `E2E_FAILED_TEST` (typed breakdown below) |
+| `afe3e08` | 41461749711 | still `in_progress` (~55 min, boot-timeout window 2400 s) | `E2E_RESULT_UNAVAILABLE` (second sample pending) |
+
+### 213182a failure breakdown (from log 0_emulator-e2e.txt)
+
+- 2× `AssertionError: Failed to inject touch input` + "no existing nodes" on
+  MARBLE LIGHT / Reduced motion (Appearance) — the KNOWN emulator
+  input/rendering flake class from Graph 3 ("emulator input flakes").
+- N× `ComposeTimeoutException` after 20,000 ms on waitForText (onboarding,
+  clear-sensitive-values) — navigation/screen-not-reached class, same family.
+- 1× `queued request was never validated and delivered after reconnect` — the
+  KNOWN queue-reconnect question carried from Graph 3 residual ledger.
+- Remaining failures are cascades of the same two classes (suite ran 25 min on
+  a slow software-transitioned emulator).
+
+NOT a source failure: the SAME commit built green (run 41459906150, 126/126
+cloud JUnit) and these exact suites passed 17/17 at Graph 3 on a stable runner.
+Recovery: second sample (afe3e08 run) + third sample (749e746 run) on fresh
+runners will separate flake from regression by reproducibility. If the identical
+failure set reproduces on two fresh runners, it escalates to a typed repair
+node (do NOT reclassify as environment).
