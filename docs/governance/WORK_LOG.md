@@ -409,3 +409,26 @@ COMMIT: (this commit)
 NEXT: E2E re-read-back for 213182a/afe3e08 + cloud build of this commit →
 G4-C04 runtime adapters (vosk/piper delivery-dependent) → Tower Gate pairing
 client + QR scanner (Owner delta) → Tower Archive → G4-C11/C12 packaging.
+
+NODE G4-N09 — CP-G4-012a pairing client wave 1 + cloud evidence mid-cycle (2026-11-02)
+FINDING: E2E 213182a (41459906172) ran the full suite this time (install OK —
+the CP-G4-005 broken-pipe did not recur): 13 failures classified E2E_FAILED_TEST
+with the Graph 3 known flake classes (touch-injection, wait-timeouts) plus the
+known queue-reconnect question; receipt addendum written. Same commit unit-tested
+126/126 green on cloud → flake-vs-regression separation needs the second/third
+samples (afe3e08 run + adbc16c/749e746 runs). Cloud: adbc16c debug-build SUCCESS
+(41470976809); 749e746 build+E2E in progress at node close (evidence read-back
+next session, no terminality claimed on unfinished runs).
+ACTION: G4-C09 wave 1 — PairingPayloadParser (strict versioned scheme, typed
+rejections covering the whole Owner delta §11 matrix, replay nonce store,
+redaction-safe describe) + MockTowerPairingClient (deterministic, zero network;
+real pairing deferred to Tower Graph 1.7 — NO claim anywhere).
+TEST: 192/192 unit green (14 new). Secret scan 0.
+COMMIT: f7bde56 (CP-G4-012a)
+NEXT (exact action sequence for the next session): (1) read back cloud runs
+41472352299/41472352520 (749e746) + 41461749711 (afe3e08 E2E) and classify;
+(2) G4-C09 wave 2 — CameraX+ML Kit in-app QR scanner (verify dependency
+versions/licenses first) + scanner screen with camera permission flow and
+§10 lifecycle rules; (3) Tower Archive (Conversations/Missions/Artifacts);
+(4) G4-C04 runtime adapters when catalog artifacts are delivered on device;
+(5) G4-C11/C12 self-test expansion, packaging, Xiaomi runbook.
