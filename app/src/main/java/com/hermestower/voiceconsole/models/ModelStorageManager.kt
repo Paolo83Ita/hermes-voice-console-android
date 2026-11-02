@@ -38,14 +38,29 @@ class DefaultModelStorageManager(
 
     override fun preflight(neededBytes: Long): StoragePreflight {
         runCatching { Files.createDirectories(root) }
-        val free = Files.getFileStore(root).usableSpace
+        // Graph 3 E2E evidence (run 41368013409): java.nio.Files.getFileStore() is NOT
+        // supported on Android/ART — every download instantly failed with error
+        // "getFileStore" (bytes=0/0) while the desktop-JVM unit tests passed. The
+        // java.io.File space query is supported on both JVM and Android (API 9+).
+        val file = root.toFile()
+        val free = runCatching {
+            val viaFile = file.usableSpace
+            if (viaFile > 0) viaFile else Files.getFileStore(root).usableSpace
+        }.getOrElse {
+            // Last resort on exotic filesystems: report unavailable so the preflight
+            // degrades truthfully instead of crashing the download pipeline.
+            -1L
+        }
         val required = neededBytes + reserveBytes
         return StoragePreflight(
             sufficient = free >= required,
             freeBytes = free,
             requiredBytes = required,
-            message = if (free >= required) "Storage preflight passed ($free bytes free)." else
-                "Storage preflight failed: $free bytes free, $required required (download + safe reserve).",
+            message = when {
+                free < 0 -> "Storage preflight unavailable on this filesystem (free space unknown)."
+                free >= required -> "Storage preflight passed ($free bytes free)."
+                else -> "Storage preflight failed: $free bytes free, $required required (download + safe reserve)."
+            },
         )
     }
 

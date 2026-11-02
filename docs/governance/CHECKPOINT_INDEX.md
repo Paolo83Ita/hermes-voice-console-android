@@ -41,3 +41,7 @@ Graph 3 checkpoints (branch graph-3/monumental-oracle-tower-visual-refoundation,
 
 | CP-G3-003 | de4e54e | cloud build evidence + APK receipt + doc convergence |
 | CP-G3-004 | (this commit) | loopback-only cleartext policy (download-FAILED root cause) + E2E ledger |
+
+| CP-G3-005 | fcea6bc | in-script logcat/screenshot evidence capture (runner teardown was deleting the device first) |
+| CP-G3-006 | 6a92942 | awaitState surfaces downloader error text + byte counters |
+| CP-G3-007 | (this commit) | preflight getFileStore → File.usableSpace (Android-supported); REAL download root cause fixed |

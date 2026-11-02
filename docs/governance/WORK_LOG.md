@@ -235,3 +235,20 @@ error text + byte counters in the assertion ("error=…; bytes=x/y") — decisiv
 on the next cycle, no assertion weakened. Local build green (app + androidTest + unit).
 COMMIT: CP-G3-006
 NEXT: cloud cycle → read the surfaced error → attempt 3 (final for this class) if needed.
+
+NODE G3-N11 — download-class ROOT CAUSE + fix (2026-11-03)
+FINDING: the surfaced diagnostic delivered the reason exactly as designed —
+"Timed out waiting for <id> in [DOWNLOADED]; last=FAILED; bytes=0/0; error=getFileStore".
+Root cause: DefaultModelStorageManager.preflight() called java.nio.Files.getFileStore(),
+which is NOT supported on Android/ART — every download failed instantly (0 bytes, no
+network I/O) while desktop-JVM unit tests passed. A genuine device-only defect the E2E
+suite existed to catch; cleartext policy (CP-G3-004) stays as correct hardening but was
+not the cause.
+ACTION (repair attempt 3, evidence-driven — final for this class): preflight now reads
+root.toFile().usableSpace (java.io, supported on JVM + Android API 9+), falls back to
+FileStore, degrades truthfully to "unavailable" (-1 → insufficient, honest message)
+rather than crashing. Unit tests 102/102 green, assembleDebug green.
+TEST: run 41368013409 artifact (stack with error=getFileStore); local build.
+COMMIT: CP-G3-007
+NEXT: cloud cycle → expected: 9 download-class tests flip to pass; remaining
+touch-injection/destroy-timeout classes are emulator-environment flakes.
