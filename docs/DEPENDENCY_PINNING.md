@@ -13,6 +13,7 @@ bulk-upgrade AGP, Kotlin or Compose in this node").
 | kotlinx-coroutines | 1.9.0 | — | `TestMonotonicFrameClock` behavior pinned for the frame-clock test harness. |
 | androidx.activity / navigation / lifecycle | 1.9.3 / 2.8.5 / 2.8.7 | newer available | Verified pairings; no functional gap for Graph 4 scope. |
 | androidx.test (ext-junit/runner/rules/espresso) | 1.2.1 / 1.6.2 / 1.6.1 / 3.6.1 | newer available | The E2E ledger (runs 41349811483…41380930578) was produced on these; changing them changes emulator-truth comparability. |
+| onnxruntime-android (CP-G4-008) | 1.20.0 | 1.29.0 | REAL runtime binding for the physically verified voice assets (GTCRN denoiser, openWakeWord melspec/embed/head). 1.20.0 is a mature stable line covering opsets 11/13 used by the verified models; newer lines are re-evaluated at a dedicated node. minSdk 24+ ≤ project minSdk 30. |
 | targetSdk | 35 | lint suggests newer preview | 35 matches the installed cloud SDK (`platforms;android-35`), keeping the build hermetic. |
 
 Policy:

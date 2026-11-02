@@ -67,6 +67,9 @@ dependencies {
     implementation(libs.kotlinx.coroutines.core)
     implementation(libs.kotlinx.coroutines.android)
     implementation(libs.kotlinx.serialization.json)
+    // CP-G4-008: real ONNX runtime for the verified voice assets (GTCRN denoiser,
+    // openWakeWord melspec/embed/head chain). Version pinned in DEPENDENCY_PINNING.md.
+    implementation(libs.onnxruntime.android)
 
     debugImplementation(libs.compose.ui.tooling)
 
