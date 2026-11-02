@@ -73,7 +73,24 @@ class ScriptedConsoleDriver(
                 if (connection.status != previous) {
                     events.log("BRIDGE", "connection $previous -> ${connection.status}")
                     if (connection.status == ConnectionStatus.BridgeStatus.CONNECTED) {
-                        flushQueuedIfAny()
+                        // CP-G4-007 attempt-3 diagnostics: record the exact guard
+                        // inputs at the flush trigger (counts/states only — no
+                        // transcript content ever reaches the event log).
+                        events.log(
+                            "FLUSH", "trigger state=${store.currentState()} " +
+                                "active=${store.currentState().isPipelineActive} " +
+                                "queued=${store.queuedTurns().size}",
+                        )
+                        try {
+                            flushQueuedIfAny()
+                        } catch (e: kotlinx.coroutines.CancellationException) {
+                            throw e
+                        } catch (t: Throwable) {
+                            // A failed flush must NEVER kill the connection collector:
+                            // a dead collector silently drops every later flush trigger
+                            // (the run-41503065076 evidence class). Typed log, truthful.
+                            events.log("FLUSH", "error ${t.javaClass.simpleName}")
+                        }
                     }
                 }
             }
@@ -402,8 +419,15 @@ class ScriptedConsoleDriver(
 
     private suspend fun flushQueuedIfAny() {
         val queued = store.queuedTurns()
-        if (queued.isEmpty()) return
-        if (store.currentState().isPipelineActive) return
+        if (queued.isEmpty()) {
+            events.log("FLUSH", "skip: queue empty")
+            return
+        }
+        if (store.currentState().isPipelineActive) {
+            events.log("FLUSH", "skip: pipeline active state=${store.currentState()}")
+            return
+        }
+        events.log("FLUSH", "begin n=${queued.size}")
         store.transition(ConsoleState.REQUEST_QUEUED)
         for (turn in queued) {
             if (store.transition(ConsoleState.CONTACTING_TOWER) == null) break

@@ -100,7 +100,7 @@ class E2EAppearancePersistenceTest {
         graph().profileStore.setSecret(profileId, "e2e-secret-value".toCharArray())
         assertNotNull(graph().profileStore.secretFor(profileId))
         compose.openDrawerAndNavigate("Connect to Hermes Tower", "Connect Hermes Tower")
-        compose.onNodeWithText("Clear sensitive values").performClick()
+        compose.clickFirstClickable("Clear sensitive values")
         compose.waitForText("Sensitive values cleared")
         assertNull(graph().vault.get(VaultKeys.secretKeyFor(profileId)))
         assertNull(graph().vault.get(VaultKeys.pairingKeyFor(profileId)))

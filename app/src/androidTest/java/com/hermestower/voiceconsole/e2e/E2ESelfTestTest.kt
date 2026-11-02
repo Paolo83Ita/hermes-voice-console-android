@@ -44,7 +44,7 @@ class E2ESelfTestTest {
     @Test
     fun e2e_31_33_runQuickSelfTest_verifyTypedResults() {
         compose.openDrawerAndNavigate("Self-Test Center", "Run Quick")
-        compose.onNodeWithText("Run Quick").performClick()
+        compose.clickFirstClickable("Run Quick")
         awaitCompletion(180_000)
         val results = graph().selfTestCenter.results.value
         assertTrue(results.isNotEmpty())
@@ -62,7 +62,7 @@ class E2ESelfTestTest {
     @Test
     fun e2e_32_runFullSelfTest_allPassOnEmulator() {
         compose.openDrawerAndNavigate("Self-Test Center", "Run Full")
-        compose.onNodeWithText("Run Full").performClick()
+        compose.clickFirstClickable("Run Full")
         awaitCompletion(480_000)
         val results = graph().selfTestCenter.results.value
         assertTrue(results.size >= 45)
@@ -73,9 +73,9 @@ class E2ESelfTestTest {
     @Test
     fun e2e_34_exportSecretCleanReport() {
         compose.openDrawerAndNavigate("Self-Test Center", "Run Quick")
-        compose.onNodeWithText("Run Quick").performClick()
+        compose.clickFirstClickable("Run Quick")
         awaitCompletion(180_000)
-        compose.onNodeWithText("Export Secret-Clean Report").performClick()
+        compose.clickFirstClickable("Export Secret-Clean Report")
         val clipboard = graph().let {
             val cm = androidx.test.platform.app.InstrumentationRegistry.getInstrumentation()
                 .targetContext.getSystemService(Context.CLIPBOARD_SERVICE) as android.content.ClipboardManager
