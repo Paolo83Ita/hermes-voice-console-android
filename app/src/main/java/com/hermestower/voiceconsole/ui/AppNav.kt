@@ -34,6 +34,7 @@ import androidx.compose.material.icons.outlined.Mic
 import androidx.compose.material.icons.outlined.Memory
 import androidx.compose.material.icons.outlined.Palette
 import androidx.compose.material.icons.outlined.Psychology
+import androidx.compose.material.icons.outlined.Settings
 import androidx.compose.material.icons.outlined.Router
 import androidx.compose.material.icons.outlined.Waves
 import androidx.compose.material3.DrawerValue
