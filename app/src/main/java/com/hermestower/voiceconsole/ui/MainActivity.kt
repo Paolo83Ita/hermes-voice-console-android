@@ -39,6 +39,14 @@ class MainActivity : ComponentActivity() {
         ) {
             MotionProfile.ciLifecycleProfile = true
         }
+        // CP-G4-016: observable engagement probe (debug builds only) — the E2E
+        // lifecycle experiments must be able to PROVE which variant ran.
+        if (com.hermestower.voiceconsole.BuildConfig.DEBUG) {
+            android.util.Log.i(
+                "HermesMotionProfile",
+                "ciLifecycleProfile=" + MotionProfile.ciLifecycleProfile,
+            )
+        }
         val graph = AppGraphHolder.graph(this)
         setContent {
             val settings by graph.store.settings.collectAsStateWithLifecycle()

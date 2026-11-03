@@ -98,6 +98,12 @@ object E2E {
  * action remains the documented fallback in both variants.
  */
 fun HermesComposeRule.openDrawerAndNavigate(destinationLabel: String, screenAnchor: String) {
+    if (ciLifecycleProfileRequested) {
+        // CP-G4-016: PROVE the profile engaged in the app process (probe + state).
+        check(
+            com.hermestower.voiceconsole.ui.runtime.MotionProfile.ciLifecycleProfile,
+        ) { "CI_LIFECYCLE_PROFILE requested but NOT engaged in the app" }
+    }
     onNodeWithContentDescription("Open navigation drawer").performClick()
 
     if (ciLifecycleProfileRequested) {
