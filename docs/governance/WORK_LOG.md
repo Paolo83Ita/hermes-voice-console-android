@@ -499,3 +499,42 @@ COMMIT: 3deb28c → 26e2e8d → 7014d3e (all pushed, read back exact)
 NEXT: CP-G4-009 real model delivery + §6 control audit → CP-G4-010 wave 2 CameraX QR
 scanner → visual refinement → packaging; Owner decision requested on the residual recovery
 path (physical Xiaomi / animation-free CI variant / navigation upgrade).
+
+NODE G4-N13 — CP-G4-009 real model delivery + CP-G4-010 wave 2 camera QR scanner (2026-11-03)
+FINDING: (1) CP-G4-009 — the four physically verified ONNX artifacts (openWakeWord trio +
+GTCRN, hashes re-measured this session and equal to bundled_manifest.json AND
+voice_pack_catalog.json: melspec ba2b0e0f…, embed 70d16429…, hey_jarvis 94a13cfe…,
+gtcrn_simple e77603ac…) now ride INSIDE the APK (assets/models/bundled/) and are delivered
+through the SAME hash-gated, receipted pipeline as network downloads: double gate (manifest
+AND catalog must agree on identity/hash/version/size — conflicts are typed refusals, no
+silent trust), quarantine facts sidecar on hash mismatch (evidence preserved, §7), atomic
+install with previous-version preservation, registry read-back, qualification/activation
+ALWAYS via ModelActivationController, sequential truthful stop, idempotent re-delivery.
+Provenance literal 'app-bundle' (no network). Delivery ≠ enablement: wake OFF until the
+FA/FR harness, denoiser bypassed until device qualification; gtcrnDenoiserIfDelivered()/
+openWakeWordIfDelivered() construct ONLY on demand. paola.tar.bz2 (81 MB VITS) intentionally
+NOT bundled — APK size guard, receipted network installer stays its delivery path.
+(2) CP-G4-010 wave 2 (G4-C09 wave 2) — camera QR pairing scanner: dependencies verified
+BEFORE adoption (Google Maven HTTP 200 on both POMs, measured this session) and pinned with
+licenses (CameraX 1.4.2 Apache-2.0, mlkit barcode-scanning 17.3.0 Apache-2.0 bundled
+on-device, no Play Services). QrPairingScanFlow (pure, deterministic): duplicate-frame
+suppression 1.5s debounce, full typed rejection matrix inherited, Detected terminal until
+reset (nonce consumed — rescanning honestly yields REPLAYED_NONCE), rejections non-terminal,
+truthful framesAnalyzed counting EVERY surfaced frame, redaction-safe summaries.
+QrScannerScreen: CAMERA permission only in-context with honest rationale + manual-pairing
+fallback text, typed CAMERA_UNAVAILABLE (no silent fallback), bindToLifecycle (hardware
+released when screen leaves STARTED), scanner+use cases released onDispose, imageProxy
+always closed. Pairing executes on the deterministic MOCK client only, labeled SIMULATED —
+Tower Graph 1.7 authority untouched. Route qr_scanner reached from Tower Studio Actions
+(drawer untouched — no E2E selector churn). Manifest: CAMERA + uses-feature required=false.
+Review fix before commit: '$report.stoppedAt' template bug corrected (would have printed the
+whole report object + literal '.stoppedAt').
+TEST: 242/242 unit green (CP-G4-009: +9 bundled-delivery; CP-G4-010w2: +8 QR flow);
+lint 0 errors / 34 warnings unchanged; androidTest compiles; local verify with JDK17.
+COMMIT: ed50b21 (CP-G4-009) → 5c7993b (CP-G4-010 wave 2) — both pushed, ls-remote read back
+exact (5c7993b). Governance rows added to CHECKPOINT_INDEX.
+NEXT: visual refinement (Monumental convergence pass) → G4-C11/C12 self-test expansion and
+packaging (cloud build evidence at these commits) → Xiaomi qualification package; cloud
+debug-build + E2E evidence read-back for ed50b21/5c7993b next session (E2E residual recovery
+path still awaiting Owner decision: physical Xiaomi / animation-free CI variant / navigation
+upgrade).
