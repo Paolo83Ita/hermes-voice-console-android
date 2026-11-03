@@ -604,3 +604,10 @@ channel for any future run); (b) physical Xiaomi qualification via the b1df58a r
 (c) real Tower pairing (Tower Graph 1.7 authority). G4-C04 runtime adapters (vosk/piper/
 silero STT·TTS·VAD, optional local LLM qwen) stay delivery-dependent per catalog contract.
 No terminal verdict: nodes remain.
+
+G4-N15 READ-BACK (2026-11-03) — cloud validation at 1fa7829: debug-build 41632784469
+SUCCESS; android-e2e 41632784491 completed and the REPAIRED verdict channel printed the
+truthful INSTRUMENTATION_FAILED_OR_INCOMPLETE marker as a single sh -c line (zero syntax
+errors in execution); the typed residual fired again with identical signature (7th sample:
+e2e_35_36, route=appearance INITIALIZED→DESTROYED, crash at #3 of 30, two green before).
+Commit 1fa7829 pushed and read back exact (1fa7829b8b37decebc3acf6c92cb8bfa018de95a).

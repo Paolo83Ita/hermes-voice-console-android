@@ -184,3 +184,16 @@ and 41615537760 @ed50b21):
    qualification; (b) authorized animation-free CI console variant (separate named node);
    (c) navigation-compose upgrade node re-evaluating the INITIALIZED-entry teardown race.
    No assertion was weakened; no app source changed in this read-back node.
+
+### Verdict-channel repair VALIDATED on cloud (run 41632784491 @ 1fa7829, 2026-11-03)
+
+- The single-line verdict executed as ONE `sh -c` invocation and printed the truthful
+  marker `INSTRUMENTATION_FAILED_OR_INCOMPLETE` + exit 1 — no `Syntax error` anywhere in
+  execution (the only textual match is the evidence comment inside the script dump).
+- The residual fired again with the identical signature (7th deterministic sample):
+  e2e_35_36, `IllegalStateException … route=appearance`, process crash, abort at #3 of
+  numtests=30; e2e_41_42 and e2e_40 green before it. Debug-build @ 1fa7829 SUCCESS
+  (run 41632784469).
+- Net effect of the repair: from this run forward every android-e2e job conclusion carries
+  a truthful typed marker, so the Owner's recovery-path decision (a/b/c) can rest on clean
+  evidence. The residual itself remains open and decision-gated.
