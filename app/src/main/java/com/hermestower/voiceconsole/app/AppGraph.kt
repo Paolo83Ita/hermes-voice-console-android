@@ -191,6 +191,18 @@ class AppGraph(context: Context) {
             appVersion = APP_VERSION,
             commitReference = null,
             isAndroidRuntime = true,
+            bundledManifestText = {
+                runCatching {
+                    context.assets.open("models/bundled/bundled_manifest.json").bufferedReader().use { it.readText() }
+                }.getOrNull()
+            },
+            bundledInstaller = bundledModelInstaller,
+            pairingParserFactory = {
+                com.hermestower.voiceconsole.pairing.PairingPayloadParser(
+                    nonceStore = com.hermestower.voiceconsole.pairing.InMemoryPairingNonceStore(),
+                )
+            },
+            towerArchive = towerArchive,
         ),
         dispatcher = Dispatchers.Default,
     )

@@ -22,5 +22,6 @@ object AppRoutes {
     val all: Set<String> = setOf(
         CONSOLE, HISTORY, CONNECTION, VOICE, INTELLIGENCE, APPEARANCE,
         DIAGNOSTICS, ABOUT, MODEL_MANAGER, TOWER_STUDIO, SELF_TEST, ARCHIVE,
+        QR_SCANNER,
     )
 }

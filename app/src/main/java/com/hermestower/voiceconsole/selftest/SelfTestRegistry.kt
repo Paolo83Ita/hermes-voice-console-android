@@ -8,6 +8,10 @@ import com.hermestower.voiceconsole.core.routing.RoutingRequest
 import com.hermestower.voiceconsole.core.state.ConsoleState
 import com.hermestower.voiceconsole.core.state.ConsoleStateMachine
 import com.hermestower.voiceconsole.core.state.ConnectionStatus
+import com.hermestower.voiceconsole.archive.ArtifactDownloadResult
+import com.hermestower.voiceconsole.archive.ContinuationResult
+import com.hermestower.voiceconsole.models.BundledModelInstaller
+import com.hermestower.voiceconsole.models.DefaultVoiceModelCatalog
 import com.hermestower.voiceconsole.models.DeterministicTestArtifact
 import com.hermestower.voiceconsole.models.ModelCatalogEntry
 import com.hermestower.voiceconsole.models.ModelComponentType
@@ -34,7 +38,8 @@ import java.time.Duration
 import java.time.Instant
 
 /**
- * The 45 deterministic self-tests (GRAPH 2 §11). Every check is bounded, offline
+ * The 50 deterministic self-tests (GRAPH 2 §11 + GRAPH 4 G4-C11 expansion,
+ * ST-46..ST-50: bundled delivery, QR pairing, archive truth). Every check is bounded, offline
  * (127.0.0.1 only) and side-effect limited to its own fixture. Real acoustic,
  * LLM and soak qualification stay QUALIFICATION_PENDING_DEVICE.
  */
@@ -548,6 +553,108 @@ object SelfTestRegistry {
                     SelfTestState.PASS to "V0.1 values preserved, corrupt recovered, unknown kept, rollback works."
                 } else {
                     SelfTestState.FAIL to "migration unexpected: $report / rollback=$rolledBack."
+                }
+            },
+            // ---------- GRAPH 4 expansion (G4-C11 wave): bundled delivery, QR pairing, archive truth ----------
+            def("ST-46", "Bundled manifest double-gate agreement", SelfTestCategory.MODELS, setOf(SelfTestMode.QUICK, SelfTestMode.STANDARD, SelfTestMode.FULL, SelfTestMode.VOICE_FOUNDATION_ONLY)) { s ->
+                val text = s.bundledManifestText()
+                if (text == null) {
+                    SelfTestState.SKIPPED_NOT_APPLICABLE to "bundled manifest not readable on this runtime."
+                } else {
+                    val manifest = DefaultVoiceModelCatalog.json.decodeFromString(
+                        BundledModelInstaller.BundledManifest.serializer(), text,
+                    )
+                    val conflicts = manifest.artifacts.mapNotNull { a ->
+                        val e = s.catalog.find(a.identity)
+                        when {
+                            e == null -> "${a.asset}: identity missing from catalog"
+                            e.sha256 != a.sha256 -> "${a.asset}: hash conflict"
+                            e.version != a.version -> "${a.asset}: version conflict"
+                            e.downloadSizeBytes != a.sizeBytes -> "${a.asset}: size conflict"
+                            else -> null
+                        }
+                    }
+                    if (conflicts.isEmpty()) {
+                        SelfTestState.PASS to "${manifest.artifacts.size} bundled artifacts agree with the shipped catalog on hash/version/size."
+                    } else {
+                        SelfTestState.FAIL to "double-gate conflicts: ${conflicts.joinToString("; ")}."
+                    }
+                }
+            },
+            def("ST-47", "Bundled delivery end-to-end (Owner §6)", SelfTestCategory.MODELS, setOf(SelfTestMode.STANDARD, SelfTestMode.FULL, SelfTestMode.VOICE_FOUNDATION_ONLY)) { s ->
+                val installer = s.bundledInstaller
+                if (installer == null) {
+                    SelfTestState.SKIPPED_NOT_APPLICABLE to "bundled installer not wired on this runtime."
+                } else {
+                    val report = installer.deliverAll()
+                    val second = installer.deliverAll()
+                    val reverified = second.results.count { it is BundledModelInstaller.BundledInstallResult.AlreadyInstalled }
+                    if (report.allDelivered && report.installedCount == 4 && second.allDelivered && reverified == 4) {
+                        SelfTestState.PASS to "4/4 delivered through the hash-gated, receipted pipeline; re-delivery idempotent (4 re-verified, no network)."
+                    } else {
+                        SelfTestState.FAIL to "delivery truth: stoppedAt=${report.stoppedAt} installed=${report.installedCount} reVerified=$reverified secondAll=${second.allDelivered}."
+                    }
+                }
+            },
+            def("ST-48", "QR pairing parser strict matrix probe", SelfTestCategory.TOWER, setOf(SelfTestMode.QUICK, SelfTestMode.STANDARD, SelfTestMode.FULL, SelfTestMode.CONNECTIVITY_ONLY)) { s ->
+                val now = System.currentTimeMillis()
+                fun uri(nonce: String, issued: Long, expires: Long) =
+                    "hermes-pair://v1/tower-selftest?env=local&iat=$issued&exp=$expires&n=$nonce&c=CHALLENGE&ep=https%3A%2F%2Ftower.local%2Fpair"
+                val parser = s.pairingParserFactory()
+                val valid = parser.parse(uri("SELFTESTNONCE1", now - 60_000, now + 300_000))
+                val replay = parser.parse(uri("SELFTESTNONCE1", now - 60_000, now + 300_000))
+                val expired = s.pairingParserFactory().parse(uri("SELFTESTNONCE2", now - 700_000, now - 100_000))
+                val wrongScheme = s.pairingParserFactory().parse("https://tower.local/qr")
+                val okValid = valid.getOrNull()?.towerId == "tower-selftest"
+                fun kind(r: Result<com.hermestower.voiceconsole.pairing.PairingPayload>) =
+                    (r.exceptionOrNull() as? com.hermestower.voiceconsole.pairing.PairingRejectException)?.reject?.kind
+                val matrix = listOf(
+                    "parse=${if (okValid) "ok" else "fail"}",
+                    "replay=${kind(replay)}",
+                    "expired=${kind(expired)}",
+                    "scheme=${kind(wrongScheme)}",
+                )
+                if (okValid && kind(replay) == com.hermestower.voiceconsole.pairing.PairingRejectKind.REPLAYED_NONCE &&
+                    kind(expired) == com.hermestower.voiceconsole.pairing.PairingRejectKind.EXPIRED &&
+                    kind(wrongScheme) == com.hermestower.voiceconsole.pairing.PairingRejectKind.UNSUPPORTED_SCHEME
+                ) {
+                    SelfTestState.PASS to "strict matrix: valid parses, replay/expiry/scheme rejected with typed kinds (no endpoint contacted)."
+                } else {
+                    SelfTestState.FAIL to "matrix unexpected: ${matrix.joinToString(", ")}."
+                }
+            },
+            def("ST-49", "Archive authority truthfulness (Owner §15/§16/§17)", SelfTestCategory.TOWER, setOf(SelfTestMode.STANDARD, SelfTestMode.FULL)) { s ->
+                val archive = s.towerArchive
+                if (archive == null) {
+                    SelfTestState.SKIPPED_NOT_APPLICABLE to "archive not wired on this runtime."
+                } else {
+                    // §15: local-cache removal and clearCache NEVER delete remote authority rows.
+                    val before = archive.listConversations(1, 100).items.size
+                    archive.cachedConversationIds().forEach { archive.removeLocalCache(it) }
+                    archive.clearCache()
+                    val after = archive.listConversations(1, 100).items.size
+                    val s15 = before > 0 && after == before
+                    // §16: continuation authority is the REAL Tower — the mock answers typed SIMULATED/Refused.
+                    val cont = archive.listMissions(1, 100).items.firstOrNull()?.let { archive.requestContinuation(it.id) }
+                    val s16 = cont is ContinuationResult.SimulatedAccepted || cont is ContinuationResult.Refused
+                    // §17: download is typed SIMULATED (no silent byte regeneration).
+                    val dl = archive.listArtifacts(1, 100).items.firstOrNull()?.let { archive.download(it.id) }
+                    val s17 = dl is ArtifactDownloadResult.Simulated ||
+                        (dl is ArtifactDownloadResult.Completed && dl.sha256.isNotBlank())
+                    if (s15 && s16 && s17) {
+                        SelfTestState.PASS to "authority rows survive cache removal ($before kept); continuation typed ${cont?.javaClass?.simpleName}; download typed ${dl?.javaClass?.simpleName}."
+                    } else {
+                        SelfTestState.FAIL to "truth breach: §15=$s15 §16=$s16 §17=$s17."
+                    }
+                }
+            },
+            def("ST-50", "Graph 4 route registry", SelfTestCategory.UI_SEMANTICS, setOf(SelfTestMode.QUICK, SelfTestMode.STANDARD, SelfTestMode.FULL)) { s ->
+                val required = setOf(AppRoutes.ARCHIVE, AppRoutes.QR_SCANNER, AppRoutes.TOWER_STUDIO, AppRoutes.MODEL_MANAGER, AppRoutes.SELF_TEST)
+                val missing = required - AppRoutes.all
+                if (missing.isEmpty()) {
+                    SelfTestState.PASS to "Graph 4 surfaces registered: archive, qr_scanner, tower_studio, model_manager, self_test."
+                } else {
+                    SelfTestState.FAIL to "missing routes: $missing."
                 }
             },
         )

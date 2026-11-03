@@ -50,6 +50,9 @@ import kotlinx.coroutines.launch
 import kotlinx.coroutines.withTimeout
 import java.time.Duration
 import java.time.Instant
+import com.hermestower.voiceconsole.archive.MockTowerArchive
+import com.hermestower.voiceconsole.models.BundledModelInstaller
+import com.hermestower.voiceconsole.pairing.PairingPayloadParser
 
 /**
  * Runtime dependencies the Self-Test Center exercises. Everything here is already
@@ -75,6 +78,13 @@ data class SelfTestSubjects(
     val appVersion: String,
     val commitReference: String?,
     val isAndroidRuntime: Boolean,
+    // GRAPH 4 self-test expansion (G4-C11 wave): bundled delivery, QR pairing
+    // parser and Tower Archive subjects. Nullable members degrade honestly to
+    // SKIPPED_NOT_APPLICABLE on runtimes that cannot provide them (JVM checks).
+    val bundledManifestText: () -> String? = { null },
+    val bundledInstaller: BundledModelInstaller? = null,
+    val pairingParserFactory: () -> PairingPayloadParser = { PairingPayloadParser() },
+    val towerArchive: MockTowerArchive? = null,
 )
 
 /**

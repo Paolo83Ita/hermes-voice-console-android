@@ -111,22 +111,28 @@ class SelfTestCenterTest {
         center.run(SelfTestMode.QUICK)
         awaitCompletion()
         val results = center.results.value
-        assertEquals(45, results.size)
+        assertEquals(50, results.size)
         val quick = results.values.filter { it.state != SelfTestState.NOT_RUN }
         assertTrue("quick subset empty", quick.isNotEmpty())
-        val failures = quick.filter { it.state != SelfTestState.PASS }
+        // JVM runtime: bundled manifest is not readable → ST-46 is honestly skipped.
+        val skipped = quick.filter { it.state == SelfTestState.SKIPPED_NOT_APPLICABLE }.map { it.testId }
+        assertEquals(listOf("ST-46"), skipped)
+        val failures = quick.filter { it.state != SelfTestState.PASS && it.state != SelfTestState.SKIPPED_NOT_APPLICABLE }
         assertTrue("non-pass quick results: ${failures.map { it.testId to it.evidence }}", failures.isEmpty())
-        assertTrue(center.summary().contains("20 pass"))
+        assertTrue(center.summary().contains("22 pass"))
     }
 
     @Test
-    fun `full mode runs all 45 definitions and every one passes on the JVM`() {
+    fun `full mode runs all 50 definitions and passes or skips honestly on the JVM`() {
         center.run(SelfTestMode.FULL)
         awaitCompletion()
         val results = center.results.value
-        assertEquals(45, results.size)
-        assertTrue(results.keys.containsAll((1..45).map { "ST-%02d".format(it) }))
-        val failures = results.values.filter { it.state != SelfTestState.PASS }
+        assertEquals(50, results.size)
+        assertTrue(results.keys.containsAll((1..50).map { "ST-%02d".format(it) }))
+        // JVM runtime: the Android-asset subjects degrade to typed skips.
+        val skipped = results.values.filter { it.state == SelfTestState.SKIPPED_NOT_APPLICABLE }.map { it.testId }.sorted()
+        assertEquals(listOf("ST-46", "ST-47", "ST-49"), skipped)
+        val failures = results.values.filter { it.state != SelfTestState.PASS && it.state != SelfTestState.SKIPPED_NOT_APPLICABLE }
         assertTrue("non-pass results: ${failures.map { it.testId to it.evidence }}", failures.isEmpty())
     }
 

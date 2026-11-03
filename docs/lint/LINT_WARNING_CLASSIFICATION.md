@@ -20,11 +20,11 @@ classified below. No blanket suppression is used anywhere (`abortOnError=true`, 
 5. no orphan coroutine remains (`cancelled pump stops consuming frames`, disposal test)
 6. OLED idle policy preserved (static 0 ms frame asserted; LOW profile shares the same `running=false` gate)
 
-## Warnings (36, individually classified)
+## Warnings (43 at CP-G4-010 wave 2, individually classified)
 
 | Count | Rule | Location | Classification | Disposition |
 | --- | --- | --- | --- | --- |
-| 27 | `GradleDependency` | `gradle/libs.versions.toml` (lines 4,5,6,7,11,12,13,14 ×3 variants) | ACCEPTED, INTENTIONAL — pinned versions (see `docs/DEPENDENCY_PINNING.md`); bulk upgrades explicitly forbidden by mission NODE 0 in this node | Documented; no change |
+| 36 | `GradleDependency` | `gradle/libs.versions.toml` (pinned lines incl. CP-G4-008 onnxruntime 1.20.0 and CP-G4-010 wave 2 CameraX 1.4.2 / ML Kit barcode-scanning 17.3.0) | ACCEPTED, INTENTIONAL — pinned versions (see `docs/DEPENDENCY_PINNING.md`); upgrades happen only in a dedicated named node | Documented; no change |
 | 3 | `AndroidGradlePluginVersion` | `gradle/libs.versions.toml:2` | ACCEPTED, INTENTIONAL — AGP 8.7.3 pinned (mission: "do not bulk-upgrade AGP, Kotlin or Compose in this node") | Documented; no change |
 | 1 | `OldTargetApi` | `app/build.gradle.kts:15` | ACCEPTED, INTENTIONAL — targetSdk 35 is current for this project; lint's "newer exists" noise refers to a preview API level | Documented; no change |
 | 2 | `ObsoleteSdkInt` | `models/AndroidModelProviders.kt:27`; `res/mipmap-anydpi-v26` | REPAIRED — dead `SDK_INT >= 30` guard removed (minSdk 30 guarantees it); `mipmap-anydpi-v26` merged into `mipmap-anydpi` | Fixed in CP-G4-002 |
@@ -35,6 +35,6 @@ classified below. No blanket suppression is used anywhere (`abortOnError=true`, 
 ## Verification
 
 - `:app:lintDebug` executed locally and in CI (blocking step, report uploaded);
-- terminal: **0 errors**; remaining warnings = the 31 accepted/pinned-version ones above.
+- terminal: **0 errors**; remaining warnings = the 39 accepted/pinned-version ones above (36 `GradleDependency` + 3 `AndroidGradlePluginVersion` + 1 `OldTargetApi`).
 - mutableIntStateOf audit: no integer-valued `mutableStateOf` exists in `app/src/main` (both long state
   usages — the frame clocks — now use `mutableLongStateOf` inside `AnimationFrameClock`); nothing to convert.
