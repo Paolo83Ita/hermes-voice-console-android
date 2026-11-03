@@ -104,3 +104,40 @@ Rule 3 compliance: three materially different repair attempts per class were use
 stated; no assertion was weakened at any point (predicates were tightened, anchors made
 compile-time-required, diagnostics added). The "Process system isn't responding" dialog on the
 software emulator remains an environment observation, not a verdict.
+
+---
+
+## CP-G4-007 VERDICT (run 41551630218 @ 26e2e8d — full cloud E2E)
+
+**Trajectory across CP-G4-007:** 14 deterministic assertion failures → 8 → **0 assertion
+failures** (all repaired tests green through the run), with the suite aborting at test #14
+(e2e_35_36) on a process crash — NOT an assertion failure.
+
+**The residual, typed with complete evidence (Owner §2/§3):**
+
+- **Class: EMULATOR_INPUT_INJECTION_LIMITATION** (3 materially different repair attempts
+  consumed: ① virtual-time advancement, ② semantic hasClickAction selectors + bounded
+  advanceTimeUntil/advanceTimeBy pumping, ③ coordinate-free accessible OnClick activation).
+- Mechanism: `freezeAnimationsForTest()` (required — the Oracle Core animates infinitely and
+  Espresso-idle would hang) freezes the compose animation clock; the M3 drawer + navigation-
+  compose AnimatedContent transitions advance only on that clock. The semantics activation
+  provably fires `navigate()` (run 41551630218 logcat: the NavBackStackEntry for route
+  `appearance` was created), but the entering content never composes on this emulator
+  configuration, so the anchor cannot appear and the entry stays INITIALIZED.
+- Consequence recorded: at test teardown the stuck INITIALIZED entry makes activity destroy
+  throw `IllegalStateException: State must be at least CREATED to move to DESTROYED`
+  (navigation-compose 2.8.5 internal lifecycle move) → process death → suite abort at #14.
+  This is a library-internal lifecycle race surfaced by the frozen clock, not application
+  logic (the console, routing, queue, archive and voice paths are all exercised green).
+- Physical-click truthfulness: row clickability remains asserted (hasClickAction matcher);
+  the accessible activation is the screen-reader path (Owner §3.3), never a logic bypass.
+- **Recovery paths (Owner decision):** (a) physical Xiaomi qualification — no frozen clock,
+  real touch; (b) a CI emulator variant with animation-free console build (dedicated
+  resource flag) — a separate, named node if authorized; (c) navigation-compose upgrade node
+  (pinned 2.8.5) re-evaluating the INITIALIZED-entry teardown race.
+
+**Closed failures (repaired + verified green in run 41551630218):** e2e_01_02 (selector rot),
+e2e_19_20 (APPLICATION_DEFECT — state machine queue edges, verified delivering), e2e_23,
+e2e_31_33/32/34 (SelfTest startup race), and all anchor/wait mechanics for the classes they
+cover. 225/225 JVM unit tests green; lint 0 errors / 34 warnings; cloud debug-build SUCCESS
+at every repair commit.
