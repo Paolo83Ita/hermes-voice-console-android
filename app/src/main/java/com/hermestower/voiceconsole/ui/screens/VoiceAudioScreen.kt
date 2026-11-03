@@ -45,51 +45,55 @@ fun VoiceAudioScreen(graph: AppGraph) {
             .padding(16.dp),
         verticalArrangement = Arrangement.spacedBy(12.dp),
     ) {
-        Text("Voice & Audio", style = HermesType.screenTitle, color = c.ink)
+        Text(stringResource(com.hermestower.voiceconsole.R.string.voice_title), style = HermesType.screenTitle, color = c.ink)
         MeanderBand(colors = hermesColors, modifier = Modifier.padding(top = 6.dp))
 
-        SectionCard(title = "Wake word") {
+        SectionCard(title = stringResource(com.hermestower.voiceconsole.R.string.voice_wake_card)) {
             Row(horizontalArrangement = Arrangement.spacedBy(8.dp)) {
-                TruthBadge("PROVIDER: ${graph.wakeWordEngine.phrase.uppercase()} CANDIDATES", c.gold)
-                TruthBadge("ENGINE: ${wakeState.value.name}", c.inkSecondary)
+                TruthBadge(stringResource(com.hermestower.voiceconsole.R.string.voice_provider_fmt, graph.wakeWordEngine.phrase.uppercase()), c.gold)
+                TruthBadge(stringResource(com.hermestower.voiceconsole.R.string.voice_engine_fmt, wakeState.value.name), c.inkSecondary)
             }
             Text(
-                "Configuration placeholder. Candidates (openWakeWord, Porcupine) are QUALIFY_ON_DEVICE — nothing is active until physical tests pass (VOICE_PIPELINE_OPTIONS §2).",
+                stringResource(com.hermestower.voiceconsole.R.string.voice_wake_note),
                 style = HermesType.bodySecondary,
                 color = c.inkSecondary,
             )
         }
 
-        SectionCard(title = "Voice activity detection") {
-            TruthBadge("ENGINE: ${vadState.value.name}", c.inkSecondary)
+        SectionCard(title = stringResource(com.hermestower.voiceconsole.R.string.voice_vad_card)) {
+            TruthBadge(stringResource(com.hermestower.voiceconsole.R.string.voice_engine_fmt, vadState.value.name), c.inkSecondary)
             Text(
-                "Silero VAD (primary candidate) and WebRTC VAD (prototype) behind one seam; qualification criteria fixed in VOICE_PIPELINE_OPTIONS §3.",
+                stringResource(com.hermestower.voiceconsole.R.string.voice_vad_note),
                 style = HermesType.bodySecondary,
                 color = c.inkSecondary,
             )
         }
 
-        SectionCard(title = "Speech-to-text") {
-            TruthBadge("ENGINE: ${sttState.value.name}", c.inkSecondary)
-            TruthBadge("V0.1 PATH: TEXT INJECTION", c.warn)
+        SectionCard(title = stringResource(com.hermestower.voiceconsole.R.string.voice_stt_card)) {
+            TruthBadge(stringResource(com.hermestower.voiceconsole.R.string.voice_engine_fmt, sttState.value.name), c.inkSecondary)
+            TruthBadge(stringResource(com.hermestower.voiceconsole.R.string.voice_v01_path), c.warn)
             Text(
-                "whisper.cpp is the primary QUALIFY_ON_DEVICE candidate; the Android system recognizer is a prototype fallback that must prove fully on-device behavior before LOCAL-mode use.",
+                stringResource(com.hermestower.voiceconsole.R.string.voice_stt_note),
                 style = HermesType.bodySecondary,
                 color = c.inkSecondary,
             )
         }
 
-        SectionCard(title = "Text-to-speech") {
+        SectionCard(title = stringResource(com.hermestower.voiceconsole.R.string.voice_tts_card)) {
             Row(horizontalArrangement = Arrangement.spacedBy(8.dp)) {
                 when (ttsState.value.state) {
                     com.hermestower.voiceconsole.voice.TtsState.READY,
                     com.hermestower.voiceconsole.voice.TtsState.SPEAKING,
-                    com.hermestower.voiceconsole.voice.TtsState.SYNTHESIZING -> TruthBadge("SYSTEM TTS — ACTIVE (REAL AUDIO)", c.ok)
-                    else -> TruthBadge("SYSTEM TTS — UNAVAILABLE (text-only)", c.warn)
+                    com.hermestower.voiceconsole.voice.TtsState.SYNTHESIZING -> TruthBadge(stringResource(com.hermestower.voiceconsole.R.string.voice_tts_active), c.ok)
+                    else -> TruthBadge(stringResource(com.hermestower.voiceconsole.R.string.voice_tts_unavailable), c.warn)
                 }
-                TruthBadge("ENGINE: ${ttsState.value.state.name}", c.inkSecondary)
+                TruthBadge(stringResource(com.hermestower.voiceconsole.R.string.voice_engine_fmt, ttsState.value.state.name), c.inkSecondary)
             }
-            Text("Speaking speed: ${"%.2f".format(settings.speakingRate)}×", style = HermesType.body, color = c.ink)
+            Text(
+                stringResource(com.hermestower.voiceconsole.R.string.voice_speed_fmt, "%.2f".format(settings.speakingRate)),
+                style = HermesType.body,
+                color = c.ink,
+            )
             Slider(
                 value = settings.speakingRate,
                 onValueChange = { graph.store.updateSettings { s -> s.copy(speakingRate = it) } },
@@ -97,27 +101,27 @@ fun VoiceAudioScreen(graph: AppGraph) {
                 steps = 7,
             )
             Text(
-                "Voice selection and higher-quality local voices (Piper candidate, Kokoro deferred) follow the physical qualification sessions; the target voice is calm, authoritative, Italian-first.",
+                stringResource(com.hermestower.voiceconsole.R.string.voice_tts_note),
                 style = HermesType.bodySecondary,
                 color = c.inkSecondary,
             )
         }
 
-        SectionCard(title = "Interruption & captions") {
+        SectionCard(title = stringResource(com.hermestower.voiceconsole.R.string.voice_interruption_card)) {
             SettingRow(
-                label = "Barge-in: new input interrupts playback",
+                label = stringResource(com.hermestower.voiceconsole.R.string.voice_barge_in),
                 checked = true,
                 enabled = false,
                 onToggle = { /* V0.1: always on by design in the driver */ },
             )
             SettingRow(
-                label = "Captions",
+                label = stringResource(com.hermestower.voiceconsole.R.string.voice_captions),
                 checked = settings.captionsEnabled,
                 enabled = true,
                 onToggle = { graph.store.updateSettings { s -> s.copy(captionsEnabled = it) } },
             )
             Text(
-                "Stop-speaking and privacy mute are always available on the console; speech is never captured into persistent logs (SEC §4).",
+                stringResource(com.hermestower.voiceconsole.R.string.voice_capture_note),
                 style = HermesType.bodySecondary,
                 color = c.inkSecondary,
             )

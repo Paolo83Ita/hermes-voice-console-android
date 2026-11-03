@@ -101,39 +101,33 @@ fun QrScannerScreen(graph: AppGraph, onBack: () -> Unit) {
             .padding(16.dp),
         verticalArrangement = Arrangement.spacedBy(12.dp),
     ) {
-        Text("Scan pairing QR", style = HermesType.screenTitle, color = c.ink)
+        Text(stringResource(com.hermestower.voiceconsole.R.string.qr_title), style = HermesType.screenTitle, color = c.ink)
         MeanderBand(colors = hermesColors, modifier = Modifier.padding(top = 6.dp))
         Text(
-            "Point the camera at the Tower's hermes-pair QR code. Frames are decoded on-device " +
-                "and never stored. The payload is checked by the strict versioned parser before " +
-                "anything is offered for pairing.",
+            stringResource(com.hermestower.voiceconsole.R.string.qr_intro),
             style = HermesType.bodySecondary, color = c.inkSecondary,
         )
 
         when {
-            !hasPermission -> SectionCard(title = "Camera permission") {
+            !hasPermission -> SectionCard(title = stringResource(com.hermestower.voiceconsole.R.string.qr_permission_card)) {
                 Text(
-                    "The camera is used only while this screen is visible, to read a pairing QR. " +
-                        "No frame is saved or sent anywhere. You can also pair without QR by entering " +
-                        "the pairing code manually in Tower Studio.",
+                    stringResource(com.hermestower.voiceconsole.R.string.qr_permission_note),
                     style = HermesType.bodySecondary, color = c.inkSecondary,
                 )
                 if (permissionDenied) {
                     Text(
-                        "Camera permission was refused — QR scanning is unavailable. " +
-                            "Manual pairing code entry in Tower Studio still works.",
+                        stringResource(com.hermestower.voiceconsole.R.string.qr_permission_refused),
                         style = HermesType.body, color = c.energy,
                     )
                 }
                 Button(onClick = { permissionLauncher.launch(Manifest.permission.CAMERA) }) {
-                    Text("Grant camera permission")
+                    Text(stringResource(com.hermestower.voiceconsole.R.string.qr_grant_button))
                 }
             }
 
-            cameraError != null -> SectionCard(title = "Camera unavailable") {
+            cameraError != null -> SectionCard(title = stringResource(com.hermestower.voiceconsole.R.string.qr_unavailable_card)) {
                 Text(
-                    "Typed failure: $cameraError. The rest of the app is unaffected; " +
-                        "manual pairing code entry in Tower Studio still works.",
+                    stringResource(com.hermestower.voiceconsole.R.string.qr_unavailable_note, cameraError),
                     style = HermesType.body, color = c.energy,
                 )
             }
@@ -190,54 +184,50 @@ fun QrScannerScreen(graph: AppGraph, onBack: () -> Unit) {
                     AndroidView(factory = { previewView }, modifier = Modifier.fillMaxSize())
                 }
 
-                SectionCard(title = "Scan result") {
+                SectionCard(title = stringResource(com.hermestower.voiceconsole.R.string.qr_result_card)) {
                     when (val s = scanState) {
                         is QrPairingScanFlow.ScanState.Idle, is QrPairingScanFlow.ScanState.Scanning ->
                             Text(
-                                "Looking for a hermes-pair QR… (${scanFlow.framesAnalyzed} frames analyzed)",
+                                stringResource(com.hermestower.voiceconsole.R.string.qr_looking_fmt, scanFlow.framesAnalyzed),
                                 style = HermesType.bodySecondary, color = c.inkSecondary,
                             )
 
                         is QrPairingScanFlow.ScanState.Rejected -> {
                             Text(
-                                "REFUSED ${s.reject.kind} — ${s.reject.detail}",
+                                stringResource(com.hermestower.voiceconsole.R.string.qr_refused_fmt, s.reject.kind, s.reject.detail),
                                 style = HermesType.body, color = c.energy,
                             )
                             Text(
-                                "The strict parser refused this code; nothing was paired. " +
-                                    "Point at a fresh Tower QR or go back.",
+                                stringResource(com.hermestower.voiceconsole.R.string.qr_refused_note),
                                 style = HermesType.bodySecondary, color = c.inkSecondary,
                             )
                             TextButton(onClick = {
                                 scanFlow.reset()
                                 scanState = QrPairingScanFlow.ScanState.Idle
-                            }) { Text("Scan again") }
+                            }) { Text(stringResource(com.hermestower.voiceconsole.R.string.qr_scan_again)) }
                         }
 
                         is QrPairingScanFlow.ScanState.Detected -> {
-                            Text("Payload accepted by the strict parser:", style = HermesType.body, color = c.ink)
+                            Text(stringResource(com.hermestower.voiceconsole.R.string.qr_accepted), style = HermesType.body, color = c.ink)
                             Text(s.summary, style = HermesType.bodySecondary, color = c.inkSecondary)
                             Text(
-                                "Endpoint and challenge are held but never displayed; pairing runs " +
-                                    "through the DETERMINISTIC MOCK executor — the result below is " +
-                                    "SIMULATED. Real pairing is Tower Graph 1.7 authority.",
+                                stringResource(com.hermestower.voiceconsole.R.string.qr_mock_note),
                                 style = HermesType.bodySecondary, color = c.inkSecondary,
                             )
                             Button(
                                 onClick = {
                                     scope.launch {
-                                        pairingLine = "SIMULATED pairing in progress…"
+                                        pairingLine = context.getString(com.hermestower.voiceconsole.R.string.qr_pairing_progress)
                                         val phrase = "OWNER-CONSOLE"
                                         pairingLine = when (val r = graph.mockTowerPairingClient.pair(s.payload, phrase)) {
                                             is com.hermestower.voiceconsole.pairing.PairingResult.Success ->
-                                                "SIMULATED result — session ${r.sessionId}, match phrase ${r.matchPhrase}. " +
-                                                    "No real Tower was contacted (Tower Graph 1.7 pending)."
+                                                context.getString(com.hermestower.voiceconsole.R.string.qr_result_ok_fmt, r.sessionId, r.matchPhrase)
                                             is com.hermestower.voiceconsole.pairing.PairingResult.Failure ->
-                                                "SIMULATED pairing refused: ${r.kind} — ${r.detail}"
+                                                context.getString(com.hermestower.voiceconsole.R.string.qr_result_fail_fmt, r.kind, r.detail)
                                         }
                                     }
                                 },
-                            ) { Text("Pair with this Tower (SIMULATED)") }
+                            ) { Text(stringResource(com.hermestower.voiceconsole.R.string.qr_pair_button)) }
                             pairingLine?.let { Text(it, style = HermesType.body, color = c.energy) }
                         }
                     }
@@ -245,10 +235,9 @@ fun QrScannerScreen(graph: AppGraph, onBack: () -> Unit) {
             }
         }
 
-        TextButton(onClick = onBack) { Text("Back to Tower Studio") }
+        TextButton(onClick = onBack) { Text(stringResource(com.hermestower.voiceconsole.R.string.qr_back)) }
         Text(
-            "Note: rescanning the same QR after a successful parse is honestly refused as " +
-                "REPLAYED_NONCE — pairing nonces are single-use by contract.",
+            stringResource(com.hermestower.voiceconsole.R.string.qr_replay_note),
             style = HermesType.bodySecondary, color = c.inkSecondary,
         )
     }
