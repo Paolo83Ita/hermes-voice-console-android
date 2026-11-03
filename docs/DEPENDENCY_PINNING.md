@@ -14,6 +14,8 @@ bulk-upgrade AGP, Kotlin or Compose in this node").
 | androidx.activity / navigation / lifecycle | 1.9.3 / 2.8.5 / 2.8.7 | newer available | Verified pairings; no functional gap for Graph 4 scope. |
 | androidx.test (ext-junit/runner/rules/espresso) | 1.2.1 / 1.6.2 / 1.6.1 / 3.6.1 | newer available | The E2E ledger (runs 41349811483…41380930578) was produced on these; changing them changes emulator-truth comparability. |
 | onnxruntime-android (CP-G4-008) | 1.20.0 | 1.29.0 | REAL runtime binding for the physically verified voice assets (GTCRN denoiser, openWakeWord melspec/embed/head). 1.20.0 is a mature stable line covering opsets 11/13 used by the verified models; newer lines are re-evaluated at a dedicated node. minSdk 24+ ≤ project minSdk 30. |
+| androidx.camera (CP-G4-010 wave 2) | 1.4.2 | newer available | QR pairing scanner capture pipeline (camera-camera2/lifecycle/view). Stable line, minSdk 21 ≤ project minSdk 30. Availability verified on Google Maven this session (HTTP 200 on the 1.4.2 POM). License Apache-2.0. bindToLifecycle gives lifecycle-bound open/close (camera honesty rules). |
+| com.google.mlkit:barcode-scanning (CP-G4-010 wave 2) | 17.3.0 | newer available | BUNDLED on-device barcode scanning (QR-only configured) — no Play Services dependency, frames never leave the process. Availability verified on Google Maven this session (HTTP 200 on the 17.3.0 POM). License Apache-2.0. Upgrade re-evaluated at a dedicated node. |
 | targetSdk | 35 | lint suggests newer preview | 35 matches the installed cloud SDK (`platforms;android-35`), keeping the build hermetic. |
 
 Policy:

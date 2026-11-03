@@ -41,9 +41,12 @@ import kotlinx.coroutines.launch
  * Advanced collapsed by default. Every action reports a truthful typed result;
  * secrets are held only long enough to store them in the vault — they are never
  * placed in Compose state after save, in logs, or in exports.
+ *
+ * CP-G4-010 wave 2: the QR pairing scanner is reachable from the Actions card
+ * (callback injected by AppNav; null in previews keeps the screen standalone).
  */
 @Composable
-fun TowerStudioScreen(graph: AppGraph) {
+fun TowerStudioScreen(graph: AppGraph, onOpenScanner: (() -> Unit)? = null) {
     val c = hermesColors
     val existing = remember { graph.profileStore.load() }
     var name by rememberSaveable { mutableStateOf(existing?.profileName ?: "") }
@@ -201,6 +204,14 @@ fun TowerStudioScreen(graph: AppGraph) {
         }
 
         SectionCard(title = "Actions") {
+            if (onOpenScanner != null) {
+                Text(
+                    "Pairing via QR: scan the Tower's hermes-pair code with the camera — the " +
+                        "strict versioned parser checks it before anything is offered for pairing.",
+                    style = HermesType.bodySecondary, color = c.inkSecondary,
+                )
+                Button(onClick = { onOpenScanner() }) { Text("Scan pairing QR") }
+            }
             Row(horizontalArrangement = Arrangement.spacedBy(6.dp)) {
                 TextButton(onClick = {
                     when (val r = graph.profileStore.saveDraft(buildProfile())) {

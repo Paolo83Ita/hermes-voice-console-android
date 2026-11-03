@@ -17,6 +17,7 @@ object AppRoutes {
     const val TOWER_STUDIO = "tower_studio"
     const val SELF_TEST = "self_test"
     const val ARCHIVE = "archive"
+    const val QR_SCANNER = "qr_scanner"
 
     val all: Set<String> = setOf(
         CONSOLE, HISTORY, CONNECTION, VOICE, INTELLIGENCE, APPEARANCE,

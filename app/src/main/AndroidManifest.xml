@@ -16,6 +16,13 @@
     <uses-permission android:name="android.permission.POST_NOTIFICATIONS" />
     <uses-permission android:name="android.permission.FOREGROUND_SERVICE" />
     <uses-permission android:name="android.permission.FOREGROUND_SERVICE_MICROPHONE" />
+    <!-- CP-G4-010 wave 2: QR pairing scanner. Requested ONLY while the scanner
+         screen is visible; frames are analyzed on-device (ML Kit bundled, no
+         network) and never persisted. Camera is an OPTIONAL hardware feature:
+         without it the scanner screen reports a typed CAMERA_UNAVAILABLE state
+         and the rest of the app is unaffected. -->
+    <uses-permission android:name="android.permission.CAMERA" />
+    <uses-feature android:name="android.hardware.camera.any" android:required="false" />
 
     <application
         android:localeConfig="@xml/locales_config"

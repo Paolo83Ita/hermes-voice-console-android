@@ -70,6 +70,13 @@ dependencies {
     // CP-G4-008: real ONNX runtime for the verified voice assets (GTCRN denoiser,
     // openWakeWord melspec/embed/head chain). Version pinned in DEPENDENCY_PINNING.md.
     implementation(libs.onnxruntime.android)
+    // CP-G4-010 wave 2: in-app QR pairing scanner — CameraX capture pipeline +
+    // ML Kit bundled on-device barcode scanning (no Play Services dependency).
+    // Versions pinned in DEPENDENCY_PINNING.md with license verification.
+    implementation(libs.camera.camera2)
+    implementation(libs.camera.lifecycle)
+    implementation(libs.camera.view)
+    implementation(libs.mlkit.barcode.scanning)
 
     debugImplementation(libs.compose.ui.tooling)
 

@@ -74,6 +74,7 @@ import com.hermestower.voiceconsole.ui.screens.HistoryScreen
 import com.hermestower.voiceconsole.ui.screens.LocalIntelligenceScreen
 import com.hermestower.voiceconsole.ui.screens.ModelManagerScreen
 import com.hermestower.voiceconsole.ui.screens.SelfTestScreen
+import com.hermestower.voiceconsole.ui.screens.QrScannerScreen
 import com.hermestower.voiceconsole.ui.screens.TowerStudioScreen
 import com.hermestower.voiceconsole.ui.screens.VoiceAudioScreen
 import com.hermestower.voiceconsole.ui.nav.DrawerWidthPolicy
@@ -291,7 +292,8 @@ fun AppNav(graph: AppGraph) {
                 composable(AppRoutes.HISTORY) { HistoryScreen(graph) }
                 composable(AppRoutes.ARCHIVE) { ArchiveScreen(graph.towerArchive) }
                 composable(AppRoutes.CONNECTION) { ConnectionScreen(graph, onOpenStudio = { navController.navigate(AppRoutes.TOWER_STUDIO) { launchSingleTop = true } }) }
-                composable(AppRoutes.TOWER_STUDIO) { TowerStudioScreen(graph) }
+                composable(AppRoutes.TOWER_STUDIO) { TowerStudioScreen(graph, onOpenScanner = { navController.navigate(AppRoutes.QR_SCANNER) { launchSingleTop = true } }) }
+                composable(AppRoutes.QR_SCANNER) { QrScannerScreen(graph, onBack = { navController.popBackStack() }) }
                 composable(AppRoutes.VOICE) { VoiceAudioScreen(graph) }
                 composable(AppRoutes.MODEL_MANAGER) { ModelManagerScreen(graph) }
                 composable(AppRoutes.INTELLIGENCE) { LocalIntelligenceScreen(graph) }

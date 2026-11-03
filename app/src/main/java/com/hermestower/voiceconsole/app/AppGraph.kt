@@ -90,6 +90,15 @@ class AppGraph(context: Context) {
     val modelRollback = DefaultModelRollbackController(modelStorage, modelRegistry)
     val modelResolver = DefaultVoicePackResolver()
 
+    // GRAPH 4 CP-G4-010 wave 2 (G4-C09 wave 2): QR pairing scan flow. The strict
+    // hermes-pair://v1 parser (CP-G4-012a) with a session-lifetime nonce store and
+    // the deterministic mock executor. Real Tower pairing stays deferred to Tower
+    // Graph 1.7: nothing here contacts an endpoint — the mock client is the only
+    // executor and every result it produces is labeled SIMULATED in the UI.
+    val pairingNonceStore = com.hermestower.voiceconsole.pairing.InMemoryPairingNonceStore()
+    val pairingPayloadParser = com.hermestower.voiceconsole.pairing.PairingPayloadParser(nonceStore = pairingNonceStore)
+    val mockTowerPairingClient = com.hermestower.voiceconsole.pairing.MockTowerPairingClient()
+
     // GRAPH 4 CP-G4-009 (Owner §6 real model delivery): the four physically
     // verified ONNX artifacts ride INSIDE the APK (assets/models/bundled/) and
     // are delivered into the §7 roots through the same hash-gated, receipted
