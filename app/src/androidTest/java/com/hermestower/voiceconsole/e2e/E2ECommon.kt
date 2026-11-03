@@ -39,8 +39,8 @@ typealias HermesComposeRule = AndroidComposeTestRule<ActivityScenarioRule<MainAc
  *     lifecycle/navigation qualification the Owner authorized.
  */
 val ciLifecycleProfileRequested: Boolean =
-    InstrumentationRegistry.getInstrumentation()
-        .arguments.getString("lifecycleProfile", "false") == "true"
+    InstrumentationRegistry.getArguments()
+        .getString("lifecycleProfile", "false") == "true"
 
 /** Test rule factory honoring the authorized profile (see class docs above). */
 fun hermesComposeRule(): HermesComposeRule {
@@ -49,7 +49,7 @@ fun hermesComposeRule(): HermesComposeRule {
     if (ciLifecycleProfileRequested) {
         intent.putExtra(MainActivity.EXTRA_CI_LIFECYCLE_PROFILE, true)
     }
-    return AndroidComposeTestRule(ActivityScenarioRule(intent)) { it }
+    return AndroidComposeTestRule(ActivityScenarioRule<MainActivity>(intent)) { it }
 }
 
 /**

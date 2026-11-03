@@ -1,0 +1,1647 @@
+[
+ {
+  "file": "archive/MockTowerArchive.kt",
+  "line": 68,
+  "kind": "title",
+  "literal": "Mission $m — ${projects[m % projects.size]}",
+  "class": "MUST_LOCALIZE"
+ },
+ {
+  "file": "ui/AppNav.kt",
+  "line": 170,
+  "kind": "Text",
+  "literal": "HERMES TOWER",
+  "class": "MUST_LOCALIZE"
+ },
+ {
+  "file": "ui/AppNav.kt",
+  "line": 349,
+  "kind": "Text",
+  "literal": "CURRENT",
+  "class": "DIAGNOSTIC_CODE"
+ },
+ {
+  "file": "ui/monumental/MonumentalChrome.kt",
+  "line": 56,
+  "kind": "Text",
+  "literal": "◤ ",
+  "class": "MUST_LOCALIZE"
+ },
+ {
+  "file": "ui/monumental/MonumentalChrome.kt",
+  "line": 63,
+  "kind": "Text",
+  "literal": " ◥",
+  "class": "MUST_LOCALIZE"
+ },
+ {
+  "file": "ui/monumental/MonumentalChrome.kt",
+  "line": 121,
+  "kind": "contentDescription",
+  "literal": "Operating mode $label",
+  "class": "MUST_LOCALIZE"
+ },
+ {
+  "file": "ui/monumental/MonumentalChrome.kt",
+  "line": 129,
+  "kind": "Text",
+  "literal": "MODE",
+  "class": "DIAGNOSTIC_CODE"
+ },
+ {
+  "file": "ui/monumental/MonumentalChrome.kt",
+  "line": 190,
+  "kind": "contentDescription",
+  "literal": "$count requests queued for the Tower",
+  "class": "MUST_LOCALIZE"
+ },
+ {
+  "file": "ui/monumental/MonumentalChrome.kt",
+  "line": 193,
+  "kind": "Text",
+  "literal": "QUEUED ×$count",
+  "class": "MUST_LOCALIZE"
+ },
+ {
+  "file": "ui/monumental/MonumentalChrome.kt",
+  "line": 194,
+  "kind": "Text",
+  "literal": "SUSPENDED SCROLL",
+  "class": "MUST_LOCALIZE"
+ },
+ {
+  "file": "ui/monumental/MonumentalChrome.kt",
+  "line": 205,
+  "kind": "contentDescription",
+  "literal": "Privacy mute engaged. Microphone disabled.",
+  "class": "MUST_LOCALIZE"
+ },
+ {
+  "file": "ui/screens/AboutSafetyScreen.kt",
+  "line": 44,
+  "kind": "Text",
+  "literal": "About & Safety",
+  "class": "MUST_LOCALIZE"
+ },
+ {
+  "file": "ui/screens/AboutSafetyScreen.kt",
+  "line": 47,
+  "kind": "title",
+  "literal": "Version",
+  "class": "MUST_LOCALIZE"
+ },
+ {
+  "file": "ui/screens/AboutSafetyScreen.kt",
+  "line": 48,
+  "kind": "Text",
+  "literal": "Hermes Voice Console ${com.hermestower.voiceconsole.BuildConfig.VERSION_NAME} (build ${com.hermestower.voiceconsole.BuildConfig.VERSION_CODE})",
+  "class": "MUST_LOCALIZE"
+ },
+ {
+  "file": "ui/screens/AboutSafetyScreen.kt",
+  "line": 52,
+  "kind": "title",
+  "literal": "Components and licenses",
+  "class": "MUST_LOCALIZE"
+ },
+ {
+  "file": "ui/screens/AboutSafetyScreen.kt",
+  "line": 68,
+  "kind": "title",
+  "literal": "Privacy explanation",
+  "class": "MUST_LOCALIZE"
+ },
+ {
+  "file": "ui/screens/AboutSafetyScreen.kt",
+  "line": 82,
+  "kind": "title",
+  "literal": "Known limitations (truthful)",
+  "class": "MUST_LOCALIZE"
+ },
+ {
+  "file": "ui/screens/AboutSafetyScreen.kt",
+  "line": 93,
+  "kind": "Text",
+  "literal": "• $it",
+  "class": "MUST_LOCALIZE"
+ },
+ {
+  "file": "ui/screens/AboutSafetyScreen.kt",
+  "line": 96,
+  "kind": "title",
+  "literal": "Danger zone",
+  "class": "MUST_LOCALIZE"
+ },
+ {
+  "file": "ui/screens/AboutSafetyScreen.kt",
+  "line": 97,
+  "kind": "Text",
+  "literal": "Reset local data",
+  "class": "MUST_LOCALIZE"
+ },
+ {
+  "file": "ui/screens/AboutSafetyScreen.kt",
+  "line": 109,
+  "kind": "Text",
+  "literal": "Reset local data?",
+  "class": "MUST_LOCALIZE"
+ },
+ {
+  "file": "ui/screens/AboutSafetyScreen.kt",
+  "line": 110,
+  "kind": "Text",
+  "literal": "Conversation history, captions, queue state and settings return to their defaults. This cannot be undone.",
+  "class": "MUST_LOCALIZE"
+ },
+ {
+  "file": "ui/screens/AboutSafetyScreen.kt",
+  "line": 117,
+  "kind": "Text",
+  "literal": "Reset",
+  "class": "MUST_LOCALIZE"
+ },
+ {
+  "file": "ui/screens/AboutSafetyScreen.kt",
+  "line": 119,
+  "kind": "Text",
+  "literal": "Cancel",
+  "class": "MUST_LOCALIZE"
+ },
+ {
+  "file": "ui/screens/AppearanceScreen.kt",
+  "line": 67,
+  "kind": "Text",
+  "literal": "Appearance",
+  "class": "MUST_LOCALIZE"
+ },
+ {
+  "file": "ui/screens/AppearanceScreen.kt",
+  "line": 69,
+  "kind": "Text",
+  "literal": "ARCHITECTURAL FORGE · VISUAL CALIBRATION CHAMBER",
+  "class": "MUST_LOCALIZE"
+ },
+ {
+  "file": "ui/screens/AppearanceScreen.kt",
+  "line": 71,
+  "kind": "title",
+  "literal": "Visual quality (Monumental core)",
+  "class": "MUST_LOCALIZE"
+ },
+ {
+  "file": "ui/screens/AppearanceScreen.kt",
+  "line": 99,
+  "kind": "title",
+  "literal": "Theme",
+  "class": "MUST_LOCALIZE"
+ },
+ {
+  "file": "ui/screens/AppearanceScreen.kt",
+  "line": 102,
+  "kind": "label",
+  "literal": "MARBLE LIGHT",
+  "class": "MUST_LOCALIZE"
+ },
+ {
+  "file": "ui/screens/AppearanceScreen.kt",
+  "line": 108,
+  "kind": "label",
+  "literal": "OBSIDIAN NIGHT",
+  "class": "MUST_LOCALIZE"
+ },
+ {
+  "file": "ui/screens/AppearanceScreen.kt",
+  "line": 121,
+  "kind": "title",
+  "literal": "Brightness",
+  "class": "MUST_LOCALIZE"
+ },
+ {
+  "file": "ui/screens/AppearanceScreen.kt",
+  "line": 122,
+  "kind": "Text",
+  "literal": "Idle dimming scrim: ${",
+  "class": "MUST_LOCALIZE"
+ },
+ {
+  "file": "ui/screens/AppearanceScreen.kt",
+  "line": 135,
+  "kind": "title",
+  "literal": "Motion",
+  "class": "MUST_LOCALIZE"
+ },
+ {
+  "file": "ui/screens/AppearanceScreen.kt",
+  "line": 136,
+  "kind": "Text",
+  "literal": "Animation intensity: ${",
+  "class": "MUST_LOCALIZE"
+ },
+ {
+  "file": "ui/screens/AppearanceScreen.kt",
+  "line": 143,
+  "kind": "label",
+  "literal": "Reduced motion (static mid-state rendering of every state)",
+  "class": "MUST_LOCALIZE"
+ },
+ {
+  "file": "ui/screens/AppearanceScreen.kt",
+  "line": 150,
+  "kind": "title",
+  "literal": "Display safety",
+  "class": "MUST_LOCALIZE"
+ },
+ {
+  "file": "ui/screens/AppearanceScreen.kt",
+  "line": 152,
+  "kind": "label",
+  "literal": "Burn-in protection (per-region bounded drift, 25 s cadence)",
+  "class": "MUST_LOCALIZE"
+ },
+ {
+  "file": "ui/screens/AppearanceScreen.kt",
+  "line": 158,
+  "kind": "label",
+  "literal": "Keep screen on while console is open",
+  "class": "MUST_LOCALIZE"
+ },
+ {
+  "file": "ui/screens/AppearanceScreen.kt",
+  "line": 205,
+  "kind": "title",
+  "literal": "Kiosk behavior",
+  "class": "MUST_LOCALIZE"
+ },
+ {
+  "file": "ui/screens/ArchiveScreen.kt",
+  "line": 58,
+  "kind": "Text",
+  "literal": "Tower Archive",
+  "class": "MUST_LOCALIZE"
+ },
+ {
+  "file": "ui/screens/ArchiveScreen.kt",
+  "line": 60,
+  "kind": "Text",
+  "literal": "ARCHIVE CHAMBER",
+  "class": "MUST_LOCALIZE"
+ },
+ {
+  "file": "ui/screens/ArchiveScreen.kt",
+  "line": 78,
+  "kind": "Text",
+  "literal": "Search the archive…",
+  "class": "MUST_LOCALIZE"
+ },
+ {
+  "file": "ui/screens/ArchiveScreen.kt",
+  "line": 104,
+  "kind": "Text",
+  "literal": "Load more",
+  "class": "MUST_LOCALIZE"
+ },
+ {
+  "file": "ui/screens/ArchiveScreen.kt",
+  "line": 113,
+  "kind": "Text",
+  "literal": "Close",
+  "class": "MUST_LOCALIZE"
+ },
+ {
+  "file": "ui/screens/ArchiveScreen.kt",
+  "line": 132,
+  "kind": "Text",
+  "literal": "Load more",
+  "class": "MUST_LOCALIZE"
+ },
+ {
+  "file": "ui/screens/ArchiveScreen.kt",
+  "line": 146,
+  "kind": "Text",
+  "literal": "Load more",
+  "class": "MUST_LOCALIZE"
+ },
+ {
+  "file": "ui/screens/ArchiveScreen.kt",
+  "line": 165,
+  "kind": "Text",
+  "literal": "Open transcript",
+  "class": "MUST_LOCALIZE"
+ },
+ {
+  "file": "ui/screens/ArchiveScreen.kt",
+  "line": 167,
+  "kind": "Text",
+  "literal": "mission-linked",
+  "class": "MUST_LOCALIZE"
+ },
+ {
+  "file": "ui/screens/ArchiveScreen.kt",
+  "line": 186,
+  "kind": "Text",
+  "literal": "Blockers: ${mission.blockers.joinToString()}",
+  "class": "MUST_LOCALIZE"
+ },
+ {
+  "file": "ui/screens/ArchiveScreen.kt",
+  "line": 194,
+  "kind": "Text",
+  "literal": "Request continuation",
+  "class": "MUST_LOCALIZE"
+ },
+ {
+  "file": "ui/screens/ArchiveScreen.kt",
+  "line": 207,
+  "kind": "Text",
+  "literal": "Download",
+  "class": "MUST_LOCALIZE"
+ },
+ {
+  "file": "ui/screens/ArchiveScreen.kt",
+  "line": 208,
+  "kind": "Text",
+  "literal": "Remove local",
+  "class": "MUST_LOCALIZE"
+ },
+ {
+  "file": "ui/screens/ArchiveScreen.kt",
+  "line": 209,
+  "kind": "Text",
+  "literal": "Verify hash",
+  "class": "MUST_LOCALIZE"
+ },
+ {
+  "file": "ui/screens/ConnectionScreen.kt",
+  "line": 54,
+  "kind": "Text",
+  "literal": "Connection",
+  "class": "MUST_LOCALIZE"
+ },
+ {
+  "file": "ui/screens/ConnectionScreen.kt",
+  "line": 57,
+  "kind": "Text",
+  "literal": "Open Hermes Tower Connection Studio →",
+  "class": "MUST_LOCALIZE"
+ },
+ {
+  "file": "ui/screens/ConnectionScreen.kt",
+  "line": 60,
+  "kind": "title",
+  "literal": "Tower endpoint",
+  "class": "MUST_LOCALIZE"
+ },
+ {
+  "file": "ui/screens/ConnectionScreen.kt",
+  "line": 64,
+  "kind": "Text",
+  "literal": "Endpoint (placeholder — unused in V0.1)",
+  "class": "MUST_LOCALIZE"
+ },
+ {
+  "file": "ui/screens/ConnectionScreen.kt",
+  "line": 75,
+  "kind": "title",
+  "literal": "Transport",
+  "class": "MUST_LOCALIZE"
+ },
+ {
+  "file": "ui/screens/ConnectionScreen.kt",
+  "line": 98,
+  "kind": "title",
+  "literal": "Pairing",
+  "class": "MUST_LOCALIZE"
+ },
+ {
+  "file": "ui/screens/ConnectionScreen.kt",
+  "line": 107,
+  "kind": "title",
+  "literal": "Tests",
+  "class": "MUST_LOCALIZE"
+ },
+ {
+  "file": "ui/screens/ConnectionScreen.kt",
+  "line": 140,
+  "kind": "title",
+  "literal": "No secrets policy",
+  "class": "MUST_LOCALIZE"
+ },
+ {
+  "file": "ui/screens/ConsoleScreen.kt",
+  "line": 157,
+  "kind": "contentDescription",
+  "literal": "Open navigation drawer",
+  "class": "MUST_LOCALIZE"
+ },
+ {
+  "file": "ui/screens/ConsoleScreen.kt",
+  "line": 169,
+  "kind": "Text",
+  "literal": "HERMES",
+  "class": "DIAGNOSTIC_CODE"
+ },
+ {
+  "file": "ui/screens/ConsoleScreen.kt",
+  "line": 171,
+  "kind": "Text",
+  "literal": "TOWER",
+  "class": "DIAGNOSTIC_CODE"
+ },
+ {
+  "file": "ui/screens/ConsoleScreen.kt",
+  "line": 341,
+  "kind": "Text",
+  "literal": "you: “${draft}”",
+  "class": "MUST_LOCALIZE"
+ },
+ {
+  "file": "ui/screens/ConsoleScreen.kt",
+  "line": 541,
+  "kind": "Text",
+  "literal": "Inject text (STT stand-in)",
+  "class": "MUST_LOCALIZE"
+ },
+ {
+  "file": "ui/screens/ConsoleScreen.kt",
+  "line": 546,
+  "kind": "Text",
+  "literal": "Type what you would say…",
+  "class": "MUST_LOCALIZE"
+ },
+ {
+  "file": "ui/screens/ConsoleScreen.kt",
+  "line": 555,
+  "kind": "Text",
+  "literal": "Send",
+  "class": "MUST_LOCALIZE"
+ },
+ {
+  "file": "ui/screens/ConsoleScreen.kt",
+  "line": 557,
+  "kind": "Text",
+  "literal": "Cancel",
+  "class": "MUST_LOCALIZE"
+ },
+ {
+  "file": "ui/screens/DiagnosticsScreen.kt",
+  "line": 53,
+  "kind": "Text",
+  "literal": "Diagnostics",
+  "class": "MUST_LOCALIZE"
+ },
+ {
+  "file": "ui/screens/DiagnosticsScreen.kt",
+  "line": 56,
+  "kind": "Text",
+  "literal": "Open Tower Connection Studio →",
+  "class": "MUST_LOCALIZE"
+ },
+ {
+  "file": "ui/screens/DiagnosticsScreen.kt",
+  "line": 57,
+  "kind": "Text",
+  "literal": "Run Self-Test →",
+  "class": "MUST_LOCALIZE"
+ },
+ {
+  "file": "ui/screens/DiagnosticsScreen.kt",
+  "line": 60,
+  "kind": "title",
+  "literal": "Device (real values)",
+  "class": "MUST_LOCALIZE"
+ },
+ {
+  "file": "ui/screens/DiagnosticsScreen.kt",
+  "line": 61,
+  "kind": "Text",
+  "literal": "Manufacturer: ${healthState.manufacturer}",
+  "class": "MUST_LOCALIZE"
+ },
+ {
+  "file": "ui/screens/DiagnosticsScreen.kt",
+  "line": 62,
+  "kind": "Text",
+  "literal": "Model: ${healthState.model}",
+  "class": "MUST_LOCALIZE"
+ },
+ {
+  "file": "ui/screens/DiagnosticsScreen.kt",
+  "line": 63,
+  "kind": "Text",
+  "literal": "Android: ${healthState.androidRelease} (SDK ${healthState.sdkInt})",
+  "class": "MUST_LOCALIZE"
+ },
+ {
+  "file": "ui/screens/DiagnosticsScreen.kt",
+  "line": 87,
+  "kind": "title",
+  "literal": "Service state",
+  "class": "MUST_LOCALIZE"
+ },
+ {
+  "file": "ui/screens/DiagnosticsScreen.kt",
+  "line": 98,
+  "kind": "title",
+  "literal": "Tests",
+  "class": "MUST_LOCALIZE"
+ },
+ {
+  "file": "ui/screens/DiagnosticsScreen.kt",
+  "line": 107,
+  "kind": "Text",
+  "literal": "Run bridge test",
+  "class": "MUST_LOCALIZE"
+ },
+ {
+  "file": "ui/screens/DiagnosticsScreen.kt",
+  "line": 110,
+  "kind": "Text",
+  "literal": "Run audio test",
+  "class": "MUST_LOCALIZE"
+ },
+ {
+  "file": "ui/screens/DiagnosticsScreen.kt",
+  "line": 120,
+  "kind": "title",
+  "literal": "Simulation (prototype controls)",
+  "class": "MUST_LOCALIZE"
+ },
+ {
+  "file": "ui/screens/DiagnosticsScreen.kt",
+  "line": 122,
+  "kind": "Text",
+  "literal": "Simulate disconnect",
+  "class": "MUST_LOCALIZE"
+ },
+ {
+  "file": "ui/screens/DiagnosticsScreen.kt",
+  "line": 123,
+  "kind": "Text",
+  "literal": "Simulate tower error",
+  "class": "MUST_LOCALIZE"
+ },
+ {
+  "file": "ui/screens/DiagnosticsScreen.kt",
+  "line": 126,
+  "kind": "Text",
+  "literal": "Simulate slow tower",
+  "class": "MUST_LOCALIZE"
+ },
+ {
+  "file": "ui/screens/DiagnosticsScreen.kt",
+  "line": 127,
+  "kind": "Text",
+  "literal": "Clear fault",
+  "class": "MUST_LOCALIZE"
+ },
+ {
+  "file": "ui/screens/DiagnosticsScreen.kt",
+  "line": 130,
+  "kind": "Text",
+  "literal": "Simulate update",
+  "class": "MUST_LOCALIZE"
+ },
+ {
+  "file": "ui/screens/DiagnosticsScreen.kt",
+  "line": 131,
+  "kind": "Text",
+  "literal": "Clear event log",
+  "class": "MUST_LOCALIZE"
+ },
+ {
+  "file": "ui/screens/DiagnosticsScreen.kt",
+  "line": 140,
+  "kind": "title",
+  "literal": "Redacted log export",
+  "class": "MUST_LOCALIZE"
+ },
+ {
+  "file": "ui/screens/DiagnosticsScreen.kt",
+  "line": 141,
+  "kind": "Text",
+  "literal": "Generate redacted report",
+  "class": "MUST_LOCALIZE"
+ },
+ {
+  "file": "ui/screens/DiagnosticsScreen.kt",
+  "line": 148,
+  "kind": "Text",
+  "literal": "Copy full report",
+  "class": "MUST_LOCALIZE"
+ },
+ {
+  "file": "ui/screens/HistoryScreen.kt",
+  "line": 51,
+  "kind": "Text",
+  "literal": "Conversation History",
+  "class": "MUST_LOCALIZE"
+ },
+ {
+  "file": "ui/screens/HistoryScreen.kt",
+  "line": 65,
+  "kind": "title",
+  "literal": "Turns (${turns.size})",
+  "class": "MUST_LOCALIZE"
+ },
+ {
+  "file": "ui/screens/HistoryScreen.kt",
+  "line": 90,
+  "kind": "Text",
+  "literal": "Clear history",
+  "class": "MUST_LOCALIZE"
+ },
+ {
+  "file": "ui/screens/HistoryScreen.kt",
+  "line": 91,
+  "kind": "Text",
+  "literal": "Reset all local data",
+  "class": "MUST_LOCALIZE"
+ },
+ {
+  "file": "ui/screens/HistoryScreen.kt",
+  "line": 104,
+  "kind": "Text",
+  "literal": "Clear history?",
+  "class": "MUST_LOCALIZE"
+ },
+ {
+  "file": "ui/screens/HistoryScreen.kt",
+  "line": 105,
+  "kind": "Text",
+  "literal": "This removes every turn from the current session. It cannot be undone.",
+  "class": "MUST_LOCALIZE"
+ },
+ {
+  "file": "ui/screens/HistoryScreen.kt",
+  "line": 110,
+  "kind": "Text",
+  "literal": "Clear",
+  "class": "MUST_LOCALIZE"
+ },
+ {
+  "file": "ui/screens/HistoryScreen.kt",
+  "line": 112,
+  "kind": "Text",
+  "literal": "Cancel",
+  "class": "MUST_LOCALIZE"
+ },
+ {
+  "file": "ui/screens/HistoryScreen.kt",
+  "line": 140,
+  "kind": "title",
+  "literal": "#${turn.id} · $who",
+  "class": "MUST_LOCALIZE"
+ },
+ {
+  "file": "ui/screens/HistoryScreen.kt",
+  "line": 164,
+  "kind": "Text",
+  "literal": "Retry (safe: non-consequential)",
+  "class": "MUST_LOCALIZE"
+ },
+ {
+  "file": "ui/screens/LocalIntelligenceScreen.kt",
+  "line": 39,
+  "kind": "Text",
+  "literal": "Local Intelligence",
+  "class": "MUST_LOCALIZE"
+ },
+ {
+  "file": "ui/screens/LocalIntelligenceScreen.kt",
+  "line": 42,
+  "kind": "title",
+  "literal": "Local conversation engine",
+  "class": "MUST_LOCALIZE"
+ },
+ {
+  "file": "ui/screens/LocalIntelligenceScreen.kt",
+  "line": 54,
+  "kind": "title",
+  "literal": "Candidates (not endorsements)",
+  "class": "MUST_LOCALIZE"
+ },
+ {
+  "file": "ui/screens/LocalIntelligenceScreen.kt",
+  "line": 65,
+  "kind": "Text",
+  "literal": "$meta — $note",
+  "class": "MUST_LOCALIZE"
+ },
+ {
+  "file": "ui/screens/LocalIntelligenceScreen.kt",
+  "line": 71,
+  "kind": "title",
+  "literal": "Routing policy (HYBRID)",
+  "class": "MUST_LOCALIZE"
+ },
+ {
+  "file": "ui/screens/LocalIntelligenceScreen.kt",
+  "line": 86,
+  "kind": "title",
+  "literal": "Resource limits (targets)",
+  "class": "MUST_LOCALIZE"
+ },
+ {
+  "file": "ui/screens/LocalIntelligenceScreen.kt",
+  "line": 95,
+  "kind": "title",
+  "literal": "Load / unload controls",
+  "class": "MUST_LOCALIZE"
+ },
+ {
+  "file": "ui/screens/ModelManagerScreen.kt",
+  "line": 92,
+  "kind": "Text",
+  "literal": "MODEL SANCTUM",
+  "class": "MUST_LOCALIZE"
+ },
+ {
+  "file": "ui/screens/ModelManagerScreen.kt",
+  "line": 94,
+  "kind": "Text",
+  "literal": "Models and Voice",
+  "class": "MUST_LOCALIZE"
+ },
+ {
+  "file": "ui/screens/ModelManagerScreen.kt",
+  "line": 104,
+  "kind": "title",
+  "literal": "A. Recommended setup",
+  "class": "MUST_LOCALIZE"
+ },
+ {
+  "file": "ui/screens/ModelManagerScreen.kt",
+  "line": 106,
+  "kind": "Text",
+  "literal": "Detected device: ${resources.deviceModel} (Android ${resources.androidVersion})",
+  "class": "MUST_LOCALIZE"
+ },
+ {
+  "file": "ui/screens/ModelManagerScreen.kt",
+  "line": 119,
+  "kind": "Text",
+  "literal": "Current profile: ${appliedProfile.displayLabel}",
+  "class": "MUST_LOCALIZE"
+ },
+ {
+  "file": "ui/screens/ModelManagerScreen.kt",
+  "line": 120,
+  "kind": "Text",
+  "literal": "Recommended profile: ${selectedProfile.displayLabel}",
+  "class": "MUST_LOCALIZE"
+ },
+ {
+  "file": "ui/screens/ModelManagerScreen.kt",
+  "line": 135,
+  "kind": "Text",
+  "literal": "Compatibility summary: ${rec.routeSummary}",
+  "class": "MUST_LOCALIZE"
+ },
+ {
+  "file": "ui/screens/ModelManagerScreen.kt",
+  "line": 141,
+  "kind": "Text",
+  "literal": "⚠ $it",
+  "class": "MUST_LOCALIZE"
+ },
+ {
+  "file": "ui/screens/ModelManagerScreen.kt",
+  "line": 146,
+  "kind": "Text",
+  "literal": "Apply Recommended Configuration",
+  "class": "MUST_LOCALIZE"
+ },
+ {
+  "file": "ui/screens/ModelManagerScreen.kt",
+  "line": 148,
+  "kind": "Text",
+  "literal": "Select a mode to compute the deterministic recommendation.",
+  "class": "MUST_LOCALIZE"
+ },
+ {
+  "file": "ui/screens/ModelManagerScreen.kt",
+  "line": 153,
+  "kind": "title",
+  "literal": "INSTALL RECOMMENDED VOICE PACK",
+  "class": "MUST_LOCALIZE"
+ },
+ {
+  "file": "ui/screens/ModelManagerScreen.kt",
+  "line": 158,
+  "kind": "Text",
+  "literal": "RECOMMENDED SETUP — minimal voice pack for this device (profile: Hybrid balanced)",
+  "class": "MUST_LOCALIZE"
+ },
+ {
+  "file": "ui/screens/ModelManagerScreen.kt",
+  "line": 165,
+  "kind": "Text",
+  "literal": "Will be installed (${included.size}):",
+  "class": "MUST_LOCALIZE"
+ },
+ {
+  "file": "ui/screens/ModelManagerScreen.kt",
+  "line": 174,
+  "kind": "Text",
+  "literal": "• ${it.entry?.displayName} — ${it.reason}",
+  "class": "MUST_LOCALIZE"
+ },
+ {
+  "file": "ui/screens/ModelManagerScreen.kt",
+  "line": 177,
+  "kind": "Text",
+  "literal": "• ${it.entry?.displayName} — ${it.reason}",
+  "class": "MUST_LOCALIZE"
+ },
+ {
+  "file": "ui/screens/ModelManagerScreen.kt",
+  "line": 180,
+  "kind": "Text",
+  "literal": "⚠ $name — $reason",
+  "class": "MUST_LOCALIZE"
+ },
+ {
+  "file": "ui/screens/ModelManagerScreen.kt",
+  "line": 192,
+  "kind": "Text",
+  "literal": "Expected duration: ${summary.durationRangeText}",
+  "class": "MUST_LOCALIZE"
+ },
+ {
+  "file": "ui/screens/ModelManagerScreen.kt",
+  "line": 196,
+  "kind": "Text",
+  "literal": "Licenses: ${summary.licenses.joinToString()}",
+  "class": "MUST_LOCALIZE"
+ },
+ {
+  "file": "ui/screens/ModelManagerScreen.kt",
+  "line": 207,
+  "kind": "Text",
+  "literal": "Install Recommended Voice Pack",
+  "class": "MUST_LOCALIZE"
+ },
+ {
+  "file": "ui/screens/ModelManagerScreen.kt",
+  "line": 219,
+  "kind": "title",
+  "literal": "B. Installed voice components",
+  "class": "MUST_LOCALIZE"
+ },
+ {
+  "file": "ui/screens/ModelManagerScreen.kt",
+  "line": 246,
+  "kind": "title",
+  "literal": "C. Available components",
+  "class": "MUST_LOCALIZE"
+ },
+ {
+  "file": "ui/screens/ModelManagerScreen.kt",
+  "line": 289,
+  "kind": "Text",
+  "literal": "Last download event: $err",
+  "class": "MUST_LOCALIZE"
+ },
+ {
+  "file": "ui/screens/ModelManagerScreen.kt",
+  "line": 315,
+  "kind": "Text",
+  "literal": "• $it",
+  "class": "MUST_LOCALIZE"
+ },
+ {
+  "file": "ui/screens/ModelManagerScreen.kt",
+  "line": 342,
+  "kind": "Text",
+  "literal": "Download",
+  "class": "MUST_LOCALIZE"
+ },
+ {
+  "file": "ui/screens/ModelManagerScreen.kt",
+  "line": 343,
+  "kind": "Text",
+  "literal": "Pause",
+  "class": "MUST_LOCALIZE"
+ },
+ {
+  "file": "ui/screens/ModelManagerScreen.kt",
+  "line": 360,
+  "kind": "Text",
+  "literal": "Resume",
+  "class": "MUST_LOCALIZE"
+ },
+ {
+  "file": "ui/screens/ModelManagerScreen.kt",
+  "line": 361,
+  "kind": "Text",
+  "literal": "Cancel",
+  "class": "MUST_LOCALIZE"
+ },
+ {
+  "file": "ui/screens/ModelManagerScreen.kt",
+  "line": 365,
+  "kind": "Text",
+  "literal": "Verify",
+  "class": "MUST_LOCALIZE"
+ },
+ {
+  "file": "ui/screens/ModelManagerScreen.kt",
+  "line": 387,
+  "kind": "Text",
+  "literal": "Install",
+  "class": "MUST_LOCALIZE"
+ },
+ {
+  "file": "ui/screens/ModelManagerScreen.kt",
+  "line": 391,
+  "kind": "Text",
+  "literal": "Qualify",
+  "class": "MUST_LOCALIZE"
+ },
+ {
+  "file": "ui/screens/ModelManagerScreen.kt",
+  "line": 396,
+  "kind": "Text",
+  "literal": "Activate",
+  "class": "MUST_LOCALIZE"
+ },
+ {
+  "file": "ui/screens/ModelManagerScreen.kt",
+  "line": 401,
+  "kind": "Text",
+  "literal": "Deactivate",
+  "class": "MUST_LOCALIZE"
+ },
+ {
+  "file": "ui/screens/ModelManagerScreen.kt",
+  "line": 406,
+  "kind": "Text",
+  "literal": "Roll back",
+  "class": "MUST_LOCALIZE"
+ },
+ {
+  "file": "ui/screens/ModelManagerScreen.kt",
+  "line": 411,
+  "kind": "Text",
+  "literal": "Remove",
+  "class": "MUST_LOCALIZE"
+ },
+ {
+  "file": "ui/screens/ModelManagerScreen.kt",
+  "line": 423,
+  "kind": "Text",
+  "literal": "Re-download",
+  "class": "MUST_LOCALIZE"
+ },
+ {
+  "file": "ui/screens/ModelManagerScreen.kt",
+  "line": 436,
+  "kind": "Text",
+  "literal": "Repair",
+  "class": "MUST_LOCALIZE"
+ },
+ {
+  "file": "ui/screens/ModelManagerScreen.kt",
+  "line": 444,
+  "kind": "Text",
+  "literal": "Update",
+  "class": "MUST_LOCALIZE"
+ },
+ {
+  "file": "ui/screens/ModelManagerScreen.kt",
+  "line": 445,
+  "kind": "Text",
+  "literal": "Open diagnostics",
+  "class": "MUST_LOCALIZE"
+ },
+ {
+  "file": "ui/screens/ModelManagerScreen.kt",
+  "line": 450,
+  "kind": "Text",
+  "literal": "Diagnostics — storage roots (bytes used):",
+  "class": "MUST_LOCALIZE"
+ },
+ {
+  "file": "ui/screens/ModelManagerScreen.kt",
+  "line": 452,
+  "kind": "Text",
+  "literal": "• $root: ${formatBytes(bytes)}",
+  "class": "MUST_LOCALIZE"
+ },
+ {
+  "file": "ui/screens/ModelManagerScreen.kt",
+  "line": 463,
+  "kind": "title",
+  "literal": "Bundled verified delivery",
+  "class": "MUST_LOCALIZE"
+ },
+ {
+  "file": "ui/screens/ModelManagerScreen.kt",
+  "line": 500,
+  "kind": "title",
+  "literal": "E. Modes",
+  "class": "MUST_LOCALIZE"
+ },
+ {
+  "file": "ui/screens/ModelManagerScreen.kt",
+  "line": 511,
+  "kind": "title",
+  "literal": "F. Tower-only fallback",
+  "class": "MUST_LOCALIZE"
+ },
+ {
+  "file": "ui/screens/ModelManagerScreen.kt",
+  "line": 520,
+  "kind": "Text",
+  "literal": "Status: $it",
+  "class": "MUST_LOCALIZE"
+ },
+ {
+  "file": "ui/screens/ModelManagerScreen.kt",
+  "line": 530,
+  "kind": "Text",
+  "literal": "Install recommended voice pack?",
+  "class": "MUST_LOCALIZE"
+ },
+ {
+  "file": "ui/screens/ModelManagerScreen.kt",
+  "line": 537,
+  "kind": "Text",
+  "literal": "Licenses: ${summary?.licenses?.joinToString()}",
+  "class": "MUST_LOCALIZE"
+ },
+ {
+  "file": "ui/screens/ModelManagerScreen.kt",
+  "line": 538,
+  "kind": "Text",
+  "literal": "Optional components (including the local LLM) are NOT part of this pack.",
+  "class": "MUST_LOCALIZE"
+ },
+ {
+  "file": "ui/screens/ModelManagerScreen.kt",
+  "line": 539,
+  "kind": "Text",
+  "literal": "You can pause, cancel or remove each component afterwards.",
+  "class": "MUST_LOCALIZE"
+ },
+ {
+  "file": "ui/screens/ModelManagerScreen.kt",
+  "line": 561,
+  "kind": "Text",
+  "literal": "Install",
+  "class": "MUST_LOCALIZE"
+ },
+ {
+  "file": "ui/screens/ModelManagerScreen.kt",
+  "line": 564,
+  "kind": "Text",
+  "literal": "Cancel",
+  "class": "MUST_LOCALIZE"
+ },
+ {
+  "file": "ui/screens/QrScannerScreen.kt",
+  "line": 104,
+  "kind": "Text",
+  "literal": "Scan pairing QR",
+  "class": "MUST_LOCALIZE"
+ },
+ {
+  "file": "ui/screens/QrScannerScreen.kt",
+  "line": 114,
+  "kind": "title",
+  "literal": "Camera permission",
+  "class": "MUST_LOCALIZE"
+ },
+ {
+  "file": "ui/screens/QrScannerScreen.kt",
+  "line": 129,
+  "kind": "Text",
+  "literal": "Grant camera permission",
+  "class": "MUST_LOCALIZE"
+ },
+ {
+  "file": "ui/screens/QrScannerScreen.kt",
+  "line": 133,
+  "kind": "title",
+  "literal": "Camera unavailable",
+  "class": "MUST_LOCALIZE"
+ },
+ {
+  "file": "ui/screens/QrScannerScreen.kt",
+  "line": 193,
+  "kind": "title",
+  "literal": "Scan result",
+  "class": "MUST_LOCALIZE"
+ },
+ {
+  "file": "ui/screens/QrScannerScreen.kt",
+  "line": 214,
+  "kind": "Text",
+  "literal": "Scan again",
+  "class": "MUST_LOCALIZE"
+ },
+ {
+  "file": "ui/screens/QrScannerScreen.kt",
+  "line": 218,
+  "kind": "Text",
+  "literal": "Payload accepted by the strict parser:",
+  "class": "MUST_LOCALIZE"
+ },
+ {
+  "file": "ui/screens/QrScannerScreen.kt",
+  "line": 240,
+  "kind": "Text",
+  "literal": "Pair with this Tower (SIMULATED)",
+  "class": "MUST_LOCALIZE"
+ },
+ {
+  "file": "ui/screens/QrScannerScreen.kt",
+  "line": 248,
+  "kind": "Text",
+  "literal": "Back to Tower Studio",
+  "class": "MUST_LOCALIZE"
+ },
+ {
+  "file": "ui/screens/SelfTestScreen.kt",
+  "line": 53,
+  "kind": "Text",
+  "literal": "Self-Test Center",
+  "class": "MUST_LOCALIZE"
+ },
+ {
+  "file": "ui/screens/SelfTestScreen.kt",
+  "line": 61,
+  "kind": "title",
+  "literal": "Run",
+  "class": "MUST_LOCALIZE"
+ },
+ {
+  "file": "ui/screens/SelfTestScreen.kt",
+  "line": 63,
+  "kind": "Text",
+  "literal": "Run Quick",
+  "class": "MUST_LOCALIZE"
+ },
+ {
+  "file": "ui/screens/SelfTestScreen.kt",
+  "line": 64,
+  "kind": "Text",
+  "literal": "Run Standard",
+  "class": "MUST_LOCALIZE"
+ },
+ {
+  "file": "ui/screens/SelfTestScreen.kt",
+  "line": 65,
+  "kind": "Text",
+  "literal": "Run Full",
+  "class": "MUST_LOCALIZE"
+ },
+ {
+  "file": "ui/screens/SelfTestScreen.kt",
+  "line": 68,
+  "kind": "Text",
+  "literal": "Connectivity only",
+  "class": "MUST_LOCALIZE"
+ },
+ {
+  "file": "ui/screens/SelfTestScreen.kt",
+  "line": 69,
+  "kind": "Text",
+  "literal": "Voice foundation only",
+  "class": "MUST_LOCALIZE"
+ },
+ {
+  "file": "ui/screens/SelfTestScreen.kt",
+  "line": 72,
+  "kind": "Text",
+  "literal": "Stop",
+  "class": "MUST_LOCALIZE"
+ },
+ {
+  "file": "ui/screens/SelfTestScreen.kt",
+  "line": 73,
+  "kind": "Text",
+  "literal": "Retry Failed Tests",
+  "class": "MUST_LOCALIZE"
+ },
+ {
+  "file": "ui/screens/SelfTestScreen.kt",
+  "line": 74,
+  "kind": "Text",
+  "literal": "Reset Test History",
+  "class": "MUST_LOCALIZE"
+ },
+ {
+  "file": "ui/screens/SelfTestScreen.kt",
+  "line": 81,
+  "kind": "Text",
+  "literal": "Export Secret-Clean Report",
+  "class": "MUST_LOCALIZE"
+ },
+ {
+  "file": "ui/screens/SelfTestScreen.kt",
+  "line": 85,
+  "kind": "Text",
+  "literal": "Copy Summary",
+  "class": "MUST_LOCALIZE"
+ },
+ {
+  "file": "ui/screens/SelfTestScreen.kt",
+  "line": 87,
+  "kind": "Text",
+  "literal": "Running: ${current ?: ",
+  "class": "MUST_LOCALIZE"
+ },
+ {
+  "file": "ui/screens/SelfTestScreen.kt",
+  "line": 91,
+  "kind": "title",
+  "literal": "Results",
+  "class": "MUST_LOCALIZE"
+ },
+ {
+  "file": "ui/screens/SelfTestScreen.kt",
+  "line": 93,
+  "kind": "Text",
+  "literal": "No tests run yet in this session.",
+  "class": "MUST_LOCALIZE"
+ },
+ {
+  "file": "ui/screens/SelfTestScreen.kt",
+  "line": 105,
+  "kind": "Text",
+  "literal": "$id — ${result.testName}",
+  "class": "MUST_LOCALIZE"
+ },
+ {
+  "file": "ui/screens/SelfTestScreen.kt",
+  "line": 115,
+  "kind": "Text",
+  "literal": "Repair: $it",
+  "class": "MUST_LOCALIZE"
+ },
+ {
+  "file": "ui/screens/TowerStudioScreen.kt",
+  "line": 125,
+  "kind": "Text",
+  "literal": "Connect Hermes Tower",
+  "class": "MUST_LOCALIZE"
+ },
+ {
+  "file": "ui/screens/TowerStudioScreen.kt",
+  "line": 133,
+  "kind": "title",
+  "literal": "Basic",
+  "class": "MUST_LOCALIZE"
+ },
+ {
+  "file": "ui/screens/TowerStudioScreen.kt",
+  "line": 134,
+  "kind": "Text",
+  "literal": "Connection name",
+  "class": "MUST_LOCALIZE"
+ },
+ {
+  "file": "ui/screens/TowerStudioScreen.kt",
+  "line": 137,
+  "kind": "Text",
+  "literal": "Tower address or base URL",
+  "class": "MUST_LOCALIZE"
+ },
+ {
+  "file": "ui/screens/TowerStudioScreen.kt",
+  "line": 140,
+  "kind": "Text",
+  "literal": "Connection method",
+  "class": "MUST_LOCALIZE"
+ },
+ {
+  "file": "ui/screens/TowerStudioScreen.kt",
+  "line": 161,
+  "kind": "Text",
+  "literal": "Pairing code or access token",
+  "class": "MUST_LOCALIZE"
+ },
+ {
+  "file": "ui/screens/TowerStudioScreen.kt",
+  "line": 165,
+  "kind": "Text",
+  "literal": "User or Owner reference",
+  "class": "MUST_LOCALIZE"
+ },
+ {
+  "file": "ui/screens/TowerStudioScreen.kt",
+  "line": 166,
+  "kind": "Text",
+  "literal": "Device display name",
+  "class": "MUST_LOCALIZE"
+ },
+ {
+  "file": "ui/screens/TowerStudioScreen.kt",
+  "line": 167,
+  "kind": "Text",
+  "literal": "Default operating mode",
+  "class": "MUST_LOCALIZE"
+ },
+ {
+  "file": "ui/screens/TowerStudioScreen.kt",
+  "line": 168,
+  "kind": "Text",
+  "literal": "Preferred language",
+  "class": "MUST_LOCALIZE"
+ },
+ {
+  "file": "ui/screens/TowerStudioScreen.kt",
+  "line": 171,
+  "kind": "Text",
+  "literal": "Connect automatically",
+  "class": "MUST_LOCALIZE"
+ },
+ {
+  "file": "ui/screens/TowerStudioScreen.kt",
+  "line": 175,
+  "kind": "Text",
+  "literal": "Use Tailscale address",
+  "class": "MUST_LOCALIZE"
+ },
+ {
+  "file": "ui/screens/TowerStudioScreen.kt",
+  "line": 179,
+  "kind": "title",
+  "literal": "Advanced",
+  "class": "MUST_LOCALIZE"
+ },
+ {
+  "file": "ui/screens/TowerStudioScreen.kt",
+  "line": 184,
+  "kind": "Text",
+  "literal": "REST base path",
+  "class": "MUST_LOCALIZE"
+ },
+ {
+  "file": "ui/screens/TowerStudioScreen.kt",
+  "line": 185,
+  "kind": "Text",
+  "literal": "WebSocket path",
+  "class": "MUST_LOCALIZE"
+ },
+ {
+  "file": "ui/screens/TowerStudioScreen.kt",
+  "line": 186,
+  "kind": "Text",
+  "literal": "Protocol version",
+  "class": "MUST_LOCALIZE"
+ },
+ {
+  "file": "ui/screens/TowerStudioScreen.kt",
+  "line": 187,
+  "kind": "Text",
+  "literal": "Request timeout (ms)",
+  "class": "MUST_LOCALIZE"
+ },
+ {
+  "file": "ui/screens/TowerStudioScreen.kt",
+  "line": 188,
+  "kind": "Text",
+  "literal": "Streaming timeout (ms)",
+  "class": "MUST_LOCALIZE"
+ },
+ {
+  "file": "ui/screens/TowerStudioScreen.kt",
+  "line": 189,
+  "kind": "Text",
+  "literal": "Bounded retry count",
+  "class": "MUST_LOCALIZE"
+ },
+ {
+  "file": "ui/screens/TowerStudioScreen.kt",
+  "line": 190,
+  "kind": "Text",
+  "literal": "Queued-request policy",
+  "class": "MUST_LOCALIZE"
+ },
+ {
+  "file": "ui/screens/TowerStudioScreen.kt",
+  "line": 191,
+  "kind": "Text",
+  "literal": "Local/Tower routing threshold (0–1)",
+  "class": "MUST_LOCALIZE"
+ },
+ {
+  "file": "ui/screens/TowerStudioScreen.kt",
+  "line": 192,
+  "kind": "Text",
+  "literal": "Diagnostics verbosity",
+  "class": "MUST_LOCALIZE"
+ },
+ {
+  "file": "ui/screens/TowerStudioScreen.kt",
+  "line": 195,
+  "kind": "Text",
+  "literal": "Require confirmation for consequential requests",
+  "class": "MUST_LOCALIZE"
+ },
+ {
+  "file": "ui/screens/TowerStudioScreen.kt",
+  "line": 197,
+  "kind": "Text",
+  "literal": "Certificate behavior",
+  "class": "MUST_LOCALIZE"
+ },
+ {
+  "file": "ui/screens/TowerStudioScreen.kt",
+  "line": 199,
+  "kind": "Text",
+  "literal": "System trust",
+  "class": "MUST_LOCALIZE"
+ },
+ {
+  "file": "ui/screens/TowerStudioScreen.kt",
+  "line": 200,
+  "kind": "Text",
+  "literal": "Pinned fingerprint",
+  "class": "MUST_LOCALIZE"
+ },
+ {
+  "file": "ui/screens/TowerStudioScreen.kt",
+  "line": 203,
+  "kind": "Text",
+  "literal": "Pinned SHA-256 fingerprint",
+  "class": "MUST_LOCALIZE"
+ },
+ {
+  "file": "ui/screens/TowerStudioScreen.kt",
+  "line": 208,
+  "kind": "title",
+  "literal": "Actions",
+  "class": "MUST_LOCALIZE"
+ },
+ {
+  "file": "ui/screens/TowerStudioScreen.kt",
+  "line": 215,
+  "kind": "Text",
+  "literal": "Scan pairing QR",
+  "class": "MUST_LOCALIZE"
+ },
+ {
+  "file": "ui/screens/TowerStudioScreen.kt",
+  "line": 223,
+  "kind": "Text",
+  "literal": "Save draft",
+  "class": "MUST_LOCALIZE"
+ },
+ {
+  "file": "ui/screens/TowerStudioScreen.kt",
+  "line": 232,
+  "kind": "Text",
+  "literal": "Validate fields",
+  "class": "MUST_LOCALIZE"
+ },
+ {
+  "file": "ui/screens/TowerStudioScreen.kt",
+  "line": 255,
+  "kind": "Text",
+  "literal": "Test connection",
+  "class": "MUST_LOCALIZE"
+ },
+ {
+  "file": "ui/screens/TowerStudioScreen.kt",
+  "line": 264,
+  "kind": "Text",
+  "literal": "Pair device",
+  "class": "MUST_LOCALIZE"
+ },
+ {
+  "file": "ui/screens/TowerStudioScreen.kt",
+  "line": 277,
+  "kind": "Text",
+  "literal": "Save and connect",
+  "class": "MUST_LOCALIZE"
+ },
+ {
+  "file": "ui/screens/TowerStudioScreen.kt",
+  "line": 287,
+  "kind": "Text",
+  "literal": "Connect",
+  "class": "MUST_LOCALIZE"
+ },
+ {
+  "file": "ui/screens/TowerStudioScreen.kt",
+  "line": 290,
+  "kind": "Text",
+  "literal": "Disconnect",
+  "class": "MUST_LOCALIZE"
+ },
+ {
+  "file": "ui/screens/TowerStudioScreen.kt",
+  "line": 297,
+  "kind": "Text",
+  "literal": "Clear sensitive values",
+  "class": "MUST_LOCALIZE"
+ },
+ {
+  "file": "ui/screens/TowerStudioScreen.kt",
+  "line": 310,
+  "kind": "Text",
+  "literal": "Export secret-clean profile",
+  "class": "MUST_LOCALIZE"
+ },
+ {
+  "file": "ui/screens/TowerStudioScreen.kt",
+  "line": 331,
+  "kind": "Text",
+  "literal": "Import profile",
+  "class": "MUST_LOCALIZE"
+ },
+ {
+  "file": "ui/screens/TowerStudioScreen.kt",
+  "line": 337,
+  "kind": "Text",
+  "literal": "Restore previous",
+  "class": "MUST_LOCALIZE"
+ },
+ {
+  "file": "ui/screens/TowerStudioScreen.kt",
+  "line": 348,
+  "kind": "Text",
+  "literal": "Reset to Mock mode",
+  "class": "MUST_LOCALIZE"
+ },
+ {
+  "file": "ui/screens/TowerStudioScreen.kt",
+  "line": 353,
+  "kind": "title",
+  "literal": "Last connection test",
+  "class": "MUST_LOCALIZE"
+ },
+ {
+  "file": "ui/screens/TowerStudioScreen.kt",
+  "line": 354,
+  "kind": "Text",
+  "literal": "Outcome: ${r.outcome.name}",
+  "class": "MUST_LOCALIZE"
+ },
+ {
+  "file": "ui/screens/VoiceAudioScreen.kt",
+  "line": 48,
+  "kind": "Text",
+  "literal": "Voice & Audio",
+  "class": "MUST_LOCALIZE"
+ },
+ {
+  "file": "ui/screens/VoiceAudioScreen.kt",
+  "line": 51,
+  "kind": "title",
+  "literal": "Wake word",
+  "class": "MUST_LOCALIZE"
+ },
+ {
+  "file": "ui/screens/VoiceAudioScreen.kt",
+  "line": 63,
+  "kind": "title",
+  "literal": "Voice activity detection",
+  "class": "MUST_LOCALIZE"
+ },
+ {
+  "file": "ui/screens/VoiceAudioScreen.kt",
+  "line": 72,
+  "kind": "title",
+  "literal": "Speech-to-text",
+  "class": "MUST_LOCALIZE"
+ },
+ {
+  "file": "ui/screens/VoiceAudioScreen.kt",
+  "line": 82,
+  "kind": "title",
+  "literal": "Text-to-speech",
+  "class": "MUST_LOCALIZE"
+ },
+ {
+  "file": "ui/screens/VoiceAudioScreen.kt",
+  "line": 92,
+  "kind": "Text",
+  "literal": "Speaking speed: ${",
+  "class": "MUST_LOCALIZE"
+ },
+ {
+  "file": "ui/screens/VoiceAudioScreen.kt",
+  "line": 106,
+  "kind": "title",
+  "literal": "Interruption & captions",
+  "class": "MUST_LOCALIZE"
+ },
+ {
+  "file": "ui/screens/VoiceAudioScreen.kt",
+  "line": 108,
+  "kind": "label",
+  "literal": "Barge-in: new input interrupts playback",
+  "class": "MUST_LOCALIZE"
+ },
+ {
+  "file": "ui/screens/VoiceAudioScreen.kt",
+  "line": 114,
+  "kind": "label",
+  "literal": "Captions",
+  "class": "MUST_LOCALIZE"
+ }
+]
