@@ -90,6 +90,57 @@ class AppGraph(context: Context) {
     val modelRollback = DefaultModelRollbackController(modelStorage, modelRegistry)
     val modelResolver = DefaultVoicePackResolver()
 
+    // GRAPH 4 CP-G4-009 (Owner §6 real model delivery): the four physically
+    // verified ONNX artifacts ride INSIDE the APK (assets/models/bundled/) and
+    // are delivered into the §7 roots through the same hash-gated, receipted
+    // pipeline as network downloads. Delivery ≠ enablement: wake stays OFF
+    // until the FA/FR harness, the denoiser stays bypassed until device
+    // qualification — the runtimes below are constructed ONLY on demand.
+    val bundledModelInstaller = com.hermestower.voiceconsole.models.BundledModelInstaller(
+        assetSource = com.hermestower.voiceconsole.models.AndroidModelProviders.bundledAssetSource(context),
+        catalog = modelCatalog,
+        storage = modelStorage,
+        registry = modelRegistry,
+        activation = modelActivation,
+    )
+
+    /** Denoiser runtime from the REAL installed gtcrn artifact (null until delivered). */
+    fun gtcrnDenoiserIfDelivered(): com.hermestower.voiceconsole.voice.GtcrnDenoiserEngine? {
+        val entry = modelCatalog.find("org.gtcrn.speech-enhancement.simple") ?: return null
+        val file = modelStorage.installedFile(entry) ?: return null
+        val record = modelRegistry.record(entry.identity)
+        if (record == null || record.state != com.hermestower.voiceconsole.models.ModelInstallState.ACTIVE.name) return null
+        return com.hermestower.voiceconsole.voice.GtcrnDenoiserEngine(
+            com.hermestower.voiceconsole.voice.onnx.OrtOnnxRunner(file.toString()),
+        )
+    }
+
+    /** Wake chain from the REAL installed trio (null until all three delivered).
+     *  Construction never enables: OpenWakeWordEngine stays OFF until enable(). */
+    fun openWakeWordIfDelivered(): com.hermestower.voiceconsole.voice.OpenWakeWordEngine? {
+        val ids = listOf(
+            "org.openwakeword.model.melspectrogram",
+            "org.openwakeword.model.embedding",
+            "org.openwakeword.wakeword.hey-jarvis",
+        )
+        val files = ids.map { id ->
+            val entry = modelCatalog.find(id) ?: return null
+            val file = modelStorage.installedFile(entry) ?: return null
+            val record = modelRegistry.record(id)
+            if (record == null || record.state != com.hermestower.voiceconsole.models.ModelInstallState.ACTIVE.name) return null
+            file
+        }
+        return com.hermestower.voiceconsole.voice.OpenWakeWordEngine(
+            frontend = com.hermestower.voiceconsole.voice.RealMelEmbedFrontend(
+                com.hermestower.voiceconsole.voice.onnx.OrtOnnxRunner(files[0].toString()),
+                com.hermestower.voiceconsole.voice.onnx.OrtOnnxRunner(files[1].toString()),
+            ),
+            scorer = com.hermestower.voiceconsole.voice.RealHeadScorer(
+                com.hermestower.voiceconsole.voice.onnx.OrtOnnxRunner(files[2].toString()),
+            ),
+        )
+    }
+
     // GRAPH 4 NODE 2 (§6/§7): MODEL SANCTUM — recommended-pack planner, preflight
     // summary and receipted sequential installer. Optional components (LLM,
     // alternatives, denoiser) are never part of the pack plan.
@@ -135,6 +186,8 @@ class AppGraph(context: Context) {
         dispatcher = Dispatchers.Default,
     )
 
+    // Wake word remains INACTIVE by default (Owner §8/§9): the bundled trio is
+    // delivered by CP-G4-009 but the FA/FR harness on the Xiaomi is the gate.
     val wakeWordEngine = InactiveWakeWordEngine(phrase = "hermes")
     val voiceActivityDetector = InactiveVoiceActivityDetector()
     val audioCaptureEngine = NoAudioCaptureEngine()

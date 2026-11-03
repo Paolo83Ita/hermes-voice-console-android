@@ -77,4 +77,13 @@ object AndroidModelProviders {
 
     fun registry(context: Context): ModelInstallationRegistry =
         FileInstallationRegistry(File(context.filesDir, "models/installation_registry.json").toPath())
+
+    /** CP-G4-009: APK-asset accessor for the bundled verified artifacts. */
+    fun bundledAssetSource(context: Context): BundledModelInstaller.BundledAssetSource =
+        object : BundledModelInstaller.BundledAssetSource {
+            override fun open(assetName: String) = context.assets.open("models/bundled/$assetName")
+            override fun exists(assetName: String): Boolean = runCatching {
+                context.assets.open("models/bundled/$assetName").use { true }
+            }.getOrDefault(false)
+        }
 }

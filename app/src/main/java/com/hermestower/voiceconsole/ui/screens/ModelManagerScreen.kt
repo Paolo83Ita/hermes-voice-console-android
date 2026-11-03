@@ -457,6 +457,43 @@ fun ModelManagerScreen(graph: AppGraph) {
             }
         }
 
+        // ---------- CP-G4-009: bundled verified delivery (no network) ----------
+        SectionCard(title = "Bundled verified delivery") {
+            var bundledReport by remember { mutableStateOf<List<String>>(emptyList()) }
+            var bundledRunning by remember { mutableStateOf(false) }
+            Text(
+                "Four physically verified ONNX artifacts (openWakeWord trio + GTCRN denoiser) ride inside " +
+                    "the APK and are delivered into the model storage roots through the same hash-gated, " +
+                    "receipted pipeline as network downloads. No network is used — provenance 'app-bundle'. " +
+                    "Delivery does NOT enable behavior: the wake word stays OFF until the FA/FR harness on " +
+                    "the Xiaomi and the denoiser stays bypassed until device qualification.",
+                style = HermesType.bodySecondary, color = c.inkSecondary,
+            )
+            Button(
+                enabled = !bundledRunning,
+                onClick = {
+                    bundledRunning = true
+                    bundledReport = listOf("Bundled delivery started…")
+                    scope.launch {
+                        val report = graph.bundledModelInstaller.deliverAll()
+                        bundledReport = report.results.map { result ->
+                            when (result) {
+                                is com.hermestower.voiceconsole.models.BundledModelInstaller.BundledInstallResult.Installed ->
+                                    "✓ ${result.artifact.asset}: INSTALLED (${result.qualificationSummary}); receipt ${result.receiptId}"
+                                is com.hermestower.voiceconsole.models.BundledModelInstaller.BundledInstallResult.AlreadyInstalled ->
+                                    "✓ ${result.artifact.asset}: already installed, bytes re-verified"
+                                is com.hermestower.voiceconsole.models.BundledModelInstaller.BundledInstallResult.Refused ->
+                                    "✗ ${result.artifact?.asset ?: "manifest"}: REFUSED ${result.kind} — ${result.detail}"
+                            }
+                        } + if (report.stoppedAt != null) "Stopped truthfully at ${report.stoppedAt}." else "All ${report.installedCount} bundled artifacts delivered."
+                        registryTick++
+                        bundledRunning = false
+                    }
+                },
+            ) { Text(if (bundledRunning) "Delivering…" else "Install bundled verified models") }
+            bundledReport.forEach { Text(it, style = HermesType.bodySecondary, color = c.inkSecondary) }
+        }
+
         // ---------- E. Modes ----------
         SectionCard(title = "E. Modes") {
             Text(
