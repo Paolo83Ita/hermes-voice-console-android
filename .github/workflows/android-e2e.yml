@@ -96,11 +96,15 @@ jobs:
             # emulator-runner executes this script with /bin/sh (dash). The previous
             # bash-only `set -o pipefail` exited 2 before am instrument could start.
             # POSIX-safe: capture to file, echo it, classify the result.
-            # Single-line ifs ONLY — this script runs ONE LINE PER sh -c (CP-G4-016 evidence).
-            INSTRUMENT_ARGS=""
-            if [ "$E2E_PROFILE" = "LIFECYCLE" ]; then INSTRUMENT_ARGS="$INSTRUMENT_ARGS -e lifecycleProfile true"; fi
-            if [ -n "$E2E_CLASS_FILTER" ]; then INSTRUMENT_ARGS="$INSTRUMENT_ARGS -e class $E2E_CLASS_FILTER"; fi
-            timeout 3600 adb shell am instrument -w -r $INSTRUMENT_ARGS com.hermestower.voiceconsole.test/androidx.test.runner.AndroidJUnitRunner > instrumentation-output.txt 2>&1
+            # CP-G4-016 (runs 41657209419/41657223032): the runner executes this
+            # script ONE LINE PER `sh -c` — a shell VARIABLE built on one line is
+            # DEAD by the next line. Both runs executed am instrument with EMPTY
+            # args (numtests=31 despite a single-test -e class filter request; the
+            # engagement probe printed ciLifecycleProfile=false) — neither the
+            # class filter nor `-e lifecycleProfile true` EVER reached the device,
+            # silently invalidating every dispatched experiment up to this repair.
+            # CONSTRUCTION AND CONSUMPTION MUST SHARE ONE LINE:
+            IA=""; if [ "$E2E_PROFILE" = "LIFECYCLE" ]; then IA="$IA -e lifecycleProfile true"; fi; if [ -n "$E2E_CLASS_FILTER" ]; then IA="$IA -e class $E2E_CLASS_FILTER"; fi; timeout 3600 adb shell am instrument -w -r $IA com.hermestower.voiceconsole.test/androidx.test.runner.AndroidJUnitRunner > instrumentation-output.txt 2>&1
             cat instrumentation-output.txt
             # Evidence capture INSIDE the script step: the runner tears the emulator
             # down before the separate failure-evidence step can run, which produced

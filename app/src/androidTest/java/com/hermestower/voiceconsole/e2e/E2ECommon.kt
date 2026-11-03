@@ -108,7 +108,13 @@ fun HermesComposeRule.openDrawerAndNavigate(destinationLabel: String, screenAnch
 
     if (ciLifecycleProfileRequested) {
         // ---- Variant B: REAL frames — wait in real time, click physically. ----
-        waitUntil(15_000) { drawerRowNode(destinationLabel) != null }
+        // CP-G4-017 wave 1 moved Appearance/Connection/Self-Test Center behind the
+        // Settings hub: a hub-only label is NOT a drawer row. The activation
+        // attempt therefore fails FAST for hub labels and the REAL product path
+        // continues through the hub. (Cloud evidence for the previous
+        // unconditional drawer-row wait: run 41657188171 — e2e_35_36 died in
+        // ComposeTimeoutException inside this function, waiting 15 s for a drawer
+        // row that no longer exists. The hub path was never reached.)
         if (!activateRowReal(destinationLabel)) {
             check(activateRowReal(SETTINGS_ROW)) { "Settings row missing from drawer" }
             waitUntil(15_000) { drawerRowNode(destinationLabel) != null }
@@ -127,12 +133,15 @@ fun HermesComposeRule.openDrawerAndNavigate(destinationLabel: String, screenAnch
     }
 
     // ---- Variant A: frozen clock — bounded virtual-time pumping. ----
-    waitUntil(15_000) { drawerRowNode(destinationLabel) != null }
+    // Same drawer-then-hub shape as variant B; the hub-row wait uses pumpUntil
+    // because ONLY explicit virtual-time pumping composes new destinations on
+    // the frozen clock (CP-G4-007 physics). activateRowFrozen already bounds its
+    // own pump (5 s virtual), so no unconditional pre-wait is needed here.
     if (!activateRowFrozen(destinationLabel)) {
         check(activateRowFrozen(SETTINGS_ROW)) { "Settings row missing from drawer" }
         // pump until the Settings hub composes (its title anchor)
         pumpToAnchor("Settings")
-        waitUntil(15_000) { drawerRowNode(destinationLabel) != null }
+        pumpUntil(15_000) { drawerRowNode(destinationLabel) != null }
         val hubRow = drawerRowNode(destinationLabel)
             ?: error("settings-hub row '$destinationLabel' not found")
         activateAccessible(hubRow, destinationLabel)

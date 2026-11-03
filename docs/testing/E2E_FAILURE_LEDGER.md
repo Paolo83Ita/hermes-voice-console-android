@@ -197,3 +197,44 @@ and 41615537760 @ed50b21):
 - Net effect of the repair: from this run forward every android-e2e job conclusion carries
   a truthful typed marker, so the Owner's recovery-path decision (a/b/c) can rest on clean
   evidence. The residual itself remains open and decision-gated.
+
+### CP-G4-016 addendum — instrument-args transport defect + system collapse + route variance (2026-11-04)
+
+Read-back of the CP-G4-016 controlled re-runs (all @ b0be658) and of the three push
+runs b0be658/5319da3/543bc2d:
+
+1. **NEW INFRA DEFECT — instrument arguments never transmitted** (same per-line `sh -c`
+   execution class as the verdict-channel bug above): the workflow built
+   `INSTRUMENT_ARGS` across three lines and consumed it on a fourth; the emulator-runner
+   runs each line as a SEPARATE `sh -c`, so the variable was always unset at consumption.
+   Evidence: dispatch runs 41657209419 (NORMAL) and 41657223032 (LIFECYCLE) both ran the
+   FULL suite (`numtests=31`) despite a single-test `-e class …#e2e_35_36…` request, and
+   the b0be658 engagement probe logged `HermesMotionProfile: ciLifecycleProfile=false` in
+   the LIFECYCLE run's logcat artifact. Consequence: NO dispatched CP-G4-016 experiment
+   ever executed with its requested profile/filter; the "TEST-B first sample"
+   (41648000740 @ c6476a1) is reclassified as the 8th NORMAL-profile control sample.
+   Repair: android-e2e.yml builds AND consumes the args on ONE POSIX-safe line (locally
+   simulated for NORMAL/LIFECYCLE × filter/no-filter).
+2. **System collapse in both dispatch runs** (`INSTRUMENTATION_ABORTED: System has
+   crashed` at suite position 1, first-started test e2e_41_42): `com.android.phone`
+   death loop → cascading system ANRs (com.google.android.as, gms.persistent,
+   googlequicksearchbox, RoleControllerService) → system_server FATAL
+   `ConnectivityModuleConnector.maybeCrashWithTerribleFailure` ("Lost network stack" —
+   the message itself declares it a side effect of an earlier crash). The push run of
+   the SAME commit survived to position 7 → environmental, classified
+   E2E_BLOCKED_EMULATOR_ENVIRONMENT. Not a residual regression; not counted as a test
+   verdict.
+3. **Route variance of the residual (9th/10th/11th control samples)**: push runs
+   41657188171 (b0be658) / 41657320566 (5319da3) / 41662377976 (543bc2d) all show the
+   IDENTICAL teardown class at `e2e_43_44_clearSensitiveValues_metadataRemains` with
+   `route=tower_studio` (previously route=appearance @ e2e_35_36). The residual is
+   position- AND route-independent: ANY frozen-clock navigation can leave its entry
+   un-promoted. In 41657188171, e2e_35_36 additionally failed EARLY with
+   `ComposeTimeoutException` (15 s) in openDrawerAndNavigate — the wave-1 harness
+   demanded hub-only labels as drawer rows (repaired in the same commit as this
+   addendum: drawer-then-hub in both variants; variant A hub waits on pumpUntil;
+   e2e_03_04 label "Connection" → "Current Tower & reconnect").
+4. Disposition state: the experiment matrix (root-cause report §4) is RESET to PENDING
+   on the repaired channel. Recovery paths unchanged; no assertion weakened by the
+   repairs (harness plumbing + workflow plumbing only; one test label updated to the
+   real product row that carries its anchor).

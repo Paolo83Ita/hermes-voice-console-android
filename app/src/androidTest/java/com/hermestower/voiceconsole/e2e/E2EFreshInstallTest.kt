@@ -46,7 +46,12 @@ class E2EFreshInstallTest {
 
     @Test
     fun e2e_03_04_onboardingWithoutCredentials_mockModeSelected() {
-        compose.openDrawerAndNavigate("Connection", "Open Hermes Tower Connection Studio")
+        // CP-G4-017 wave 1: the Tower Gate status screen is reached from the
+        // Settings hub (TOWER CONNECTION → "Current Tower & reconnect"); the
+        // previous drawer row "Connection" no longer exists. Substring-matching
+        // "Connection" would land on "Connection Studio (advanced)" — the
+        // TOWER_STUDIO route — whose screen does NOT carry this test's anchor.
+        compose.openDrawerAndNavigate("Current Tower & reconnect", "Open Hermes Tower Connection Studio")
         compose.clickFirstClickable("Open Hermes Tower Connection Studio")
         compose.waitForText("Reset to Mock mode")
         compose.onNodeWithText("Reset to Mock mode").performClick()

@@ -652,3 +652,53 @@ TEST-C/D/E next; verdict + disposition in the next read-back).
 NEXT: read controlled-run verdicts → disposition per directive §2 → TEST-C/D/E →
 CP-G4-017 localization waves 2-3 + onboarding (§6) → CP-G4-018 Tower refoundation →
 CP-G4-019..025. No terminal verdict: nodes remain.
+
+G4-N16 CONTINUATION — controlled-run read-back: instrument-args TRANSPORT DEFECT + system collapse + route variance; channel repaired; matrix reset (2026-11-04)
+FINDING: (1) Read-back of the two controlled re-runs dispatched @ b0be658 (TEST-A
+NORMAL 41657209419, TEST-B LIFECYCLE 41657223032) and of the three push runs
+b0be658/5319da3/543bc2d. NEW INFRA DEFECT (same per-line sh -c execution class as the
+N15 verdict-channel bug): the emulator-runner executes the script ONE LINE PER sh -c, so
+the workflow's INSTRUMENT_ARGS (built on line N, consumed on line N+3) was ALWAYS EMPTY
+at `am instrument` — neither `-e class …#e2e_35_36…` nor `-e lifecycleProfile true` ever
+reached the device in ANY dispatched CP-G4-016 run. Proof ×2: numtests=31 (full suite)
+despite the single-test filter request in both dispatch runs; the engagement probe
+logged `HermesMotionProfile: ciLifecycleProfile=false` in the LIFECYCLE run's logcat
+artifact. (2) RECLASSIFICATION: the "TEST-B first sample" (41648000740 @ c6476a1) ran
+with empty args → it was the 8th NORMAL-profile control sample, NOT a TEST-B execution;
+§4b's frame-skip engagement inference is non-discriminative and withdrawn (probe read
+FALSE). No CI_LIFECYCLE_PROFILE-engaged run exists yet. (3) Both b0be658 dispatch runs
+died of a system collapse (com.android.phone death loop → cascading ANRs → system_server
+FATAL "Lost network stack" → INSTRUMENTATION_ABORTED: System has crashed at position 1)
+— E2E_BLOCKED_EMULATOR_ENVIRONMENT; the push run of the same commit survived to
+position 7, so the collapse is environmental. (4) ROUTE VARIANCE of the residual: the
+three push runs all show the identical teardown class at e2e_43_44 with
+route=tower_studio (was e2e_35_36/route=appearance) — 9th/10th/11th samples; the
+residual is position- AND route-independent. (5) HARNESS DEFECT surfaced by the same
+evidence: the wave-1 openDrawerAndNavigate waited unconditionally for the destination
+label as a DRAWER row, but Appearance/Connection/Self-Test Center are hub-only rows
+since CP-G4-017 wave 1 — every hub-label navigation could only time out
+(41657188171: e2e_35_36 ComposeTimeoutException 15 s at E2ECommon.kt:130); the hub
+fallback was unreachable.
+ACTION: (1) android-e2e.yml — instrument arguments built AND consumed on ONE POSIX-safe
+line (IA=…; if…fi; if…fi; timeout 3600 adb shell am instrument -w -r $IA …), evidence
+comment with the run ids; locally simulated for NORMAL/LIFECYCLE × filter/no-filter
+(sh + dash). (2) E2ECommon.openDrawerAndNavigate — drawer-then-hub in BOTH variants:
+activate the drawer row first (fails fast for hub labels), Settings-hub path on miss;
+variant A hub-row wait moved to pumpUntil (virtual-time pumping composes destinations
+on the frozen clock — CP-G4-007 physics); variant B unchanged semantics plus the hub
+path actually reachable. (3) E2EFreshInstallTest e2e_03_04 label "Connection" → the
+real product row "Current Tower & reconnect" (substring would land on "Connection
+Studio (advanced)" = TOWER_STUDIO, whose screen lacks the test's anchor). (4) Root-
+cause report §4c + matrix reset to PENDING on the repaired channel; §4b superseded in
+part (banner); ledger addendum; CHECKPOINT_INDEX rows.
+TEST: YAML structure validated (script = 14 non-comment lines; the one-liner is the
+only cross-line stateful construct); one-liner simulation printed the expected args in
+all four cases; Kotlin changes are harness-plumbing only (no assertion touched; no app
+source changed); cloud compile gate via the dispatched runs themselves (no local SDK).
+COMMIT: (this commit) — pushed, ls-remote read-back.
+CHECKPOINT: CP-G4-016 IN PROGRESS — matrix reset; next = re-dispatch TEST-A/TEST-B on
+the repaired channel (probe must read TRUE in B), then TEST-C/TEST-E/TEST-D; verdict +
+disposition per directive §2 in the next read-back.
+NEXT: TEST-A/B re-runs → C/E/D → disposition → CP-G4-017 localization waves 2-3 +
+onboarding (§6) → CP-G4-018 Tower refoundation → CP-G4-019..025. No terminal verdict:
+nodes remain.

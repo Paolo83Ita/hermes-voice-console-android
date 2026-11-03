@@ -64,13 +64,20 @@ is legacy and not instantiated). The profile reuses the app's own reduced-motion
 
 | ID | Scope | Profile | Expected | Cloud run | Verdict |
 | --- | --- | --- | --- | --- | --- |
-| TEST-A | e2e_35_36 alone | NORMAL_VISUAL_PROFILE | residual reproduces (control) | 41645556871 @ bd1606c = compile fail (harness defect, repaired); 41647987018 @ c6476a1 = install infra failure (`Can't find service: package`, zero tests — E2E_BLOCKED_EMULATOR_ENVIRONMENT class); re-dispatched @ b0be658 | PENDING |
-| TEST-B | e2e_35_36 alone | CI_LIFECYCLE_PROFILE | passes with real navigation | **41648000740 @ c6476a1: executed — RESIDUAL REPRODUCED** (identical signature); controlled re-run @ b0be658 with engagement probe | REPRODUCED (first sample) |
+| TEST-A | e2e_35_36 alone | NORMAL_VISUAL_PROFILE | residual reproduces (control) | 41645556871 @ bd1606c = compile fail (harness defect, repaired); 41647987018 @ c6476a1 = install infra failure (`Can't find service: package`, zero tests); 41657209419 @ b0be658 = **args-transport defect + system collapse** (§4c, E2E_BLOCKED_EMULATOR_ENVIRONMENT) — no clean isolated control has executed yet | PENDING (re-dispatch on the repaired channel) |
+| TEST-B | e2e_35_36 alone | CI_LIFECYCLE_PROFILE | passes with real navigation | 41648000740 @ c6476a1 RECLASSIFIED (§4c: profile never transmitted — it was the 8th NORMAL control sample); 41657223032 @ b0be658 = **args-transport defect + system collapse** (§4c) — no profile-engaged run has executed yet | PENDING (re-dispatch on the repaired channel) |
 | TEST-C | E2EAppearancePersistenceTest whole class | CI_LIFECYCLE_PROFILE | passes | PENDING | PENDING |
 | TEST-D | complete instrumentation suite | CI_LIFECYCLE_PROFILE | 0 failures | PENDING | PENDING |
 | TEST-E | normal appearance navigation ×20, one session | CI_LIFECYCLE_PROFILE | no entry-lifecycle crash | PENDING | PENDING |
 
 ## 4b. MAJOR FINDING (2026-11-03, run 41648000740 @ c6476a1) — the frozen clock is NOT the sole mechanism
+
+> **SUPERSEDED IN PART by §4c (2026-11-04)**: run 41648000740 did NOT engage the profile
+> (args-transport defect — the instrumentation arguments never reached the device; the
+> probe would have read `ciLifecycleProfile=false`). This section's environment forensics
+> (relaunch/pause/destroy timeouts, the exact destroy-path stack) remain VALID as
+> NORMAL-profile evidence; its engagement inference is withdrawn. Retained for the
+> forensic record as written:
 
 TEST-B executed with the profile requested and the residual fired with the IDENTICAL
 signature at the same test. Environment forensics from the run's logcat artifact:
@@ -103,6 +110,70 @@ signature at the same test. Environment forensics from the run's logcat artifact
 
 A CI_LIFECYCLE_PROFILE PASS does NOT physically qualify the NORMAL animated profile —
 that remains the physical Xiaomi gate (directive §2), which this report records.
+
+## 4c. TRANSPORT-CHANNEL DEFECT (2026-11-04, read-back of runs 41657209419/41657223032 @ b0be658) — no dispatched experiment ever transmitted its arguments
+
+The controlled re-runs were dispatched at b0be658 (TEST-A NORMAL 41657209419, TEST-B
+LIFECYCLE 41657223032) and both died BEFORE any experiment verdict could form. Read-back
+of the job logs + artifacts established a NEW infrastructure defect that retroactively
+invalidates the experiment matrix as previously filled:
+
+**Defect (same execution class as the verdict-channel bug, §N15)**: the emulator-runner
+executes the `script:` input ONE LINE PER `sh -c`. The workflow built
+`INSTRUMENT_ARGS=""` on one line, appended `-e lifecycleProfile true` / `-e class …`
+in two separate `if` lines, and consumed `$INSTRUMENT_ARGS` on a FOURTH line. Each line
+is a separate shell process, so the variable was ALWAYS unset at the consumption line:
+`am instrument` ran with EMPTY arguments in EVERY dispatched run of this node.
+
+**Proof (two independent signals)**:
+1. `numtests=31` in both dispatch runs although a single-test `-e class …#e2e_35_36…`
+   filter was requested (suite size is 31 — verified locally by @Test count) — the filter
+   never reached the device; the FULL suite ran.
+2. The engagement probe (b0be658) logged `HermesMotionProfile: ciLifecycleProfile=false`
+   in the LIFECYCLE dispatch run's logcat artifact — the profile was requested at the
+   workflow level but never requested at the instrumentation level. Definitive, no
+   inference.
+
+**Consequences for the record**:
+- The "TEST-B first sample" (41648000740 @ c6476a1) is RECLASSIFIED: with empty args it
+  was a NORMAL-profile FULL-SUITE run whose crash at e2e_35_36 / route=appearance is the
+  **8th control sample** — NOT a TEST-B execution. §4b's "33 s frame-skip-free window"
+  engagement inference is non-discriminative (variant A's frozen clock produces the same
+  static frame) and is withdrawn as engagement evidence; the probe makes engagement
+  observable, and it read FALSE.
+- Both b0be658 dispatch runs died in a NEW environment failure mode before any test
+  verdict: `com.android.phone` death loop → cascading system ANRs (phone/gms/as/search)
+  → `ConnectivityModuleConnector.maybeCrashWithTerribleFailure` ("Lost network stack")
+  FATAL in system_server → `INSTRUMENTATION_ABORTED: System has crashed` at suite
+  position 1 (e2e_41_42 was merely the first-started test). Classified
+  E2E_BLOCKED_EMULATOR_ENVIRONMENT (the same class as the 41647987018 install failure).
+  The push run of the SAME commit (41657188171) survived to suite position 7 — the
+  collapse is environmental, not deterministic.
+- **Route variance confirmed (9th/10th/11th control samples)**: the push runs at
+  b0be658/5319da3/543bc2d (41657188171/41657320566/41662377976) all crashed with the
+  identical teardown class at `e2e_43_44_clearSensitiveValues_metadataRemains` with
+  `route=tower_studio` (was: e2e_35_36 / route=appearance). The residual is therefore
+  ROUTE-INDEPENDENT as well as position-independent: ANY frozen-clock navigation can
+  leave its entry un-promoted. Additionally, in the b0be658 push run e2e_35_36 itself
+  FAILED EARLY with `ComposeTimeoutException` (15 s) inside openDrawerAndNavigate — the
+  frozen-clock stall surfacing as a typed test failure instead of a teardown crash.
+- **Harness defect found by the same evidence (repaired)**: the wave-1 harness waited
+  unconditionally for the destination label as a DRAWER row before the hub fallback —
+  but Appearance/Connection/Self-Test Center are no longer drawer rows (CP-G4-017), so
+  every hub-label navigation could only time out. Repaired: drawer-row attempt first,
+  hub path on miss; variant A hub waits use pumpUntil (virtual time).
+
+**Repairs (this commit)**: (1) android-e2e.yml — the instrument arguments are built AND
+consumed on ONE POSIX-safe line (construction+consumption share the line; verified by
+local simulation for NORMAL/LIFECYCLE × filter/no-filter). (2) E2ECommon.
+openDrawerAndNavigate — drawer-then-hub in both variants, hub-row wait on the variant-
+appropriate clock. (3) E2EFreshInstallTest e2e_03_04 — label "Connection" → the real
+product row "Current Tower & reconnect" (the substring match would have landed on
+"Connection Studio (advanced)", the wrong route for this test's anchor).
+
+The matrix is RESET to PENDING on the repaired channel: no CI_LIFECYCLE_PROFILE-engaged
+run exists yet; §4b's disposition narrowing stands as HYPOTHESIS until the controlled
+re-runs execute with the probe reading TRUE.
 
 ## 5. Outcome disposition (to be set from the matrix)
 
