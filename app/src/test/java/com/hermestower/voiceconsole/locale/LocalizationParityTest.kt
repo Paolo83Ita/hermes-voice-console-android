@@ -56,7 +56,7 @@ class LocalizationParityTest {
         val f = File(resDir(), if (lang == "en") "values/strings.xml" else "values-$lang/strings.xml")
         if (!f.exists()) return emptySet()
         val text = f.readText()
-        val regex = Regex("""<plurals name="([^"]+)">""", RegexOption.DOT_MATCHES_ALL)
+        val regex = Regex("""<plurals name="([^"]+)">.*?</plurals>""", RegexOption.DOT_MATCHES_ALL)
         // every plurals entry must carry at least one/other in EVERY locale
         val ok = regex.findAll(text).all { block ->
             listOf("one", "other").all { q -> block.value.contains("quantity=\"$q\"") }

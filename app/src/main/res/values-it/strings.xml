@@ -9,11 +9,11 @@
     <string name="composer_send">invia</string>
     <string name="composer_speak_instead">parla invece</string>
     <string name="composer_stop">stop</string>
-    <string name="desc_bridge_fmt">Bridge Tower: %s, endpoint %s</string>
+    <string name="desc_bridge_fmt">Bridge Tower: %1$s, endpoint %2$s</string>
     <string name="desc_mic_live">Il riconoscitore di sistema sta acquisendo — push-to-talk attivo</string>
     <string name="desc_mic_ready">Microfono pronto per push-to-talk; l’acquisizione avviene solo durante un turno</string>
     <string name="desc_muted">Modalità silenziosa attiva, microfono fisicamente disconnesso</string>
-    <string name="desc_queued_fmt">%d richieste in coda per la Tower</string>
+    <string name="desc_queued_fmt">%1$d richieste in coda per la Tower</string>
     <string name="dest_about">Informazioni e sicurezza</string>
     <string name="dest_appearance">Aspetto</string>
     <string name="dest_archive">Archivio Tower</string>
@@ -26,7 +26,7 @@
     <string name="dest_models">Modelli e voce</string>
     <string name="dest_selftest">Centro di autotest</string>
     <string name="dest_voice_audio">Voce e audio</string>
-    <string name="effective_note_fmt"> · effettiva %s</string>
+    <string name="effective_note_fmt"> · effettiva %1$s</string>
     <string name="engine_row">mic: push-to-talk (riconoscitore di sistema) · testo: di prima classe · voce uscita: TTS di sistema Android · STT offline + voce naturale: in attesa in Modelli e voce · tower: SIMULATA fino a Tower Graph 1.7</string>
     <string name="inject_cd">Inserisci una riga di testo invece di parlare</string>
     <string name="lang_de">Tedesco</string>
@@ -38,10 +38,10 @@
     <string name="language_note">Si applica a ogni schermata. Alla prima esecuzione viene usata la lingua di sistema se tra quelle supportate; altrimenti l’inglese.</string>
     <string name="listening_hint">in ascolto — parla ora (l’acquisizione è attiva)</string>
     <string name="local_core_label">CORE LOCALE</string>
-    <string name="mode_note_fmt">modalità %s%s</string>
+    <string name="mode_note_fmt">modalità %1$s%2$s</string>
     <string name="mute_cd_off">Attiva la modalità silenziosa</string>
     <string name="mute_cd_on">Disattiva la modalità silenziosa</string>
-    <string name="nav_bridge_state">Bridge Tower: %s</string>
+    <string name="nav_bridge_state">Bridge Tower: %1$s</string>
     <string name="nav_close_drawer">Chiudi il pannello di navigazione</string>
     <string name="nav_open_drawer">Apri il pannello di navigazione</string>
     <string name="nav_primary">PRINCIPALI</string>
@@ -55,7 +55,7 @@
     <string name="pill_mock">SIMULATO</string>
     <string name="pill_muted">SILENZIOSO</string>
     <string name="pill_offline">OFFLINE</string>
-    <string name="pill_queued_fmt">IN CODA ×%d</string>
+    <string name="pill_queued_fmt">IN CODA ×%1$d</string>
     <string name="ptt_cd">Premi per parlare: acquisisce un turno di voce</string>
     <string name="repeat_cd">Ripeti l’ultima risposta vocale</string>
     <string name="settings_language_title">Lingua</string>

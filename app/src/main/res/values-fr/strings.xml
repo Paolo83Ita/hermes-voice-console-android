@@ -9,11 +9,11 @@
     <string name="composer_send">envoyer</string>
     <string name="composer_speak_instead">parler plutôt</string>
     <string name="composer_stop">arrêter</string>
-    <string name="desc_bridge_fmt">Passerelle de la Tower : %s, endpoint %s</string>
+    <string name="desc_bridge_fmt">Passerelle de la Tower : %1$s, endpoint %2$s</string>
     <string name="desc_mic_live">Le système est en cours de capture — appui pour parler actif</string>
     <string name="desc_mic_ready">Micro prêt pour l’appui pour parler ; la capture ne s’effectue que pendant un tour</string>
     <string name="desc_muted">Coupure du microphone active, micro physiquement déconnecté</string>
-    <string name="desc_queued_fmt">%d requêtes en attente pour la Tower</string>
+    <string name="desc_queued_fmt">%1$d requêtes en attente pour la Tower</string>
     <string name="dest_about">À propos et sécurité</string>
     <string name="dest_appearance">Apparence</string>
     <string name="dest_archive">Archives de la Tower</string>
@@ -26,7 +26,7 @@
     <string name="dest_models">Modèles et voix</string>
     <string name="dest_selftest">Centre d’autotest</string>
     <string name="dest_voice_audio">Voix et audio</string>
-    <string name="effective_note_fmt"> · effectif %s</string>
+    <string name="effective_note_fmt"> · effectif %1$s</string>
     <string name="engine_row">micro : appui pour parler (reconnaissance système) · texte : de premier plan · voix sortante : TTS système Android · STT hors ligne + voix naturelle : en attente dans Modèles et voix · tower : SIMULÉE jusqu’à Tower Graph 1.7</string>
     <string name="inject_cd">Insérer une ligne de texte au lieu de parler</string>
     <string name="lang_de">Allemand</string>
@@ -38,10 +38,10 @@
     <string name="language_note">S’applique à tous les écrans. Au premier lancement, la langue du système est utilisée si elle est prise en charge ; sinon l’anglais.</string>
     <string name="listening_hint">écoute — parlez maintenant (la capture est active)</string>
     <string name="local_core_label">NOYAU LOCAL</string>
-    <string name="mode_note_fmt">mode %s%s</string>
+    <string name="mode_note_fmt">mode %1$s%2$s</string>
     <string name="mute_cd_off">Activer la coupure du microphone</string>
     <string name="mute_cd_on">Désactiver la coupure du microphone</string>
-    <string name="nav_bridge_state">Passerelle de la Tower : %s</string>
+    <string name="nav_bridge_state">Passerelle de la Tower : %1$s</string>
     <string name="nav_close_drawer">Fermer le panneau de navigation</string>
     <string name="nav_open_drawer">Ouvrir le panneau de navigation</string>
     <string name="nav_primary">PRINCIPALES</string>
@@ -55,7 +55,7 @@
     <string name="pill_mock">SIMULÉ</string>
     <string name="pill_muted">COUPÉ</string>
     <string name="pill_offline">HORS LIGNE</string>
-    <string name="pill_queued_fmt">EN FILE ×%d</string>
+    <string name="pill_queued_fmt">EN FILE ×%1$d</string>
     <string name="ptt_cd">Appui pour parler : capture un tour de voix</string>
     <string name="repeat_cd">Répéter la dernière réponse parlée</string>
     <string name="settings_language_title">Langue</string>

@@ -9,11 +9,11 @@
     <string name="composer_send">send</string>
     <string name="composer_speak_instead">speak instead</string>
     <string name="composer_stop">stop</string>
-    <string name="desc_bridge_fmt">Tower bridge: %s, endpoint %s</string>
+    <string name="desc_bridge_fmt">Tower bridge: %1$s, endpoint %2$s</string>
     <string name="desc_mic_live">System recognizer is capturing — push-to-talk active</string>
     <string name="desc_mic_ready">Microphone ready for push-to-talk; capture runs only during a turn</string>
     <string name="desc_muted">Privacy mute engaged, microphone physically disconnected</string>
-    <string name="desc_queued_fmt">%d requests queued for the Tower</string>
+    <string name="desc_queued_fmt">%1$d requests queued for the Tower</string>
     <string name="dest_about">About and Safety</string>
     <string name="dest_appearance">Appearance</string>
     <string name="dest_archive">Tower Archive</string>
@@ -26,7 +26,7 @@
     <string name="dest_models">Models and Voice</string>
     <string name="dest_selftest">Self-Test Center</string>
     <string name="dest_voice_audio">Voice and Audio</string>
-    <string name="effective_note_fmt"> · effective %s</string>
+    <string name="effective_note_fmt"> · effective %1$s</string>
     <string name="engine_row">mic: push-to-talk (system recognizer) · text: first-class · voice out: Android system TTS · offline STT + natural voice: pending Models and Voice · tower: SIMULATED until Tower Graph 1.7</string>
     <string name="inject_cd">Inject a line of text instead of speaking</string>
     <string name="lang_de">Deutsch</string>
@@ -38,10 +38,10 @@
     <string name="language_note">Applies to every screen. The system language is used on first launch when it is one of the supported languages; English otherwise.</string>
     <string name="listening_hint">listening — speak now (capture is live)</string>
     <string name="local_core_label">LOCAL CORE</string>
-    <string name="mode_note_fmt">mode %s%s</string>
+    <string name="mode_note_fmt">mode %1$s%2$s</string>
     <string name="mute_cd_off">Engage privacy mute</string>
     <string name="mute_cd_on">Disable privacy mute</string>
-    <string name="nav_bridge_state">Tower bridge: %s</string>
+    <string name="nav_bridge_state">Tower bridge: %1$s</string>
     <string name="nav_close_drawer">Close navigation drawer</string>
     <string name="nav_open_drawer">Open navigation drawer</string>
     <string name="nav_primary">PRIMARY</string>
@@ -55,7 +55,7 @@
     <string name="pill_mock">MOCK</string>
     <string name="pill_muted">MUTED</string>
     <string name="pill_offline">OFFLINE</string>
-    <string name="pill_queued_fmt">QUEUED ×%d</string>
+    <string name="pill_queued_fmt">QUEUED ×%1$d</string>
     <string name="ptt_cd">Push to talk: capture one voice turn</string>
     <string name="repeat_cd">Repeat last spoken response</string>
     <string name="settings_language_title">Language</string>

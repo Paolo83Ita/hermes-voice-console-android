@@ -9,11 +9,11 @@
     <string name="composer_send">enviar</string>
     <string name="composer_speak_instead">hablar en su lugar</string>
     <string name="composer_stop">detener</string>
-    <string name="desc_bridge_fmt">Puente de la Tower: %s, endpoint %s</string>
+    <string name="desc_bridge_fmt">Puente de la Tower: %1$s, endpoint %2$s</string>
     <string name="desc_mic_live">El reconocedor del sistema está capturando — pulsar para hablar activo</string>
     <string name="desc_mic_ready">Micrófono listo para pulsar para hablar; la captura ocurre solo durante un turno</string>
     <string name="desc_muted">Silenciar privacidad activado, micrófono físicamente desconectado</string>
-    <string name="desc_queued_fmt">%d solicitudes en cola para la Tower</string>
+    <string name="desc_queued_fmt">%1$d solicitudes en cola para la Tower</string>
     <string name="dest_about">Acerca de y seguridad</string>
     <string name="dest_appearance">Apariencia</string>
     <string name="dest_archive">Archivo de la Tower</string>
@@ -26,7 +26,7 @@
     <string name="dest_models">Modelos y voz</string>
     <string name="dest_selftest">Centro de autoprueba</string>
     <string name="dest_voice_audio">Voz y audio</string>
-    <string name="effective_note_fmt"> · efectivo %s</string>
+    <string name="effective_note_fmt"> · efectivo %1$s</string>
     <string name="engine_row">mic: pulsar para hablar (reconocedor del sistema) · texto: de primera clase · voz de salida: TTS del sistema Android · STT sin conexión + voz natural: pendiente en Modelos y voz · tower: SIMULADA hasta Tower Graph 1.7</string>
     <string name="inject_cd">Insertar una línea de texto en lugar de hablar</string>
     <string name="lang_de">Alemán</string>
@@ -38,10 +38,10 @@
     <string name="language_note">Se aplica a todas las pantallas. En el primer inicio se usa el idioma del sistema si está entre los admitidos; de lo contrario, inglés.</string>
     <string name="listening_hint">escuchando — habla ahora (la captura está activa)</string>
     <string name="local_core_label">NÚCLEO LOCAL</string>
-    <string name="mode_note_fmt">modo %s%s</string>
+    <string name="mode_note_fmt">modo %1$s%2$s</string>
     <string name="mute_cd_off">Activar el silencio de privacidad</string>
     <string name="mute_cd_on">Desactivar el silencio de privacidad</string>
-    <string name="nav_bridge_state">Puente de la Tower: %s</string>
+    <string name="nav_bridge_state">Puente de la Tower: %1$s</string>
     <string name="nav_close_drawer">Cerrar el panel de navegación</string>
     <string name="nav_open_drawer">Abrir el panel de navegación</string>
     <string name="nav_primary">PRINCIPALES</string>
@@ -55,7 +55,7 @@
     <string name="pill_mock">SIMULADO</string>
     <string name="pill_muted">SILENCIADO</string>
     <string name="pill_offline">SIN CONEXIÓN</string>
-    <string name="pill_queued_fmt">EN COLA ×%d</string>
+    <string name="pill_queued_fmt">EN COLA ×%1$d</string>
     <string name="ptt_cd">Pulsar para hablar: captura un turno de voz</string>
     <string name="repeat_cd">Repetir la última respuesta hablada</string>
     <string name="settings_language_title">Idioma</string>

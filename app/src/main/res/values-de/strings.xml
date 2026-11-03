@@ -9,11 +9,11 @@
     <string name="composer_send">senden</string>
     <string name="composer_speak_instead">stattdessen sprechen</string>
     <string name="composer_stop">stoppen</string>
-    <string name="desc_bridge_fmt">Tower-Brücke: %s, Endpunkt %s</string>
+    <string name="desc_bridge_fmt">Tower-Brücke: %1$s, Endpunkt %2$s</string>
     <string name="desc_mic_live">Systemerkennung erfasst — Sprechtaste aktiv</string>
     <string name="desc_mic_ready">Mikrofon bereit für die Sprechtaste; Aufnahme nur während eines Sprechturns</string>
     <string name="desc_muted">Mikrofon stummschalten aktiv, Mikrofon physisch getrennt</string>
-    <string name="desc_queued_fmt">%d Anforderungen in Warteschlange für die Tower</string>
+    <string name="desc_queued_fmt">%1$d Anforderungen in Warteschlange für die Tower</string>
     <string name="dest_about">Über und Sicherheit</string>
     <string name="dest_appearance">Erscheinungsbild</string>
     <string name="dest_archive">Tower-Archiv</string>
@@ -26,7 +26,7 @@
     <string name="dest_models">Modelle und Stimme</string>
     <string name="dest_selftest">Selbsttest-Center</string>
     <string name="dest_voice_audio">Stimme und Audio</string>
-    <string name="effective_note_fmt"> · effektiv %s</string>
+    <string name="effective_note_fmt"> · effektiv %1$s</string>
     <string name="engine_row">Mikro: Sprechtaste (Systemerkennung) · Text: vollwertig · Sprachausgabe: Android-System-TTS · Offline-STT + natürliche Stimme: ausstehend in Modelle und Stimme · Tower: SIMULIERT bis Tower Graph 1.7</string>
     <string name="inject_cd">Textzeile statt Sprache eingeben</string>
     <string name="lang_de">Deutsch</string>
@@ -38,10 +38,10 @@
     <string name="language_note">Gilt für alle Bildschirme. Beim ersten Start wird die Systemsprache verwendet, wenn sie unterstützt wird; sonst Englisch.</string>
     <string name="listening_hint">hören — jetzt sprechen (Aufnahme ist aktiv)</string>
     <string name="local_core_label">LOKALER KERN</string>
-    <string name="mode_note_fmt">Modus %s%s</string>
+    <string name="mode_note_fmt">Modus %1$s%2$s</string>
     <string name="mute_cd_off">Mikrofon stummschalten</string>
     <string name="mute_cd_on">Mikrofon-Stummschaltung aufheben</string>
-    <string name="nav_bridge_state">Tower-Brücke: %s</string>
+    <string name="nav_bridge_state">Tower-Brücke: %1$s</string>
     <string name="nav_close_drawer">Navigationsleiste schließen</string>
     <string name="nav_open_drawer">Navigationsleiste öffnen</string>
     <string name="nav_primary">HAUPTBEREICH</string>
@@ -55,7 +55,7 @@
     <string name="pill_mock">SIMULIERT</string>
     <string name="pill_muted">STUMM</string>
     <string name="pill_offline">OFFLINE</string>
-    <string name="pill_queued_fmt">IN WARTESCHLANGE ×%d</string>
+    <string name="pill_queued_fmt">IN WARTESCHLANGE ×%1$d</string>
     <string name="ptt_cd">Sprechtaste: erfasst einen Sprachturn</string>
     <string name="repeat_cd">Letzte gesprochene Antwort wiederholen</string>
     <string name="settings_language_title">Sprache</string>
