@@ -72,16 +72,20 @@ fun HermesComposeRule.openDrawerAndNavigate(destinationLabel: String, screenAnch
         if (onScreen) break
     }
 
-    // (b) activate: physical click when the control is physically clickable,
-    //     accessible semantics activation otherwise (Owner §3.3)
+    // (b) activate: the ACCESSIBLE OnClick semantics action is the primary
+    // activation path here (Owner §3.3) — on this emulator the frozen drawer
+    // animation leaves the sheet's visual position ambiguous (graphicsLayer
+    // translation is not reflected in layout coordinates), so touch injection
+    // cannot be trusted to land on the control. The physical clickability of
+    // the row remains ASSERTED by the hasClickAction matcher (Owner §3.4);
+    // physical touch qualification happens on the Xiaomi.
     val row = drawerRowNode(destinationLabel)
     if (row == null) error("drawer row '$destinationLabel' disappeared before activation")
-    if (onScreen) {
-        onAllNodes(hasText(destinationLabel, substring = true).and(hasClickAction()))[0].performClick()
+    val accessibleClick = row.config[SemanticsActions.OnClick]
+    if (accessibleClick?.action != null) {
+        accessibleClick.action!!()
     } else {
-        // accessible activation path (screen-reader equivalent), never a logic bypass
-        val clickAction = row.config[SemanticsActions.OnClick]
-        if (clickAction?.action != null) clickAction.action!!.invoke()
+        error("drawer row '$destinationLabel' has no accessible OnClick action")
     }
 
     // (c) destination screen: pump until the anchor composes
