@@ -1,12 +1,12 @@
 package com.hermestower.voiceconsole.e2e
 
-import android.content.Intent
 import androidx.compose.ui.geometry.Offset
 import androidx.compose.ui.semantics.SemanticsActions
 import androidx.compose.ui.semantics.SemanticsProperties
 import androidx.compose.ui.test.hasClickAction
 import androidx.compose.ui.test.hasText
 import androidx.compose.ui.test.junit4.AndroidComposeTestRule
+import androidx.compose.ui.test.junit4.createAndroidComposeRule
 import androidx.compose.ui.test.onAllNodesWithText
 import androidx.compose.ui.test.onNodeWithContentDescription
 import androidx.compose.ui.test.onNodeWithText
@@ -17,7 +17,6 @@ import androidx.test.platform.app.InstrumentationRegistry
 import com.hermestower.voiceconsole.app.AppGraph
 import com.hermestower.voiceconsole.app.AppGraphHolder
 import com.hermestower.voiceconsole.ui.MainActivity
-import com.hermestower.voiceconsole.ui.runtime.MotionProfile
 
 typealias HermesComposeRule = AndroidComposeTestRule<ActivityScenarioRule<MainActivity>, MainActivity>
 
@@ -28,28 +27,34 @@ typealias HermesComposeRule = AndroidComposeTestRule<ActivityScenarioRule<MainAc
  *     the harness freezes the compose clock (the console ships an infinite Oracle
  *     Core animation, which would otherwise keep the rule from reaching idle).
  *
- *  B. CI_LIFECYCLE_PROFILE   — `lifecycleProfile true`: the activity is launched
- *     with [MainActivity.EXTRA_CI_LIFECYCLE_PROFILE] (debug builds only), which
- *     freezes every infinite ornamental frame clock through the app's own
- *     reduced-motion gate. NOTHING about navigation, state machine, controls,
- *     persistence, semantics or business logic changes. Because no infinite
- *     animation remains, the compose clock is left ADVANCING: NavHost and drawer
- *     transitions complete in real time, back-stack entries reach CREATED, and
- *     the harness navigates the real UI with REAL physical clicks — exactly the
- *     lifecycle/navigation qualification the Owner authorized.
+ *  B. CI_LIFECYCLE_PROFILE   — `lifecycleProfile true`: the harness sets the
+ *     DEBUG-only system property [MainActivity.CI_LIFECYCLE_PROFILE_PROPERTY]
+ *     BEFORE the activity launches (androidTest runs in the application process,
+ *     so the property is visible to MainActivity, which freezes every infinite
+ *     ornamental frame clock through the app's own reduced-motion gate). NOTHING
+ *     about navigation, state machine, controls, persistence, semantics or
+ *     business logic changes. Because no infinite animation remains, the compose
+ *     clock is left ADVANCING: NavHost and drawer transitions complete in real
+ *     time, back-stack entries reach CREATED, and the harness navigates the real
+ *     UI with REAL physical clicks — exactly the lifecycle/navigation
+ *     qualification the Owner authorized.
  */
-val ciLifecycleProfileRequested: Boolean =
-    InstrumentationRegistry.getArguments()
+val ciLifecycleProfileRequested: Boolean = run {
+    val requested = InstrumentationRegistry.getArguments()
         .getString("lifecycleProfile", "false") == "true"
-
-/** Test rule factory honoring the authorized profile (see class docs above). */
-fun hermesComposeRule(): HermesComposeRule {
-    val context = InstrumentationRegistry.getInstrumentation().targetContext
-    val intent = Intent(context, MainActivity::class.java)
-    if (ciLifecycleProfileRequested) {
-        intent.putExtra(MainActivity.EXTRA_CI_LIFECYCLE_PROFILE, true)
+    if (requested) {
+        System.setProperty(MainActivity.CI_LIFECYCLE_PROFILE_PROPERTY, "true")
     }
-    return AndroidComposeTestRule(ActivityScenarioRule<MainActivity>(intent)) { it }
+    requested
+}
+
+/** Test rule factory honoring the authorized profile (see class docs above).
+ *  Referencing [ciLifecycleProfileRequested] here guarantees the DEBUG-only
+ *  system property is set BEFORE the rule launches the activity. */
+fun hermesComposeRule(): HermesComposeRule {
+    val profileRequested = ciLifecycleProfileRequested
+    check(!profileRequested || System.getProperty(MainActivity.CI_LIFECYCLE_PROFILE_PROPERTY) == "true")
+    return createAndroidComposeRule(MainActivity::class.java)
 }
 
 /**

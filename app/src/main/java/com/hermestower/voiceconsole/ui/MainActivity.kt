@@ -29,13 +29,13 @@ class MainActivity : ComponentActivity() {
         super.onCreate(savedInstanceState)
         enableEdgeToEdge()
         // CP-G4-016 — CI_LIFECYCLE_PROFILE (OWNER_DECISION_E2E_RECOVERY): the test
-        // harness may launch this activity with the TEST_ONLY extra to freeze every
-        // infinite ornamental frame clock while navigation, state machine,
-        // controls, persistence, semantics and business logic stay identical.
-        // DEBUG builds only: a release build can never enter this branch, so the
-        // shipped application is unaffected.
+        // harness (running in THIS process) sets the TEST_ONLY property before the
+        // activity launches; MainActivity freezes every infinite ornamental frame
+        // clock while navigation, state machine, controls, persistence, semantics
+        // and business logic stay identical. DEBUG builds only: a release build
+        // can never enter this branch, so the shipped application is unaffected.
         if (com.hermestower.voiceconsole.BuildConfig.DEBUG &&
-            intent.getBooleanExtra(EXTRA_CI_LIFECYCLE_PROFILE, false)
+            System.getProperty(CI_LIFECYCLE_PROFILE_PROPERTY) == "true"
         ) {
             MotionProfile.ciLifecycleProfile = true
         }
@@ -61,8 +61,9 @@ class MainActivity : ComponentActivity() {
     }
 
     companion object {
-        /** TEST_ONLY (debug builds): freezes infinite ornamental motion for the
-         *  CI lifecycle/navigation qualification variant (CP-G4-016). */
-        const val EXTRA_CI_LIFECYCLE_PROFILE = "hermes.ci_lifecycle_profile"
+        /** TEST_ONLY (debug builds): system property that freezes infinite
+         *  ornamental motion for the CI lifecycle/navigation qualification
+         *  variant (CP-G4-016). Set by the in-process test harness. */
+        const val CI_LIFECYCLE_PROFILE_PROPERTY = "hermes.ci_lifecycle_profile"
     }
 }
