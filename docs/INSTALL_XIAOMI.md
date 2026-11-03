@@ -74,3 +74,59 @@ DEVICE_QUALIFICATION_CHECKLIST.md §7):
 - PASS/FAIL/PARTIAL per the 11 steps above, with notes.
 - Any visual issue at 2400×1080 / 90 Hz (text contrast, animation smoothness).
 - Thermal/charging behaviour during 15 minutes screen-on if convenient.
+
+---
+
+## GRAPH 4 ADDENDUM (2026-11-03) — qualification build from `graph-4/real-voice-pairing-archive-e2e`
+
+Everything in §1–§6 above still applies (integrity check, install path, reversibility).
+This addendum covers what is NEW since that receipt and what to verify ON THE DEVICE during
+the physical Xiaomi qualification run. Always build from the LATEST SUCCESSFUL
+`android-debug-build` run on the branch above (the Actions list shows the commit SHA next
+to every run — read it back against `git ls-remote` before installing).
+
+### A. What is new in this build (all measured, nothing simulated beyond the labels below)
+
+- **Bundled verified models (Owner §6)**: the four physically verified ONNX artifacts
+  (openWakeWord melspec/embed/hey_jarvis + GTCRN denoiser, SHA-256 published in
+  `docs/models/VOICE_ARTIFACT_PHYSICAL_AUDIT.md`) ride inside the APK and install through
+  the same hash-gated, receipted pipeline as downloads. Provenance shows `app-bundle`.
+- **QR pairing scanner (Owner delta §11)**: Tower Studio → Actions → "Scan pairing QR".
+  Camera permission is requested only in that screen; frames are decoded on-device and
+  never stored; every rejected code shows a typed reason (e.g. EXPIRED, REPLAYED_NONCE).
+- **Self-Test Center ST-46..ST-50**: bundled double-gate agreement, bundled delivery
+  end-to-end (§6), QR strict-matrix probe, Archive truth (§15/§16/§17), route registry.
+- **Status-bar fix (Owner field report)**: content clears the system clock/signal area
+  (edge-to-edge with safe-drawing insets; the obsidian background stays full-bleed).
+- **Tower Archive (Owner §14–§17)**: Archive Chamber with Conversations/Missions/Artifacts;
+  every row is labeled SIMULATED — the real Tower stays the authority (Graph 1.7).
+
+### B. On-device verification sequence (suggested order)
+
+1. **Install + first launch** — app renders, no overlap with the system status bar.
+2. **Model Manager → "Install bundled verified models"** — expect four `INSTALLED` lines
+   with receipts (id `bundled-…`). Press it again: expect four `already installed, bytes
+   re-verified` lines (idempotence is a contract, not an accident).
+3. **Self-Test → Quick** — expect 22 pass, 0 fail (ST-46 included: it reads the bundled
+   manifest from the APK). **Self-Test → Standard** — additionally ST-47 (bundled delivery
+   end-to-end) and ST-49 (archive truth) must PASS on the device.
+4. **Tower Studio → Scan pairing QR** — deny the permission once: expect the honest
+   "manual pairing still works" state, no crash. Grant it, scan a `hermes-pair://v1` QR:
+   the payload summary shows tower/env/scopes only (endpoint and challenge are never
+   displayed). Pairing result is labeled **SIMULATED** — that is the truth until Tower
+   Graph 1.7.
+5. **Wake word** — stays OFF. The FA/FR harness on this device is the gate (Owner §8/§9):
+   record false-accept and false-reject counts before enabling anything always-on.
+6. **Denoiser** — remains bypassed until the device qualification numbers exist. Memory
+   and latency stay `TARGET_PENDING_DEVICE_QUALIFICATION` until measured here.
+7. **Language** — switch it/en/es/fr/de; nav + console + appearance strings follow.
+8. **Archive** — open, paginate, pin a conversation offline, clear cache: the TOWER rows
+   survive (local-cache removal never deletes remote authority — §15).
+
+### C. What to bring back from the run
+
+- Measured memory + latency for the denoiser and wake chain (replaces the
+  `TARGET_PENDING_DEVICE_QUALIFICATION` markers).
+- FA/FR harness results for `hey_jarvis` (the custom Italian wake word remains
+  `CANDIDATE_PENDING_DISCOVERY` — no claim).
+- Any typed failure verbatim (the app never silently falls back; every refusal is text).
