@@ -17,8 +17,11 @@ import androidx.compose.runtime.remember
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.platform.LocalClipboardManager
+import androidx.compose.ui.platform.LocalContext
+import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.AnnotatedString
 import androidx.compose.ui.unit.dp
+import com.hermestower.voiceconsole.R as Res
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import com.hermestower.voiceconsole.app.AppGraph
 import com.hermestower.voiceconsole.bridge.BridgeFault
@@ -42,6 +45,7 @@ fun DiagnosticsScreen(graph: AppGraph, onOpenStudio: () -> Unit = {}, onOpenSelf
     var report by remember { mutableStateOf<String?>(null) }
     var testResult by remember { mutableStateOf<String?>(null) }
     val clipboard = LocalClipboardManager.current
+    val context = androidx.compose.ui.platform.LocalContext.current
 
     Column(
         Modifier
@@ -50,105 +54,122 @@ fun DiagnosticsScreen(graph: AppGraph, onOpenStudio: () -> Unit = {}, onOpenSelf
             .padding(16.dp),
         verticalArrangement = Arrangement.spacedBy(12.dp),
     ) {
-        Text("Diagnostics", style = HermesType.screenTitle, color = c.ink)
+        Text(stringResource(Res.string.diag_title), style = HermesType.screenTitle, color = c.ink)
         MeanderBand(colors = hermesColors, modifier = Modifier.padding(top = 6.dp))
         Row(horizontalArrangement = Arrangement.spacedBy(8.dp)) {
-            TextButton(onClick = onOpenStudio) { Text("Open Tower Connection Studio →") }
-            TextButton(onClick = onOpenSelfTest) { Text("Run Self-Test →") }
+            TextButton(onClick = onOpenStudio) { Text(stringResource(Res.string.diag_studio_link)) }
+            TextButton(onClick = onOpenSelfTest) { Text(stringResource(Res.string.diag_selftest_link)) }
         }
 
-        SectionCard(title = "Device (real values)") {
-            Text("Manufacturer: ${healthState.manufacturer}", style = HermesType.body, color = c.ink)
-            Text("Model: ${healthState.model}", style = HermesType.body, color = c.ink)
-            Text("Android: ${healthState.androidRelease} (SDK ${healthState.sdkInt})", style = HermesType.body, color = c.ink)
+        SectionCard(title = stringResource(Res.string.diag_device_card)) {
+            Text(stringResource(Res.string.diag_manufacturer_fmt, healthState.manufacturer), style = HermesType.body, color = c.ink)
+            Text(stringResource(Res.string.diag_model_fmt, healthState.model), style = HermesType.body, color = c.ink)
+            Text(stringResource(Res.string.diag_android_fmt, healthState.androidRelease, healthState.sdkInt), style = HermesType.body, color = c.ink)
             Text(
-                "Memory: ${healthState.memoryTotalMb ?: "unavailable"} MB total, ${healthState.memoryAvailableMb ?: "unavailable"} MB available",
+                stringResource(
+                    Res.string.diag_memory_fmt,
+                    healthState.memoryTotalMb ?: stringResource(Res.string.diag_unavailable),
+                    healthState.memoryAvailableMb ?: stringResource(Res.string.diag_unavailable),
+                ),
                 style = HermesType.body, color = c.ink,
             )
             Text(
-                "Storage free: ${healthState.storageFreeGb?.let { "%.1f".format(it) } ?: "unavailable"} GB",
+                stringResource(
+                    Res.string.diag_storage_fmt,
+                    healthState.storageFreeGb?.let { "%.1f".format(it) } ?: stringResource(Res.string.diag_unavailable),
+                ),
                 style = HermesType.body, color = c.ink,
             )
             Text(
-                "Battery temperature: ${healthState.batteryTemperatureC?.let { "%.1f".format(it) } ?: "unavailable"} °C (charging: ${healthState.isCharging ?: "unavailable"})",
+                stringResource(
+                    Res.string.diag_battery_fmt,
+                    healthState.batteryTemperatureC?.let { "%.1f".format(it) } ?: stringResource(Res.string.diag_unavailable),
+                    healthState.isCharging ?: stringResource(Res.string.diag_unavailable),
+                ),
                 style = HermesType.body, color = c.ink,
             )
             Text(
-                "Refresh rate: ${healthState.refreshRateHz?.let { "%.0f".format(it) } ?: "unavailable"} Hz — thermal: ${healthState.thermalStatus ?: "unavailable"}",
+                stringResource(
+                    Res.string.diag_refresh_fmt,
+                    healthState.refreshRateHz?.let { "%.0f".format(it) } ?: stringResource(Res.string.diag_unavailable),
+                    healthState.thermalStatus ?: stringResource(Res.string.diag_unavailable),
+                ),
                 style = HermesType.body, color = c.ink,
             )
             Text(
-                "A dash or 'unavailable' means the platform does not expose the datum; nothing here is fabricated.",
+                stringResource(Res.string.diag_unavailable_note),
                 style = HermesType.bodySecondary,
                 color = c.inkSecondary,
             )
         }
 
-        SectionCard(title = "Service state") {
+        SectionCard(title = stringResource(Res.string.diag_service_card)) {
             Row(horizontalArrangement = Arrangement.spacedBy(8.dp)) {
-                TruthBadge("VoiceConsoleService: REGISTERED, NOT STARTED", c.warn)
+                TruthBadge(stringResource(Res.string.diag_service_badge), c.warn)
             }
             Text(
-                "Truthful per decision D-011: the foreground voice service is V0.2 work; starting a service now would imply a pipeline that does not exist.",
+                stringResource(Res.string.diag_service_note),
                 style = HermesType.bodySecondary,
                 color = c.inkSecondary,
             )
         }
 
-        SectionCard(title = "Tests") {
+        SectionCard(title = stringResource(Res.string.diag_tests_card)) {
             Row(horizontalArrangement = Arrangement.spacedBy(8.dp)) {
                 Button(onClick = {
                     scope.launch {
                         testResult = when (val r = graph.bridge.handshake()) {
-                            is com.hermestower.voiceconsole.domain.BridgeResult.Success -> "Bridge handshake: OK (mock)"
-                            is com.hermestower.voiceconsole.domain.BridgeResult.Failure -> "Bridge handshake: FAILED (${r.error})"
+                            is com.hermestower.voiceconsole.domain.BridgeResult.Success ->
+                                context.getString(Res.string.diag_bridge_ok)
+                            is com.hermestower.voiceconsole.domain.BridgeResult.Failure ->
+                                context.getString(Res.string.diag_bridge_fail, r.error)
                         }
                     }
-                }) { Text("Run bridge test") }
+                }) { Text(stringResource(Res.string.diag_run_bridge)) }
                 TextButton(onClick = {
-                    testResult = "Audio loopback test: NOT AVAILABLE (V0.2 — no capture engine exists in V0.1)."
-                }) { Text("Run audio test") }
+                    testResult = context.getString(Res.string.diag_audio_unavailable)
+                }) { Text(stringResource(Res.string.diag_run_audio)) }
             }
             testResult?.let { Text(it, style = HermesType.body, color = c.ink) }
             Text(
-                "Bridge endpoint: ${connection.value.endpointLabel} · status ${connection.value.status.name.lowercase()}",
+                stringResource(Res.string.diag_bridge_endpoint_fmt, connection.value.endpointLabel, connection.value.status.name.lowercase()),
                 style = HermesType.bodySecondary,
                 color = c.inkSecondary,
             )
         }
 
-        SectionCard(title = "Simulation (prototype controls)") {
+        SectionCard(title = stringResource(Res.string.diag_sim_card)) {
             Row(horizontalArrangement = Arrangement.spacedBy(6.dp)) {
-                TextButton(onClick = { graph.driver.setFault(BridgeFault.DISCONNECT_AT_ACK) }) { Text("Simulate disconnect") }
-                TextButton(onClick = { graph.driver.setFault(BridgeFault.ERROR_AFTER_PROGRESS) }) { Text("Simulate tower error") }
+                TextButton(onClick = { graph.driver.setFault(BridgeFault.DISCONNECT_AT_ACK) }) { Text(stringResource(Res.string.diag_sim_disconnect)) }
+                TextButton(onClick = { graph.driver.setFault(BridgeFault.ERROR_AFTER_PROGRESS) }) { Text(stringResource(Res.string.diag_sim_tower_error)) }
             }
             Row(horizontalArrangement = Arrangement.spacedBy(6.dp)) {
-                TextButton(onClick = { graph.driver.setFault(BridgeFault.SLOW_TOWER) }) { Text("Simulate slow tower") }
-                TextButton(onClick = { graph.driver.clearFault() }) { Text("Clear fault") }
+                TextButton(onClick = { graph.driver.setFault(BridgeFault.SLOW_TOWER) }) { Text(stringResource(Res.string.diag_sim_slow)) }
+                TextButton(onClick = { graph.driver.clearFault() }) { Text(stringResource(Res.string.diag_clear_fault)) }
             }
             Row(horizontalArrangement = Arrangement.spacedBy(6.dp)) {
-                TextButton(onClick = { graph.driver.simulateUpdateAvailable() }) { Text("Simulate update") }
-                TextButton(onClick = { graph.events.clear() }) { Text("Clear event log") }
+                TextButton(onClick = { graph.driver.simulateUpdateAvailable() }) { Text(stringResource(Res.string.diag_sim_update)) }
+                TextButton(onClick = { graph.events.clear() }) { Text(stringResource(Res.string.diag_clear_events)) }
             }
             Text(
-                "These buttons drive the real code paths (bridge faults, states) — they do not fake UI states.",
+                stringResource(Res.string.diag_sim_note),
                 style = HermesType.bodySecondary,
                 color = c.inkSecondary,
             )
         }
 
-        SectionCard(title = "Redacted log export") {
-            Button(onClick = { report = graph.diagnostics.exportRedactedReport() }) { Text("Generate redacted report") }
+        SectionCard(title = stringResource(Res.string.diag_export_card)) {
+            Button(onClick = { report = graph.diagnostics.exportRedactedReport() }) { Text(stringResource(Res.string.diag_generate)) }
             report?.let {
                 Text(
                     it.take(1200) + if (it.length > 1200) " …" else "",
                     style = HermesType.bodySecondary,
                     color = c.inkSecondary,
                 )
-                TextButton(onClick = { clipboard.setText(AnnotatedString(it)) }) { Text("Copy full report") }
+                TextButton(onClick = { clipboard.setText(AnnotatedString(it)) }) { Text(stringResource(Res.string.diag_copy_full)) }
             }
             Text(
-                "Every exported line passes LogRedactor (token/key/secret assignments, long hex and base64 runs are masked) — unit-tested (SEC-06).",
+                stringResource(Res.string.diag_redaction_note),
                 style = HermesType.bodySecondary,
                 color = c.inkSecondary,
             )

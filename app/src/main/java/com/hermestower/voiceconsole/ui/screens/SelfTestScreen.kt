@@ -17,6 +17,8 @@ import androidx.compose.runtime.remember
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.platform.LocalClipboardManager
+import androidx.compose.ui.platform.LocalContext
+import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.AnnotatedString
 import androidx.compose.ui.unit.dp
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
@@ -42,6 +44,7 @@ fun SelfTestScreen(graph: AppGraph) {
     val current by center.current.collectAsStateWithLifecycle()
     var note by remember { mutableStateOf<String?>(null) }
     val clipboard = LocalClipboardManager.current
+    val context = LocalContext.current
 
     Column(
         Modifier
@@ -50,47 +53,46 @@ fun SelfTestScreen(graph: AppGraph) {
             .padding(16.dp),
         verticalArrangement = Arrangement.spacedBy(12.dp),
     ) {
-        Text("Self-Test Center", style = HermesType.screenTitle, color = c.ink)
+        Text(stringResource(com.hermestower.voiceconsole.R.string.st_title), style = HermesType.screenTitle, color = c.ink)
         MeanderBand(colors = hermesColors, modifier = Modifier.padding(top = 6.dp))
         Text(
-            "Deterministic checks for every V0.2 subsystem. They run on this device, need no Tower, " +
-                "and never send data anywhere. Results are honest: FAIL is a finding, not an error to hide.",
+            stringResource(com.hermestower.voiceconsole.R.string.st_intro),
             style = HermesType.bodySecondary, color = c.inkSecondary,
         )
 
-        SectionCard(title = "Run") {
+        SectionCard(title = stringResource(com.hermestower.voiceconsole.R.string.st_run_card)) {
             Row(horizontalArrangement = Arrangement.spacedBy(6.dp)) {
-                Button(enabled = !running, onClick = { note = null; center.run(SelfTestMode.QUICK) }) { Text("Run Quick") }
-                TextButton(enabled = !running, onClick = { note = null; center.run(SelfTestMode.STANDARD) }) { Text("Run Standard") }
-                TextButton(enabled = !running, onClick = { note = null; center.run(SelfTestMode.FULL) }) { Text("Run Full") }
+                Button(enabled = !running, onClick = { note = null; center.run(SelfTestMode.QUICK) }) { Text(stringResource(com.hermestower.voiceconsole.R.string.st_run_quick)) }
+                TextButton(enabled = !running, onClick = { note = null; center.run(SelfTestMode.STANDARD) }) { Text(stringResource(com.hermestower.voiceconsole.R.string.st_run_standard)) }
+                TextButton(enabled = !running, onClick = { note = null; center.run(SelfTestMode.FULL) }) { Text(stringResource(com.hermestower.voiceconsole.R.string.st_run_full)) }
             }
             Row(horizontalArrangement = Arrangement.spacedBy(6.dp)) {
-                TextButton(enabled = !running, onClick = { note = null; center.run(SelfTestMode.CONNECTIVITY_ONLY) }) { Text("Connectivity only") }
-                TextButton(enabled = !running, onClick = { note = null; center.run(SelfTestMode.VOICE_FOUNDATION_ONLY) }) { Text("Voice foundation only") }
+                TextButton(enabled = !running, onClick = { note = null; center.run(SelfTestMode.CONNECTIVITY_ONLY) }) { Text(stringResource(com.hermestower.voiceconsole.R.string.st_connectivity_only)) }
+                TextButton(enabled = !running, onClick = { note = null; center.run(SelfTestMode.VOICE_FOUNDATION_ONLY) }) { Text(stringResource(com.hermestower.voiceconsole.R.string.st_voice_only)) }
             }
             Row(horizontalArrangement = Arrangement.spacedBy(6.dp)) {
-                TextButton(enabled = running, onClick = { center.stop(); note = "Stopped." }) { Text("Stop") }
-                TextButton(enabled = !running, onClick = { center.retryFailed(); note = "Retrying failed tests." }) { Text("Retry Failed Tests") }
-                TextButton(enabled = !running, onClick = { center.resetHistory(); note = "Test history reset." }) { Text("Reset Test History") }
+                TextButton(enabled = running, onClick = { center.stop(); note = context.getString(com.hermestower.voiceconsole.R.string.st_note_stopped) }) { Text(stringResource(com.hermestower.voiceconsole.R.string.st_stop)) }
+                TextButton(enabled = !running, onClick = { center.retryFailed(); note = context.getString(com.hermestower.voiceconsole.R.string.st_note_retrying) }) { Text(stringResource(com.hermestower.voiceconsole.R.string.st_retry_failed)) }
+                TextButton(enabled = !running, onClick = { center.resetHistory(); note = context.getString(com.hermestower.voiceconsole.R.string.st_note_reset) }) { Text(stringResource(com.hermestower.voiceconsole.R.string.st_reset_history)) }
             }
             Row(horizontalArrangement = Arrangement.spacedBy(6.dp)) {
                 TextButton(onClick = {
                     val report = center.exportSecretCleanReport()
                     clipboard.setText(AnnotatedString(report))
-                    note = "Secret-clean report copied to clipboard (${report.lines().size} lines)."
-                }) { Text("Export Secret-Clean Report") }
+                    note = context.getString(com.hermestower.voiceconsole.R.string.st_note_export_fmt, report.lines().size)
+                }) { Text(stringResource(com.hermestower.voiceconsole.R.string.st_export_report)) }
                 TextButton(onClick = {
                     clipboard.setText(AnnotatedString(center.summary()))
-                    note = "Summary copied."
-                }) { Text("Copy Summary") }
+                    note = context.getString(com.hermestower.voiceconsole.R.string.st_note_summary)
+                }) { Text(stringResource(com.hermestower.voiceconsole.R.string.st_copy_summary)) }
             }
-            if (running) Text("Running: ${current ?: "…"}", style = HermesType.body, color = c.energy)
+            if (running) Text(stringResource(com.hermestower.voiceconsole.R.string.st_running_fmt, current ?: "…"), style = HermesType.body, color = c.energy)
             note?.let { Text(it, style = HermesType.bodySecondary, color = c.inkSecondary) }
         }
 
-        SectionCard(title = "Results") {
+        SectionCard(title = stringResource(com.hermestower.voiceconsole.R.string.st_results_card)) {
             if (results.isEmpty()) {
-                Text("No tests run yet in this session.", style = HermesType.bodySecondary, color = c.inkSecondary)
+                Text(stringResource(com.hermestower.voiceconsole.R.string.st_none_yet), style = HermesType.bodySecondary, color = c.inkSecondary)
             }
             results.toSortedMap().forEach { (id, result) ->
                 val stateLabel = when (result.state) {
@@ -112,7 +114,7 @@ fun SelfTestScreen(graph: AppGraph) {
                         else -> c.inkSecondary
                     },
                 )
-                result.repairSuggestion?.let { Text("Repair: $it", style = HermesType.bodySecondary, color = c.inkSecondary) }
+                result.repairSuggestion?.let { Text(stringResource(com.hermestower.voiceconsole.R.string.st_repair_fmt, it), style = HermesType.bodySecondary, color = c.inkSecondary) }
             }
             if (results.isNotEmpty()) {
                 Text(center.summary(), style = HermesType.body, color = c.ink)
