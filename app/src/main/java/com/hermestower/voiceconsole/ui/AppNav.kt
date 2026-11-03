@@ -75,6 +75,7 @@ import com.hermestower.voiceconsole.ui.screens.LocalIntelligenceScreen
 import com.hermestower.voiceconsole.ui.screens.ModelManagerScreen
 import com.hermestower.voiceconsole.ui.screens.SelfTestScreen
 import com.hermestower.voiceconsole.ui.screens.QrScannerScreen
+import com.hermestower.voiceconsole.ui.screens.SettingsHubScreen
 import com.hermestower.voiceconsole.ui.screens.TowerStudioScreen
 import com.hermestower.voiceconsole.ui.screens.VoiceAudioScreen
 import com.hermestower.voiceconsole.ui.nav.DrawerWidthPolicy
@@ -97,17 +98,18 @@ private val destinations = listOf(
     Destination(AppRoutes.DIAGNOSTICS, com.hermestower.voiceconsole.R.string.dest_diagnostics, Icons.Outlined.BugReport),
     Destination(AppRoutes.SELF_TEST, com.hermestower.voiceconsole.R.string.dest_selftest, Icons.Outlined.FactCheck),
     Destination(AppRoutes.ABOUT, com.hermestower.voiceconsole.R.string.dest_about, Icons.Outlined.Info),
+    Destination(AppRoutes.SETTINGS, com.hermestower.voiceconsole.R.string.dest_settings, Icons.Outlined.Settings),
 )
 
-/** GRAPH 4 G4-C07 (Owner delta §11): primary then secondary destinations.
- *  CP-G4-011 (§14): Tower Archive joins PRIMARY. */
+/** CP-G4-017 (directive §5): the drawer exposes ONLY the five primary
+ *  destinations. Every technical destination is reached through the Settings
+ *  hub (GENERAL / VOICE / TOWER CONNECTION / MODELS / DISPLAY / DIAGNOSTICS),
+ *  which keeps the ordinary product feeling like a dedicated Hermes console
+ *  rather than a developer control panel. The compact side-panel policy
+ *  (G4-C07: 60% preferred, 2/3 hard max, 248–360dp) is unchanged. */
 private val primaryDestinations = listOf(
     AppRoutes.CONSOLE, AppRoutes.ARCHIVE, AppRoutes.TOWER_STUDIO,
-    AppRoutes.MODEL_MANAGER, AppRoutes.SELF_TEST,
-)
-private val secondaryDestinations = listOf(
-    AppRoutes.HISTORY, AppRoutes.CONNECTION, AppRoutes.VOICE,
-    AppRoutes.INTELLIGENCE, AppRoutes.APPEARANCE, AppRoutes.DIAGNOSTICS, AppRoutes.ABOUT,
+    AppRoutes.MODEL_MANAGER, AppRoutes.SETTINGS,
 )
 
 private fun subtitleFor(route: String): String = when (route) {
@@ -123,6 +125,7 @@ private fun subtitleFor(route: String): String = when (route) {
     AppRoutes.DIAGNOSTICS -> "MECHANISM INSPECTION"
     AppRoutes.SELF_TEST -> "TRIAL CHAMBER"
     AppRoutes.ABOUT -> "FOUNDATION CHAMBER"
+    AppRoutes.SETTINGS -> "CONTROL CORRIDOR"
     else -> ""
 }
 
@@ -203,14 +206,12 @@ fun AppNav(graph: AppGraph) {
                         }
                         HorizontalDivider(color = m.bronzeDeep, modifier = Modifier.padding(top = 10.dp))
 
-                        // ---- PRIMARY destinations ----
+                        // ---- PRIMARY destinations (the only drawer section; CP-G4-017) ----
                         Text(stringResource(com.hermestower.voiceconsole.R.string.nav_primary), style = MonumentalType.sealSub, color = m.gold, modifier = Modifier.padding(top = 12.dp, bottom = 4.dp))
-                        primaryDestinations.forEach { route -> DrawerRow(route, currentRoute, m, compact = true) { navController.navigate(route) { launchSingleTop = true } } }
-                        HorizontalDivider(color = m.bronzeDeep, modifier = Modifier.padding(top = 8.dp))
-
-                        // ---- SECONDARY destinations ----
-                        Text(stringResource(com.hermestower.voiceconsole.R.string.nav_secondary), style = MonumentalType.sealSub, color = m.inkSecondary, modifier = Modifier.padding(top = 10.dp, bottom = 4.dp))
-                        secondaryDestinations.forEach { route -> DrawerRow(route, currentRoute, m, compact = true) { navController.navigate(route) { launchSingleTop = true } } }
+                        // CP-G4-017: selecting a destination closes the drawer
+                        // (Material modal-drawer behavior; also keeps the real-frame
+                        // CI path physically sound — the hub is never behind a scrim).
+                        primaryDestinations.forEach { route -> DrawerRow(route, currentRoute, m, compact = true) { scope.launch { drawerState.close() }; navController.navigate(route) { launchSingleTop = true } } }
                         HorizontalDivider(color = m.bronzeDeep, modifier = Modifier.padding(top = 8.dp))
 
                         // ---- FOOTER: version, mode, language (§11) ----
@@ -295,6 +296,7 @@ fun AppNav(graph: AppGraph) {
                 composable(AppRoutes.TOWER_STUDIO) { TowerStudioScreen(graph, onOpenScanner = { navController.navigate(AppRoutes.QR_SCANNER) { launchSingleTop = true } }) }
                 composable(AppRoutes.QR_SCANNER) { QrScannerScreen(graph, onBack = { navController.popBackStack() }) }
                 composable(AppRoutes.VOICE) { VoiceAudioScreen(graph) }
+                composable(AppRoutes.SETTINGS) { SettingsHubScreen(onOpen = { route -> navController.navigate(route) { launchSingleTop = true } }) }
                 composable(AppRoutes.MODEL_MANAGER) { ModelManagerScreen(graph) }
                 composable(AppRoutes.INTELLIGENCE) { LocalIntelligenceScreen(graph) }
                 composable(AppRoutes.APPEARANCE) { AppearanceScreen(graph) }

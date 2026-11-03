@@ -19,9 +19,15 @@ object AppRoutes {
     const val ARCHIVE = "archive"
     const val QR_SCANNER = "qr_scanner"
 
+    /** CP-G4-017 (directive §5): the Settings hub — the fifth and only new
+     *  primary destination. General/voice/tower/models/display categories and
+     *  the diagnostics group are reached FROM here; the drawer lists only the
+     *  five primary destinations. */
+    const val SETTINGS = "settings"
+
     val all: Set<String> = setOf(
         CONSOLE, HISTORY, CONNECTION, VOICE, INTELLIGENCE, APPEARANCE,
         DIAGNOSTICS, ABOUT, MODEL_MANAGER, TOWER_STUDIO, SELF_TEST, ARCHIVE,
-        QR_SCANNER,
+        QR_SCANNER, SETTINGS,
     )
 }

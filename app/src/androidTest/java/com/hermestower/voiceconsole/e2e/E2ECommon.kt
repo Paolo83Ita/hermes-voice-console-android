@@ -75,11 +75,14 @@ object E2E {
 }
 
 /**
- * CP-G4-007 E2E-ROBUSTNESS — the frozen-clock navigation contract (variant A).
+ * CP-G4-007 E2E-ROBUSTNESS — the frozen-clock navigation contract (variant A);
+ * CP-G4-017 — the Settings-hub path. The drawer lists ONLY the five primary
+ * destinations; when the requested label is not a drawer row, the harness walks
+ * the REAL product path (drawer → Settings hub → row) — no destination logic is
+ * ever called directly.
  *
- * Physics of the failure class (proven by runs 41459906172/41461749711/
- * 41470976708/41485512432/41503065076/41514356403 + the run-41514356403
- * semantics-tree dump):
+ * Variant A physics (proven by runs 41459906172/41461749711/41470976708/
+ * 41485512432/41503065076/41514356403 + the run-41514356403 semantics-tree dump):
  *  1. `freezeAnimationsForTest()` (needed: infinite Oracle Core animation)
  *     freezes the compose animation clock;
  *  2. the drawer-open and NavHost enter transitions advance ONLY on that clock
@@ -96,25 +99,19 @@ object E2E {
  */
 fun HermesComposeRule.openDrawerAndNavigate(destinationLabel: String, screenAnchor: String) {
     onNodeWithContentDescription("Open navigation drawer").performClick()
+
     if (ciLifecycleProfileRequested) {
-        // ---- Variant B: REAL frames. Wait in real time, click physically. ----
+        // ---- Variant B: REAL frames — wait in real time, click physically. ----
         waitUntil(15_000) { drawerRowNode(destinationLabel) != null }
-        val deadline = System.currentTimeMillis() + 5_000
-        while (System.currentTimeMillis() < deadline) {
-            val pos = drawerRowPosition(destinationLabel)
-            if (pos != null && pos.x >= 0f) break
-            Thread.sleep(50)
-        }
-        val rowNode = drawerRowNode(destinationLabel)
-        if (rowNode == null) error("drawer row '$destinationLabel' disappeared before activation")
-        val onScreen = drawerRowPosition(destinationLabel)?.let { it.x >= 0f } ?: false
-        if (onScreen) {
-            onAllNodes(hasText(destinationLabel, substring = true).and(hasClickAction()))[0]
-                .performClick()
-        } else {
-            val accessibleClick = rowNode.config[SemanticsActions.OnClick]
-            if (accessibleClick?.action != null) accessibleClick.action!!()
-            else error("drawer row '$destinationLabel' has no accessible OnClick action")
+        if (!activateRowReal(destinationLabel)) {
+            check(activateRowReal(SETTINGS_ROW)) { "Settings row missing from drawer" }
+            waitUntil(15_000) { drawerRowNode(destinationLabel) != null }
+            // Hub rows can sit below the fold: the accessible OnClick activation
+            // (the screen-reader path, Owner §3.3) is used — truthful, and immune
+            // to scroll state. Physical clicks stay reserved for drawer rows.
+            val hubRow = drawerRowNode(destinationLabel)
+                ?: error("settings-hub row '$destinationLabel' not found")
+            activateAccessible(hubRow, destinationLabel)
         }
         waitUntil(20_000) {
             onAllNodesWithText(screenAnchor, substring = true).fetchSemanticsNodes().isNotEmpty()
@@ -123,49 +120,80 @@ fun HermesComposeRule.openDrawerAndNavigate(destinationLabel: String, screenAnch
         return
     }
 
-    // ---- Variant A: frozen clock — bounded virtual-time pumping (unchanged). ----
+    // ---- Variant A: frozen clock — bounded virtual-time pumping. ----
     waitUntil(15_000) { drawerRowNode(destinationLabel) != null }
+    if (!activateRowFrozen(destinationLabel)) {
+        check(activateRowFrozen(SETTINGS_ROW)) { "Settings row missing from drawer" }
+        // pump until the Settings hub composes (its title anchor)
+        pumpToAnchor("Settings")
+        waitUntil(15_000) { drawerRowNode(destinationLabel) != null }
+        val hubRow = drawerRowNode(destinationLabel)
+            ?: error("settings-hub row '$destinationLabel' not found")
+        activateAccessible(hubRow, destinationLabel)
+    }
 
-    // (a) drawer-open animation: pump until the row is physically on-screen
+    // destination screen: pump until the anchor composes, then settle
+    pumpToAnchor(screenAnchor)
+}
+
+private const val SETTINGS_ROW = "Settings"
+
+/** Variant B activation: physical click when truly on-screen, accessible fallback. */
+private fun HermesComposeRule.activateRowReal(label: String): Boolean {
+    val deadline = System.currentTimeMillis() + 5_000
+    while (System.currentTimeMillis() < deadline) {
+        val pos = drawerRowPosition(label)
+        if (pos != null && pos.x >= 0f) break
+        Thread.sleep(50)
+    }
+    val rowNode = drawerRowNode(label) ?: return false
+    val onScreen = drawerRowPosition(label)?.let { it.x >= 0f } ?: false
+    return if (onScreen) {
+        onAllNodes(hasText(label, substring = true).and(hasClickAction()))[0].performClick()
+        true
+    } else {
+        activateAccessible(rowNode, label)
+    }
+}
+
+/** Variant A activation: accessible OnClick is primary (documented CP-G4-007
+ *  physics — frozen drawer position ambiguity), bounded virtual pump first. */
+private fun HermesComposeRule.activateRowFrozen(label: String): Boolean {
     var advanced = 0L
-    var onScreen = false
     while (advanced < 5_000L) {
         mainClock.advanceTimeBy(100)
         advanced += 100
-        onScreen = drawerRowPosition(destinationLabel)?.let { it.x >= 0f } ?: false
-        if (onScreen) break
+        val pos = drawerRowPosition(label)
+        if (pos != null && pos.x >= 0f) break
     }
+    val row = drawerRowNode(label) ?: return false
+    return activateAccessible(row, label)
+}
 
-    // (b) activate: the ACCESSIBLE OnClick semantics action is the primary
-    // activation path here (Owner §3.3) — on this emulator the frozen drawer
-    // animation leaves the sheet's visual position ambiguous (graphicsLayer
-    // translation is not reflected in layout coordinates), so touch injection
-    // cannot be trusted to land on the control. The physical clickability of
-    // the row remains ASSERTED by the hasClickAction matcher (Owner §3.4);
-    // physical touch qualification happens on the Xiaomi.
-    val row = drawerRowNode(destinationLabel)
-    if (row == null) error("drawer row '$destinationLabel' disappeared before activation")
+private fun activateAccessible(row: androidx.compose.ui.semantics.SemanticsNode, label: String): Boolean {
     val accessibleClick = row.config[SemanticsActions.OnClick]
     if (accessibleClick?.action != null) {
         accessibleClick.action!!()
-    } else {
-        error("drawer row '$destinationLabel' has no accessible OnClick action")
+        return true
     }
+    error("row '$label' has no accessible OnClick action")
+}
 
-    // (c) destination screen: pump until the anchor composes
+/** Frozen-clock bounded pump until [anchor] composes, then a settle window. */
+private fun HermesComposeRule.pumpToAnchor(anchor: String) {
     var settled = 0L
     while (settled < 20_000L) {
         mainClock.advanceTimeBy(100)
         settled += 100
-        if (onAllNodesWithText(screenAnchor, substring = true).fetchSemanticsNodes().isNotEmpty()) {
-            // (d) settle window: transition + layout/placement complete before
-            // any further PHYSICAL click on the new screen
+        if (onAllNodesWithText(anchor, substring = true).fetchSemanticsNodes().isNotEmpty()) {
+            // settle window: transition + layout/placement complete before any
+            // further activation on the new screen
             mainClock.advanceTimeBy(600)
             return
         }
     }
     error(
-        "destination screen anchor '$screenAnchor' did not compose within 20 s of virtual time; " +
+        "screen anchor '$anchor' did not compose within 20 s of virtual time; " +
             "visible texts: " + visibleTextsSample(),
     )
 }
