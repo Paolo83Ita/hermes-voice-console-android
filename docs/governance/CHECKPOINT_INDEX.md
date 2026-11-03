@@ -62,3 +62,14 @@ Graph 4 checkpoints (branch graph-4/real-voice-pairing-archive-e2e, from ca8980b
 | CP-G4-010 | (this commit) | G4-C07 compact responsive navigation — DrawerWidthPolicy (hard 2/3 maximum, 60% preferred, 248–360dp bounds; pure + full width-matrix test), drawer rebuilt with HEADER (sigil/bridge/close) + PRIMARY/SECONDARY (Owner §11 destinations) + FOOTER (version/mode/lang), 48dp rows, two-line labels |
 | CP-G4-011a | (this commit) | G4-C08 wave 1 — five-language localization: 75-key strings in values + it/es/fr/de (Owner §14 terminology anchors), AppLanguage per-app locale (LocaleManager 33+ official, attachBaseContext fallback 30–32), localeConfig, Settings→Language (Follow system + 5 languages, persistent, reversible), Console+Nav+Appearance localized, LocalizationParityTest (GATE-05) — 178/178 |
 | CP-G4-012a | (this commit) | G4-C09 wave 1 — versioned Tower pairing client: strict hermes-pair://v1 QR parser with full typed-rejection matrix (Owner delta §11, 14 deterministic tests incl. replay/expiry/environment/endpoint), session nonce store, redaction-safe describe, MockTowerPairingClient (deterministic, ZERO network, real pairing explicitly deferred to Tower Graph 1.7). Tests 192/192 |
+
+## GRAPH 4 — CP-G4-007 (E2E-ROBUSTNESS) — CLOSED WITH TYPED RESIDUAL (2026-11-03)
+- NODE/FINDING/ACTION/TEST/FILES/EVIDENCE/COMMIT/READ-BACK: WORK_LOG G4-N11 + G4-N12;
+  docs/testing/E2E_FAILURE_LEDGER.md (full per-failure ledger + verdict addenda).
+- E2E trajectory: 14 deterministic failures (runs 41459906172/41461749711/41470976708) → 8
+  (run 41539016998, state-machine repair verified) → 0 assertion failures
+  (run 41551630218) with a typed EMULATOR_INPUT_INJECTION_LIMITATION residual aborting the
+  suite at #14 (frozen-clock transition stall + navigation-compose teardown race).
+- Application defect found + fixed: queue-state machine starvation (latent since Graph 1).
+- Owner field report fixed: status-bar overlap (WindowInsets.safeDrawing at AppNav root).
+- Governance: no main changes; no force-push; all checkpoints pushed and read back.

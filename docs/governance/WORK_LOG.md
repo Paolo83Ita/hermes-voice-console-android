@@ -477,3 +477,25 @@ NEXT: cloud E2E verdict for aeb69a3 → update E2E_FAILURE_LEDGER verdicts;
 19_20 root cause from the diagnostics dump (attempt 3 of 3 for RC-3);
 then CP-G4-009 real model delivery + QR scanner wave 2; governance
 convergence at each checkpoint.
+
+NODE G4-N12 — CP-G4-007 terminal evidence: 14→8→0 assertion failures + typed residual (2026-11-03)
+FINDING: three more instrumented E2E cycles produced decisive evidence: (a) run 41527072357
+FLUSH diagnostics exposed the REAL queue root cause — the offline-queue branch entered
+REQUEST_QUEUED while TRANSCRIBING (illegal edge, silently ignored since Graph 1) so the state
+stayed pipeline-active and every reconnect flush skipped (turns id=3/id=6 stuck QUEUED);
+(b) run 41539016998 confirmed the state-matrix repair: e2e_19_20 + SelfTest trio + e2e_23 all
+GREEN (13→8 failures); (c) run 41551630218 (semantics-first drawer activation) reached ZERO
+assertion failures — the suite aborted at test #14 on the frozen-clock residual: navigate()
+provably fires (NavBackStackEntry created) but the entering content never composes under the
+frozen animation clock, and teardown then trips the navigation-compose 2.8.5
+INITIALIZED→DESTROYED lifecycle race (process death — library-internal).
+ACTION: ConsoleStateMachine +TRANSCRIBING→REQUEST_QUEUED / +IDLE→REQUEST_QUEUED
+(pinned by QueueStateMachineTest ×4); ledger verdict recorded (EMULATOR_INPUT_INJECTION_
+LIMITATION, 3 attempts consumed, recovery = Xiaomi / animation-free CI variant / navigation
+upgrade node); owner field report fixed earlier in this node chain (WindowInsets.safeDrawing).
+TEST: 225/225 unit green; lint 0 errors / 34 warnings; cloud debug-build SUCCESS at
+3deb28c and 26e2e8d; secret scan 0.
+COMMIT: 3deb28c → 26e2e8d → 7014d3e (all pushed, read back exact)
+NEXT: CP-G4-009 real model delivery + §6 control audit → CP-G4-010 wave 2 CameraX QR
+scanner → visual refinement → packaging; Owner decision requested on the residual recovery
+path (physical Xiaomi / animation-free CI variant / navigation upgrade).
