@@ -126,9 +126,12 @@ fun QrScannerScreen(graph: AppGraph, onBack: () -> Unit) {
                 }
             }
 
-            cameraError != null -> SectionCard(title = stringResource(com.hermestower.voiceconsole.R.string.qr_unavailable_card)) {
+            // capture the delegated value once: smart cast is impossible on a
+            // delegated property, and the format arg must be non-null Any.
+            val cameraFailure = cameraError
+            cameraFailure != null -> SectionCard(title = stringResource(com.hermestower.voiceconsole.R.string.qr_unavailable_card)) {
                 Text(
-                    stringResource(com.hermestower.voiceconsole.R.string.qr_unavailable_note, cameraError),
+                    stringResource(com.hermestower.voiceconsole.R.string.qr_unavailable_note, cameraFailure),
                     style = HermesType.body, color = c.energy,
                 )
             }
