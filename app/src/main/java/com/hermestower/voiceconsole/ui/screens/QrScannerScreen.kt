@@ -44,6 +44,7 @@ import com.google.mlkit.vision.common.InputImage
 import com.hermestower.voiceconsole.app.AppGraph
 import com.hermestower.voiceconsole.pairing.QrPairingScanFlow
 import com.hermestower.voiceconsole.ui.components.SectionCard
+import com.hermestower.voiceconsole.ui.components.MeanderBand
 import com.hermestower.voiceconsole.ui.theme.HermesType
 import com.hermestower.voiceconsole.ui.theme.hermesColors
 import kotlinx.coroutines.launch
@@ -101,6 +102,7 @@ fun QrScannerScreen(graph: AppGraph, onBack: () -> Unit) {
         verticalArrangement = Arrangement.spacedBy(12.dp),
     ) {
         Text("Scan pairing QR", style = HermesType.screenTitle, color = c.ink)
+        MeanderBand(colors = hermesColors, modifier = Modifier.padding(top = 6.dp))
         Text(
             "Point the camera at the Tower's hermes-pair QR code. Frames are decoded on-device " +
                 "and never stored. The payload is checked by the strict versioned parser before " +

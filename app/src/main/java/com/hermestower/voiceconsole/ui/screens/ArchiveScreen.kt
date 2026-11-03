@@ -27,6 +27,7 @@ import com.hermestower.voiceconsole.archive.ArchiveMission
 import com.hermestower.voiceconsole.archive.ArchiveSource
 import com.hermestower.voiceconsole.archive.MockTowerArchive
 import com.hermestower.voiceconsole.ui.components.SectionCard
+import com.hermestower.voiceconsole.ui.components.MeanderBand
 import com.hermestower.voiceconsole.ui.components.TruthBadge
 import com.hermestower.voiceconsole.ui.monumental.MonumentalType
 import com.hermestower.voiceconsole.ui.monumental.monumentalColors
@@ -55,6 +56,7 @@ fun ArchiveScreen(archive: MockTowerArchive) {
         verticalArrangement = Arrangement.spacedBy(12.dp),
     ) {
         Text("Tower Archive", style = HermesType.screenTitle, color = c.ink)
+        MeanderBand(colors = hermesColors, modifier = Modifier.padding(top = 6.dp))
         Text("ARCHIVE CHAMBER", style = MonumentalType.sealSub, color = m.gold)
         TruthBadge("SIMULATED DATA — the real Tower stays the authority (Tower Graph 1.7 pending)", c.inkSecondary)
 

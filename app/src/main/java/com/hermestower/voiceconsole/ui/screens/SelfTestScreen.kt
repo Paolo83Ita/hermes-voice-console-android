@@ -24,6 +24,7 @@ import com.hermestower.voiceconsole.app.AppGraph
 import com.hermestower.voiceconsole.selftest.SelfTestMode
 import com.hermestower.voiceconsole.selftest.SelfTestState
 import com.hermestower.voiceconsole.ui.components.SectionCard
+import com.hermestower.voiceconsole.ui.components.MeanderBand
 import com.hermestower.voiceconsole.ui.theme.HermesType
 import com.hermestower.voiceconsole.ui.theme.hermesColors
 
@@ -50,6 +51,7 @@ fun SelfTestScreen(graph: AppGraph) {
         verticalArrangement = Arrangement.spacedBy(12.dp),
     ) {
         Text("Self-Test Center", style = HermesType.screenTitle, color = c.ink)
+        MeanderBand(colors = hermesColors, modifier = Modifier.padding(top = 6.dp))
         Text(
             "Deterministic checks for every V0.2 subsystem. They run on this device, need no Tower, " +
                 "and never send data anywhere. Results are honest: FAIL is a finding, not an error to hide.",

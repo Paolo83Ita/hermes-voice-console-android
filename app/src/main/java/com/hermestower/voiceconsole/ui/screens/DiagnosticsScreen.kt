@@ -23,6 +23,7 @@ import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import com.hermestower.voiceconsole.app.AppGraph
 import com.hermestower.voiceconsole.bridge.BridgeFault
 import com.hermestower.voiceconsole.ui.components.SectionCard
+import com.hermestower.voiceconsole.ui.components.MeanderBand
 import com.hermestower.voiceconsole.ui.components.TruthBadge
 import com.hermestower.voiceconsole.ui.theme.HermesType
 import com.hermestower.voiceconsole.ui.theme.hermesColors
@@ -50,6 +51,7 @@ fun DiagnosticsScreen(graph: AppGraph, onOpenStudio: () -> Unit = {}, onOpenSelf
         verticalArrangement = Arrangement.spacedBy(12.dp),
     ) {
         Text("Diagnostics", style = HermesType.screenTitle, color = c.ink)
+        MeanderBand(colors = hermesColors, modifier = Modifier.padding(top = 6.dp))
         Row(horizontalArrangement = Arrangement.spacedBy(8.dp)) {
             TextButton(onClick = onOpenStudio) { Text("Open Tower Connection Studio →") }
             TextButton(onClick = onOpenSelfTest) { Text("Run Self-Test →") }

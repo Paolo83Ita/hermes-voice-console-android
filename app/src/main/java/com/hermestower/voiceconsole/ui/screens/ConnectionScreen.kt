@@ -24,6 +24,7 @@ import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import com.hermestower.voiceconsole.app.AppGraph
 import com.hermestower.voiceconsole.core.state.ConnectionStatus
 import com.hermestower.voiceconsole.ui.components.SectionCard
+import com.hermestower.voiceconsole.ui.components.MeanderBand
 import com.hermestower.voiceconsole.ui.components.TruthBadge
 import com.hermestower.voiceconsole.ui.theme.HermesType
 import com.hermestower.voiceconsole.ui.theme.hermesColors
@@ -51,6 +52,7 @@ fun ConnectionScreen(graph: AppGraph, onOpenStudio: () -> Unit = {}) {
         verticalArrangement = Arrangement.spacedBy(12.dp),
     ) {
         Text("Connection", style = HermesType.screenTitle, color = c.ink)
+        MeanderBand(colors = hermesColors, modifier = Modifier.padding(top = 6.dp))
         TextButton(onClick = onOpenStudio) {
             Text("Open Hermes Tower Connection Studio →")
         }

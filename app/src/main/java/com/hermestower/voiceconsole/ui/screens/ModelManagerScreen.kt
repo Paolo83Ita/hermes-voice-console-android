@@ -30,6 +30,7 @@ import com.hermestower.voiceconsole.models.ModelSha256
 import com.hermestower.voiceconsole.models.VoiceModelProfile
 import com.hermestower.voiceconsole.towersim.LocalTowerMockServer
 import com.hermestower.voiceconsole.ui.components.SectionCard
+import com.hermestower.voiceconsole.ui.components.MeanderBand
 import com.hermestower.voiceconsole.ui.theme.HermesType
 import com.hermestower.voiceconsole.ui.theme.hermesColors
 import kotlinx.coroutines.launch
@@ -89,6 +90,7 @@ fun ModelManagerScreen(graph: AppGraph) {
         verticalArrangement = Arrangement.spacedBy(12.dp),
     ) {
         Text("MODEL SANCTUM", style = HermesType.screenTitle, color = c.ink)
+        MeanderBand(colors = hermesColors, modifier = Modifier.padding(top = 6.dp))
         Text("Models and Voice", style = HermesType.sectionLabel, color = c.bronze)
         Text(
             "Local intelligence is optional and independent per component; complex, uncertain and " +

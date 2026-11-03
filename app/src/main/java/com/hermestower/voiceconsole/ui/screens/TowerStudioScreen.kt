@@ -32,6 +32,7 @@ import com.hermestower.voiceconsole.tower.TowerConnectionTester
 import com.hermestower.voiceconsole.tower.TowerProfileValidator
 import com.hermestower.voiceconsole.tower.TowerProfileWriteResult
 import com.hermestower.voiceconsole.ui.components.SectionCard
+import com.hermestower.voiceconsole.ui.components.MeanderBand
 import com.hermestower.voiceconsole.ui.theme.HermesType
 import com.hermestower.voiceconsole.ui.theme.hermesColors
 import kotlinx.coroutines.launch
@@ -122,6 +123,7 @@ fun TowerStudioScreen(graph: AppGraph, onOpenScanner: (() -> Unit)? = null) {
         verticalArrangement = Arrangement.spacedBy(12.dp),
     ) {
         Text("Connect Hermes Tower", style = HermesType.screenTitle, color = c.ink)
+        MeanderBand(colors = hermesColors, modifier = Modifier.padding(top = 6.dp))
         Text(
             "Name this console, enter the Tower address, choose how to connect, then test. " +
                 "Pairing codes and tokens live in the Android Keystore — never in settings, logs or exports.",

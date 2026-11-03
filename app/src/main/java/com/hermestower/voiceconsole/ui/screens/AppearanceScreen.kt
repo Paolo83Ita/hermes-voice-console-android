@@ -34,6 +34,7 @@ import com.hermestower.voiceconsole.app.AppGraph
 import com.hermestower.voiceconsole.locale.AppLanguage
 import com.hermestower.voiceconsole.R as Res
 import com.hermestower.voiceconsole.ui.components.ModeChip
+import com.hermestower.voiceconsole.ui.components.MeanderBand
 import com.hermestower.voiceconsole.ui.components.SectionCard
 import com.hermestower.voiceconsole.ui.components.TruthBadge
 import com.hermestower.voiceconsole.ui.monumental.MonumentalType
@@ -64,6 +65,7 @@ fun AppearanceScreen(graph: AppGraph) {
         verticalArrangement = Arrangement.spacedBy(12.dp),
     ) {
         Text("Appearance", style = HermesType.screenTitle, color = c.ink)
+        MeanderBand(colors = hermesColors, modifier = Modifier.padding(top = 6.dp))
         Text("ARCHITECTURAL FORGE · VISUAL CALIBRATION CHAMBER", style = MonumentalType.sealSub, color = m.gold)
 
         SectionCard(title = "Visual quality (Monumental core)") {
