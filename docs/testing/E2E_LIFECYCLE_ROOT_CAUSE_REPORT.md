@@ -65,7 +65,7 @@ is legacy and not instantiated). The profile reuses the app's own reduced-motion
 | ID | Scope | Profile | Expected | Cloud run | Verdict |
 | --- | --- | --- | --- | --- | --- |
 | TEST-A | e2e_35_36 alone | NORMAL_VISUAL_PROFILE | residual reproduces (control) | 41645556871 @ bd1606c = compile fail (harness defect, repaired); 41647987018 @ c6476a1 = install infra failure (`Can't find service: package`, zero tests); 41657209419 @ b0be658 = **args-transport defect + system collapse** (§4c, E2E_BLOCKED_EMULATOR_ENVIRONMENT) — no clean isolated control has executed yet | PENDING (re-dispatch on the repaired channel) |
-| TEST-B | e2e_35_36 alone | CI_LIFECYCLE_PROFILE | passes with real navigation | 41648000740 @ c6476a1 RECLASSIFIED (§4c: profile never transmitted — it was the 8th NORMAL control sample); 41657223032 @ b0be658 = **args-transport defect + system collapse** (§4c) — no profile-engaged run has executed yet | PENDING (re-dispatch on the repaired channel) |
+| TEST-B | e2e_35_36 alone | CI_LIFECYCLE_PROFILE | passes with real navigation | **41718228168 @ 3893e88: EXECUTED CLEANLY — numtests=1 (filter AND `-e lifecycleProfile true` transmitted; probe `ciLifecycleProfile=true` at 21:48:02); RESIDUAL REPRODUCED WITH THE PROFILE ENGAGED** — `Unable to destroy activity … IllegalStateException … route=appearance` at 21:51:15 (§4d) | **REPRODUCED (profile-engaged, probe-verified)** |
 | TEST-C | E2EAppearancePersistenceTest whole class | CI_LIFECYCLE_PROFILE | passes | PENDING | PENDING |
 | TEST-D | complete instrumentation suite | CI_LIFECYCLE_PROFILE | 0 failures | PENDING | PENDING |
 | TEST-E | normal appearance navigation ×20, one session | CI_LIFECYCLE_PROFILE | no entry-lifecycle crash | PENDING | PENDING |
@@ -175,10 +175,61 @@ The matrix is RESET to PENDING on the repaired channel: no CI_LIFECYCLE_PROFILE-
 run exists yet; §4b's disposition narrowing stands as HYPOTHESIS until the controlled
 re-runs execute with the probe reading TRUE.
 
+## 4d. TEST-B DECISIVE VERDICT (2026-11-04, run 41718228168 @ 3893e88) — the residual fires with the profile ENGAGED: the frozen clock is excluded as the mechanism
+
+The transport repair (§4c) held: the dispatch ran with `E2E_PROFILE: LIFECYCLE` and the
+instrumentation output shows **numtests=1** — for the first time in this node the
+class-filter AND the profile argument reached the device, and the experiment executed as
+designed (single test, isolated session).
+
+Timeline from the run's logcat artifact:
+- 21:48:02 `HermesMotionProfile: ciLifecycleProfile=true` — the DEBUG-only probe proves
+  the profile was engaged in the app process (MainActivity read the property through the
+  app's own reduced-motion gate; the harness `check()` in the variant-B path passed,
+  since navigation proceeded).
+- The test ran to completion of its navigation work (real frames; physical drawer
+  clicks; the anchor composed — otherwise the failure would have been a
+  ComposeTimeoutException, not a destroy crash).
+- 21:51:15 `FATAL EXCEPTION: main — RuntimeException: Unable to destroy activity
+  {com.hermestower.voiceconsole/com.hermestower.voiceconsole.ui.MainActivity}:
+  java.lang.IllegalStateException: State must be at least CREATED to move to DESTROYED,
+  but was INITIALIZED in component NavBackStackEntry(…) route=appearance` — the SAME
+  teardown race, at `ActivityThread.performDestroyActivity`, with the profile ENGAGED.
+
+Consequences:
+1. §2's frozen-clock mechanism analysis is REFUTED as the sole mechanism: with real
+   frames and the ornamental clocks frozen in-app, the entering NavBackStackEntry still
+   never reaches CREATED on this software-emulated environment. The un-promotion is an
+   emulator environment property (frame/lifecycle pipeline stalls measured in §4b:
+   finishDrawing of relaunch 25 s, pause timeouts), not an application defect and not a
+   test-configuration defect.
+2. Disposition per §5: **PHYSICAL_XIAOMI_RECOVERY_REQUIRED** — the directive's rule is
+   explicit ("if any CI_LIFECYCLE_PROFILE experiment still fails, the residual is deeper
+   than the animation clock and the physical device must arbitrate"). TEST-C/D/E remain
+   in the matrix as breadth/confirmation evidence (which routes, how often, whole-class
+   and full-suite behavior under the engaged profile), but the disposition branch is
+   determined by the probe-verified TEST-B reproduction.
+3. SOURCE_DEFECT_REPAIRED and TEST_LIFECYCLE_DEFECT_REPAIRED are both excluded: no
+   application defect was shown, and the authorized profile does NOT repair the
+   lifecycle qualification on the emulator.
+4. Navigation-compose upgrade: still NOT executed (directive §2: no speculative
+   upgrades; the failure still does not map to a documented framework defect with a
+   verified fixed version).
+5. The physical-Xiaomi gate remains as documented: a CI_LIFECYCLE_PROFILE pass would
+   NOT have qualified the NORMAL animated profile; a fortiori its failure does not
+   qualify anything — the physical device (directive option (a)) arbitrates both the
+   residual and the visual profiles.
+
 ## 5. Outcome disposition (to be set from the matrix)
 
-- SOURCE_DEFECT_REPAIRED — not applicable so far: no application defect has been shown;
-  the defect class is framework+test-harness interaction.
+> **SET 2026-11-04 (§4d)**: **PHYSICAL_XIAOMI_RECOVERY_REQUIRED** — TEST-B reproduced the
+> residual with the CI_LIFECYCLE_PROFILE engaged (probe `ciLifecycleProfile=true`,
+> numtests=1, run 41718228168 @ 3893e88). The emulator cannot host the navigation
+> lifecycle qualification in either visual profile; the physical device arbitrates.
+> TEST-C/D/E remain in the matrix as breadth/confirmation evidence.
+
+- SOURCE_DEFECT_REPAIRED — EXCLUDED: no application defect has been shown;
+  the defect class is framework+environment interaction.
 - TEST_LIFECYCLE_DEFECT_REPAIRED — claimed if TEST-B/C/D/E pass: the harness defect was
   the frozen clock's lifecycle race; the authorized profile removes the race without
   weakening any assertion.

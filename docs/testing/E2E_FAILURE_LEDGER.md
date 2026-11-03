@@ -238,3 +238,21 @@ runs b0be658/5319da3/543bc2d:
    on the repaired channel. Recovery paths unchanged; no assertion weakened by the
    repairs (harness plumbing + workflow plumbing only; one test label updated to the
    real product row that carries its anchor).
+
+### CP-G4-016 addendum 2 — TEST-B decisive verdict with the profile ENGAGED (2026-11-04)
+
+- Transport repair VALIDATED: dispatch 41718228168 @ 3893e88 (LIFECYCLE) shows
+  `numtests=1` — the single-line instrument-args repair transmitted BOTH the class
+  filter and `-e lifecycleProfile true` for the first time in this node.
+- Engagement PROVEN: logcat artifact line `HermesMotionProfile: ciLifecycleProfile=true`
+  (21:48:02); the harness variant-B hard-check passed (navigation proceeded).
+- Residual REPRODUCED with the profile engaged: `FATAL EXCEPTION: main — RuntimeException:
+  Unable to destroy activity … IllegalStateException: State must be at least CREATED to
+  move to DESTROYED, but was INITIALIZED … route=appearance` (21:51:15,
+  ActivityThread.performDestroyActivity).
+- Disposition: PHYSICAL_XIAOMI_RECOVERY_REQUIRED (root-cause report §4d/§5). The frozen
+  clock is excluded as the mechanism; the emulator cannot host the navigation lifecycle
+  qualification in either profile; the physical Xiaomi arbitrates (directive §2 option (a)).
+- TEST-A dispatch @ 3893e88 died BEFORE the script in the runner's own setup (boot
+  915,901 ms then Broken pipe (32) on `settings put system screen_off_timeout`, runner
+  abort exit 224, zero instrumentation) — E2E_BLOCKED_EMULATOR_ENVIRONMENT.

@@ -744,3 +744,39 @@ pending after the environment stabilizes).
 NEXT: read 3893f88-era run verdicts → finish wave 2 (TowerStudio, ModelManager) + wave 3
 (MockTowerArchive title) → Italian completeness gate test → CP-G4-018 Tower refoundation
 → CP-G4-019..025. No terminal verdict: nodes remain.
+
+G4-N16 READ-BACK 2 — TEST-B decisive verdict: residual reproduces with the CI_LIFECYCLE_PROFILE ENGAGED → PHYSICAL_XIAOMI_RECOVERY_REQUIRED (2026-11-04)
+FINDING: (1) The transport repair (3893e88) is cloud-VALIDATED: dispatch 41718228168
+(LIFECYCLE) executed with numtests=1 — the single-test class filter AND
+`-e lifecycleProfile true` reached the device for the first time in this node.
+(2) Engagement PROVEN by the probe: `HermesMotionProfile: ciLifecycleProfile=true`
+(21:48:02, logcat artifact); the harness variant-B hard-check passed (navigation
+proceeded — anchor composed, no ComposeTimeoutException). (3) The residual REPRODUCED
+with the profile engaged: `FATAL EXCEPTION: main — RuntimeException: Unable to destroy
+activity … IllegalStateException: State must be at least CREATED to move to DESTROYED,
+but was INITIALIZED … route=appearance` at 21:51:15 in
+ActivityThread.performDestroyActivity. The frozen clock is EXCLUDED as the mechanism
+(§2's analysis refuted as sole cause): with real frames and ornaments frozen in-app the
+entering entry still never reaches CREATED on this software emulator — the un-promotion
+is an environment property of the emulator's frame/lifecycle pipeline (§4b forensics:
+finishDrawing of relaunch 25 s, pause timeouts, 15.3-min boots). (4) TEST-A dispatch
+@ 3893e88 died BEFORE the script in the runner's own setup (boot 915,901 ms → Broken
+pipe (32) on settings → runner abort exit 224, zero instrumentation) —
+E2E_BLOCKED_EMULATOR_ENVIRONMENT. (5) DISPOSITION SET per directive §2 rule:
+PHYSICAL_XIAOMI_RECOVERY_REQUIRED — the physical Xiaomi arbitrates the E2E residual and
+the visual profiles; SOURCE_DEFECT_REPAIRED and TEST_LIFECYCLE_DEFECT_REPAIRED are both
+excluded; no navigation-compose upgrade (still no documented framework defect with a
+verified fixed version; directive §2). TEST-C dispatched (whole class, LIFECYCLE) as
+breadth/confirmation evidence; TEST-D/E remain in the matrix.
+ACTION: root-cause report §4d + §5 disposition set + matrix row updated; ledger
+addendum 2; CHECKPOINT_INDEX row updated.
+TEST: verdict read from the run's job log + logcat artifact (probe line, numtests=1,
+crash stack); no source changed in this entry (docs only).
+COMMIT: (this commit) — pushed, ls-remote read-back.
+CHECKPOINT: CP-G4-016 CONVERGED TO DISPOSITION (breadth evidence pending: TEST-C in
+flight, TEST-D/E to dispatch). CP-G4-017 IN PROGRESS (wave 2 done at 362×5; build GREEN
+@ a0a5357; wave 3 + Italian gate test pending).
+NEXT: read TEST-C verdict → dispatch TEST-D (full suite, LIFECYCLE — includes the TEST-E
+soak class) → wave 3 (MockTowerArchive title frame) → TowerStudio + ModelManager wave-2
+completion → Italian completeness gate test (directive §4) → CP-G4-018 Tower
+refoundation → CP-G4-019..025. No terminal verdict: nodes remain.
