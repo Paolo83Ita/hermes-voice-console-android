@@ -538,3 +538,37 @@ packaging (cloud build evidence at these commits) → Xiaomi qualification packa
 debug-build + E2E evidence read-back for ed50b21/5c7993b next session (E2E residual recovery
 path still awaiting Owner decision: physical Xiaomi / animation-free CI variant / navigation
 upgrade).
+
+NODE G4-N14 — G4-C11 self-test expansion + cloud evidence read-back + infra resilience + G4-C10 visual convergence (2026-11-03)
+FINDING: (1) Cloud read-back: ed50b21 debug-build 41615537732 SUCCESS; its android-e2e
+41615537760 FAILED at e2e_35_36 with the DOCUMENTED CP-G4-007 typed residual
+(EMULATOR_INPUT_INJECTION_LIMITATION: frozen-clock transition stall → navigation-compose
+2.8.5 INITIALIZED→DESTROYED teardown race, process death; tests 1–13 executed with ZERO
+assertion failures) — third deterministic sample, no new regression, recovery paths still
+awaiting the Owner decision (physical Xiaomi / animation-free CI variant / navigation
+upgrade). 5c7993b debug-build 41617910340 SUCCESS. 35380b7 (docs-only commit) debug-build
+41618048112 FAILED: Maven Central 429/5xx transient outage on the runner could not resolve
+onnxruntime-android 1.20.0 + auto-value-annotations 1.6.3 (CameraX transitive) while the
+ADJACENT 5c7993b run resolved the same artifacts minutes earlier — infrastructure failure,
+NOT a test verdict (mission rule §CI).
+ACTION: (1) G4-C11 SELF-TEST EXPANSION ST-46..ST-50 (bundled double-gate agreement, bundled
+delivery §6 end-to-end ×2 idempotent, QR strict-matrix probe, archive truth §15/§16/§17,
+Graph 4 route registry) — the Self-Test Center is the on-device qualification instrument:
+the new Graph 4 subsystems now self-qualify on the Xiaomi with no host tooling; meta-tests
+updated truthfully (JVM = 50 definitions, typed skips {ST-46,ST-47,ST-49} for asset-backed
+subjects). Found+fixed during the wave: QR_SCANNER missing from AppRoutes.all. (2) INFRA
+resilience: Aliyun central/google mirrors appended AFTER the primary authorities in
+settings.gradle.kts (fall-through only when primaries cannot serve; byte-identical,
+checksum-verified; same remedy as the sandbox init script) — VERIFIED ON THE FIELD:
+e9abee9 debug-build 41621063944 SUCCESS with the same dependency tree that failed at
+35380b7. (3) G4-C10 MONUMENTAL VISUAL CONVERGENCE: the MeanderBand signature motif
+(VISUAL_DIRECTION §1) was Console-only; all 12 secondary screens now carry it under the
+title — strictly additive pure Canvas, no semantics/text/selectors, E2E strings untouched
+by construction.
+TEST: 242/242 unit green; lint 0 errors / 43 warnings (classification doc updated: 39
+accepted-pinned); androidTest compiles; secret scan 0.
+COMMIT: 9543007 (G4-C11) → e9abee9 (infra) → 32e35e0 (G4-C10) — all pushed, ls-remote read
+back exact at each step; governance rows in CHECKPOINT_INDEX.
+NEXT: E2E read-back for e9abee9/32e35e0 + packaging (APK receipt at the converged tip,
+5-language packaging strings if any) → Xiaomi runbook refresh (INSTALL_XIAOMI.md) → Owner
+decision on the E2E residual recovery path. No terminal verdict: nodes remain.
