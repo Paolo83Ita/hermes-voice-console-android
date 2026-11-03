@@ -218,4 +218,40 @@
         <item quantity="one">%1$d request queued for the Tower</item>
         <item quantity="other">%1$d requests queued for the Tower</item>
     </plurals>
+    <!-- CP-G4-017 wave 2 — About & Safety, History, shared verbs -->
+    <string name="about_title">About &amp; Safety</string>
+    <string name="about_version_card">Version</string>
+    <string name="about_version_fmt">Hermes Voice Console %1$s (build %2$d)</string>
+    <string name="about_badge_foundation">V0.1 — FOUNDATION AND VISUAL PROTOTYPE</string>
+    <string name="about_licenses_card">Components and licenses</string>
+    <string name="about_licenses_note">The application code is a private project of Paolo Lombisani. No third-party interface artwork is used anywhere; every visual element is drawn in code (mission rule).</string>
+    <string name="about_privacy_card">Privacy explanation</string>
+    <string name="about_privacy_note">The console captures no audio in V0.1; wake and speech are simulated by text injection. Audio retention is OFF by design and nothing is recorded. Conversation turns live in memory for the session. Diagnostics export is redacted. The privacy mute stops the whole pipeline and is unmistakable on screen.</string>
+    <string name="about_privacy_note_v03">From V0.3 (real microphone): capture only during visible LISTENING; wake-word engine is the only always-on consumer and is disabled by the mute; retention stays opt-in.</string>
+    <string name="about_limits_card">Known limitations (truthful)</string>
+    <string name="about_limit_mic">No microphone input — wake, listening and STT are simulated (V0.2/V0.3).</string>
+    <string name="about_limit_bridge">Tower bridge is a deterministic mock; no real endpoint is contacted (V0.4).</string>
+    <string name="about_limit_model">No local model is installed or qualified (V0.6).</string>
+    <string name="about_limit_tts">TTS produces timing/amplitude but no audible voice (system TTS at V0.3).</string>
+    <string name="about_limit_service">Foreground service is a registered skeleton, not started (V0.2).</string>
+    <string name="about_limit_history">History is session-scoped; persistence is a later, justified addition.</string>
+    <string name="about_limit_language">The interface ships in five languages (it/en/es/fr/de); the Italian completeness gate is part of the same delivery.</string>
+    <string name="about_limit_build">Build cannot be verified inside this sandbox — see FINAL_REPORT.md and BUILDING.md.</string>
+    <string name="about_danger_card">Danger zone</string>
+    <string name="about_reset_button">Reset local data</string>
+    <string name="about_reset_note">Clears conversation turns, captions, queue counters and persisted settings. Pairing does not exist yet, so there is nothing to unpair (V0.5 note).</string>
+    <string name="about_reset_dialog_title">Reset local data?</string>
+    <string name="about_reset_dialog_text">Conversation history, captions, queue state and settings return to their defaults. This cannot be undone.</string>
+    <string name="common_reset">Reset</string>
+    <string name="common_cancel">Cancel</string>
+    <string name="common_clear">Clear</string>
+    <string name="history_title">Conversation History</string>
+    <string name="history_turns_fmt">Turns (%1$d)</string>
+    <string name="history_empty">No turns in this session. History is session-scoped in V0.1; persistence is evaluated at V0.3 (decision D-004).</string>
+    <string name="history_clear_button">Clear history</string>
+    <string name="history_reset_all_button">Reset all local data</string>
+    <string name="history_retention_note">Retention: session-scoped, in-memory (V0.1). Speech audio is never recorded. Transcript retention windows arrive with persistence (V0.3+).</string>
+    <string name="history_clear_dialog_title">Clear history?</string>
+    <string name="history_clear_dialog_text">This removes every turn from the current session. It cannot be undone.</string>
+    <string name="history_retry_safe">Retry (safe: non-consequential)</string>
 </resources>

@@ -218,4 +218,40 @@
         <item quantity="one">%1$d Anfrage in der Warteschlange für den Turm</item>
         <item quantity="other">%1$d Anfragen in der Warteschlange für den Turm</item>
     </plurals>
+    <!-- CP-G4-017 wave 2 — Über und Sicherheit, Verlauf, gemeinsame Verben -->
+    <string name="about_title">Über und Sicherheit</string>
+    <string name="about_version_card">Version</string>
+    <string name="about_version_fmt">Hermes Voice Console %1$s (Build %2$d)</string>
+    <string name="about_badge_foundation">V0.1 — FUNDAMENT UND VISUELLER PROTOTYP</string>
+    <string name="about_licenses_card">Komponenten und Lizenzen</string>
+    <string name="about_licenses_note">Der Anwendungscode ist ein Privatprojekt von Paolo Lombisani. Keine Dritt-Interface-Grafik wird irgendwo verwendet; jedes visuelle Element ist im Code gezeichnet (Missionsregel).</string>
+    <string name="about_privacy_card">Datenschutzerklärung</string>
+    <string name="about_privacy_note">Die Konsole nimmt in V0.1 kein Audio auf; Aufwachen und Sprache werden durch Textinjektion simuliert. Audiospeicherung ist dem Design nach AUS und nichts wird aufgezeichnet. Gesprächsrunden leben für die Sitzung im Speicher. Der Diagnoseexport ist geschwärzt. Die Privat-Stummschaltung stoppt die gesamte Pipeline und ist auf dem Bildschirm unverkennbar.</string>
+    <string name="about_privacy_note_v03">Ab V0.3 (echtes Mikrofon): Aufnahme nur während sichtbarem LISTENING; die Wake-Word-Engine ist der einzige dauerhaft aktive Konsument und wird durch die Stummschaltung deaktiviert; Speicherung bleibt Opt-in.</string>
+    <string name="about_limits_card">Bekannte Einschränkungen (wahrheitsgetreu)</string>
+    <string name="about_limit_mic">Kein Mikrofoneingang — Wake, Zuhören und STT sind simuliert (V0.2/V0.3).</string>
+    <string name="about_limit_bridge">Die Turmbrücke ist ein deterministischer Mock; kein echter Endpoint wird kontaktiert (V0.4).</string>
+    <string name="about_limit_model">Kein lokales Modell ist installiert oder qualifiziert (V0.6).</string>
+    <string name="about_limit_tts">Das TTS erzeugt Timing/Amplitude, aber keine hörbare Stimme (System-TTS ab V0.3).</string>
+    <string name="about_limit_service">Der Vordergrunddienst ist ein registriertes Skelett, nicht gestartet (V0.2).</string>
+    <string name="about_limit_history">Der Verlauf sitzungsbezogen; Persistenz ist eine spätere, begründete Ergänzung.</string>
+    <string name="about_limit_language">Die Oberfläche wird in fünf Sprachen ausgeliefert (it/en/es/fr/de); die italienische Vollständigkeitspforte gehört zur selben Lieferung.</string>
+    <string name="about_limit_build">Der Build kann in dieser Sandbox nicht verifiziert werden — siehe FINAL_REPORT.md und BUILDING.md.</string>
+    <string name="about_danger_card">Gefahrenzone</string>
+    <string name="about_reset_button">Lokale Daten zurücksetzen</string>
+    <string name="about_reset_note">Löscht Gesprächsrunden, Untertitel, Warteschlangenzähler und gespeicherte Einstellungen. Eine Kopplung existiert noch nicht, daher gibt es nichts zu entkoppeln (Hinweis V0.5).</string>
+    <string name="about_reset_dialog_title">Lokale Daten zurücksetzen?</string>
+    <string name="about_reset_dialog_text">Gesprächsverlauf, Untertitel, Warteschlangenzustand und Einstellungen kehren zu ihren Standardwerten zurück. Dies kann nicht rückgängig gemacht werden.</string>
+    <string name="common_reset">Zurücksetzen</string>
+    <string name="common_cancel">Abbrechen</string>
+    <string name="common_clear">Leeren</string>
+    <string name="history_title">Gesprächsverlauf</string>
+    <string name="history_turns_fmt">Runden (%1$d)</string>
+    <string name="history_empty">Keine Runden in dieser Sitzung. Der Verlauf ist in V0.1 sitzungsbezogen; Persistenz wird in V0.3 bewertet (Entscheidung D-004).</string>
+    <string name="history_clear_button">Verlauf leeren</string>
+    <string name="history_reset_all_button">Alle lokalen Daten zurücksetzen</string>
+    <string name="history_retention_note">Speicherung: sitzungsbezogen, im Speicher (V0.1). Sprachaudio wird nie aufgezeichnet. Transkript-Aufbewahrungsfenster kommen mit der Persistenz (V0.3+).</string>
+    <string name="history_clear_dialog_title">Verlauf leeren?</string>
+    <string name="history_clear_dialog_text">Dies entfernt alle Runden der aktuellen Sitzung. Dies kann nicht rückgängig gemacht werden.</string>
+    <string name="history_retry_safe">Wiederholen (sicher: nicht folgenreich)</string>
 </resources>

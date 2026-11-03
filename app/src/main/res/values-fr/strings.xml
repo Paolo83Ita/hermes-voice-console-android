@@ -218,4 +218,40 @@
         <item quantity="one">%1$d demande en attente pour la Tour</item>
         <item quantity="other">%1$d demandes en attente pour la Tour</item>
     </plurals>
+    <!-- CP-G4-017 wave 2 — À propos et sécurité, Historique, verbes partagés -->
+    <string name="about_title">À propos et sécurité</string>
+    <string name="about_version_card">Version</string>
+    <string name="about_version_fmt">Hermes Voice Console %1$s (build %2$d)</string>
+    <string name="about_badge_foundation">V0.1 — FONDATION ET PROTOTYPE VISUEL</string>
+    <string name="about_licenses_card">Composants et licences</string>
+    <string name="about_licenses_note">Le code de l’application est un projet privé de Paolo Lombisani. Aucune illustration d’interface tierce n’est utilisée ; chaque élément visuel est dessiné dans le code (règle de mission).</string>
+    <string name="about_privacy_card">Explication de confidentialité</string>
+    <string name="about_privacy_note">La console ne capture aucun audio en V0.1 ; le réveil et la parole sont simulés par injection de texte. La rétention audio est DÉSACTIVÉE par conception et rien n’est enregistré. Les tours de conversation vivent en mémoire pendant la session. L’export de diagnostic est expurgé. Le mode privé stoppe toute la chaîne et est sans ambiguïté à l’écran.</string>
+    <string name="about_privacy_note_v03">À partir de V0.3 (micro réel) : capture uniquement pendant LISTENING visible ; le moteur de wake word est le seul consommateur permanent et le mode privé le désactive ; la rétention reste optionnelle.</string>
+    <string name="about_limits_card">Limitations connues (véridiques)</string>
+    <string name="about_limit_mic">Pas d’entrée micro — wake, écoute et STT sont simulés (V0.2/V0.3).</string>
+    <string name="about_limit_bridge">Le pont de la Tour est un mock déterministe ; aucun endpoint réel n’est contacté (V0.4).</string>
+    <string name="about_limit_model">Aucun modèle local n’est installé ni qualifié (V0.6).</string>
+    <string name="about_limit_tts">Le TTS produit la temporisation/l’amplitude mais aucune voix audible (TTS système en V0.3).</string>
+    <string name="about_limit_service">Le service de premier plan est un squelette enregistré, non démarré (V0.2).</string>
+    <string name="about_limit_history">L’historique est limité à la session ; la persistance est un ajout ultérieur et justifié.</string>
+    <string name="about_limit_language">L’interface est livrée en cinq langues (it/en/es/fr/de) ; la porte d’intégrité italienne fait partie de la même livraison.</string>
+    <string name="about_limit_build">La compilation ne peut pas être vérifiée dans ce bac à sable — voir FINAL_REPORT.md et BUILDING.md.</string>
+    <string name="about_danger_card">Zone de danger</string>
+    <string name="about_reset_button">Réinitialiser les données locales</string>
+    <string name="about_reset_note">Efface les tours de conversation, les sous-titres, les compteurs de file et les réglages persistés. L’appariement n’existe pas encore : il n’y a rien à départir (note V0.5).</string>
+    <string name="about_reset_dialog_title">Réinitialiser les données locales ?</string>
+    <string name="about_reset_dialog_text">L’historique de conversation, les sous-titres, l’état de la file et les réglages reviennent à leurs valeurs par défaut. Action irréversible.</string>
+    <string name="common_reset">Réinitialiser</string>
+    <string name="common_cancel">Annuler</string>
+    <string name="common_clear">Effacer</string>
+    <string name="history_title">Historique de conversation</string>
+    <string name="history_turns_fmt">Tours (%1$d)</string>
+    <string name="history_empty">Aucun tour dans cette session. L’historique est limité à la session en V0.1 ; la persistance est évaluée en V0.3 (décision D-004).</string>
+    <string name="history_clear_button">Effacer l’historique</string>
+    <string name="history_reset_all_button">Réinitialiser toutes les données locales</string>
+    <string name="history_retention_note">Rétention : limitée à la session, en mémoire (V0.1). L’audio de la parole n’est jamais enregistré. Les fenêtres de rétention de la transcription arrivent avec la persistance (V0.3+).</string>
+    <string name="history_clear_dialog_title">Effacer l’historique ?</string>
+    <string name="history_clear_dialog_text">Supprime tous les tours de la session en cours. Action irréversible.</string>
+    <string name="history_retry_safe">Réessayer (sûr : non conséquent)</string>
 </resources>

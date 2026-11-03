@@ -188,13 +188,15 @@ fun ControlMedallion(
 @Composable
 fun QueueSeal(count: Int, colors: MonumentalColors, modifier: Modifier = Modifier) {
     if (count <= 0) return
+    // semantics {} is not composable — resolve the localized plural here.
+    val queuedCd = pluralStringResource(R.plurals.chrome_queued_cd, count, count)
     Column(
         modifier
             .background(colors.stoneDeep, RoundedCornerShape(8.dp))
             .border(2.dp, colors.amber, RoundedCornerShape(8.dp))
             .padding(horizontal = 14.dp, vertical = 8.dp)
             .semantics {
-                contentDescription = pluralStringResource(R.plurals.chrome_queued_cd, count, count)
+                contentDescription = queuedCd
             },
         horizontalAlignment = Alignment.CenterHorizontally,
     ) {

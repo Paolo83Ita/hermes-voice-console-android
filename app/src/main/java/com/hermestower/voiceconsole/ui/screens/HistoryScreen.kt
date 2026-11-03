@@ -48,7 +48,7 @@ fun HistoryScreen(graph: AppGraph) {
             .padding(16.dp),
         verticalArrangement = Arrangement.spacedBy(12.dp),
     ) {
-        Text("Conversation History", style = HermesType.screenTitle, color = c.ink)
+        Text(stringResource(com.hermestower.voiceconsole.R.string.history_title), style = HermesType.screenTitle, color = c.ink)
         MeanderBand(colors = hermesColors, modifier = Modifier.padding(top = 6.dp))
 
         Row(horizontalArrangement = Arrangement.spacedBy(6.dp)) {
@@ -62,10 +62,10 @@ fun HistoryScreen(graph: AppGraph) {
             }
         }
 
-        SectionCard(title = "Turns (${turns.size})") {
+        SectionCard(title = stringResource(com.hermestower.voiceconsole.R.string.history_turns_fmt, turns.size)) {
             if (turns.isEmpty()) {
                 Text(
-                    "No turns in this session. History is session-scoped in V0.1; persistence is evaluated at V0.3 (decision D-004).",
+                    stringResource(com.hermestower.voiceconsole.R.string.history_empty),
                     style = HermesType.bodySecondary,
                     color = c.inkSecondary,
                 )
@@ -87,12 +87,11 @@ fun HistoryScreen(graph: AppGraph) {
         }
 
         Row(horizontalArrangement = Arrangement.spacedBy(8.dp)) {
-            TextButton(onClick = { confirmClear = true }) { Text("Clear history") }
-            TextButton(onClick = { graph.store.resetLocalData() }) { Text("Reset all local data") }
+            TextButton(onClick = { confirmClear = true }) { Text(stringResource(com.hermestower.voiceconsole.R.string.history_clear_button)) }
+            TextButton(onClick = { graph.store.resetLocalData() }) { Text(stringResource(com.hermestower.voiceconsole.R.string.history_reset_all_button)) }
         }
         Text(
-            "Retention: session-scoped, in-memory (V0.1). Speech audio is never recorded. " +
-                "Transcript retention windows arrive with persistence (V0.3+).",
+            stringResource(com.hermestower.voiceconsole.R.string.history_retention_note),
             style = HermesType.bodySecondary,
             color = c.inkSecondary,
         )
@@ -101,15 +100,15 @@ fun HistoryScreen(graph: AppGraph) {
     if (confirmClear) {
         AlertDialog(
             onDismissRequest = { confirmClear = false },
-            title = { Text("Clear history?") },
-            text = { Text("This removes every turn from the current session. It cannot be undone.") },
+            title = { Text(stringResource(com.hermestower.voiceconsole.R.string.history_clear_dialog_title)) },
+            text = { Text(stringResource(com.hermestower.voiceconsole.R.string.history_clear_dialog_text)) },
             confirmButton = {
                 Button(onClick = {
                     graph.store.resetLocalData()
                     confirmClear = false
-                }) { Text("Clear") }
+                }) { Text(stringResource(com.hermestower.voiceconsole.R.string.common_clear)) }
             },
-            dismissButton = { TextButton(onClick = { confirmClear = false }) { Text("Cancel") } },
+            dismissButton = { TextButton(onClick = { confirmClear = false }) { Text(stringResource(com.hermestower.voiceconsole.R.string.common_cancel)) } },
         )
     }
 }
@@ -129,7 +128,7 @@ private enum class Filter(val label: String) {
 private fun TurnRow(turn: ConversationTurn, onRetry: () -> Unit) {
     val c = hermesColors
     val who = when (turn.role) {
-        ConversationTurn.Role.OWNER -> "OWNER"
+        ConversationTurn.Role.OWNER -> stringResource(com.hermestower.voiceconsole.R.string.turn_role_owner)
         else -> if (turn.source == ConversationTurn.Source.TOWER) "HERMES TOWER" else "HERMES · LOCAL"
     }
     val whoColor = when {
@@ -161,7 +160,7 @@ private fun TurnRow(turn: ConversationTurn, onRetry: () -> Unit) {
         val retryable = !turn.consequential &&
             (turn.delivery == ConversationTurn.Delivery.FAILED || turn.delivery == ConversationTurn.Delivery.QUEUED)
         if (retryable) {
-            TextButton(onClick = onRetry) { Text("Retry (safe: non-consequential)") }
+            TextButton(onClick = onRetry) { Text(stringResource(com.hermestower.voiceconsole.R.string.history_retry_safe)) }
         }
     }
 }

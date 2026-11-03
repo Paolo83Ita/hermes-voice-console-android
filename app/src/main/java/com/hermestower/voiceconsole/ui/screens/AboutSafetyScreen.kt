@@ -17,7 +17,9 @@ import androidx.compose.runtime.remember
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.unit.dp
+import com.hermestower.voiceconsole.R as Res
 import com.hermestower.voiceconsole.app.AppGraph
 import com.hermestower.voiceconsole.ui.components.SectionCard
 import com.hermestower.voiceconsole.ui.components.MeanderBand
@@ -41,15 +43,23 @@ fun AboutSafetyScreen(graph: AppGraph) {
             .padding(16.dp),
         verticalArrangement = Arrangement.spacedBy(12.dp),
     ) {
-        Text("About & Safety", style = HermesType.screenTitle, color = c.ink)
+        Text(stringResource(Res.string.about_title), style = HermesType.screenTitle, color = c.ink)
         MeanderBand(colors = hermesColors, modifier = Modifier.padding(top = 6.dp))
 
-        SectionCard(title = "Version") {
-            Text("Hermes Voice Console ${com.hermestower.voiceconsole.BuildConfig.VERSION_NAME} (build ${com.hermestower.voiceconsole.BuildConfig.VERSION_CODE})", style = HermesType.body, color = c.ink)
-            TruthBadge("V0.1 — FOUNDATION AND VISUAL PROTOTYPE", c.gold)
+        SectionCard(title = stringResource(Res.string.about_version_card)) {
+            Text(
+                stringResource(
+                    Res.string.about_version_fmt,
+                    com.hermestower.voiceconsole.BuildConfig.VERSION_NAME,
+                    com.hermestower.voiceconsole.BuildConfig.VERSION_CODE,
+                ),
+                style = HermesType.body,
+                color = c.ink,
+            )
+            TruthBadge(stringResource(Res.string.about_badge_foundation), c.gold)
         }
 
-        SectionCard(title = "Components and licenses") {
+        SectionCard(title = stringResource(Res.string.about_licenses_card)) {
             val components = listOf(
                 "Kotlin 2.0.21 — Apache-2.0",
                 "Jetpack Compose BOM 2024.12.01 (ui, material3, icons) — Apache-2.0",
@@ -59,44 +69,43 @@ fun AboutSafetyScreen(graph: AppGraph) {
             )
             components.forEach { Text(it, style = HermesType.body, color = c.ink) }
             Text(
-                "The application code is a private project of Paolo Lombisani. No third-party interface artwork is used anywhere; every visual element is drawn in code (mission rule).",
+                stringResource(Res.string.about_licenses_note),
                 style = HermesType.bodySecondary,
                 color = c.inkSecondary,
             )
         }
 
-        SectionCard(title = "Privacy explanation") {
+        SectionCard(title = stringResource(Res.string.about_privacy_card)) {
             Text(
-                "The console captures no audio in V0.1; wake and speech are simulated by text injection. Audio retention is OFF by design and nothing is recorded. " +
-                    "Conversation turns live in memory for the session. Diagnostics export is redacted. The privacy mute stops the whole pipeline and is unmistakable on screen.",
+                stringResource(Res.string.about_privacy_note),
                 style = HermesType.body,
                 color = c.ink,
             )
             Text(
-                "From V0.3 (real microphone): capture only during visible LISTENING; wake-word engine is the only always-on consumer and is disabled by the mute; retention stays opt-in.",
+                stringResource(Res.string.about_privacy_note_v03),
                 style = HermesType.bodySecondary,
                 color = c.inkSecondary,
             )
         }
 
-        SectionCard(title = "Known limitations (truthful)") {
+        SectionCard(title = stringResource(Res.string.about_limits_card)) {
             val limits = listOf(
-                "No microphone input — wake, listening and STT are simulated (V0.2/V0.3).",
-                "Tower bridge is a deterministic mock; no real endpoint is contacted (V0.4).",
-                "No local model is installed or qualified (V0.6).",
-                "TTS produces timing/amplitude but no audible voice (system TTS at V0.3).",
-                "Foreground service is a registered skeleton, not started (V0.2).",
-                "History is session-scoped; persistence is a later, justified addition.",
-                "UI language is English; Italian localization is scheduled for V1.0.",
-                "Build cannot be verified inside this sandbox — see FINAL_REPORT.md and BUILDING.md.",
+                Res.string.about_limit_mic,
+                Res.string.about_limit_bridge,
+                Res.string.about_limit_model,
+                Res.string.about_limit_tts,
+                Res.string.about_limit_service,
+                Res.string.about_limit_history,
+                Res.string.about_limit_language,
+                Res.string.about_limit_build,
             )
-            limits.forEach { Text("• $it", style = HermesType.body, color = c.ink) }
+            limits.forEach { Text("• " + stringResource(it), style = HermesType.body, color = c.ink) }
         }
 
-        SectionCard(title = "Danger zone") {
-            Button(onClick = { confirmReset = true }) { Text("Reset local data") }
+        SectionCard(title = stringResource(Res.string.about_danger_card)) {
+            Button(onClick = { confirmReset = true }) { Text(stringResource(Res.string.about_reset_button)) }
             Text(
-                "Clears conversation turns, captions, queue counters and persisted settings. Pairing does not exist yet, so there is nothing to unpair (V0.5 note).",
+                stringResource(Res.string.about_reset_note),
                 style = HermesType.bodySecondary,
                 color = c.inkSecondary,
             )
@@ -106,17 +115,17 @@ fun AboutSafetyScreen(graph: AppGraph) {
     if (confirmReset) {
         AlertDialog(
             onDismissRequest = { confirmReset = false },
-            title = { Text("Reset local data?") },
-            text = { Text("Conversation history, captions, queue state and settings return to their defaults. This cannot be undone.") },
+            title = { Text(stringResource(Res.string.about_reset_dialog_title)) },
+            text = { Text(stringResource(Res.string.about_reset_dialog_text)) },
             confirmButton = {
                 Button(onClick = {
                     graph.store.resetLocalData()
                     graph.settingsRepository.clear()
                     graph.store.updateSettings { graph.settingsRepository.load() }
                     confirmReset = false
-                }) { Text("Reset") }
+                }) { Text(stringResource(Res.string.common_reset)) }
             },
-            dismissButton = { TextButton(onClick = { confirmReset = false }) { Text("Cancel") } },
+            dismissButton = { TextButton(onClick = { confirmReset = false }) { Text(stringResource(Res.string.common_cancel)) } },
         )
     }
 }

@@ -218,4 +218,40 @@
         <item quantity="one">%1$d solicitud en cola para la Torre</item>
         <item quantity="other">%1$d solicitudes en cola para la Torre</item>
     </plurals>
+    <!-- CP-G4-017 wave 2 — Acerca de y seguridad, Historial, verbos compartidos -->
+    <string name="about_title">Acerca de y seguridad</string>
+    <string name="about_version_card">Versión</string>
+    <string name="about_version_fmt">Hermes Voice Console %1$s (build %2$d)</string>
+    <string name="about_badge_foundation">V0.1 — CIMIENTO Y PROTOTIPO VISUAL</string>
+    <string name="about_licenses_card">Componentes y licencias</string>
+    <string name="about_licenses_note">El código de la aplicación es un proyecto privado de Paolo Lombisani. No se usa ninguna ilustración de interfaz de terceros; cada elemento visual está dibujado en código (regla de la misión).</string>
+    <string name="about_privacy_card">Explicación de privacidad</string>
+    <string name="about_privacy_note">La consola no captura audio en V0.1; la activación y el habla se simulan mediante inyección de texto. La retención de audio está DESACTIVADA por diseño y no se graba nada. Los turnos de conversación viven en memoria durante la sesión. La exportación de diagnóstico está depurada. El silencio de privacidad detiene toda la canalización y es inconfundible en pantalla.</string>
+    <string name="about_privacy_note_v03">Desde V0.3 (micrófono real): captura solo durante LISTENING visible; el motor de wake word es el único consumidor siempre activo y el silencio lo desactiva; la retención sigue siendo opcional.</string>
+    <string name="about_limits_card">Limitaciones conocidas (veraces)</string>
+    <string name="about_limit_mic">Sin entrada de micrófono — wake, escucha y STT son simulados (V0.2/V0.3).</string>
+    <string name="about_limit_bridge">El puente de la Torre es un mock determinista; no se contacta ningún endpoint real (V0.4).</string>
+    <string name="about_limit_model">No hay ningún modelo local instalado ni calificado (V0.6).</string>
+    <string name="about_limit_tts">El TTS produce temporización/amplitud pero ninguna voz audible (TTS del sistema en V0.3).</string>
+    <string name="about_limit_service">El servicio en primer plano es un esqueleto registrado, no iniciado (V0.2).</string>
+    <string name="about_limit_history">El historial está acotado a la sesión; la persistencia es una adición posterior y justificada.</string>
+    <string name="about_limit_language">La interfaz se entrega en cinco idiomas (it/en/es/fr/de); la puerta de integridad italiana forma parte de la misma entrega.</string>
+    <string name="about_limit_build">La compilación no puede verificarse dentro de este sandbox — véase FINAL_REPORT.md y BUILDING.md.</string>
+    <string name="about_danger_card">Zona de peligro</string>
+    <string name="about_reset_button">Restablecer datos locales</string>
+    <string name="about_reset_note">Borra turnos de conversación, subtítulos, contadores de cola y ajustes persistentes. El emparejamiento aún no existe, así que no hay nada que desemparejar (nota V0.5).</string>
+    <string name="about_reset_dialog_title">¿Restablecer los datos locales?</string>
+    <string name="about_reset_dialog_text">El historial de conversación, los subtítulos, el estado de la cola y los ajustes vuelven a sus valores predeterminados. No se puede deshacer.</string>
+    <string name="common_reset">Restablecer</string>
+    <string name="common_cancel">Cancelar</string>
+    <string name="common_clear">Borrar</string>
+    <string name="history_title">Historial de conversación</string>
+    <string name="history_turns_fmt">Turnos (%1$d)</string>
+    <string name="history_empty">Sin turnos en esta sesión. El historial está acotado a la sesión en V0.1; la persistencia se evalúa en V0.3 (decisión D-004).</string>
+    <string name="history_clear_button">Borrar historial</string>
+    <string name="history_reset_all_button">Restablecer todos los datos locales</string>
+    <string name="history_retention_note">Retención: acotada a la sesión, en memoria (V0.1). El audio del habla nunca se graba. Las ventanas de retención de la transcripción llegan con la persistencia (V0.3+).</string>
+    <string name="history_clear_dialog_title">¿Borrar el historial?</string>
+    <string name="history_clear_dialog_text">Elimina todos los turnos de la sesión actual. No se puede deshacer.</string>
+    <string name="history_retry_safe">Reintentar (seguro: no consecuencial)</string>
 </resources>
