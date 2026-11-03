@@ -78,3 +78,5 @@ Graph 4 checkpoints (branch graph-4/real-voice-pairing-archive-e2e, from ca8980b
 - Application defect found + fixed: queue-state machine starvation (latent since Graph 1).
 - Owner field report fixed: status-bar overlap (WindowInsets.safeDrawing at AppNav root).
 - Governance: no main changes; no force-push; all checkpoints pushed and read back.
+
+| G4-N15 read-back | (this commit) | E2E read-back e9abee9/32e35e0/b1df58a: debug-builds 41621063944/41621713767/41621955833 SUCCESS; E2E 41621063936/41621713747/41621955951 = 4th/5th/6th deterministic samples of the CP-G4-007 typed residual (position-independent: class ordering varies, abort at #3 of 30 vs #14 before); VERDICT-CHANNEL INFRA REPAIR — emulator-runner executes script line-by-line, multi-line if/fi always exit 2 (green suite would fail), verdict collapsed to single POSIX-safe line; G4-C12 packaging: GRAPH4_DEBUG_APK_RECEIPT.md (APK @ b1df58a = 165,029,486 B sha256 9275aa22…, honest growth decomposition, 4/4 bundled assets re-hashed MATCH inside the CI APK, app_name invariant ×5 locales, ABI-splits Owner-optional) |

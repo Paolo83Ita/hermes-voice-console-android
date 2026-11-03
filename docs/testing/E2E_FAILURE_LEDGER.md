@@ -141,3 +141,46 @@ e2e_19_20 (APPLICATION_DEFECT — state machine queue edges, verified delivering
 e2e_31_33/32/34 (SelfTest startup race), and all anchor/wait mechanics for the classes they
 cover. 225/225 JVM unit tests green; lint 0 errors / 34 warnings; cloud debug-build SUCCESS
 at every repair commit.
+
+---
+
+## ADDENDUM — post-verdict read-back (G4-N15, 2026-11-03): runs at e9abee9 / 32e35e0 / b1df58a
+
+Cloud android-debug-build SUCCESS at all three commits (41621063944 / 41621713767 /
+41621955833). Cloud android-e2e executed at each (41621063936 / 41621713747 / 41621955951)
+and aborted with the SAME typed residual, signature identical to the CP-G4-007 verdict:
+
+`java.lang.IllegalStateException: State must be at least CREATED to move to DESTROYED,
+but was INITIALIZED in component NavBackStackEntry(…) route=appearance` → process crash
+(`INSTRUMENTATION_RESULT: shortMsg=Process crashed.`) → suite abort.
+
+New deterministic facts (4th/5th/6th samples of the residual after 41551630218 @26e2e8d
+and 41615537760 @ed50b21):
+
+1. **Position independence.** JUnit class/method ordering is reflection-dependent and
+   varied between runs: in these three runs `E2EAppearancePersistenceTest` ran FIRST and
+   the abort landed at suite test #3 of `numtests=30` (e2e_35_36 was its 3rd method,
+   after e2e_41_42 and e2e_40 passed green). In 41551630218 the same crash landed at #14
+   after 13 green tests. The MECHANISM is deterministic (any run that leaves the
+   route=appearance entry stuck INITIALIZED at teardown crashes the process); only the
+   crash POSITION varies with ordering. No new test, selector, screen or assertion is
+   implicated: e2e_40 and e2e_41_42 (recreate/restart paths, which drive the entry
+   lifecycle forward before teardown) pass green in the same class.
+2. **INFRASTRUCTURE FINDING — the E2E verdict channel was corrupted by construction.**
+   The emulator-runner executes the `script:` input ONE LINE PER `sh -c` invocation.
+   The multi-line `if grep -q 'OK (…)' … fi` verdict block (android-e2e.yml) therefore
+   always died with `/usr/bin/sh: 1: Syntax error: end of file unexpected (expecting
+   "fi")`, exit 2 — every job failed at the verdict line REGARDLESS of suite outcome,
+   and even a fully green suite would have failed the job without a truthful marker.
+   This is the same line-by-line execution class as the historical dash/`set -o pipefail`
+   bug documented in the script comment. Repair (same commit as this addendum): verdict
+   collapsed to a single POSIX-safe line with identical semantics, with the evidence
+   recorded in a comment. The three runs above remain valid RESIDUAL evidence (the
+   process crash is visible in the instrumentation output itself, before the verdict
+   line), but their job-level "failure" conclusion was not yet a clean typed verdict;
+   future runs will print INSTRUMENTATION_PASSED / INSTRUMENTATION_FAILED_OR_INCOMPLETE
+   truthfully.
+3. Recovery paths unchanged and still awaiting the Owner decision: (a) physical Xiaomi
+   qualification; (b) authorized animation-free CI console variant (separate named node);
+   (c) navigation-compose upgrade node re-evaluating the INITIALIZED-entry teardown race.
+   No assertion was weakened; no app source changed in this read-back node.

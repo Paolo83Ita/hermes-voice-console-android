@@ -88,12 +88,14 @@ jobs:
             # empty evidence on every failure so far (runs 41349811483 / 41356511688).
             adb logcat -d -t 6000 > e2e-logcat-tail.txt 2>/dev/null || true
             adb exec-out screencap -p > e2e-final-screen.png 2>/dev/null || true
-            if grep -q 'OK ([0-9][0-9]* tests)' instrumentation-output.txt; then
-              echo 'INSTRUMENTATION_PASSED'
-            else
-              echo 'INSTRUMENTATION_FAILED_OR_INCOMPLETE'
-              exit 1
-            fi
+            # VERDICT — MUST be a single line. The emulator-runner executes this
+            # script ONE LINE PER `sh -c` invocation (evidence: runs 41621063936 /
+            # 41621713747 / 41621955951 each logged a standalone `if …; then` line
+            # dying with "Syntax error: end of file unexpected (expecting fi)",
+            # exit 2 — the verdict channel was corrupted for every multi-line if,
+            # so even a fully green suite would have failed the job before any
+            # truthful classification). One line, POSIX-safe, same semantics.
+            grep -q 'OK ([0-9][0-9]* tests)' instrumentation-output.txt && echo 'INSTRUMENTATION_PASSED' || { echo 'INSTRUMENTATION_FAILED_OR_INCOMPLETE'; exit 1; }
 
       - name: Upload connected-test results
         if: always()

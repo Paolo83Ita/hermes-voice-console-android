@@ -572,3 +572,35 @@ back exact at each step; governance rows in CHECKPOINT_INDEX.
 NEXT: E2E read-back for e9abee9/32e35e0 + packaging (APK receipt at the converged tip,
 5-language packaging strings if any) → Xiaomi runbook refresh (INSTALL_XIAOMI.md) → Owner
 decision on the E2E residual recovery path. No terminal verdict: nodes remain.
+
+NODE G4-N15 — E2E read-back e9abee9/32e35e0/b1df58a + verdict-channel infra repair + packaging (G4-C12) (2026-11-03)
+FINDING: (1) android-debug-build SUCCESS at all three converged-tip commits (e9abee9 →
+41621063944, 32e35e0 → 41621713767, b1df58a → 41621955833). (2) android-e2e at each
+(41621063936 / 41621713747 / 41621955951) aborted with the SAME typed CP-G4-007 residual —
+signature identical (INITIALIZED→DESTROYED NavBackStackEntry route=appearance, process
+crash, suite abort) — 4th/5th/6th deterministic samples; NEW FACT: position independence
+(class ordering varies per run; E2EAppearancePersistenceTest ran first here, abort at #3 of
+numtests=30 vs #14 in 41551630218; e2e_40/e2e_41_42 recreate/restart paths green in the
+same class). (3) INFRASTRUCTURE FINDING: the emulator-runner executes the script: input
+ONE LINE PER sh -c — the multi-line if/fi verdict block ALWAYS exited 2
+("Syntax error: end of file unexpected (expecting fi)"), so the job-level E2E verdict was
+corrupted by construction (even a green suite would fail the job); same execution class as
+the historical dash/pipefail bug.
+ACTION: (1) android-e2e.yml verdict collapsed to a single POSIX-safe line, identical
+semantics, evidence recorded in a script comment — no test, assertion or app source
+touched. (2) G4-C12 PACKAGING: GRAPH4_DEBUG_APK_RECEIPT.md — CI APK @ b1df58a downloaded
+and measured: 165,029,486 B, sha256 9275aa222d75411587eb9058bca370e6a0f4dfdcc32c2e21815d8
+e3f30ffdaa0; growth vs Graph 3 decomposed honestly (ORT ×4 ABI ≈73.7 MB, ML Kit barhopper
+×4 ABI ≈20.8 MB, dex ≈65 MB, bundled ONNX ≈4.3 MB); all 4 bundled artifacts re-hashed
+MATCH inside the CI-built APK against the shipped manifest; app_name invariant across the
+5 locales (brand anchor §14, no packaging-string work pending); ABI-splits recorded as an
+Owner-optional refinement, runbook unchanged and valid. (3) E2E ledger addendum with the
+three runs, the position-independence fact and the verdict-channel repair record.
+TEST: read-back + workflow/packaging docs only — no source changed; no assertion touched.
+COMMIT: (this commit) — pushed, ls-remote read-back exact.
+NEXT: Owner decision gates remain: (a) E2E residual recovery path (physical Xiaomi /
+authorized animation-free CI variant / navigation upgrade — now with a clean typed verdict
+channel for any future run); (b) physical Xiaomi qualification via the b1df58a runbook;
+(c) real Tower pairing (Tower Graph 1.7 authority). G4-C04 runtime adapters (vosk/piper/
+silero STT·TTS·VAD, optional local LLM qwen) stay delivery-dependent per catalog contract.
+No terminal verdict: nodes remain.
