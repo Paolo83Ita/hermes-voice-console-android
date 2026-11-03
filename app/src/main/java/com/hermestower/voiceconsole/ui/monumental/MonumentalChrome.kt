@@ -208,12 +208,14 @@ fun QueueSeal(count: Int, colors: MonumentalColors, modifier: Modifier = Modifie
 /** Red-bronze privacy gate note (PRIVACY_MUTED — unmistakable mic state). */
 @Composable
 fun PrivacyGateNote(colors: MonumentalColors, modifier: Modifier = Modifier) {
+    // semantics {} is not composable — resolve the localized a11y string here.
+    val privacyCd = stringResource(R.string.chrome_privacy_cd)
     Text(
         stringResource(R.string.chrome_privacy_gate),
         style = MonumentalType.sealLabel,
         color = colors.redBronze,
         modifier = modifier.semantics {
-            contentDescription = stringResource(R.string.chrome_privacy_cd)
+            contentDescription = privacyCd
         },
     )
 }

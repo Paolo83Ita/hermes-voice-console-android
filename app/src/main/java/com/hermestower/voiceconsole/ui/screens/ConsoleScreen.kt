@@ -338,9 +338,12 @@ fun ConsoleScreen(
                     Text(turn.text, style = MonumentalType.body, color = m.ink)
                     Spacer(Modifier.height(6.dp))
                 }
-                if (draft != null) {
+                // capture the delegated value once: smart cast is impossible on a
+                // delegated property, and the format arg must be non-null Any.
+                val draftedText = draft
+                if (draftedText != null) {
                     Text(
-                        stringResource(com.hermestower.voiceconsole.R.string.console_you_draft_fmt, draft),
+                        stringResource(com.hermestower.voiceconsole.R.string.console_you_draft_fmt, draftedText),
                         style = MonumentalType.bodySecondary,
                         color = m.inkSecondary,
                     )
