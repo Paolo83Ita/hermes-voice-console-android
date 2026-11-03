@@ -62,9 +62,11 @@ fun DiagnosticsScreen(graph: AppGraph, onOpenStudio: () -> Unit = {}, onOpenSelf
         }
 
         SectionCard(title = stringResource(Res.string.diag_device_card)) {
-            Text(stringResource(Res.string.diag_manufacturer_fmt, healthState.manufacturer), style = HermesType.body, color = c.ink)
-            Text(stringResource(Res.string.diag_model_fmt, healthState.model), style = HermesType.body, color = c.ink)
-            Text(stringResource(Res.string.diag_android_fmt, healthState.androidRelease, healthState.sdkInt), style = HermesType.body, color = c.ink)
+            // DeviceHealth fields are nullable — the platform may not expose them;
+            // the localized 'unavailable' fallback keeps the honest-rendering rule.
+            Text(stringResource(Res.string.diag_manufacturer_fmt, healthState.manufacturer ?: stringResource(Res.string.diag_unavailable)), style = HermesType.body, color = c.ink)
+            Text(stringResource(Res.string.diag_model_fmt, healthState.model ?: stringResource(Res.string.diag_unavailable)), style = HermesType.body, color = c.ink)
+            Text(stringResource(Res.string.diag_android_fmt, healthState.androidRelease ?: stringResource(Res.string.diag_unavailable), healthState.sdkInt ?: -1), style = HermesType.body, color = c.ink)
             Text(
                 stringResource(
                     Res.string.diag_memory_fmt,
