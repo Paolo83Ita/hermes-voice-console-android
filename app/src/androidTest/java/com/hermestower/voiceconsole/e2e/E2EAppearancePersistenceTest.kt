@@ -1,6 +1,5 @@
 package com.hermestower.voiceconsole.e2e
 
-import androidx.compose.ui.test.junit4.createAndroidComposeRule
 import androidx.compose.ui.test.onNodeWithText
 import androidx.compose.ui.test.performClick
 import androidx.test.ext.junit.runners.AndroidJUnit4
@@ -28,7 +27,7 @@ import org.junit.Test
 class E2EAppearancePersistenceTest {
 
     @get:Rule
-    val compose: HermesComposeRule = createAndroidComposeRule(MainActivity::class.java)
+    val compose: HermesComposeRule = hermesComposeRule()
 
     private fun graph() = E2E.graph()
 

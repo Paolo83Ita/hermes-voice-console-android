@@ -1,7 +1,6 @@
 package com.hermestower.voiceconsole.e2e
 
 import android.content.Context
-import androidx.compose.ui.test.junit4.createAndroidComposeRule
 import androidx.compose.ui.test.onNodeWithText
 import androidx.compose.ui.test.performClick
 import com.hermestower.voiceconsole.selftest.SelfTestMode
@@ -23,7 +22,7 @@ import org.junit.runners.JUnit4
 class E2ESelfTestTest {
 
     @get:Rule
-    val compose: HermesComposeRule = createAndroidComposeRule(MainActivity::class.java)
+    val compose: HermesComposeRule = hermesComposeRule()
 
     private fun graph() = E2E.graph()
 

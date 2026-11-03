@@ -248,7 +248,10 @@ fun ConsoleScreen(
                 val coreH = maxWidth * (1420f / 1080f)
                 OracleCore(
                     state = state,
-                    reducedMotion = settings.reducedMotion,
+                    // CP-G4-016: CI_LIFECYCLE_PROFILE flows through the same
+                    // static-frame gate as reduced motion (TEST_ONLY debug seam).
+                    reducedMotion = settings.reducedMotion ||
+                        com.hermestower.voiceconsole.ui.runtime.MotionProfile.ornamentsFrozen,
                     quality = quality,
                     speakingAmplitude = amplitude,
                     queueCount = queueCount,

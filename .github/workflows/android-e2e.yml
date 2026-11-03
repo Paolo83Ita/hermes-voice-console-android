@@ -8,6 +8,18 @@ on:
       - graph-4/real-voice-pairing-archive-e2e
       - main
   workflow_dispatch:
+    inputs:
+      e2e_profile:
+        description: 'E2E variant: NORMAL = normal visual profile (frozen clock); LIFECYCLE = CI_LIFECYCLE_PROFILE (ornaments frozen in-app, real clock, physical clicks)'
+        type: choice
+        options:
+          - NORMAL
+          - LIFECYCLE
+        default: NORMAL
+      e2e_class_filter:
+        description: 'JUnit -e class filter (empty = full suite), e.g. com.hermestower.voiceconsole.e2e.E2EAppearancePersistenceTest#e2e_35_36_switchMarbleLightAndObsidianNight'
+        type: string
+        default: ''
 
 permissions:
   contents: read
@@ -50,6 +62,9 @@ jobs:
 
       - name: Run emulator end-to-end suite (API 34, x86_64, headless)
         uses: reactivecircus/android-emulator-runner@v2
+        env:
+          E2E_PROFILE: ${{ inputs.e2e_profile || 'NORMAL' }}
+          E2E_CLASS_FILTER: ${{ inputs.e2e_class_filter }}
         with:
           api-level: 34
           target: google_apis
@@ -77,11 +92,15 @@ jobs:
             adb install -r -t app/build/outputs/apk/debug/app-debug.apk
             echo "Installing androidTest APK..."
             adb install -r -t app/build/outputs/apk/androidTest/debug/app-debug-androidTest.apk
-            echo "Running instrumentation (E2E-01..45 + secure storage)..."
+            echo "Running instrumentation (E2E-01..45 + secure storage)... profile=$E2E_PROFILE class_filter=${E2E_CLASS_FILTER:-<full suite>}"
             # emulator-runner executes this script with /bin/sh (dash). The previous
             # bash-only `set -o pipefail` exited 2 before am instrument could start.
             # POSIX-safe: capture to file, echo it, classify the result.
-            timeout 3600 adb shell am instrument -w -r com.hermestower.voiceconsole.test/androidx.test.runner.AndroidJUnitRunner > instrumentation-output.txt 2>&1
+            # Single-line ifs ONLY — this script runs ONE LINE PER sh -c (CP-G4-016 evidence).
+            INSTRUMENT_ARGS=""
+            if [ "$E2E_PROFILE" = "LIFECYCLE" ]; then INSTRUMENT_ARGS="$INSTRUMENT_ARGS -e lifecycleProfile true"; fi
+            if [ -n "$E2E_CLASS_FILTER" ]; then INSTRUMENT_ARGS="$INSTRUMENT_ARGS -e class $E2E_CLASS_FILTER"; fi
+            timeout 3600 adb shell am instrument -w -r $INSTRUMENT_ARGS com.hermestower.voiceconsole.test/androidx.test.runner.AndroidJUnitRunner > instrumentation-output.txt 2>&1
             cat instrumentation-output.txt
             # Evidence capture INSIDE the script step: the runner tears the emulator
             # down before the separate failure-evidence step can run, which produced

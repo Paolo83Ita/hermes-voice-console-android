@@ -1,5 +1,6 @@
 package com.hermestower.voiceconsole.e2e
 
+import android.content.Intent
 import androidx.compose.ui.geometry.Offset
 import androidx.compose.ui.semantics.SemanticsActions
 import androidx.compose.ui.semantics.SemanticsProperties
@@ -12,18 +13,55 @@ import androidx.compose.ui.test.onNodeWithText
 import androidx.compose.ui.test.performClick
 import androidx.compose.ui.test.performSemanticsAction
 import androidx.test.ext.junit.rules.ActivityScenarioRule
+import androidx.test.platform.app.InstrumentationRegistry
 import com.hermestower.voiceconsole.app.AppGraph
 import com.hermestower.voiceconsole.app.AppGraphHolder
 import com.hermestower.voiceconsole.ui.MainActivity
-import androidx.test.platform.app.InstrumentationRegistry
+import com.hermestower.voiceconsole.ui.runtime.MotionProfile
 
 typealias HermesComposeRule = AndroidComposeTestRule<ActivityScenarioRule<MainActivity>, MainActivity>
 
-/** Freeze the compose clock: the console ships infinite animations, which would
- *  otherwise keep the test rule from ever reaching idle. State-driven waitUntil
- *  conditions still work (they read StateFlows, not the clock). */
+/**
+ * CP-G4-016 — the two authorized E2E visual variants (OWNER_DECISION_E2E_RECOVERY).
+ *
+ *  A. NORMAL_VISUAL_PROFILE  — no `lifecycleProfile` instrumentation argument:
+ *     the harness freezes the compose clock (the console ships an infinite Oracle
+ *     Core animation, which would otherwise keep the rule from reaching idle).
+ *
+ *  B. CI_LIFECYCLE_PROFILE   — `lifecycleProfile true`: the activity is launched
+ *     with [MainActivity.EXTRA_CI_LIFECYCLE_PROFILE] (debug builds only), which
+ *     freezes every infinite ornamental frame clock through the app's own
+ *     reduced-motion gate. NOTHING about navigation, state machine, controls,
+ *     persistence, semantics or business logic changes. Because no infinite
+ *     animation remains, the compose clock is left ADVANCING: NavHost and drawer
+ *     transitions complete in real time, back-stack entries reach CREATED, and
+ *     the harness navigates the real UI with REAL physical clicks — exactly the
+ *     lifecycle/navigation qualification the Owner authorized.
+ */
+val ciLifecycleProfileRequested: Boolean =
+    InstrumentationRegistry.getInstrumentation()
+        .arguments.getString("lifecycleProfile", "false") == "true"
+
+/** Test rule factory honoring the authorized profile (see class docs above). */
+fun hermesComposeRule(): HermesComposeRule {
+    val context = InstrumentationRegistry.getInstrumentation().targetContext
+    val intent = Intent(context, MainActivity::class.java)
+    if (ciLifecycleProfileRequested) {
+        intent.putExtra(MainActivity.EXTRA_CI_LIFECYCLE_PROFILE, true)
+    }
+    return AndroidComposeTestRule(ActivityScenarioRule(intent)) { it }
+}
+
+/**
+ * Variant A only: freeze the compose clock (the console ships infinite
+ * animations, which would otherwise keep the test rule from ever reaching idle).
+ * In variant B (CI_LIFECYCLE_PROFILE) the app's own profile freezes all infinite
+ * ornaments, so the clock keeps advancing and transitions complete in real time.
+ */
 fun HermesComposeRule.freezeAnimationsForTest() {
-    mainClock.autoAdvance = false
+    if (!ciLifecycleProfileRequested) {
+        mainClock.autoAdvance = false
+    }
 }
 
 /** Shared E2E helpers: graph access and drawer navigation. */
@@ -32,7 +70,7 @@ object E2E {
 }
 
 /**
- * CP-G4-007 E2E-ROBUSTNESS — the frozen-clock navigation contract.
+ * CP-G4-007 E2E-ROBUSTNESS — the frozen-clock navigation contract (variant A).
  *
  * Physics of the failure class (proven by runs 41459906172/41461749711/
  * 41470976708/41485512432/41503065076/41514356403 + the run-41514356403
@@ -46,20 +84,41 @@ object E2E {
  *     the semantics exist but the physics does not (the visible-texts dump of
  *     run 41514356403 shows console-only content after a "successful" row click).
  *
- * The repair (Owner §3: virtual time, semantic selectors, accessible click
- * action, performSemanticsAction where appropriate, physical-click assertion
- * preserved, no logic bypass):
- *  - pump BOUNDED VIRTUAL TIME so the drawer-open animation actually places the
- *    row on-screen, then use the PHYSICAL click (rule 4);
- *  - if the row is still off-screen after the bound, activate it via
- *    performSemanticsAction(SemanticsActions.OnClick) — the accessible
- *    activation path a screen reader uses (rule 3), never a logic bypass;
- *  - pump until the destination anchor composes, then advance a settle window
- *    so layout/placement is complete before any further physical click;
- *  - all post-click state waits pump both clocks (waitForText/pumpUntil).
+ * Variant B (CI_LIFECYCLE_PROFILE, CP-G4-016): with the app's ornaments frozen
+ * the clock advances, transitions complete, rows land on-screen, and the
+ * PHYSICAL click is used (the truthful path); the accessible OnClick semantics
+ * action remains the documented fallback in both variants.
  */
 fun HermesComposeRule.openDrawerAndNavigate(destinationLabel: String, screenAnchor: String) {
     onNodeWithContentDescription("Open navigation drawer").performClick()
+    if (ciLifecycleProfileRequested) {
+        // ---- Variant B: REAL frames. Wait in real time, click physically. ----
+        waitUntil(15_000) { drawerRowNode(destinationLabel) != null }
+        val deadline = System.currentTimeMillis() + 5_000
+        while (System.currentTimeMillis() < deadline) {
+            val pos = drawerRowPosition(destinationLabel)
+            if (pos != null && pos.x >= 0f) break
+            Thread.sleep(50)
+        }
+        val rowNode = drawerRowNode(destinationLabel)
+        if (rowNode == null) error("drawer row '$destinationLabel' disappeared before activation")
+        val onScreen = drawerRowPosition(destinationLabel)?.let { it.x >= 0f } ?: false
+        if (onScreen) {
+            onAllNodes(hasText(destinationLabel, substring = true).and(hasClickAction()))[0]
+                .performClick()
+        } else {
+            val accessibleClick = rowNode.config[SemanticsActions.OnClick]
+            if (accessibleClick?.action != null) accessibleClick.action!!()
+            else error("drawer row '$destinationLabel' has no accessible OnClick action")
+        }
+        waitUntil(20_000) {
+            onAllNodesWithText(screenAnchor, substring = true).fetchSemanticsNodes().isNotEmpty()
+        }
+        waitForIdle()
+        return
+    }
+
+    // ---- Variant A: frozen clock — bounded virtual-time pumping (unchanged). ----
     waitUntil(15_000) { drawerRowNode(destinationLabel) != null }
 
     // (a) drawer-open animation: pump until the row is physically on-screen
@@ -121,15 +180,14 @@ private fun HermesComposeRule.drawerRowPosition(label: String): Offset? =
 /**
  * Bounded dual-clock wait: checks the condition, then advances 100 ms of
  * VIRTUAL time and yields 20 ms of real time (coroutine-driven state), until
- * the condition holds or the deadline expires. The controlled replacement for
- * frozen-clock waitUntil — transitions, layout and effects progress while
- * state flows are polled (Owner §3: bounded waitUntil + virtual time).
+ * the condition holds or the deadline expires. In variant B the virtual pump is
+ * unnecessary (time flows; the bounded real-time poll remains).
  */
 fun HermesComposeRule.pumpUntil(timeoutMs: Long = 20_000, condition: () -> Boolean) {
     val deadline = System.currentTimeMillis() + timeoutMs
     while (System.currentTimeMillis() < deadline) {
         if (condition()) return
-        mainClock.advanceTimeBy(100)
+        if (!ciLifecycleProfileRequested) mainClock.advanceTimeBy(100)
         Thread.sleep(20)
     }
     error("condition not met within ${timeoutMs} ms; visible texts: ${visibleTextsSample()}")
