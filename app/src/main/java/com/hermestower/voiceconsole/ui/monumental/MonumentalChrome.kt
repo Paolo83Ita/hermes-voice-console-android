@@ -21,10 +21,13 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Brush
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.graphics.vector.ImageVector
+import androidx.compose.ui.res.pluralStringResource
+import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.semantics.contentDescription
 import androidx.compose.ui.semantics.semantics
 import androidx.compose.ui.unit.Dp
 import androidx.compose.ui.unit.dp
+import com.hermestower.voiceconsole.R
 
 /**
  * GRAPH 3 WAVE 4 — shared architectural chrome. Replaces the generic Material
@@ -111,6 +114,9 @@ fun ModeSeal(
     modifier: Modifier = Modifier,
 ) {
     val accent = if (selected) colors.gold else colors.bronzeEdge
+    // semantics {} is not composable — resolve the localized a11y string here.
+    val modeCd = stringResource(R.string.chrome_mode_cd_fmt, label) +
+        if (selected) stringResource(R.string.chrome_selected_suffix) else ""
     androidx.compose.material3.Surface(
         onClick = onClick,
         enabled = enabled,
@@ -118,7 +124,7 @@ fun ModeSeal(
         color = if (selected) colors.stoneDeep else colors.obsidianPanel,
         border = androidx.compose.foundation.BorderStroke(1.5.dp, if (selected) accent else colors.bronzeDeep),
         modifier = modifier.semantics {
-            contentDescription = "Operating mode $label" + if (selected) ", selected" else ""
+            contentDescription = modeCd
         },
     ) {
         Column(
@@ -126,7 +132,7 @@ fun ModeSeal(
             horizontalAlignment = Alignment.CenterHorizontally,
         ) {
             Text(label, style = MonumentalType.sealLabel, color = if (selected) colors.gold else colors.inkSecondary)
-            Text("MODE", style = MonumentalType.sealSub, color = colors.inkDim)
+            Text(stringResource(R.string.chrome_mode_label), style = MonumentalType.sealSub, color = colors.inkDim)
         }
     }
 }
@@ -187,11 +193,13 @@ fun QueueSeal(count: Int, colors: MonumentalColors, modifier: Modifier = Modifie
             .background(colors.stoneDeep, RoundedCornerShape(8.dp))
             .border(2.dp, colors.amber, RoundedCornerShape(8.dp))
             .padding(horizontal = 14.dp, vertical = 8.dp)
-            .semantics { contentDescription = "$count requests queued for the Tower" },
+            .semantics {
+                contentDescription = pluralStringResource(R.plurals.chrome_queued_cd, count, count)
+            },
         horizontalAlignment = Alignment.CenterHorizontally,
     ) {
-        Text("QUEUED ×$count", style = MonumentalType.sealLabel, color = colors.amber)
-        Text("SUSPENDED SCROLL", style = MonumentalType.sealSub, color = colors.inkDim)
+        Text(stringResource(R.string.chrome_queued_fmt, count), style = MonumentalType.sealLabel, color = colors.amber)
+        Text(stringResource(R.string.chrome_scroll_suspended), style = MonumentalType.sealSub, color = colors.inkDim)
     }
 }
 
@@ -199,10 +207,12 @@ fun QueueSeal(count: Int, colors: MonumentalColors, modifier: Modifier = Modifie
 @Composable
 fun PrivacyGateNote(colors: MonumentalColors, modifier: Modifier = Modifier) {
     Text(
-        "PRIVACY GATE CLOSED — MICROPHONE DISABLED",
+        stringResource(R.string.chrome_privacy_gate),
         style = MonumentalType.sealLabel,
         color = colors.redBronze,
-        modifier = modifier.semantics { contentDescription = "Privacy mute engaged. Microphone disabled." },
+        modifier = modifier.semantics {
+            contentDescription = stringResource(R.string.chrome_privacy_cd)
+        },
     )
 }
 

@@ -64,11 +64,11 @@ fun AppearanceScreen(graph: AppGraph) {
             .padding(16.dp),
         verticalArrangement = Arrangement.spacedBy(12.dp),
     ) {
-        Text("Appearance", style = HermesType.screenTitle, color = c.ink)
+        Text(stringResource(Res.string.appearance_title), style = HermesType.screenTitle, color = c.ink)
         MeanderBand(colors = hermesColors, modifier = Modifier.padding(top = 6.dp))
-        Text("ARCHITECTURAL FORGE · VISUAL CALIBRATION CHAMBER", style = MonumentalType.sealSub, color = m.gold)
+        Text(stringResource(Res.string.appearance_subtitle), style = MonumentalType.sealSub, color = m.gold)
 
-        SectionCard(title = "Visual quality (Monumental core)") {
+        SectionCard(title = stringResource(Res.string.appearance_quality_card)) {
             Row(horizontalArrangement = Arrangement.spacedBy(8.dp)) {
                 VisualQuality.entries.forEach { q ->
                     ModeChip(
@@ -81,22 +81,22 @@ fun AppearanceScreen(graph: AppGraph) {
             }
             Text(
                 when (VisualQuality.from(settings.visualQuality)) {
-                    VisualQuality.LOW -> "LOW: static or nearly static core, no glow, effect cadence 5–15 fps. Intended for thermal pressure and reduced motion."
-                    VisualQuality.BALANCED -> "BALANCED (default): 30 fps complex animation target, moderate particles, layered assets, limited glow."
-                    VisualQuality.HIGH -> "HIGH: richer particles and more ring layers. Only after physical-device qualification; falls back automatically under pressure."
+                    VisualQuality.LOW -> stringResource(Res.string.appearance_quality_low)
+                    VisualQuality.BALANCED -> stringResource(Res.string.appearance_quality_balanced)
+                    VisualQuality.HIGH -> stringResource(Res.string.appearance_quality_high)
                 },
                 style = HermesType.bodySecondary,
                 color = c.inkSecondary,
                 modifier = Modifier.padding(top = 6.dp),
             )
             Text(
-                "Thermal policy uses real device temperature reads; TARGET_PENDING_DEVICE_QUALIFICATION until Xiaomi measurements exist.",
+                stringResource(Res.string.appearance_thermal_policy),
                 style = HermesType.bodySecondary,
                 color = m.inkDim,
             )
         }
 
-        SectionCard(title = "Theme") {
+        SectionCard(title = stringResource(Res.string.appearance_theme)) {
             Row(horizontalArrangement = Arrangement.spacedBy(8.dp)) {
                 ThemeSwatch(
                     label = "MARBLE LIGHT",
@@ -112,62 +112,75 @@ fun AppearanceScreen(graph: AppGraph) {
                 )
             }
             Text(
-                "Obsidian Night is the default identity (decision D-009) and the base of the Monumental Oracle Tower identity: lowest power draw, lowest burn-in stress and correct night ambience for an always-on AMOLED console. Marble Light is the daylight / inspection theme.",
+                stringResource(Res.string.appearance_theme_note),
                 style = HermesType.bodySecondary,
                 color = c.inkSecondary,
             )
         }
 
-        SectionCard(title = "Brightness") {
-            Text("Idle dimming scrim: ${"%.0f".format(settings.brightnessScrim * 100)} %", style = HermesType.body, color = c.ink)
+        SectionCard(title = stringResource(Res.string.appearance_brightness)) {
+            Text(
+                stringResource(Res.string.appearance_idle_dimming, "%.0f".format(settings.brightnessScrim * 100)),
+                style = HermesType.body,
+                color = c.ink,
+            )
             Slider(
                 value = settings.brightnessScrim,
                 onValueChange = { graph.store.updateSettings { s -> s.copy(brightnessScrim = it) } },
                 valueRange = 0f..0.6f,
             )
             Text(
-                "A truthful dimming overlay (FR-41). Scheduled screen rest and the black idle option are specified in FR-42 (AMOLED_AND_BURN_IN_SAFETY.md).",
+                stringResource(Res.string.appearance_dimming_note),
                 style = HermesType.bodySecondary,
                 color = c.inkSecondary,
             )
         }
 
-        SectionCard(title = "Motion") {
-            Text("Animation intensity: ${"%.0f".format(settings.animationIntensity * 100)} %", style = HermesType.body, color = c.ink)
+        SectionCard(title = stringResource(Res.string.appearance_motion)) {
+            Text(
+                stringResource(Res.string.appearance_animation_intensity, "%.0f".format(settings.animationIntensity * 100)),
+                style = HermesType.body,
+                color = c.ink,
+            )
             Slider(
                 value = settings.animationIntensity,
                 onValueChange = { graph.store.updateSettings { s -> s.copy(animationIntensity = it) } },
                 valueRange = 0.2f..1.5f,
             )
             SettingRow(
-                label = "Reduced motion (static mid-state rendering of every state)",
+                label = stringResource(Res.string.appearance_reduced_motion),
                 checked = settings.reducedMotion,
                 enabled = true,
                 onToggle = { graph.store.updateSettings { s -> s.copy(reducedMotion = it) } },
             )
-        }
-
-        SectionCard(title = "Display safety") {
-            SettingRow(
-                label = "Burn-in protection (per-region bounded drift, 25 s cadence)",
-                checked = settings.burnInGuard,
-                enabled = true,
-                onToggle = { graph.store.updateSettings { s -> s.copy(burnInGuard = it) } },
-            )
-            SettingRow(
-                label = "Keep screen on while console is open",
-                checked = settings.keepScreenOn,
-                enabled = true,
-                onToggle = { graph.store.updateSettings { s -> s.copy(keepScreenOn = it) } },
-            )
             Text(
-                "The Graph 3 safeguard drifts title, core, seals, transcript and medallions independently (AMOLED_AND_BURN_IN_SAFETY.md §2).",
+                stringResource(Res.string.appearance_reduced_motion_note),
                 style = HermesType.bodySecondary,
                 color = c.inkSecondary,
             )
         }
 
-SectionCard(title = stringResource(Res.string.settings_language_title)) {
+        SectionCard(title = stringResource(Res.string.appearance_display_safety)) {
+            SettingRow(
+                label = stringResource(Res.string.appearance_burn_in),
+                checked = settings.burnInGuard,
+                enabled = true,
+                onToggle = { graph.store.updateSettings { s -> s.copy(burnInGuard = it) } },
+            )
+            Text(
+                stringResource(Res.string.appearance_burn_in_note),
+                style = HermesType.bodySecondary,
+                color = c.inkSecondary,
+            )
+            SettingRow(
+                label = stringResource(Res.string.appearance_keep_screen_on),
+                checked = settings.keepScreenOn,
+                enabled = true,
+                onToggle = { graph.store.updateSettings { s -> s.copy(keepScreenOn = it) } },
+            )
+        }
+
+        SectionCard(title = stringResource(Res.string.appearance_kiosk)) {
             Text(
                 stringResource(Res.string.language_note),
                 style = HermesType.bodySecondary,
@@ -202,10 +215,10 @@ SectionCard(title = stringResource(Res.string.settings_language_title)) {
             }
         }
 
-        SectionCard(title = "Kiosk behavior") {
-            TruthBadge("CONTROLLED CAPABILITY — V0.7", c.inkSecondary)
+        SectionCard(title = stringResource(Res.string.appearance_kiosk)) {
+            TruthBadge(stringResource(Res.string.truth_controlled_capability), c.inkSecondary)
             Text(
-                "Kiosk lockdown (single-app, owner-controlled exit) is deliberately deferred: it requires an explicit Owner decision and enclosure-finalized testing (FR-46).",
+                stringResource(Res.string.appearance_kiosk_note),
                 style = HermesType.bodySecondary,
                 color = c.inkSecondary,
             )
@@ -254,7 +267,11 @@ private fun ThemeSwatch(
             modifier = Modifier.padding(top = 4.dp),
         )
         androidx.compose.material3.TextButton(onClick = onClick) {
-            Text(if (selected) "ACTIVE" else "USE", style = HermesType.pill)
+            Text(
+                if (selected) stringResource(Res.string.appearance_chip_active)
+                else stringResource(Res.string.appearance_chip_use),
+                style = HermesType.pill,
+            )
         }
     }
 }

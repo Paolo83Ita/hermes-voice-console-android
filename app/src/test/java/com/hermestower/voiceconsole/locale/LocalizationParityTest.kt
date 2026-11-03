@@ -52,6 +52,40 @@ class LocalizationParityTest {
         }
     }
 
+    private fun parsePluralNames(lang: String): Set<String> {
+        val f = File(resDir(), if (lang == "en") "values/strings.xml" else "values-$lang/strings.xml")
+        if (!f.exists()) return emptySet()
+        val text = f.readText()
+        val regex = Regex("""<plurals name="([^"]+)">""", RegexOption.DOT_MATCHES_ALL)
+        // every plurals entry must carry at least one/other in EVERY locale
+        val ok = regex.findAll(text).all { block ->
+            listOf("one", "other").all { q -> block.value.contains("quantity=\"$q\"") }
+        }
+        assertTrue("plurals entries must define one+other in $lang", ok)
+        return regex.findAll(text).map { it.groupValues[1] }.toSet()
+    }
+
+    @Test
+    fun `plurals resources have five-locale parity with one and other quantities`() {
+        val en = parsePluralNames("en")
+        for (lang in listOf("it", "es", "fr", "de")) {
+            assertEquals("plurals mismatch for $lang", en, parsePluralNames(lang))
+        }
+    }
+
+    @Test
+    fun `format-argument placeholders are positional in every locale`() {
+        for (lang in listOf("en", "it", "es", "fr", "de")) {
+            for ((k, v) in parseKeys(lang)) {
+                val bare = Regex("%[sd]").findAll(v).toList()
+                assertTrue(
+                    "non-positional format arg in $lang:$k -> $v (use %1\$s style)",
+                    bare.isEmpty(),
+                )
+            }
+        }
+    }
+
     @Test
     fun `owner terminology anchors are respected in every locale`() {
         // §14 anchors — product name never translated as a generic tower.

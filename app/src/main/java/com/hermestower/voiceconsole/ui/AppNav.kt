@@ -113,21 +113,21 @@ private val primaryDestinations = listOf(
     AppRoutes.MODEL_MANAGER, AppRoutes.SETTINGS,
 )
 
-private fun subtitleFor(route: String): String = when (route) {
-    AppRoutes.CONSOLE -> "ORACLE CORE"
-    AppRoutes.HISTORY -> "CONSOLE MEMORY"
-    AppRoutes.ARCHIVE -> "ARCHIVE CHAMBER"
-    AppRoutes.CONNECTION -> "TOWER GATE"
-    AppRoutes.TOWER_STUDIO -> "TOWER GATE · TRANSPORT CHAMBER"
-    AppRoutes.VOICE -> "RESONANCE CHAMBER"
-    AppRoutes.MODEL_MANAGER -> "ORACLE LIBRARY"
-    AppRoutes.INTELLIGENCE -> "LOCAL CORE CHAMBER"
-    AppRoutes.APPEARANCE -> "ARCHITECTURAL FORGE"
-    AppRoutes.DIAGNOSTICS -> "MECHANISM INSPECTION"
-    AppRoutes.SELF_TEST -> "TRIAL CHAMBER"
-    AppRoutes.ABOUT -> "FOUNDATION CHAMBER"
-    AppRoutes.SETTINGS -> "CONTROL CORRIDOR"
-    else -> ""
+private fun subtitleFor(route: String): Int = when (route) {
+    AppRoutes.CONSOLE -> com.hermestower.voiceconsole.R.string.subtitle_console
+    AppRoutes.HISTORY -> com.hermestower.voiceconsole.R.string.subtitle_history
+    AppRoutes.ARCHIVE -> com.hermestower.voiceconsole.R.string.subtitle_archive
+    AppRoutes.CONNECTION -> com.hermestower.voiceconsole.R.string.subtitle_connection
+    AppRoutes.TOWER_STUDIO -> com.hermestower.voiceconsole.R.string.subtitle_tower_studio
+    AppRoutes.VOICE -> com.hermestower.voiceconsole.R.string.subtitle_voice
+    AppRoutes.MODEL_MANAGER -> com.hermestower.voiceconsole.R.string.subtitle_model_manager
+    AppRoutes.INTELLIGENCE -> com.hermestower.voiceconsole.R.string.subtitle_intelligence
+    AppRoutes.APPEARANCE -> com.hermestower.voiceconsole.R.string.subtitle_appearance
+    AppRoutes.DIAGNOSTICS -> com.hermestower.voiceconsole.R.string.subtitle_diagnostics
+    AppRoutes.SELF_TEST -> com.hermestower.voiceconsole.R.string.subtitle_self_test
+    AppRoutes.ABOUT -> com.hermestower.voiceconsole.R.string.subtitle_about
+    AppRoutes.SETTINGS -> com.hermestower.voiceconsole.R.string.subtitle_settings
+    else -> com.hermestower.voiceconsole.R.string.subtitle_console
 }
 
 /**
@@ -263,7 +263,11 @@ fun AppNav(graph: AppGraph) {
                         }
                         Column {
                             Text(stringResource(current.labelRes), style = MonumentalType.friezeTitle.copy(fontSize = androidx.compose.ui.unit.TextUnit.Unspecified), color = m.ink)
-                            Text(subtitleFor(currentRoute), style = MonumentalType.sealSub, color = m.gold)
+                            Text(
+                                stringResource(subtitleFor(currentRoute)),
+                                style = MonumentalType.sealSub,
+                                color = m.gold,
+                            )
                         }
                     }
                     Box(
@@ -349,7 +353,11 @@ private fun DrawerRow(
             modifier = Modifier.weight(1f),
         )
         if (selected) {
-            Text("CURRENT", style = MonumentalType.sealSub, color = m.gold)
+            Text(
+                stringResource(com.hermestower.voiceconsole.R.string.nav_current_chip),
+                style = MonumentalType.sealSub,
+                color = m.gold,
+            )
         }
     }
 }

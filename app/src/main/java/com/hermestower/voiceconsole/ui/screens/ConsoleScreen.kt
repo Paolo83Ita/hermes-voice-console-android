@@ -154,7 +154,7 @@ fun ConsoleScreen(
                 ) {
                     Icon(
                         Icons.Filled.Menu,
-                        contentDescription = "Open navigation drawer",
+                        contentDescription = stringResource(com.hermestower.voiceconsole.R.string.nav_open_drawer),
                         tint = m.bronzeLight,
                     )
                 }
@@ -171,7 +171,7 @@ fun ConsoleScreen(
                     Text("TOWER", style = MonumentalType.friezeTitle, color = m.bronzeLight)
                 }
                 Text(
-                    "VOICE ORACLE CONSOLE",
+                    stringResource(com.hermestower.voiceconsole.R.string.console_subtitle),
                     style = MonumentalType.friezeSubtitle,
                     color = m.inkSecondary,
                     modifier = Modifier.padding(top = 3.dp),
@@ -325,7 +325,8 @@ fun ConsoleScreen(
                 }
                 turns.takeLast(3).forEach { turn ->
                     val who = when (turn.role) {
-                        com.hermestower.voiceconsole.core.state.ConversationTurn.Role.OWNER -> "OWNER"
+                        com.hermestower.voiceconsole.core.state.ConversationTurn.Role.OWNER ->
+                            stringResource(com.hermestower.voiceconsole.R.string.turn_role_owner)
                         else -> if (turn.source == com.hermestower.voiceconsole.core.state.ConversationTurn.Source.TOWER) "HERMES TOWER" else "HERMES · LOCAL"
                     }
                     val whoColor = when {
@@ -338,7 +339,11 @@ fun ConsoleScreen(
                     Spacer(Modifier.height(6.dp))
                 }
                 if (draft != null) {
-                    Text("you: “${draft}”", style = MonumentalType.bodySecondary, color = m.inkSecondary)
+                    Text(
+                        stringResource(com.hermestower.voiceconsole.R.string.console_you_draft_fmt, draft),
+                        style = MonumentalType.bodySecondary,
+                        color = m.inkSecondary,
+                    )
                 }
                 if (micState == MicUiState.LISTENING) {
                     Text(

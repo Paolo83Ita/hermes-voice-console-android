@@ -21,7 +21,9 @@ import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.unit.dp
+import com.hermestower.voiceconsole.R as Res
 import com.hermestower.voiceconsole.archive.ArchiveConversation
 import com.hermestower.voiceconsole.archive.ArchiveMission
 import com.hermestower.voiceconsole.archive.ArchiveSource
@@ -55,13 +57,17 @@ fun ArchiveScreen(archive: MockTowerArchive) {
             .padding(16.dp),
         verticalArrangement = Arrangement.spacedBy(12.dp),
     ) {
-        Text("Tower Archive", style = HermesType.screenTitle, color = c.ink)
+        Text(stringResource(Res.string.archive_title), style = HermesType.screenTitle, color = c.ink)
         MeanderBand(colors = hermesColors, modifier = Modifier.padding(top = 6.dp))
-        Text("ARCHIVE CHAMBER", style = MonumentalType.sealSub, color = m.gold)
-        TruthBadge("SIMULATED DATA — the real Tower stays the authority (Tower Graph 1.7 pending)", c.inkSecondary)
+        Text(stringResource(Res.string.archive_subtitle), style = MonumentalType.sealSub, color = m.gold)
+        TruthBadge(stringResource(Res.string.archive_simulated_badge), c.inkSecondary)
 
         TabRow(selectedTabIndex = tab) {
-            listOf("Conversations", "Missions", "Artifacts").forEachIndexed { index, label ->
+            listOf(
+                stringResource(Res.string.archive_tab_conversations),
+                stringResource(Res.string.archive_tab_missions),
+                stringResource(Res.string.archive_tab_artifacts),
+            ).forEachIndexed { index, label ->
                 Tab(
                     selected = tab == index,
                     onClick = { tab = index },
@@ -75,12 +81,12 @@ fun ArchiveScreen(archive: MockTowerArchive) {
             onValueChange = { search = it },
             modifier = Modifier.fillMaxWidth(),
             singleLine = true,
-            placeholder = { Text("Search the archive…") },
+            placeholder = { Text(stringResource(Res.string.archive_search_hint)) },
         )
 
         if (tab == 0) {
             Row(horizontalArrangement = Arrangement.spacedBy(6.dp)) {
-                listOf(null to "All", ArchiveSource.LOCAL to "LOCAL", ArchiveSource.TOWER to "TOWER").forEach { (src, label) ->
+                listOf(null to stringResource(Res.string.archive_filter_all), ArchiveSource.LOCAL to "LOCAL", ArchiveSource.TOWER to "TOWER").forEach { (src, label) ->
                     com.hermestower.voiceconsole.ui.components.ModeChip(
                         label = label,
                         selected = sourceFilter == src,
@@ -101,7 +107,7 @@ fun ArchiveScreen(archive: MockTowerArchive) {
                     if (result.nextCursor != null) {
                         item {
                             androidx.compose.material3.TextButton(onClick = { page = result.nextCursor }) {
-                                Text("Load more")
+                                Text(stringResource(Res.string.archive_load_more))
                             }
                         }
                     }
@@ -110,7 +116,7 @@ fun ArchiveScreen(archive: MockTowerArchive) {
                     AlertDialog(
                         onDismissRequest = { transcriptFor = null },
                         confirmButton = {
-                            androidx.compose.material3.TextButton(onClick = { transcriptFor = null }) { Text("Close") }
+                            androidx.compose.material3.TextButton(onClick = { transcriptFor = null }) { Text(stringResource(Res.string.common_close)) }
                         },
                         title = { Text(id) },
                         text = {
@@ -129,7 +135,7 @@ fun ArchiveScreen(archive: MockTowerArchive) {
                     if (result.nextCursor != null) {
                         item {
                             androidx.compose.material3.TextButton(onClick = { page = result.nextCursor }) {
-                                Text("Load more")
+                                Text(stringResource(Res.string.archive_load_more))
                             }
                         }
                     }
@@ -143,7 +149,7 @@ fun ArchiveScreen(archive: MockTowerArchive) {
                     if (result.nextCursor != null) {
                         item {
                             androidx.compose.material3.TextButton(onClick = { page = result.nextCursor }) {
-                                Text("Load more")
+                                Text(stringResource(Res.string.archive_load_more))
                             }
                         }
                     }
@@ -157,14 +163,15 @@ fun ArchiveScreen(archive: MockTowerArchive) {
 private fun ConversationRow(conv: ArchiveConversation, onOpen: () -> Unit) {
     SectionCard(title = conv.title) {
         Text(
-            "${conv.id} · ${conv.source.name} · ${conv.turnCount} turns · ${conv.projectId ?: "no project"}" +
-                (conv.missionId?.let { " · mission $it" } ?: ""),
+            "${conv.id} · ${conv.source.name} · " + stringResource(Res.string.archive_meta_turns, conv.turnCount) +
+                " · " + (conv.projectId ?: stringResource(Res.string.archive_meta_no_project)) +
+                (conv.missionId?.let { " · " + stringResource(Res.string.archive_meta_mission, it) } ?: ""),
             style = HermesType.bodySecondary,
         )
         Row(horizontalArrangement = Arrangement.spacedBy(6.dp)) {
-            androidx.compose.material3.TextButton(onClick = onOpen) { Text("Open transcript") }
+            androidx.compose.material3.TextButton(onClick = onOpen) { Text(stringResource(Res.string.archive_open_transcript)) }
             if (conv.missionId != null) {
-                Text("mission-linked", style = HermesType.bodySecondary)
+                Text(stringResource(Res.string.archive_mission_linked), style = HermesType.bodySecondary)
             }
         }
     }
@@ -174,24 +181,27 @@ private fun ConversationRow(conv: ArchiveConversation, onOpen: () -> Unit) {
 private fun MissionRow(mission: ArchiveMission, archive: MockTowerArchive) {
     SectionCard(title = mission.title) {
         Text(
-            "${mission.id} · ${mission.state} · graph ${mission.graph} · phase ${mission.phase}",
+            "${mission.id} · ${mission.state} · " +
+                stringResource(Res.string.archive_meta_graph, mission.graph) + " · " +
+                stringResource(Res.string.archive_meta_phase, mission.phase),
             style = HermesType.bodySecondary,
         )
         Text(
-            "requested ${mission.requestedMode} · effective ${mission.effectiveMode}" +
-                (mission.checkpoint?.let { " · checkpoint $it" } ?: ""),
+            stringResource(Res.string.archive_meta_requested, mission.requestedMode, mission.effectiveMode) +
+                (mission.checkpoint?.let { " · " + stringResource(Res.string.archive_meta_checkpoint, it) } ?: ""),
             style = HermesType.bodySecondary,
         )
         if (mission.blockers.isNotEmpty()) {
-            Text("Blockers: ${mission.blockers.joinToString()}", style = HermesType.bodySecondary)
+            Text(stringResource(Res.string.archive_meta_blockers, mission.blockers.joinToString()), style = HermesType.bodySecondary)
         }
         Text(
-            "artifacts ${mission.artifactIds.size} · receipts ${mission.receiptIds.size}" +
-                if (mission.continuationEligible) " · continuation eligible" else " · continuation NOT eligible",
+            stringResource(Res.string.archive_meta_artifacts, mission.artifactIds.size, mission.receiptIds.size) +
+                if (mission.continuationEligible) " " + stringResource(Res.string.archive_meta_continuation_ok)
+                else " " + stringResource(Res.string.archive_meta_continuation_no),
             style = HermesType.bodySecondary,
         )
         androidx.compose.material3.TextButton(onClick = { archive.requestContinuation(mission.id) }) {
-            Text("Request continuation")
+            Text(stringResource(Res.string.archive_request_continuation))
         }
     }
 }
@@ -204,9 +214,9 @@ private fun ArtifactRow(artifact: com.hermestower.voiceconsole.archive.ArchiveAr
             style = HermesType.bodySecondary,
         )
         Row(horizontalArrangement = Arrangement.spacedBy(6.dp)) {
-            androidx.compose.material3.TextButton(onClick = { archive.download(artifact.id) }) { Text("Download") }
-            androidx.compose.material3.TextButton(onClick = { archive.removeLocalCopy(artifact.id) }) { Text("Remove local") }
-            androidx.compose.material3.TextButton(onClick = { archive.verifyHash(artifact.id) }) { Text("Verify hash") }
+            androidx.compose.material3.TextButton(onClick = { archive.download(artifact.id) }) { Text(stringResource(Res.string.common_download)) }
+            androidx.compose.material3.TextButton(onClick = { archive.removeLocalCopy(artifact.id) }) { Text(stringResource(Res.string.archive_remove_local)) }
+            androidx.compose.material3.TextButton(onClick = { archive.verifyHash(artifact.id) }) { Text(stringResource(Res.string.archive_verify_hash)) }
         }
     }
 }
