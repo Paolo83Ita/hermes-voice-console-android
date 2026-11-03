@@ -702,3 +702,45 @@ disposition per directive §2 in the next read-back.
 NEXT: TEST-A/B re-runs → C/E/D → disposition → CP-G4-017 localization waves 2-3 +
 onboarding (§6) → CP-G4-018 Tower refoundation → CP-G4-019..025. No terminal verdict:
 nodes remain.
+
+G4-N17 — CP-G4-017 wave 2 execution (localization): 11 UI files migrated, 362-string parity ×5 locales (2026-11-04)
+FINDING: (1) CP-G4-016 channel repair validated in structure; the dispatched TEST-A run
+(41718222586 @ 3893e88) died BEFORE the script in the runner's own setup phase (emulator
+boot 915,901 ms = 15.3 min, then `settings put system screen_off_timeout` Broken pipe (32)
+→ runner abort exit 224, zero instrumentation) — E2E_BLOCKED_EMULATOR_ENVIRONMENT, third
+environment-class failure of the day; the LIFECYCLE dispatch (41718228168) and the push
+run (41718165578) were still in flight at session close (read-back next session).
+(2) Wave-2 execution measured against LOCALIZATION_LITERAL_AUDIT.md: Appearance (24 keys),
+Tower Archive (26), Connection (23), Console frieze rest (4), AppNav subtitles (13 + chip),
+MonumentalChrome (7 + plurals), About & Safety (24 — limitation list updated truthfully to
+five-language delivery), History (11), QR scanner (21 — SIMULATED tokens kept inside
+localized frames), Voice & Audio (19), Self-Test Center (21 — E2E anchors preserved),
+Diagnostics (27). Parity: 110 → 362 strings + 1 plurals, all five locales in lockstep.
+(3) Cloud compile gate caught FOUR distinct defect classes in the mechanical migration,
+each repaired from run evidence with a targeted fix: stringResource inside
+semantics{} / onClick / coroutine lambdas (non-composable contexts — use hoisted vals or
+context.getString: runs 41720542709, 41721015289); delegated-property smart-cast to
+non-null Any (draft, cameraError — captured to local vals: runs 41721015289,
+41721804513); missing stringResource imports (History/QrScanner/VoiceAudio/
+LocalIntelligence — added).
+ACTION: (1) LocalizationParityTest extended with plurals five-locale parity (one+other
+mandatory) and positional-format-argument validation (bare %s/%d forbidden — %1$s style
+enforced). (2) All 362 keys translated with quality review (it/es/fr/de); technical
+allowlist respected (HERMES/TOWER/ORACLE CORE/MARBLE LIGHT/OBSIDIAN NIGHT/MODEL SANCTUM
+invariant; TLS/diagnostic codes; LOCAL/TOWER source tokens; LOCAL/TOWER source tokens;
+SIMULATED/QUALIFY_ON_DEVICE truthfulness tokens preserved in-frame). (3) New reusable
+scanner scripts/extract_literals.py (UI-scope). (4) Remains for wave completion:
+TowerStudioScreen (43), ModelManagerScreen (50), MockTowerArchive title frame (wave 3),
+then the Italian completeness instrumentation test (directive §4) on the migrated UI.
+TEST: parity hold at every batch (verified by key count ×5); compile gates via cloud
+pushes (f757f3e/c2cb6b1 builds in flight at session close); no navigation, state,
+control or persistence logic touched; E2E anchors preserved by construction (en defaults
+byte-identical for every pinned string).
+COMMIT: 1ac6f81 (batch 1) → 5f3fad9 (fix) → 84a2a64 (batch 2) → 34f92c2 (fix 2) →
+f757f3e (batch 3) → c2cb6b1 (fix 3) — all pushed, ls-remote read back at each step.
+CHECKPOINT: CP-G4-017 IN PROGRESS (wave 2 ≈ 75% by literal count; wave 3 pending; gate
+test pending). CP-G4-016 IN PROGRESS (TEST-B/TEST-D pushes in flight; TEST-A re-dispatch
+pending after the environment stabilizes).
+NEXT: read 3893f88-era run verdicts → finish wave 2 (TowerStudio, ModelManager) + wave 3
+(MockTowerArchive title) → Italian completeness gate test → CP-G4-018 Tower refoundation
+→ CP-G4-019..025. No terminal verdict: nodes remain.
