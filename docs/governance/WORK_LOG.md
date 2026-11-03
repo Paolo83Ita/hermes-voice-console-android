@@ -611,3 +611,44 @@ truthful INSTRUMENTATION_FAILED_OR_INCOMPLETE marker as a single sh -c line (zer
 errors in execution); the typed residual fired again with identical signature (7th sample:
 e2e_35_36, route=appearance INITIALIZED→DESTROYED, crash at #3 of 30, two green before).
 Commit 1fa7829 pushed and read back exact (1fa7829b8b37decebc3acf6c92cb8bfa018de95a).
+
+NODE G4-N16 — OWNER CONTINUATION DIRECTIVE intake + CP-G4-016 E2E decision work + CP-G4-017 wave 1 (2026-11-03)
+DIRECTIVE: Owner Graph 4 continuation (simplified UX, complete localization, monumental
+animated Tower, real clickable model installation, E2E recovery, Xiaomi readiness) —
+10 checkpoints CP-G4-016..025, mission mode CONTINUE_FROM_LATEST_VERIFIED_REMOTE_TIP.
+OWNER_DECISION_E2E_RECOVERY: CI_LIFECYCLE_PROFILE AUTHORIZED.
+FINDING: (1) fresh read-back at 8013853 local=remote (OWNER_CONTINUATION_READBACK.md,
+commit 1c8af71) — all five OWNER_DECISION_* intake-recorded; literal inventory MEASURED
+(235 occurrences / 16 files). (2) E2E experiments: TEST-A control attempts blocked twice
+by infrastructure (compile defect repaired from cloud evidence 41645556871/41645569087 —
+getArguments static accessor + explicit ActivityScenarioRule type + missing import;
+androidTest constructor inference defect repaired via library factory + DEBUG system
+property 41646716053/41646727671; one install infra failure 41647987018 — Can't find
+service: package, zero tests, E2E_BLOCKED_EMULATOR_ENVIRONMENT class). TEST-B executed
+(41648000740 @ c6476a1): RESIDUAL REPRODUCED WITH THE PROFILE REQUESTED — identical
+signature; forensics: 33 s frame-skip-free window (profile engaged by inference),
+relaunch finishDrawing 25084 ms, Activity pause timeout 49 s + destroy timeout, destroy
+stack = onActivityPreDestroyed → NavController propagates DESTROYED → INITIALIZED entry
+throws (navigation-compose 2.8.5 non-defensive teardown meeting an un-promoted entry).
+THE FROZEN CLOCK IS NOT THE SOLE MECHANISM. Engagement probe added (MainActivity debug
+log + harness hard check) for proof on the controlled re-runs @ b0be658 (in flight).
+ACTION: (1) CI_LIFECYCLE_PROFILE implemented: MotionProfile TEST_ONLY seam through the
+app's own reduced-motion gate (release can never engage); harness variant-aware (variant
+A byte-identical; variant B real frames, physical drawer clicks, accessible hub rows);
+android-e2e.yml workflow_dispatch inputs (profile/class filter) with single-line POSIX
+verdict discipline. (2) CP-G4-017 wave 1: drawer = ONLY the 5 primary destinations
+(Console, Tower Archive, Connect to Hermes Tower, Models and Voice, Settings);
+NEW SettingsHubScreen with the 6 prescribed categories reaching the EXISTING screens
+(zero screen-logic moves); drawer closes on selection; 34 string keys ×5 locales
+(parity 110×5); E2E walks the real product path via the hub; TEST-E onto the shared path;
+LOCALIZATION_LITERAL_AUDIT.md delivered (235 literals classified per directive §3).
+TEST: unit 242/242 at the wave-1 parent commit; compile/lint gates via cloud debug-build
+(one Settings-icon import repaired from run 41651965634 evidence).
+COMMIT: 1c8af71 (readback) → bd1606c (profile) → 6da1b58 → c6476a1 (propagation) →
+39cc422 (nav wave 1) → 353fc22 (import fix) → b0be658 (probe) → 5319da3 (report) — all
+pushed, ls-remote read back at each step.
+CHECKPOINT: CP-G4-016 IN PROGRESS (controlled TEST-A/B re-runs with probe in flight;
+TEST-C/D/E next; verdict + disposition in the next read-back).
+NEXT: read controlled-run verdicts → disposition per directive §2 → TEST-C/D/E →
+CP-G4-017 localization waves 2-3 + onboarding (§6) → CP-G4-018 Tower refoundation →
+CP-G4-019..025. No terminal verdict: nodes remain.
