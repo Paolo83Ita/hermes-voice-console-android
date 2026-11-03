@@ -64,11 +64,42 @@ is legacy and not instantiated). The profile reuses the app's own reduced-motion
 
 | ID | Scope | Profile | Expected | Cloud run | Verdict |
 | --- | --- | --- | --- | --- | --- |
-| TEST-A | e2e_35_36 alone | NORMAL_VISUAL_PROFILE | residual reproduces (control) | PENDING | PENDING |
-| TEST-B | e2e_35_36 alone | CI_LIFECYCLE_PROFILE | passes with real navigation | PENDING | PENDING |
+| TEST-A | e2e_35_36 alone | NORMAL_VISUAL_PROFILE | residual reproduces (control) | 41645556871 @ bd1606c = compile fail (harness defect, repaired); 41647987018 @ c6476a1 = install infra failure (`Can't find service: package`, zero tests — E2E_BLOCKED_EMULATOR_ENVIRONMENT class); re-dispatched @ b0be658 | PENDING |
+| TEST-B | e2e_35_36 alone | CI_LIFECYCLE_PROFILE | passes with real navigation | **41648000740 @ c6476a1: executed — RESIDUAL REPRODUCED** (identical signature); controlled re-run @ b0be658 with engagement probe | REPRODUCED (first sample) |
 | TEST-C | E2EAppearancePersistenceTest whole class | CI_LIFECYCLE_PROFILE | passes | PENDING | PENDING |
 | TEST-D | complete instrumentation suite | CI_LIFECYCLE_PROFILE | 0 failures | PENDING | PENDING |
 | TEST-E | normal appearance navigation ×20, one session | CI_LIFECYCLE_PROFILE | no entry-lifecycle crash | PENDING | PENDING |
+
+## 4b. MAJOR FINDING (2026-11-03, run 41648000740 @ c6476a1) — the frozen clock is NOT the sole mechanism
+
+TEST-B executed with the profile requested and the residual fired with the IDENTICAL
+signature at the same test. Environment forensics from the run's logcat artifact:
+
+- The test window (14:35:10 RESUMED → 14:35:59 pause request) contains a **33-second
+  frame-skip-free gap** (14:35:10.8 → 14:35:43.8, then only transition-correlated skips):
+  a continuously animating Oracle Core would produce frames (and skips) throughout —
+  the static-frame profile behavior is consistent with engagement. The controlled re-run
+  adds a hard probe (MainActivity logs `ciLifecycleProfile=` on debug builds; the harness
+  `check`s `MotionProfile.ciLifecycleProfile` in the variant-B path) so the final matrix
+  is judged on PROOF, not inference.
+- **Environment pathology measured**: `finishDrawing of relaunch: 25084ms` (e2e_40's
+  activity relaunch took 25 s to draw on the software emulator), `Activity pause timeout`
+  after 49 s, `Activity destroy timeout`, 33 frame-skips in the tail window. The surface
+  pipeline stalls for tens of seconds — NavHost enter transitions can fail to reach their
+  terminal frame EVEN IN REAL TIME, leaving an entering entry un-promoted from INITIALIZED.
+- **Destroy-path stack (exact)**: `ReportFragment.onActivityPreDestroyed` →
+  `LifecycleRegistry.backwardPass` → `NavController.lifecycleObserver(ON_DESTROY)` →
+  `NavBackStackEntry.handleLifecycleEvent → updateState → moveToState` — the framework
+  moves EVERY back-stack entry straight to DESTROYED when the host dies; an entry still
+  INITIALIZED makes `LifecycleRegistry` throw (INITIALIZED→DESTROYED is not a legal move).
+  This is navigation-compose 2.8.5's non-defensive teardown meeting an un-promoted entry;
+  the un-promotion is the emulator's transition stall, not application logic.
+- Consequence for the disposition: the residual is NOT TEST_LIFECYCLE_DEFECT_REPAIRED by
+  the profile alone. The candidate dispositions are now NORMAL_PROFILE_EMULATOR_LIMITATION
+  (if the controlled re-runs confirm engagement and the crash persists — the emulator
+  cannot host even the static-frame profile reliably) or PHYSICAL_XIAOMI_RECOVERY_REQUIRED
+  (the physical device arbitrates, as the Owner's option (a) already provides). No
+  navigation-compose upgrade has been performed (directive §2: no speculative upgrades).
 
 A CI_LIFECYCLE_PROFILE PASS does NOT physically qualify the NORMAL animated profile —
 that remains the physical Xiaomi gate (directive §2), which this report records.
