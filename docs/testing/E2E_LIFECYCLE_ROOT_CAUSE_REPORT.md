@@ -243,7 +243,7 @@ Consequences:
 | --- | --- | --- | --- |
 | TEST-A | 41645556871 / 41647987018 / 41657209419 | n/a | never executed cleanly (compile fail → install infra → args-transport + collapse) — E2E_BLOCKED_EMULATOR_ENVIRONMENT |
 | TEST-B | 41718228168 @ 3893e88 | YES (probe true) | residual REPRODUCED (`route=appearance`) |
-| TEST-C | 41726653270 died pre-install; re-dispatch 41802826358 in flight | (pending) | breadth confirmation pending; accidental NORMAL-profile breadth reproduction captured (push-run 41726726187, `route=settings`) |
+| TEST-C | 41726653270 died pre-install; **re-dispatch 41802826358 @ c5b2cc9 EXECUTED: probe `ciLifecycleProfile=true` ×2, numtests=7 (class filter transmitted), 3 tests started, FATAL at 09:37:08 — residual REPRODUCED at class breadth, `route=appearance`**; accidental NORMAL-profile breadth reproduction also captured (push-run 41726726187, `route=settings`) | **REPRODUCED (profile-engaged, class breadth)** |
 | TEST-D | 41802836756 @ c5b2cc9 | YES (probe true ×2) | residual REPRODUCED at suite breadth (numtests=31, abort at e2e_35_36, `route=appearance`) |
 | TEST-E | 41802846917 @ c5b2cc9 | YES (channel verified, probe rotated out of tail) | INCONCLUSIVE_EMULATOR_IDLE_SYNC (AppNotIdleException 60 s ASYNC_TASKS pre-soak; NOT the lifecycle residual) |
 
