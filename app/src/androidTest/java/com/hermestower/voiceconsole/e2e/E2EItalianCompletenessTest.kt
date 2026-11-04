@@ -173,7 +173,7 @@ class E2EItalianCompletenessTest {
             .mapNotNull { n -> n.config.get(SemanticsProperties.Text)?.joinToString(" ") { it.text } }
         val descs = compose.onAllNodesWithContentDescription("", substring = true)
             .fetchSemanticsNodes()
-            .mapNotNull { n -> n.config.get(SemanticsProperties.ContentDescription)?.joinToString(" ") { it.text } }
+            .mapNotNull { n -> n.config.get(SemanticsProperties.ContentDescription)?.joinToString(" ") { it } }
         return (texts + descs).filter { it.isNotBlank() }
     }
 
