@@ -14,6 +14,7 @@ import androidx.test.platform.app.InstrumentationRegistry
 import com.hermestower.voiceconsole.R
 import com.hermestower.voiceconsole.locale.AppLanguage
 import org.junit.Assert.assertTrue
+import org.junit.Before
 import org.junit.Rule
 import org.junit.Test
 import org.junit.runner.RunWith
@@ -52,6 +53,14 @@ class E2EItalianCompletenessTest {
 
     @get:Rule
     val compose: HermesComposeRule = hermesComposeRule()
+
+    @Before
+    fun freezeAnimations() {
+        // Variant-A physics (same as every other suite class): without the frozen
+        // clock compose.waitForIdle() waits for the console's infinite Oracle Core
+        // animation and never returns (run 41818773091 — 3600 s instrument timeout).
+        compose.freezeAnimationsForTest()
+    }
 
     /** Reviewed ordinary-English words that must never render under Italian. */
     private val bannedEnglish = setOf(
