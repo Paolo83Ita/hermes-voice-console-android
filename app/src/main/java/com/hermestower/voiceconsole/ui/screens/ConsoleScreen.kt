@@ -286,7 +286,7 @@ fun ConsoleScreen(
                         com.hermestower.voiceconsole.ui.runtime.MotionProfile.ornamentsFrozen,
                 )
                 Canvas(Modifier.matchParentSize()) {
-                    drawTowerFrame(towerPhase, quality, m)
+                    drawTowerFrame(towerPhase, com.hermestower.voiceconsole.ui.monumental.QualityBudgets.of(quality), m)
                 }
                 StateOverlayChip(
                     state,
