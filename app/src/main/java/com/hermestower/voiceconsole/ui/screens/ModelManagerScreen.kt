@@ -433,7 +433,7 @@ fun ModelManagerScreen(graph: AppGraph) {
                                     statusNote = context.getString(R.string.mm_install_result, entry.displayName, if (outcome.success) "COMPLETED" else "FAILED", outcome.reason)
                                     registryTick++
                                 }
-                            },
+                            }
                         },
                     ) { Text(stringResource(R.string.mm_install)) }
                     TextButton(onClick = {
