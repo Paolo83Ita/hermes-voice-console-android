@@ -158,10 +158,17 @@ class E2EItalianCompletenessTest {
                 .fetchSemanticsNodes()
                 .firstOrNull { it.config[SemanticsActions.OnClick]?.action != null }
                 ?: error("settings-hub row '$label' not found (it)")
-            hubRow.config[SemanticsActions.OnClick]!!.action!!()
+            invokeOnMain { hubRow.config[SemanticsActions.OnClick]!!.action!!() }
         }
         compose.waitForText(anchor)
         compose.waitForIdle()
+    }
+
+
+    /** NavController demands the main thread (lifecycle addObserver) — semantics
+     *  actions are dispatched via runOnMainSync (evidence run 8727210 gate). */
+    private fun invokeOnMain(action: () -> Unit) {
+        androidx.test.platform.app.InstrumentationRegistry.getInstrumentation().runOnMainSync(action)
     }
 
     private fun activateRow(label: String): Boolean {
@@ -169,7 +176,7 @@ class E2EItalianCompletenessTest {
             .fetchSemanticsNodes()
             .firstOrNull { it.config[SemanticsActions.OnClick]?.action != null }
             ?: return false
-        row.config[SemanticsActions.OnClick]!!.action!!()
+        invokeOnMain { row.config[SemanticsActions.OnClick]!!.action!!() }
         return true
     }
 
@@ -263,7 +270,7 @@ class E2EItalianCompletenessTest {
             val details = compose.onAllNodesWithText(appContext.getString(R.string.mm_details), substring = true)
                 .fetchSemanticsNodes()
                 .firstOrNull { it.config[SemanticsActions.OnClick]?.action != null }
-            details?.config[SemanticsActions.OnClick]!!.action!!()
+            invokeOnMain { details?.config[SemanticsActions.OnClick]!!.action!!() }
             compose.waitForText(appContext.getString(R.string.mm_attr_type))
             violations += collectViolations("Models attribute sheet", pool)
 
