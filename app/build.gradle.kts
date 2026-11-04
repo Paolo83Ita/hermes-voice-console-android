@@ -18,6 +18,18 @@ android {
         testInstrumentationRunner = "androidx.test.runner.AndroidJUnitRunner"
     }
 
+    // GRAPH 4 FINAL §20: DUAL APK OUTPUT — the UNIVERSAL debug APK keeps every
+    // ABI (CI + x86_64 emulator), the per-ABI split APKs serve the physical
+    // Xiaomi (arm64-v8a). universalApk keeps the universal artifact alongside
+    // the splits; per-ABI versionCode offsets stay off (debug-only qualification).
+    splits {
+        abi {
+            isEnable = true
+            isUniversalApk = true
+            reset()
+            include("arm64-v8a", "x86_64")
+        }
+    }
     buildTypes {
         release {
             isMinifyEnabled = false

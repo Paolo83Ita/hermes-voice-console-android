@@ -1,0 +1,115 @@
+# GRAPH 4.6 READBACK
+
+Directive: GRAPH 4.6 — BETA READINESS / ITALIAN_UI_COMPLETE / MONUMENTAL TOWER
+FINALIZATION / REAL STT-TTS DELIVERY / OPTIONAL LOCAL LLM / TOWER ARCHIVE / ARM64 APK /
+XIAOMI QUALIFICATION PACKAGE.
+§0 FIRST EXACT ACTION executed physically at session start. This file supersedes
+narrative claims; every dimension below was re-verified live this session.
+
+## 1. Repository authority (physically verified)
+
+| Dimension | Value |
+| --- | --- |
+| Reported tip in directive | `b3b78ed` (owner explicitly says: do NOT assume it is authoritative) |
+| Active branch (local) | `graph-4/real-voice-pairing-archive-e2e` |
+| Local HEAD (before this session's work) | `b3b78ed` |
+| `git fetch origin` | executed this session (exit 0) |
+| Remote HEAD `origin/graph-4/real-voice-pairing-archive-e2e` | `b3b78ed` |
+| Convergence | local HEAD == remote HEAD (rev-list left/right = 0/0) — **the reported tip IS the verified tip this time** |
+| `main` | untouched (not checked out, not modified; verified via `git status`) |
+| Working tree at read-back | NOT clean — two files modified (see §2) |
+| History guard | no force-push, no rebase, no checkpoint deletion; forward-only |
+
+## 2. Uncommitted work found in the tree (rescued, not discarded)
+
+The previous session was interrupted between edit and commit. The working tree carried
+the §8 (APK OPTIMIZATION) implementation UNCOMMITTED:
+
+- `app/build.gradle.kts` — `splits.abi` block: `isEnable=true`, `isUniversalApk=true`,
+  `include("arm64-v8a", "x86_64")` (universal debug APK retained for CI/x86_64 emulator;
+  arm64-v8a split APK serves the physical Xiaomi; debug-only qualification, no
+  versionCode offsets).
+- `.github/workflows/android-debug-build.yml` — SHA-256 step widened to ALL debug APKs
+  (`sha256sum` + `du -b` of every output), artifact upload widened to the three APK
+  outputs.
+
+**Defect found in the rescued diff**: the upload step carried TWO `if-no-files-found`
+keys (`warn` then `error`) — duplicate YAML key, invalid input shape. Repaired in the
+CP-G4-021 commit (single `error`: at least one APK always exists).
+**Also hardened this session**: the E2E workflow's two `adb install` calls are now
+bounded (`timeout 900`) — an unbounded install of a ~165 MB APK on a software-emulated
+device was the one unbounded statement in the emulator script, and it is inside the
+emulator step that current runs occupy for 70–100 min.
+
+## 3. Cloud runs (GitHub API, read this session with the stored credential)
+
+| Run | Workflow | Commit | Conclusion | Meaning |
+| --- | --- | --- | --- | --- |
+| 41868119129 | android-debug-build | b3b78ed | **success** | assembleDebug + 250 unit tests + lint green at the verified tip |
+| 41868118783 | android-e2e (push, segmented model) | b3b78ed | in_progress → E2E_RESULT_UNAVAILABLE at read-back | FIRST fully compile-green execution of the segmented gate model |
+| 41867050032 | android-e2e (push) | 0731d07 | in_progress → E2E_RESULT_UNAVAILABLE | same |
+| 41863355495 | android-e2e (push) | 3eac29a | in_progress → E2E_RESULT_UNAVAILABLE | same |
+| 41867050334 | android-debug-build | 0731d07 | failure | testDebugUnitTest 249/250 → fixed by CP-G4-020 fix 14 (b3b78ed) |
+| 41863355721 | android-debug-build | 3eac29a | success | build+tests+lint green |
+| 41859464564/… | android-e2e | 145ee08 | failure | compileDebugAndroidTestKotlin (fixed by 3eac29a) |
+
+**Read on the three in-flight E2E runs**: job `emulator-e2e`, step 9 ("Run emulator
+end-to-end suite") started 16:05:53 / 16:29:11 / 16:37:33 UTC; all three were still
+inside step 9 at read-back (≈ 17:50 UTC), with a job timeout of 120 min. The previous
+emulator-executing run (41846567723, monolithic model, crash at test 3/33) consumed
+~40 min in the same step; the segmented model's own bounding timeouts sum to 75 min of
+instrumentation + boot — the three runs are therefore either legitimately slow (first
+execution of gate+regression+residual invocations) or hung on a step the live-log
+credential cannot read. They will terminate by job timeout and upload their evidence
+(`if: always()`), and the CP-G4-021 push triggers a FRESH run on the new tip.
+Nothing in the read-back justifies re-opening the dispositioned lifecycle residual
+(PHYSICAL_XIAOMI_RECOVERY_REQUIRED stands; directive forbids reopening).
+
+## 4. Physical state dimensions (verified live this session)
+
+| Dimension | Verified value |
+| --- | --- |
+| String keys | **639 `<string>` × 5 locales (en/it/es/fr/de)** — counted live from `res/values*/strings.xml`; parity holds (LocalizationParityTest enforces at unit level) |
+| Unit tests | 250 in `testDebugUnitTest` (cloud run 41868119129: green at b3b78ed) |
+| Lint | android-debug-build SUCCESS at b3b78ed (abortOnError gate active) |
+| Local build capability | sandbox has NO Gradle/Android SDK — all builds are cloud-executed (Stage A contingency, unchanged) |
+| Italian gate code | ITALIAN-GATE-A..F segmented classes present in `app/src/androidTest/.../e2e/`; `ItalianGateSupport.kt` harness with 60 s destination floor, main-thread activation, scanner explicit Back, en-restore finally |
+| Segmented instrumentation | `android-e2e.yml`: GATE invocation (must pass) → REGRESSION invocation (full suite minus quarantined residual class, must pass) → RESIDUAL invocation (typed expected signature only) → single-line POSIX verdict |
+| STT | `VoskFrameSttEngine.kt` on the frame seam; vosk-android 0.3.75 pinned in `gradle/libs.versions.toml` (Maven Central, Apache-2.0); NOT_INSTALLED honesty + model-dir resolver + typed errors; AppGraph wired; active-engine read-back never claims local STT while the system recognizer runs |
+| TTS | Android System TTS engine (`AndroidSystemTtsEngine.kt`) active fallback; `AndroidSystemTtsEngine.activeEngineName` + AppGraph.activeRuntimeReadback diagnostics card ×5 locales |
+| LLM | foundation only (no engine, no candidate delivery) → implemented this session (§6 of the directive) |
+| Archive | `ArchiveScreen` (Conversations/Missions/Artifacts) + `MockTowerArchive` (deterministic, SIMULATED labels) — finished this session per §7 (search/pagination/filters/pin/provenance/hash/re-download) |
+| Source links | `ModelLinks.kt` validator (reviewed-HTTPS-host allowlist; Open source / Open license / Copy identity / View SHA-256 / Retry source check physically clickable; blocked links show localized explanation, NEVER a substitute source) + `CatalogLinkIntegrityTest` |
+| Monumental Tower | Oracle Core + original architecture frame (CP-G4-019) + visual repairs D1/D2/D4/D6/D8 (CP-G4-018, verified by post-repair re-render); preview pack with all seven required states exists in the delivery folder |
+| Onboarding | six-step wizard (ob_* keys), non-blocking post-finish, E2E-walked |
+| Navigation | drawer = 5 primary destinations; Settings hub = 6 categories |
+| APK artifacts | newest SUCCESS artifact at b3b78ed (universal only, 4-ABI); previous receipt: 165,029,486 B, sha256 9275aa…fdaa0 (b1df58a) |
+| Governance | all authorities present under `docs/governance/` (WORK_LOG, CHECKPOINT_INDEX, ledger, readbacks, MISSION_GRAPH) |
+
+## 5. Directive-item gap map (what Graph 4.6 must add)
+
+| Directive item | State at read-back | Action this session |
+| --- | --- | --- |
+| §1 ITALIAN_UI_COMPLETE | gate code complete; cloud verdict pending (runs in flight) | fresh run on CP-G4-021 tip → ITALIAN_UI_REPORT.md from its evidence |
+| §2 MONUMENTAL TOWER | implementation + repairs + previews in place | MONUMENTAL_TOWER_FINAL_REPORT.md |
+| §3 REAL SOURCE LINKS | implemented + integrity-tested (CP-G4-019/020) | verify + fold into receipts |
+| §4 REAL STT | vosk-android pinned, engine implemented, NOT_INSTALLED honesty | STT_RUNTIME_RECEIPT.md (LOCAL_STT_READY_FOR_XIAOMI_QUALIFICATION) |
+| §5 REAL TTS | system TTS active fallback | TTS_RUNTIME_RECEIPT.md + downloadable-voice candidate wiring |
+| §6 OPTIONAL LOCAL LLM | foundation only | implement engine + one verified candidate, DEFAULT DISABLED → LOCAL_LLM_IMPLEMENTED |
+| §7 TOWER ARCHIVE | tabs + mock + SIMULATED present | finish search/pagination/filters/open/preview/cache/pin/provenance/hash/re-download |
+| §8 APK OPTIMIZATION | splits implemented but UNCOMMITTED (with YAML defect) | repair + commit CP-G4-021 → dual APKs → APK_SIZE_AND_ABI_REPORT.md + SHA-256 both |
+| §9 XIAOMI PACKAGE | INSTALL_XIAOMI_GRAPH4_FINAL.md exists | XIAOMI_GRAPH4_BETA_PACKAGE runbook |
+| §10 TERMINALITY | pending | terminal receipt after all above |
+
+## 6. Forward-only plan from the true Next Exact Action
+
+1. CP-G4-021: repair the rescued §8 diff (duplicate YAML key), harden the E2E install
+   statements, commit + push → fresh cloud build/E2E on the new tip.
+2. While cloud runs: §6 LLM implementation, §7 Archive completion, §4/§5 receipts,
+   §2 Tower final report, §9 Xiaomi package.
+3. Read back the fresh cloud runs; on green gate+regression+typed residual →
+   ITALIAN_UI_COMPLETE in ITALIAN_UI_REPORT.md; on any failure → ledger row R-n + typed
+   classification + narrow repair + full rerun (no assertion weakened).
+4. Download the dual APK artifacts, hash + size-breakdown → APK_SIZE_AND_ABI_REPORT.md.
+5. Governance convergence + terminal receipt
+   `GRAPH_4_IMPLEMENTATION_COMPLETE_XIAOMI_QUALIFICATION_PENDING`.
