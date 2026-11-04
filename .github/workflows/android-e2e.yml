@@ -89,14 +89,15 @@ jobs:
             sleep 60
             adb shell getprop ro.build.version.sdk
             echo "Installing application APK..."
-            # GRAPH 4.6 (GRAPH46_READBACK §2): the two installs were the only
-            # unbounded statements in this script — a wedged package manager on a
-            # software-emulated device with a ~165 MB APK would consume the whole
-            # 120-min job silently. Bounded at 15 min each; a timeout here fails
-            # the step with the boot/install evidence intact (E2E_BLOCKED_EMULATOR_ENVIRONMENT class).
-            timeout 900 adb install -r -t app/build/outputs/apk/debug/app-debug.apk
+            # CP-G4-023 fix 2 (runs 41884838553 @ c97a02f + 41883447613 @ 6545969 —
+            # boot 17.4 min, then `adb: failed to stat app-debug.apk: No such file
+            # or directory`): the CP-G4-021 ABI splits RENAMED the outputs — the
+            # universal APK is now app-universal-debug.apk (app-debug.apk no longer
+            # exists). The universal carries x86_64 (this emulator) + every ABI.
+            # GRAPH 4.6 (GRAPH46_READBACK §2): installs stay bounded.
+            timeout 900 adb install -r -t app/build/outputs/apk/debug/app-universal-debug.apk
             echo "Installing androidTest APK..."
-            timeout 900 adb install -r -t app/build/outputs/apk/androidTest/debug/app-debug-androidTest.apk
+            timeout 900 adb install -r -t $(ls app/build/outputs/apk/androidTest/debug/*androidTest*.apk | head -1)
             echo "Running instrumentation — segmented model (CP-G4-017 final)... profile=$E2E_PROFILE class_filter=${E2E_CLASS_FILTER:-<three-invocation model>}"
             # emulator-runner executes this script with /bin/sh (dash). The previous
             # bash-only `set -o pipefail` exited 2 before am instrument could start.
