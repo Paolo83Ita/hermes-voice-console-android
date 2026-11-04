@@ -85,6 +85,7 @@ fun OnboardingScreen(graph: AppGraph, onFinish: (pendingRoute: String?) -> Unit)
     var packEvents by remember { mutableStateOf<List<String>>(emptyList()) }
     var packRunning by remember { mutableStateOf(false) }
     val selfTestResults by graph.selfTestCenter.results.collectAsState()
+    val selfTestRunning by graph.selfTestCenter.running.collectAsState()
 
     Column(
         Modifier
@@ -221,7 +222,7 @@ fun OnboardingScreen(graph: AppGraph, onFinish: (pendingRoute: String?) -> Unit)
                 SectionCard(title = stringResource(R.string.ob_s5_title)) {
                     Text(stringResource(R.string.ob_s5_body), style = HermesType.body, color = c.ink)
                     Button(
-                        enabled = graph.selfTestCenter.running.value.not(),
+                        enabled = !selfTestRunning,
                         onClick = { graph.selfTestCenter.run(SelfTestMode.VOICE_FOUNDATION_ONLY) },
                     ) { Text(stringResource(R.string.ob_s5_run)) }
                     val done = selfTestResults.values.filter { it.state != SelfTestState.NOT_RUN && it.state != SelfTestState.RUNNING }
