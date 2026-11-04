@@ -47,8 +47,12 @@ import androidx.compose.material3.ModalNavigationDrawer
 import androidx.compose.material3.Text
 import androidx.compose.material3.rememberDrawerState
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.getValue
+import androidx.compose.runtime.mutableStateOf
+import androidx.compose.runtime.remember
 import androidx.compose.runtime.rememberCoroutineScope
+import androidx.compose.runtime.setValue
 import androidx.compose.ui.text.style.TextOverflow
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import androidx.compose.ui.Alignment
@@ -74,6 +78,8 @@ import com.hermestower.voiceconsole.ui.screens.DiagnosticsScreen
 import com.hermestower.voiceconsole.ui.screens.HistoryScreen
 import com.hermestower.voiceconsole.ui.screens.LocalIntelligenceScreen
 import com.hermestower.voiceconsole.ui.screens.ModelManagerScreen
+import com.hermestower.voiceconsole.ui.screens.OnboardingScreen
+import com.hermestower.voiceconsole.ui.screens.Onboarding
 import com.hermestower.voiceconsole.ui.screens.SelfTestScreen
 import com.hermestower.voiceconsole.ui.screens.QrScannerScreen
 import com.hermestower.voiceconsole.ui.screens.SettingsHubScreen
@@ -138,6 +144,24 @@ private fun subtitleFor(route: String): Int = when (route) {
  */
 @Composable
 fun AppNav(graph: AppGraph) {
+    // GRAPH 4 directive §6: first-launch onboarding gate — chrome-free wizard
+    // (no drawer, no NavHost) until the Owner finishes or the flag is preset
+    // (the E2E harness presets it so the documented console anchors hold).
+    val appContext = androidx.compose.ui.platform.LocalContext.current
+    var onboardingDone by androidx.compose.runtime.remember {
+        androidx.compose.runtime.mutableStateOf(Onboarding.isDone(appContext))
+    }
+    var pendingRoute by androidx.compose.runtime.remember {
+        androidx.compose.runtime.mutableStateOf<String?>(null)
+    }
+    if (!onboardingDone) {
+        OnboardingScreen(graph) { route ->
+            Onboarding.markDone(appContext)
+            pendingRoute = route
+            onboardingDone = true
+        }
+        return
+    }
     val m = monumentalColors
     val navController = rememberNavController()
     val drawerState = rememberDrawerState(DrawerValue.Closed)
@@ -145,6 +169,15 @@ fun AppNav(graph: AppGraph) {
     val currentRoute = backStack?.destination?.route ?: AppRoutes.CONSOLE
     val current = destinations.firstOrNull { it.route == currentRoute } ?: destinations.first()
     val scope = rememberCoroutineScope()
+
+    // Directive §6: honor the onboarding choices (QR scan / Models) right after
+    // the wizard closes, then clear the pending route.
+    LaunchedEffect(pendingRoute) {
+        pendingRoute?.let { route ->
+            navController.navigate(route) { launchSingleTop = true }
+            pendingRoute = null
+        }
+    }
 
     ModalNavigationDrawer(
         drawerState = drawerState,

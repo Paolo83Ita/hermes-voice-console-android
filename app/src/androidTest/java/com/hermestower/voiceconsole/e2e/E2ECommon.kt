@@ -1,5 +1,6 @@
 package com.hermestower.voiceconsole.e2e
 
+import android.content.Context
 import androidx.compose.ui.geometry.Offset
 import androidx.compose.ui.semantics.SemanticsActions
 import androidx.compose.ui.semantics.SemanticsProperties
@@ -54,6 +55,14 @@ val ciLifecycleProfileRequested: Boolean = run {
 fun hermesComposeRule(): HermesComposeRule {
     val profileRequested = ciLifecycleProfileRequested
     check(!profileRequested || System.getProperty(MainActivity.CI_LIFECYCLE_PROFILE_PROPERTY) == "true")
+    // GRAPH 4 directive §6: the suite tests the CONSOLE product path — preset the
+    // onboarding-done flag so the first-launch wizard does not cover the
+    // documented anchors. E2EOnboardingTest explicitly clears it to exercise the
+    // wizard. (The androidTest runs in the application process, so the flag is
+    // written in-process before the activity launches.)
+    InstrumentationRegistry.getInstrumentation().targetContext
+        .getSharedPreferences("onboarding", Context.MODE_PRIVATE)
+        .edit().putBoolean("done", true).apply()
     return createAndroidComposeRule(MainActivity::class.java)
 }
 
