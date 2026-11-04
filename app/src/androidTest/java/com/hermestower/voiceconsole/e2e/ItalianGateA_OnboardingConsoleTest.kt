@@ -118,6 +118,10 @@ class ItalianGateA_OnboardingConsoleTest {
             compose.gateAwaitAnchor("HERMES")
             violations += compose.gateCollectViolations("Console", pool)
 
+            // R-9 completion: prove the LIVE console composition before the dialog
+            // interaction (the composer hint only exists on the interactive console).
+            compose.gateAwaitAnchor(ItalianGate.localizedString(R.string.composer_hint, "it"))
+
             // Text-injection dialog: localized title/placeholder/buttons.
             val injectDesc = ItalianGate.localizedString(R.string.inject_cd, "it")
             compose.onNodeWithContentDescription(injectDesc).performClick()

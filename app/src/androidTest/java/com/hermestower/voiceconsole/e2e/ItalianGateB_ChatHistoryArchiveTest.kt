@@ -41,6 +41,9 @@ class ItalianGateB_ChatHistoryArchiveTest {
         // ---- CHAT: localized injection dialog + honest timeline. ----
         compose.gateAwaitAnchor("HERMES")
         violations += compose.gateCollectViolations("Chat composer", pool)
+        // R-9 completion: prove the LIVE console composition before the dialog
+        // interaction (the composer hint only exists on the interactive console).
+        compose.gateAwaitAnchor(ItalianGate.localizedString(R.string.composer_hint, "it"))
         compose.onNodeWithContentDescription(ItalianGate.localizedString(R.string.inject_cd, "it"))
             .performClick()
         compose.gateAwaitAnchor(ItalianGate.localizedString(R.string.cd_inject_title, "it"))

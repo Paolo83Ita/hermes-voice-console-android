@@ -187,12 +187,32 @@ fun HermesComposeRule.gateSwitchLocaleAndAwait(code: String, timeoutMs: Long = 4
     while (System.currentTimeMillis() < deadline) {
         val found = runCatching {
             if (wizardVisible) {
-                onAllNodesWithText(anchor, substring = true).fetchSemanticsNodes().isNotEmpty()
+                onAllNodesWithText(anchor, substring = true, ignoreCase = true).fetchSemanticsNodes().isNotEmpty()
             } else {
                 onAllNodesWithContentDescription(anchor, substring = true).fetchSemanticsNodes().isNotEmpty()
             }
         }.getOrDefault(false)
-        if (found) return
+        if (found) {
+            // R-9 (run 41868118783, gates A2+B): the FIRST interaction after the
+            // system relaunch raced the recreation — the inject-dialog state is
+            // remember{}-held and the recreation silently dropped it, so the
+            // dialog anchor never composed. Repair: settle the relaunch, then
+            // REQUIRE the anchor to persist across a second poll before the
+            // caller may interact with the new composition.
+            repeat(12) {
+                if (!ciLifecycleProfileRequested) mainClock.advanceTimeBy(100)
+                Thread.sleep(50)
+            }
+            val persisted = runCatching {
+                if (wizardVisible) {
+                    onAllNodesWithText(anchor, substring = true, ignoreCase = true).fetchSemanticsNodes().isNotEmpty()
+                } else {
+                    onAllNodesWithContentDescription(anchor, substring = true).fetchSemanticsNodes().isNotEmpty()
+                }
+            }.getOrDefault(false)
+            if (persisted) return
+            // Not persisted: the composition is still being replaced — keep polling.
+        }
         if (!ciLifecycleProfileRequested) mainClock.advanceTimeBy(100)
         Thread.sleep(50)
     }
@@ -216,13 +236,13 @@ fun HermesComposeRule.gateActivateRow(label: String): Boolean {
         mainClock.advanceTimeBy(100)
         advanced += 100
         val found = runCatching {
-            onAllNodesWithText(label, substring = true).fetchSemanticsNodes()
+            onAllNodesWithText(label, substring = true, ignoreCase = true).fetchSemanticsNodes()
                 .firstOrNull { it.config[SemanticsActions.OnClick]?.action != null }
         }.getOrNull()
         if (found != null) break
     }
     val row = runCatching {
-        onAllNodesWithText(label, substring = true).fetchSemanticsNodes()
+        onAllNodesWithText(label, substring = true, ignoreCase = true).fetchSemanticsNodes()
             .firstOrNull { it.config[SemanticsActions.OnClick]?.action != null }
     }.getOrNull() ?: return false
     val click = row.config[SemanticsActions.OnClick]?.action ?: return false
@@ -234,13 +254,17 @@ fun HermesComposeRule.gateActivateRow(label: String): Boolean {
  * Destination-composition wait: ANY of [anchors] visible. Floor 60 s with the
  * R-7 evidence (destination composes past 20 s at the Console→Archive
  * boundary); the error carries the visible tree for the ledger.
+ * R-8 (run 41868118783): matching is CASE-INSENSITIVE — the product renders
+ * some section titles case-transformed (wizard step 1 shows "SCEGLI LA TUA
+ * LINGUA" in semantics while the resource is "Scegli la tua lingua"); the
+ * anchor was composed and correct, only its case differed (dump evidence).
  */
 fun HermesComposeRule.gateAwaitAnchor(vararg anchors: String, timeoutMs: Long = 60_000) {
     val deadline = System.currentTimeMillis() + timeoutMs
     while (System.currentTimeMillis() < deadline) {
         val found = runCatching {
             anchors.any { anchor ->
-                onAllNodesWithText(anchor, substring = true).fetchSemanticsNodes().isNotEmpty()
+                onAllNodesWithText(anchor, substring = true, ignoreCase = true).fetchSemanticsNodes().isNotEmpty()
             }
         }.getOrDefault(false)
         if (found) {
@@ -289,7 +313,7 @@ fun HermesComposeRule.gateNavigateTo(labelRes: Int, anchor: String, timeoutMs: L
         check(gateActivateRow(settingsLabel)) { "Settings row missing from drawer (it)" }
         gateAwaitAnchor(label, timeoutMs = 30_000)
         val hubRow = runCatching {
-            onAllNodesWithText(label, substring = true).fetchSemanticsNodes()
+            onAllNodesWithText(label, substring = true, ignoreCase = true).fetchSemanticsNodes()
                 .firstOrNull { it.config[SemanticsActions.OnClick]?.action != null }
         }.getOrNull() ?: error("settings-hub row '$label' not found (it)")
         val click = hubRow.config[SemanticsActions.OnClick]?.action
@@ -297,8 +321,13 @@ fun HermesComposeRule.gateNavigateTo(labelRes: Int, anchor: String, timeoutMs: L
         androidx.test.platform.app.InstrumentationRegistry.getInstrumentation().runOnMainSync { click() }
     }
     gateAwaitAnchor(anchor, timeoutMs = timeoutMs)
+    // R-10 (run 41868118783, gate C hang): the unconditional waitForIdle here
+    // waited on the infinite Oracle Core animation and consumed the whole gate
+    // invocation budget (runCatching catches exceptions, NOT hangs). Replaced
+    // with the same bounded settle the anchors use — no unbounded wait remains
+    // anywhere in the harness.
     if (!ciLifecycleProfileRequested) {
-        runCatching { waitForIdle() }
+        repeat(6) { mainClock.advanceTimeBy(100); Thread.sleep(25) }
     }
 }
 
