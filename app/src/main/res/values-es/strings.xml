@@ -313,9 +313,9 @@
     <string name="li_limits_card">Límites de recursos (objetivos)</string>
     <string name="li_limits_note">Con modelo residente: ≤ 1,6 GB RSS en total; descarga con temporizador de inactividad; un modelo residente a la vez. Carga en frío ≤ 4 s; primer token en caliente ≤ 1,5 s; ≥ 8 tokens/s — todas directrices de aprobación pendientes de medición (NFR-09).</string>
     <string name="li_controls_card">Controles de carga/descarga</string>
-    <string name="li_load_badge">CARGAR — SE ACTIVA EN V0.6</string>
-    <string name="li_unload_badge">DESCARGAR — SE ACTIVA EN V0.6</string>
-    <string name="li_controls_note">Los controles permanecen visibles pero desactivados hasta que exista un runtime calificado; activarlos ahora fingiría una capacidad que la compilación no tiene.</string>
+    <string name="li_load_badge">CARGAR — BLOQUEADO HASTA UN RUNTIME VERIFICADO</string>
+    <string name="li_unload_badge">DESCARGAR — SIEMPRE DISPONIBLE</string>
+    <string name="li_controls_note">La carga es honesta: en esta compilación informa la brecha tipada LLM_RUNTIME_PENDING_VERIFIED_SOURCE y nunca finge generar. La descarga de memoria siempre funciona y devuelve el motor a su estado previo.</string>
     <!-- CP-G4-017 wave 2 — Centro de Self-Test, Diagnósticos -->
     <string name="st_title">Centro de Self-Test</string>
     <string name="st_intro">Comprobaciones deterministas de cada subsistema V0.2. Se ejecutan en este dispositivo, no requieren la Torre y nunca envían datos a ninguna parte. Los resultados son honestos: FAIL es un hallazgo, no un error que ocultar.</string>
@@ -654,4 +654,19 @@ MANUAL_ADVANCED — selección independiente por componente, visibilidad total, 
     <string name="diag_llm_state_fmt">Inteligencia local: %1$s</string>
     <string name="diag_onnx_fmt">Runtime de inferencia: %1$s</string>
     <string name="diag_runtime_note">Las identidades se leen de los motores activos; los estados nunca se inventan.</string>
+    <string name="li_llm_card">Modelo local opcional (desactivado por defecto)</string>
+    <string name="li_llm_runtime_fmt">RUNTIME: %1$s</string>
+    <string name="li_llm_identity_fmt">Candidato verificado: %1$s</string>
+    <string name="li_llm_diag_fmt">Diagnóstico: %1$s</string>
+    <string name="li_llm_enable">Activar el modelo local opcional (descarga ≈ 522 MB)</string>
+    <string name="li_llm_load">Cargar</string>
+    <string name="li_llm_unload">Descargar de memoria</string>
+    <string name="li_llm_note">La generación permanece bloqueada con el código tipado LLM_RUNTIME_PENDING_VERIFIED_SOURCE hasta que se adopte un runtime Android verificado (fuente con revisión fijada, SHA-256 conocido). La consola nunca inventa una respuesta.</string>
+
+    <string name="archive_pin">Fijar sin conexión</string>
+    <string name="archive_unpin">Quitar fijado</string>
+    <string name="archive_pinned_badge">FIJADO SIN CONEXIÓN</string>
+    <string name="archive_provenance_fmt">Procedencia — conversación: %1$s · misión: %2$s</string>
+    <string name="archive_hash_fmt">SHA-256: %1$s</string>
+
 </resources>

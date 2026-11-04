@@ -31,6 +31,7 @@ class SettingsRepository(context: Context) {
             brightnessScrim = prefs.tolerantFloat(K_SCRIM, d.brightnessScrim),
             speakingRate = prefs.tolerantFloat(K_RATE, d.speakingRate),
             visualQuality = prefs.tolerantString(K_VISUAL_QUALITY, d.visualQuality),
+            localLlmEnabled = prefs.tolerantBool(K_LLM_ENABLED, d.localLlmEnabled),
         )
     }
 
@@ -46,6 +47,7 @@ class SettingsRepository(context: Context) {
             .putFloat(K_SCRIM, settings.brightnessScrim)
             .putFloat(K_RATE, settings.speakingRate)
             .putString(K_VISUAL_QUALITY, settings.visualQuality)
+            .putBoolean(K_LLM_ENABLED, settings.localLlmEnabled)
             .apply()
     }
 
@@ -82,5 +84,6 @@ class SettingsRepository(context: Context) {
         const val K_SCRIM = "brightness_scrim"
         const val K_RATE = "speaking_rate"
         const val K_VISUAL_QUALITY = "visual_quality"
+        const val K_LLM_ENABLED = "local_llm_enabled"
     }
 }

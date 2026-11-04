@@ -7,8 +7,11 @@ import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.rememberScrollState
 import androidx.compose.foundation.verticalScroll
+import androidx.compose.material3.Switch
 import androidx.compose.material3.Text
+import androidx.compose.material3.TextButton
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.getValue
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.unit.dp
@@ -22,8 +25,11 @@ import com.hermestower.voiceconsole.ui.theme.hermesColors
 
 /**
  * S5 Local Intelligence (FR-34): truthful model state, candidate placeholders,
- * routing policy, resource limits, load/unload controls (disabled until V0.6),
- * qualification status. Nothing here is claimed to work.
+ * routing policy, resource limits, load/unload controls, qualification status.
+ * GRAPH 4.6 §6: the OPTIONAL local LLM is implemented end-to-end at the seam
+ * (verified candidate, hash-gated delivery, safe prompt, typed diagnostics) and
+ * ships DEFAULT DISABLED; generation stays typed-blocked until a verified
+ * Android runtime is adopted — every state shown here is the real state.
  */
 @Composable
 fun LocalIntelligenceScreen(graph: AppGraph) {
@@ -87,6 +93,55 @@ fun LocalIntelligenceScreen(graph: AppGraph) {
                 stringResource(com.hermestower.voiceconsole.R.string.li_limits_note),
                 style = HermesType.body,
                 color = c.ink,
+            )
+        }
+
+        // ---- GRAPH 4.6 §6: OPTIONAL LOCAL LLM — DEFAULT DISABLED, honest states ----
+        val llmState by graph.localLlmEngine.state.collectAsStateWithLifecycle()
+        val llmEnabled = graph.store.settings.collectAsStateWithLifecycle().value.localLlmEnabled
+        val llmDiag = graph.localLlmEngine.diagnostics()
+        SectionCard(title = stringResource(com.hermestower.voiceconsole.R.string.li_llm_card)) {
+            Row(horizontalArrangement = Arrangement.spacedBy(8.dp)) {
+                TruthBadge(stringResource(com.hermestower.voiceconsole.R.string.li_state_fmt, llmState.name), c.warn)
+                TruthBadge(stringResource(com.hermestower.voiceconsole.R.string.li_llm_runtime_fmt, llmDiag.runtimeName), c.inkSecondary)
+            }
+            Text(
+                stringResource(com.hermestower.voiceconsole.R.string.li_llm_identity_fmt, llmDiag.candidateIdentity, llmDiag.installedFileExists.toString()),
+                style = HermesType.bodySecondary,
+                color = c.inkSecondary,
+            )
+            Text(
+                stringResource(com.hermestower.voiceconsole.R.string.li_llm_diag_fmt, llmDiag.lastDiagnosticCode.asText),
+                style = HermesType.bodySecondary,
+                color = c.inkSecondary,
+            )
+            Row(horizontalArrangement = Arrangement.spacedBy(8.dp), verticalAlignment = androidx.compose.ui.Alignment.CenterVertically) {
+                Text(
+                    stringResource(com.hermestower.voiceconsole.R.string.li_llm_enable),
+                    style = HermesType.body,
+                    color = c.ink,
+                    modifier = Modifier.weight(1f),
+                )
+                Switch(
+                    checked = llmEnabled,
+                    onCheckedChange = { checked ->
+                        graph.store.updateSettings { it.copy(localLlmEnabled = checked) }
+                        graph.localLlmEngine.syncFromEnabledFlag()
+                    },
+                )
+            }
+            Row(horizontalArrangement = Arrangement.spacedBy(8.dp)) {
+                TextButton(onClick = { graph.localLlmEngine.load() }) {
+                    Text(stringResource(com.hermestower.voiceconsole.R.string.li_llm_load), color = c.ink)
+                }
+                TextButton(onClick = { graph.localLlmEngine.unload() }) {
+                    Text(stringResource(com.hermestower.voiceconsole.R.string.li_llm_unload), color = c.ink)
+                }
+            }
+            Text(
+                stringResource(com.hermestower.voiceconsole.R.string.li_llm_note),
+                style = HermesType.bodySecondary,
+                color = c.inkSecondary,
             )
         }
 

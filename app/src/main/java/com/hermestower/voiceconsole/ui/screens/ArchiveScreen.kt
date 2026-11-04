@@ -97,13 +97,28 @@ fun ArchiveScreen(archive: MockTowerArchive) {
             }
         }
 
+        // GRAPH 4.6 §7: refresh tick — pin/cache toggles mutate the mock store;
+        // bumping this counter re-reads the pin sets deterministically.
+        var archiveTick by remember { mutableIntStateOf(0) }
+
         val pageSize = 8
         when (tab) {
             0 -> {
                 var page by remember(search, sourceFilter) { mutableIntStateOf(0) }
                 val result = archive.listConversations(page, pageSize, search = search, source = sourceFilter)
+                val pinnedSet = remember(archiveTick) { archive.pinnedConversationIds() }
                 LazyColumn(verticalArrangement = Arrangement.spacedBy(8.dp)) {
-                    items(result.items, key = { it.id }) { conv -> ConversationRow(conv) { transcriptFor = conv.id } }
+                    items(result.items, key = { it.id }) { conv ->
+                        ConversationRow(
+                            conv = conv,
+                            pinned = pinnedSet.contains(conv.id),
+                            onOpen = { transcriptFor = conv.id },
+                            onTogglePin = {
+                                archive.pinOffline(conv.id, !pinnedSet.contains(conv.id))
+                                archiveTick++
+                            },
+                        )
+                    }
                     if (result.nextCursor != null) {
                         item {
                             androidx.compose.material3.TextButton(onClick = { page = result.nextCursor }) {
@@ -160,7 +175,12 @@ fun ArchiveScreen(archive: MockTowerArchive) {
 }
 
 @Composable
-private fun ConversationRow(conv: ArchiveConversation, onOpen: () -> Unit) {
+private fun ConversationRow(
+    conv: ArchiveConversation,
+    pinned: Boolean,
+    onOpen: () -> Unit,
+    onTogglePin: () -> Unit,
+) {
     SectionCard(title = conv.title) {
         Text(
             "${conv.id} · ${conv.source.name} · " + stringResource(Res.string.archive_meta_turns, conv.turnCount) +
@@ -170,6 +190,14 @@ private fun ConversationRow(conv: ArchiveConversation, onOpen: () -> Unit) {
         )
         Row(horizontalArrangement = Arrangement.spacedBy(6.dp)) {
             androidx.compose.material3.TextButton(onClick = onOpen) { Text(stringResource(Res.string.archive_open_transcript)) }
+            // GRAPH 4.6 §7: offline pin — LOCAL cache/bookkeeping only; the remote
+            // authority is never mutated from this console.
+            androidx.compose.material3.TextButton(onClick = onTogglePin) {
+                Text(stringResource(if (pinned) Res.string.archive_unpin else Res.string.archive_pin))
+            }
+            if (pinned) {
+                TruthBadge(stringResource(Res.string.archive_pinned_badge), hermesColors.gold)
+            }
             if (conv.missionId != null) {
                 Text(stringResource(Res.string.archive_mission_linked), style = HermesType.bodySecondary)
             }
@@ -213,6 +241,23 @@ private fun ArtifactRow(artifact: com.hermestower.voiceconsole.archive.ArchiveAr
             "${artifact.id} · ${artifact.kind.name} · ${artifact.sizeBytes} B · ${artifact.localState.name}",
             style = HermesType.bodySecondary,
         )
+        // GRAPH 4.6 §7: provenance (source conversation/mission) + integrity hash.
+        val provenanceConv = archive.locateConversation(artifact.id)
+        val provenanceMission = archive.locateMission(artifact.id)
+        Text(
+            stringResource(
+                Res.string.archive_provenance_fmt,
+                provenanceConv ?: "—",
+                provenanceMission ?: "—",
+            ),
+            style = HermesType.bodySecondary,
+        )
+        if (artifact.sha256 != null) {
+            Text(
+                stringResource(Res.string.archive_hash_fmt, artifact.sha256.take(16) + "…"),
+                style = HermesType.bodySecondary,
+            )
+        }
         Row(horizontalArrangement = Arrangement.spacedBy(6.dp)) {
             androidx.compose.material3.TextButton(onClick = { archive.download(artifact.id) }) { Text(stringResource(Res.string.common_download)) }
             androidx.compose.material3.TextButton(onClick = { archive.removeLocalCopy(artifact.id) }) { Text(stringResource(Res.string.archive_remove_local)) }

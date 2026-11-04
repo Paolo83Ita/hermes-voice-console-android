@@ -69,3 +69,15 @@ a download-style state.
   VoskFrameSttEngine wired, activeEngineName read-back, Diagnostics card ×5,
   catalog honesty corrections). Commit: (this wave). No physical inference
   evidence yet — nothing is claimed qualified.
+- 2026-11-04 (Graph 4.6, CP-G4-022) — OPTIONAL LOCAL LLM implemented at the seam:
+  `LocalLlmEngine` (states DISABLED→NOT_INSTALLED→LOADING→LOADED/ERROR, typed
+  diagnostics, safe-prompt builder, hash-gated delivery reuse) +
+  `NoVerifiedLlmRuntime` (the ONLY shipped runtime — every call fails typed
+  LLM_RUNTIME_PENDING_VERIFIED_SOURCE; the engine NEVER invents a completion) +
+  `ConsoleSettings.localLlmEnabled` DEFAULT FALSE persisted through
+  SettingsRepository + Local Intelligence card (state/runtime/diagnostics rows,
+  enable switch, Load/Unload buttons) ×5 locales (652 keys). Generation stays
+  typed-blocked until a verified Android llama.cpp runtime is adopted.
+  STT/TTS receipts delivered (docs/receipts/): vosk-android AAR re-verified LIVE
+  on Maven Central (sha256 ab2f8b91…, ABI-complete) and the Italian model URL
+  re-verified LIVE (HTTP 200, 49,665,141 B = catalog-exact).

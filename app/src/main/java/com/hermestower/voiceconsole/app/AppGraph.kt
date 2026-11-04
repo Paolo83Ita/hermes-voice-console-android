@@ -217,6 +217,22 @@ class AppGraph(context: Context) {
 
     val localEngine = MockLocalConversationEngine()
 
+    // GRAPH 4.6 §6: OPTIONAL LOCAL LLM — one verified candidate (catalog identity
+    // org.qwen.qwen2.5-0.5b-instruct.q5-k-m: Qwen2.5-0.5B-Instruct GGUF q5_k_m,
+    // Apache-2.0, revision-bound HF source, known SHA-256 + size), DEFAULT DISABLED
+    // via ConsoleSettings.localLlmEnabled. The runtime seam is NoVerifiedLlmRuntime:
+    // generation stays typed-blocked (LLM_RUNTIME_PENDING_VERIFIED_SOURCE) until a
+    // verified Android llama.cpp runtime is adopted — the engine never invents text.
+    val localLlmEngine = run {
+        val qwen = modelCatalog.all().first { it.identity == "org.qwen.qwen2.5-0.5b-instruct.q5-k-m" }
+        com.hermestower.voiceconsole.local.LocalLlmEngine(
+            modelRoot = java.io.File(context.filesDir, "models/llm/qwen25-05b"),
+            expectedSha256 = qwen.sha256,
+            expectedSizeBytes = qwen.downloadSizeBytes,
+            enabledProvider = { store.settings.value.localLlmEnabled },
+        )
+    }
+
     // ---- GRAPH 4 G4-C02/C03: REAL voice path (Owner delta §5) ----
     // Microphone permission is checked physically before any hardware access.
     val micPermissionGranted: () -> Boolean = {

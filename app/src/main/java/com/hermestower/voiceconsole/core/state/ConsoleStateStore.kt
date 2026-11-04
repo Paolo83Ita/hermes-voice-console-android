@@ -48,6 +48,8 @@ data class ConsoleSettings(
     val speakingRate: Float = 1.0f,
     /** GRAPH 3: LOW / BALANCED / HIGH visual quality profile (mission §14). */
     val visualQuality: String = "BALANCED",
+    /** GRAPH 4.6 §6: optional local LLM — DEFAULT DISABLED (never self-enables). */
+    val localLlmEnabled: Boolean = false,
 )
 
 /**

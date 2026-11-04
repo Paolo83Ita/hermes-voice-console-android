@@ -313,9 +313,9 @@
     <string name="li_limits_card">Resource limits (targets)</string>
     <string name="li_limits_note">With model resident: ≤ 1.6 GB RSS total; unload on idle timer; one resident model at a time. Cold load ≤ 4 s; warm first token ≤ 1.5 s; ≥ 8 tok/s — all pass-guidelines pending measurement (NFR-09).</string>
     <string name="li_controls_card">Load / unload controls</string>
-    <string name="li_load_badge">LOAD — ENABLES AT V0.6</string>
-    <string name="li_unload_badge">UNLOAD — ENABLES AT V0.6</string>
-    <string name="li_controls_note">Controls stay visible but disabled until a qualified runtime exists; enabling them now would pretend a capability the build does not have.</string>
+    <string name="li_load_badge">LOAD — TYPED-BLOCKED UNTIL A VERIFIED RUNTIME</string>
+    <string name="li_unload_badge">UNLOAD — ALWAYS AVAILABLE</string>
+    <string name="li_controls_note">Load is honest: with the shipped build it reports the typed LLM_RUNTIME_PENDING_VERIFIED_SOURCE gap and never pretends to generate. Unload always works and returns the engine to its pre-load state.</string>
     <!-- CP-G4-017 wave 2 — Self-Test Center, Diagnostics -->
     <string name="st_title">Self-Test Center</string>
     <string name="st_intro">Deterministic checks for every V0.2 subsystem. They run on this device, need no Tower, and never send data anywhere. Results are honest: FAIL is a finding, not an error to hide.</string>
@@ -654,4 +654,19 @@ MANUAL_ADVANCED — independent per-component selection, full visibility, no sil
     <string name="diag_llm_state_fmt">Local intelligence: %1$s</string>
     <string name="diag_onnx_fmt">Inference runtime: %1$s</string>
     <string name="diag_runtime_note">Identities are read from the live engines; states are never invented.</string>
+    <string name="li_llm_card">Optional local model (disabled by default)</string>
+    <string name="li_llm_runtime_fmt">RUNTIME: %1$s</string>
+    <string name="li_llm_identity_fmt">Verified candidate: %1$s</string>
+    <string name="li_llm_diag_fmt">Diagnostics: %1$s</string>
+    <string name="li_llm_enable">Enable the optional local model (download ≈ 522 MB)</string>
+    <string name="li_llm_load">Load</string>
+    <string name="li_llm_unload">Unload</string>
+    <string name="li_llm_note">Generation stays blocked with the typed code LLM_RUNTIME_PENDING_VERIFIED_SOURCE until a verified Android runtime (pinned source, known SHA-256) is adopted. The console never invents a completion.</string>
+
+    <string name="archive_pin">Pin offline</string>
+    <string name="archive_unpin">Unpin</string>
+    <string name="archive_pinned_badge">PINNED OFFLINE</string>
+    <string name="archive_provenance_fmt">Provenance — conversation: %1$s · mission: %2$s</string>
+    <string name="archive_hash_fmt">SHA-256: %1$s</string>
+
 </resources>
