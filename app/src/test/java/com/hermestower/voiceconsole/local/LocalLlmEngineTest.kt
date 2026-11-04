@@ -121,7 +121,7 @@ class LocalLlmEngineTest {
 
     @Test
     fun `safe prompt builder caps input strips control characters and states the bounded scope`() {
-        val built = SafePromptBuilder.build("ciao\x00\t civilization".repeat(120), "STATUS 8/10")
+        val built = SafePromptBuilder.build("ciao\u0000\t civilization".repeat(120), "STATUS 8/10")
         assertTrue(built.startsWith(SafePromptBuilder.SYSTEM_SCOPE))
         assertTrue(built.contains("NOT Hermes Tower"))
         assertTrue(built.contains("Truthful device status: STATUS 8/10"))
