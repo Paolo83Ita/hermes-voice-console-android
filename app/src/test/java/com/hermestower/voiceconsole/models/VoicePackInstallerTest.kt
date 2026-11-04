@@ -133,9 +133,25 @@ class VoicePackInstallerTest {
         assertFalse("local LLM must never be packed", included.any { it.startsWith("org.qwen.") })
         assertFalse("alternative voice stays optional", included.contains("org.piper.voice.it-paola-medium"))
         assertFalse("denoiser stays optional", included.contains("org.gtcrn.speech-enhancement.simple"))
-        // Bundled runtime is named but not downloaded:
+        // GRAPH 4 FINAL §13 HONESTY CORRECTION (2026-11-04): the sherpa-onnx TTS
+        // runtime was previously mislabeled RUNTIME_BUNDLED ("pinned in gradle")
+        // while NO such gradle dependency exists — the catalog now types it
+        // CANDIDATE_PENDING_DISCOVERY and the plan must NOT present it as a
+        // bundled component. The ACTIVE TTS path is the Android system engine.
         val bundled = plan.items.filter { it.role == "BUNDLED_RUNTIME" }
-        assertTrue(bundled.any { it.entry?.identity == "org.sherpa-onnx.tts.runtime" })
+        assertTrue(
+            "the sherpa-onnx runtime must NOT be presented as bundled (no gradle dep exists)",
+            bundled.none { it.entry?.identity == "org.sherpa-onnx.tts.runtime" },
+        )
+        // The pending runtime still appears as an honest gap, never silently dropped:
+        val pendingRuntime = plan.items.filter {
+            it.entry?.identity == "org.sherpa-onnx.tts.runtime" &&
+                it.role == "BLOCKED_NO_VERIFIED_SOURCE"
+        }
+        assertTrue(
+            "the pending TTS runtime must appear as an honest gap (not bundled, not packed)",
+            pendingRuntime.isNotEmpty(),
+        )
         // Honest wake-word gap: required type with no verified production source.
         val wakeGap = plan.items.filter { it.role == "BLOCKED_NO_VERIFIED_SOURCE" }
         assertTrue("the custom Italian wake word must appear as an honest gap", wakeGap.isNotEmpty())
