@@ -859,3 +859,67 @@ typed evidence → §5 five-language completion → §8 visual preview gate → 
 refoundation → §12-13 links → §14-16 STT/TTS/LLM → §17-18 → §19-20 regression+APKs →
 §21 runbook → §22 governance → §23 CP-G4-018..025 → §24 terminal verdict only when
 no dependency-released executable node remains.
+
+## G4-N24 (2026-11-04) — GRAPH 4.6: dual APK + LLM + Archive + receipts + gate repairs (directive §0-§9)
+
+NODE: GRAPH 4.6 BETA READINESS (mission CONTINUE_FROM_LATEST_VERIFIED_REMOTE_AUTHORITY).
+FINDING: (1) FRESH READ-BACK (GRAPH46_READBACK.md): remote tip VERIFIED b3b78ed
+(local==remote, fetch exit 0, main untouched, 639 keys ×5 counted live, unit 250 green
+at tip); the working tree carried the UNCOMMITTED §8 dual-APK split (rescued, with a
+duplicate-if-no-files-found YAML defect repaired). (2) Three segmented-model E2E runs
+were in flight at read-back (E2E_RESULT_UNAVAILABLE); the first to complete
+(41868118783 @ b3b78ed) delivered the FIRST segmented-gate evidence and FOUR typed
+rows: R-8 anchor case-transform (wizard 'SCEGLI LA TUA LINGUA' in semantics vs 'Scegli
+la tua lingua' resource — composed but case-exact-matched), R-9 the first
+post-relaunch interaction raced the recreation and the remember{}-held inject-dialog
+state was dropped (gates A2+B), R-10 gateNavigateTo's unconditional waitForIdle hung
+on the infinite Oracle Core animation for the whole gate budget (runCatching does not
+catch hangs), R-11 the dispositioned lifecycle residual crashed a SECOND class
+(E2EFreshInstallTest e2e_03_04) in the regression invocation — it is CLASS-INDEPENDENT
+(4th distinct class/route), so single-class quarantine can never protect the rest.
+(3) CP-G4-021 splits RENAMED the debug APK outputs — runs 41883447613/41884838553 died
+at install ('adb: failed to stat app-debug.apk') BEFORE any instrumentation; the E2E
+workflow was still installing the dead name. (4) 6545969 build failed:
+compileDebugUnitTestKotlin — \x00 is not a Kotlin escape (LocalLlmEngineTest:124).
+ACTION: CP-G4-021 (7d1f8cf) read-back + splits committed (universal + arm64-v8a +
+x86_64, universalApk=true, no versionCode offsets) + bounded installs; CP-G4-022
+(d37d922) OPTIONAL LOCAL LLM (LocalLlmEngine: DEFAULT DISABLED via
+ConsoleSettings.localLlmEnabled + SettingsRepository persistence; real size+SHA-256
+integrity gate against the verified catalog candidate; safe-prompt builder with
+bounded scope/length/control-char strip; typed diagnostics) + NoVerifiedLlmRuntime as
+the ONLY shipped runtime (generation typed-blocked LLM_RUNTIME_PENDING_VERIFIED_SOURCE
+— the engine never invents a completion) + 10 unit tests + Local Intelligence card
+(652 keys ×5) + TOWER ARCHIVE §7 completion (offline pin toggle + PINNED OFFLINE
+badge, provenance + SHA-256 rows on artifacts) + STT_RUNTIME_RECEIPT.md (vosk-android
+0.3.75 AAR re-verified LIVE on Maven Central: sha256 ab2f8b91…, 13,472,638 B,
+ABI-complete; model URL re-verified LIVE: HTTP 200, 49,665,141 B = catalog-exact;
+LOCAL_STT_READY_FOR_XIAOMI_QUALIFICATION) + TTS_RUNTIME_RECEIPT.md (system TTS ACTIVE
+with playback/interruption/engine read-back; Piper candidates verified-downloadable,
+runtime row honestly pending; LOCAL_TTS_ACTIVE) + MONUMENTAL_TOWER_FINAL_REPORT.md
+(7 required previews with measured post-repair evidence) + XIAOMI_GRAPH4_BETA_PACKAGE.md;
+CP-G4-023 (6545969→c97a02f→bba1ebc) gate repairs R-8 (ignoreCase matching in the
+harness — matcher only, banned-English classifier unchanged) + R-9 (switchLocaleAndAwait
+settles the relaunch and requires the anchor to PERSIST across a second poll; gates
+A2/B await the composer hint before the dialog interaction) + R-10 (bounded settle
+pump — NO unbounded wait remains in the harness) + R-11 (regression leg = ONE
+INVOCATION PER CLASS with per-class typed classification: OK → pass; dispositioned
+signature → typed job-neutral INFRASTRUCTURE_FAILURE; anything else FAILS; no test
+deleted/skipped/weakened; residual timeout 600→900 s) + fix 1 (escape) + fix 2 (E2E
+installs app-universal-debug.apk + single-line androidTest glob).
+TEST: build SUCCESS + 260/260 unit tests + lint 0 errors/60 warnings at c97a02f AND
+bba1ebc (runs 41884838651/41890040725); APKs hashed from the artifact bytes
+(APK_SIZE_AND_ABI_REPORT.md: arm64 105,247,044 B f2f38b61…, universal 206,679,899 B
+97998108…, x86_64 109,176,588 B 7c4de490…); vosk AAR + model URL re-verified live.
+FILES: docs/governance/{GRAPH46_READBACK,ITALIAN_GATE_NAVIGATION_FAILURE_LEDGER,
+ACTIVE_RUNTIME_READBACK,WORK_LOG,CHECKPOINT_INDEX}.md;
+docs/receipts/{STT_RUNTIME_RECEIPT,TTS_RUNTIME_RECEIPT,APK_SIZE_AND_ABI_REPORT,
+ITALIAN_UI_REPORT}.md; docs/tower/MONUMENTAL_TOWER_FINAL_REPORT.md;
+docs/XIAOMI_GRAPH4_BETA_PACKAGE.md; app/local/{LocalLlmEngine,LlmRuntime}.kt +
+ConsoleStateStore/SettingsRepository/AppGraph/LocalIntelligenceScreen/ArchiveScreen +
+res ×5 + LocalLlmEngineTest + ItalianGateSupport/A/B + android-e2e.yml +
+android-debug-build.yml.
+COMMIT: (this commit).
+CHECKPOINT: CP-G4-021/022/023 CLOSED; CP-G4-024 (terminality) = the E2E verdict at
+bba1ebc (run 41890040629) arbitrates ITALIAN_UI_COMPLETE and the terminal receipt.
+NEXT: read the bba1ebc E2E artifacts → ITALIAN_UI_REPORT verdict → terminal receipt
+GRAPH_4_IMPLEMENTATION_COMPLETE_XIAOMI_QUALIFICATION_PENDING (or the next typed fix).

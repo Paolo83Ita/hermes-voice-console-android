@@ -342,3 +342,23 @@ fun HermesComposeRule.gateLeaveScannerBack(expectedReturnAnchor: String) {
     androidx.test.espresso.Espresso.pressBack()
     gateAwaitAnchor(expectedReturnAnchor, timeoutMs = 60_000)
 }
+
+/**
+ * R-12 (run 41890040629 @ bba1ebc — gate A2 identical anchor failure with the
+ * relaunch race ALREADY repaired): the medallion-row control was clicked via
+ * the gesture path (performClick = touch injection at the node center) and the
+ * dialog never composed, while the SAME screen's drawer/hub/button rows pass
+ * everywhere via gateActivateRow's DIRECT semantics-action dispatch on main
+ * (ledger R-3 physics). Unify: find the node carrying BOTH the description and
+ * an OnClick and invoke the action on the main thread. No assertion weakened —
+ * the dialog anchor assert stays.
+ */
+fun HermesComposeRule.gateClickByContentDescription(desc: String): Boolean {
+    val node = runCatching {
+        onAllNodesWithContentDescription(desc, substring = true).fetchSemanticsNodes()
+            .firstOrNull { it.config[SemanticsActions.OnClick]?.action != null }
+    }.getOrNull() ?: return false
+    val click = node.config[SemanticsActions.OnClick]?.action ?: return false
+    androidx.test.platform.app.InstrumentationRegistry.getInstrumentation().runOnMainSync { click() }
+    return true
+}

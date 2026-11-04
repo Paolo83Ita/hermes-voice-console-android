@@ -223,3 +223,22 @@ NO run to date shows an APPLICATION_NAVIGATION_DEFECT, a ROUTE_NOT_REACHABLE or 
 ARCHIVE_TO_TOWER_GATE_DEFECT. The dispositioned residual stays
 PHYSICAL_XIAOMI_RECOVERY_REQUIRED; R-11 changes only its containment (per-class
 isolation), not the disposition.
+
+## R-12 — gate A1 GREEN; A2 dialog gesture-click never composes the dialog (run bba1ebc)
+
+| Field | Value |
+| --- | --- |
+| Run ID / commit | 41890040629 @ bba1ebc (push, segmented model) |
+| Gate result | **A1 PASSED** (STATUS_CODE 0 — the six-step wizard REAL walk + onboarding flag: the R-8 case repair and R-9 settle+persist VERIFIED in the cloud); A2 FAILED with the SAME anchor signature as b3b78ed |
+| Expected anchor | `cd_inject_title` = "Inserisci testo (sostituto STT)" |
+| Actual semantic tree | console fully composed (composer hint awaited OK first — the R-9 live-proof), dialog ABSENT after 60 s |
+| Key observation | the R-9 relaunch-race repair did NOT change the failure: the medallion-row control was clicked via the GESTURE path (performClick = touch injection at the node center), while every drawer/hub/screen-row click that PASSES in the cloud uses gateActivateRow's DIRECT semantics-action dispatch on main (R-3 physics). The emulator also DIED mid-run (adb: device offline from ~19:41; boot 18.5 min, universal-APK install 12.7 min — the regression loop then burned 15-min timeouts per class against the dead device, and the artifact upload glob `regression-*.txt` missed the `regression_*.txt` files) |
+| Typed classification | **TEST_NAVIGATION_DEFECT** (click physics) + **INFRASTRUCTURE_FAILURE** (emulator death, E2E_BLOCKED_EMULATOR_ENVIRONMENT class) + workflow evidence-gap (upload glob) |
+| Narrow repair | A2/B inject clicks + dialog cancel clicks now use the DIRECT semantics-action dispatch (gateClickByContentDescription / gateActivateRow — same proven physics); artifact glob corrected to `regression_*.txt`; the regression loop fast-fails on `adb get-state` failure (typed DEVICE_OFFLINE_ABORT); per-class timeout 900→600 s; gate invocation timeout 1500→3000 s (measured: A1 alone ≈ 12 min on the software fleet — six classes cannot fit 25 min); job timeout 120→180 min (boot+install+gate+6 classes+residual measured budget) |
+| Complete gate rerun | next workflow execution |
+
+## Classification summary update
+
+| Run | Classification |
+| --- | --- |
+| R-12 | TEST_NAVIGATION_DEFECT + INFRASTRUCTURE_FAILURE (emulator death) |

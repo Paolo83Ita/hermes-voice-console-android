@@ -123,12 +123,18 @@ class ItalianGateA_OnboardingConsoleTest {
             compose.gateAwaitAnchor(ItalianGate.localizedString(R.string.composer_hint, "it"))
 
             // Text-injection dialog: localized title/placeholder/buttons.
+            // R-12: direct semantics-action dispatch (R-3 physics) — the gesture
+            // click on the medallion row did not compose the dialog on the
+            // software emulator (run 41890040629).
             val injectDesc = ItalianGate.localizedString(R.string.inject_cd, "it")
-            compose.onNodeWithContentDescription(injectDesc).performClick()
+            check(compose.gateClickByContentDescription(injectDesc)) {
+                "inject control not found or without OnClick (it)"
+            }
             compose.gateAwaitAnchor(ItalianGate.localizedString(R.string.cd_inject_title, "it"))
             violations += compose.gateCollectViolations("Console inject dialog", pool)
-            compose.onNodeWithText(ItalianGate.localizedString(R.string.cd_cancel, "it"))
-                .performClick()
+            check(compose.gateActivateRow(ItalianGate.localizedString(R.string.cd_cancel, "it"))) {
+                "dialog cancel button not found (it)"
+            }
 
             assertTrue(
                 "ITALIAN-GATE-A console violated (${violations.distinct().size}; first 10):\n" +
