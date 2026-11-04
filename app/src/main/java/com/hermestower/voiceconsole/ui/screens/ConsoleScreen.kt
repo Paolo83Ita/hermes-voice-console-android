@@ -11,7 +11,10 @@ import androidx.compose.foundation.layout.BoxWithConstraints
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.Spacer
+import androidx.compose.foundation.Canvas
+import androidx.compose.foundation.layout.WindowInsets
 import androidx.compose.foundation.layout.fillMaxSize
+import androidx.compose.foundation.layout.ime
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
@@ -40,6 +43,8 @@ import androidx.compose.runtime.DisposableEffect
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
+import androidx.compose.animation.core.animateFloatAsState
+import androidx.compose.ui.platform.LocalDensity
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
@@ -70,6 +75,9 @@ import com.hermestower.voiceconsole.ui.monumental.BurnInRegion
 import com.hermestower.voiceconsole.ui.monumental.MonumentalColors
 import com.hermestower.voiceconsole.ui.monumental.MonumentalType
 import com.hermestower.voiceconsole.ui.monumental.OracleCore
+import com.hermestower.voiceconsole.ui.monumental.TowerEnergyPhase
+import com.hermestower.voiceconsole.ui.monumental.TowerArchitecture
+import com.hermestower.voiceconsole.ui.monumental.drawTowerFrame
 import com.hermestower.voiceconsole.ui.monumental.VisualQuality
 import com.hermestower.voiceconsole.ui.monumental.burnInOffset
 import com.hermestower.voiceconsole.ui.monumental.monumentalColors
@@ -246,7 +254,15 @@ fun ConsoleScreen(
             ) {
                 // The core stage keeps the exact design aspect (1080 x 1420) so the
                 // WebP depth layers and the Canvas dynamics align pixel-perfectly.
-                val coreH = maxWidth * (1420f / 1080f)
+                // GRAPH 4 directive §7: when the composer is focused (keyboard
+                // visible) the Tower smoothly shrinks to a compact portal and the
+                // timeline/input area gains the space — chat-focused layout.
+                val imeOpen = WindowInsets.ime.getBottom(LocalDensity.current) > 0
+                val coreScale by animateFloatAsState(
+                    targetValue = if (imeOpen) 0.52f else 1f,
+                    label = "towerChatFocus",
+                )
+                val coreH = maxWidth * (1420f / 1080f) * coreScale
                 OracleCore(
                     state = state,
                     // CP-G4-016: CI_LIFECYCLE_PROFILE flows through the same
@@ -261,6 +277,17 @@ fun ConsoleScreen(
                         .fillMaxWidth()
                         .height(coreH),
                 )
+                // GRAPH 4 directive §7: the original architectural frame (upper
+                // order, lower structure, state-driven messenger path) drawn over
+                // the core stage — foreground built order, no bitmap memory.
+                val towerPhase = TowerEnergyPhase(
+                    flowing = TowerArchitecture.stateDrivesFlow(state),
+                    frozen = settings.reducedMotion ||
+                        com.hermestower.voiceconsole.ui.runtime.MotionProfile.ornamentsFrozen,
+                )
+                Canvas(Modifier.matchParentSize()) {
+                    drawTowerFrame(towerPhase, quality, m)
+                }
                 StateOverlayChip(
                     state,
                     effectiveMode,
