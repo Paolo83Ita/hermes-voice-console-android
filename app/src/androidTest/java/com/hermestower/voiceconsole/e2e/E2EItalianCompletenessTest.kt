@@ -279,6 +279,11 @@ class E2EItalianCompletenessTest {
             activateRow(appContext.getString(R.string.ts_action_scan_qr))
             compose.waitForText("SIMULATED", timeoutMs = 20_000)
             violations += collectViolations("QR scanner", pool)
+            // The scanner is a FULL-SCREEN route (no drawer): leave it through its
+            // own back path before any further drawer navigation (evidence run
+            // 41833663387 — navigating from the scanner dead-ended the flow).
+            androidx.test.espresso.Espresso.pressBack()
+            compose.waitForIdle()
 
             // Tower Archive: all three tabs (Conversations/Missions/Artifacts).
             navigate(appContext.getString(R.string.dest_archive), appContext.getString(R.string.archive_title))
