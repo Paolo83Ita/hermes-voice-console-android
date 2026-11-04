@@ -20,9 +20,12 @@ import androidx.compose.runtime.remember
 import androidx.compose.runtime.rememberCoroutineScope
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.platform.LocalContext
+import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.unit.dp
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import com.hermestower.voiceconsole.app.AppGraph
+import com.hermestower.voiceconsole.R
 import com.hermestower.voiceconsole.models.ComponentFallback
 import com.hermestower.voiceconsole.models.DeterministicTestArtifact
 import com.hermestower.voiceconsole.models.ModelInstallState
@@ -53,6 +56,7 @@ private fun formatBytes(bytes: Long): String = when {
 @Composable
 fun ModelManagerScreen(graph: AppGraph) {
     val c = hermesColors
+    val context = LocalContext.current
     val scope = rememberCoroutineScope()
     var selectedProfile by remember { mutableStateOf(VoiceModelProfile.TOWER_FIRST) }
     var recommendation by remember { mutableStateOf<com.hermestower.voiceconsole.models.VoicePackRecommendation?>(null) }
@@ -91,33 +95,43 @@ fun ModelManagerScreen(graph: AppGraph) {
     ) {
         Text("MODEL SANCTUM", style = HermesType.screenTitle, color = c.ink)
         MeanderBand(colors = hermesColors, modifier = Modifier.padding(top = 6.dp))
-        Text("Models and Voice", style = HermesType.sectionLabel, color = c.bronze)
+        Text(stringResource(R.string.mm_subtitle), style = HermesType.sectionLabel, color = c.bronze)
         Text(
-            "Local intelligence is optional and independent per component; complex, uncertain and " +
-                "consequential reasoning always belongs to Hermes Tower. No model is downloaded without " +
-                "your explicit confirmation.",
+            stringResource(R.string.mm_intro),
             style = HermesType.bodySecondary,
             color = c.inkSecondary,
         )
 
         // ---------- A. Recommended setup ----------
-        SectionCard(title = "A. Recommended setup") {
+        SectionCard(title = stringResource(R.string.mm_section_a)) {
             val resources = remember { graph.deviceResourceReader.read() }
-            Text("Detected device: ${resources.deviceModel} (Android ${resources.androidVersion})", style = HermesType.body, color = c.ink)
+            Text(context.getString(R.string.mm_detected_device, resources.deviceModel, resources.androidVersion), style = HermesType.body, color = c.ink)
             Text(
-                "ABIs: ${resources.supportedAbis.joinToString()} · RAM available: ${formatBytes(resources.availableRamBytes)} · Storage free: ${formatBytes(resources.freeStorageBytes)}",
+                context.getString(
+                    R.string.mm_resources_line,
+                    resources.supportedAbis.joinToString(),
+                    formatBytes(resources.availableRamBytes),
+                    formatBytes(resources.freeStorageBytes),
+                ),
                 style = HermesType.body, color = c.ink,
             )
             Text(
-                "TTS engines on device: ${if (resources.ttsEnginePackages.isEmpty()) "none reported" else resources.ttsEnginePackages.joinToString()}",
+                context.getString(
+                    R.string.mm_tts_engines,
+                    if (resources.ttsEnginePackages.isEmpty()) context.getString(R.string.mm_tts_none) else resources.ttsEnginePackages.joinToString(),
+                ),
                 style = HermesType.body, color = c.ink,
             )
             Text(
-                "Network: ${if (resources.networkOnline) "online" else "offline"}${if (resources.networkMetered) " (metered — downloads will warn)" else ""}",
+                context.getString(
+                    R.string.mm_network,
+                    if (resources.networkOnline) context.getString(R.string.mm_network_online) else context.getString(R.string.mm_network_offline),
+                    if (resources.networkMetered) context.getString(R.string.mm_network_metered) else "",
+                ),
                 style = HermesType.body, color = c.ink,
             )
-            Text("Current profile: ${appliedProfile.displayLabel}", style = HermesType.body, color = c.ink)
-            Text("Recommended profile: ${selectedProfile.displayLabel}", style = HermesType.body, color = c.ink)
+            Text(context.getString(R.string.mm_current_profile, appliedProfile.displayLabel), style = HermesType.body, color = c.ink)
+            Text(context.getString(R.string.mm_recommended_profile, selectedProfile.displayLabel), style = HermesType.body, color = c.ink)
             Row(horizontalArrangement = Arrangement.spacedBy(8.dp), modifier = Modifier.padding(top = 4.dp)) {
                 VoiceModelProfile.entries.forEach { profile ->
                     FilterChip(
@@ -132,40 +146,50 @@ fun ModelManagerScreen(graph: AppGraph) {
             }
             val rec = recommendation
             if (rec != null) {
-                Text("Compatibility summary: ${rec.routeSummary}", style = HermesType.body, color = c.ink)
+                Text(context.getString(R.string.mm_compat_summary, rec.routeSummary), style = HermesType.body, color = c.ink)
                 Text(
-                    "Expected download: ${formatBytes(rec.expectedDownloadBytes)} · installed: ${formatBytes(rec.expectedInstalledBytes)} · " +
-                        "RAM range: ${formatBytes(rec.ramEstimateLowBytes)}–${formatBytes(rec.ramEstimateHighBytes)}",
+                    context.getString(
+                        R.string.mm_expected_footprint,
+                        formatBytes(rec.expectedDownloadBytes),
+                        formatBytes(rec.expectedInstalledBytes),
+                        formatBytes(rec.ramEstimateLowBytes),
+                        formatBytes(rec.ramEstimateHighBytes),
+                    ),
                     style = HermesType.body, color = c.ink,
                 )
                 rec.warnings.forEach { Text("⚠ $it", style = HermesType.bodySecondary, color = c.warn) }
                 Button(onClick = {
                     graph.keyValueStore.putString("voice_profile", rec.profile)
                     appliedProfile = VoiceModelProfile.entries.first { it.name == rec.profile }
-                    statusNote = "Recommended configuration applied: ${rec.profile}. Components below still require explicit download + activation."
-                }) { Text("Apply Recommended Configuration") }
+                    statusNote = context.getString(R.string.mm_applied_note, rec.profile)
+                }) { Text(stringResource(R.string.mm_apply_recommended)) }
             } else {
-                Text("Select a mode to compute the deterministic recommendation.", style = HermesType.bodySecondary, color = c.inkSecondary)
+                Text(stringResource(R.string.mm_select_mode_hint), style = HermesType.bodySecondary, color = c.inkSecondary)
             }
         }
 
         // ---------- RECOMMENDED VOICE PACK (GRAPH 4 §6 bulk action) ----------
-        SectionCard(title = "INSTALL RECOMMENDED VOICE PACK") {
+        SectionCard(title = stringResource(R.string.mm_section_pack)) {
             val plan = computedPlan
             val summary = computedSummary
             val included = plan.includedItems
 
-            Text("RECOMMENDED SETUP — minimal voice pack for this device (profile: Hybrid balanced)", style = HermesType.sectionLabel, color = c.bronze)
+            Text(context.getString(R.string.mm_pack_header, VoiceModelProfile.HYBRID_BALANCED.displayLabel), style = HermesType.sectionLabel, color = c.bronze)
             if (included.isEmpty()) {
                 Text(
-                    "No additional components are required right now: everything the minimal pack needs is already installed or bundled.",
+                    stringResource(R.string.mm_pack_nothing_needed),
                     style = HermesType.bodySecondary, color = c.inkSecondary,
                 )
             } else {
-                Text("Will be installed (${included.size}):", style = HermesType.body, color = c.ink)
+                Text(context.getString(R.string.mm_will_install, included.size), style = HermesType.body, color = c.ink)
                 included.forEach { item ->
                     Text(
-                        "• ${item.entry?.displayName} v${item.entry?.version} — download ${formatBytes(item.entry?.downloadSizeBytes ?: 0)}",
+                        context.getString(
+                            R.string.mm_pack_item,
+                            item.entry?.displayName ?: "",
+                            item.entry?.version ?: "",
+                            formatBytes(item.entry?.downloadSizeBytes ?: 0),
+                        ),
                         style = HermesType.body, color = c.ink,
                     )
                 }
@@ -180,23 +204,30 @@ fun ModelManagerScreen(graph: AppGraph) {
                 Text("⚠ $name — $reason", style = HermesType.bodySecondary, color = c.warn)
             }
             Text(
-                "Download total: ${formatBytes(summary.totalDownloadBytes)} · installed total: ${formatBytes(summary.totalInstalledBytes)} · " +
-                    "peak temporary storage: ${formatBytes(summary.peakTempBytes)}",
+                context.getString(
+                    R.string.mm_download_total,
+                    formatBytes(summary.totalDownloadBytes),
+                    formatBytes(summary.totalInstalledBytes),
+                    formatBytes(summary.peakTempBytes),
+                ),
                 style = HermesType.body, color = c.ink,
             )
             Text(
-                "Free-space reserve kept: ${formatBytes(summary.reserveBytes)} (greater of 2 GB and 15% of available) — " +
-                    "minimum free required: ${formatBytes(summary.minimumFreeRequiredBytes)}",
+                context.getString(
+                    R.string.mm_reserve_line,
+                    formatBytes(summary.reserveBytes),
+                    formatBytes(summary.minimumFreeRequiredBytes),
+                ),
                 style = HermesType.body, color = c.ink,
             )
-            Text("Expected duration: ${summary.durationRangeText}", style = HermesType.body, color = c.ink)
+            Text(context.getString(R.string.mm_expected_duration, summary.durationRangeText), style = HermesType.body, color = c.ink)
             Text(summary.wifiAdvice, style = HermesType.bodySecondary, color = c.inkSecondary)
             Text(summary.chargingAdvice, style = HermesType.bodySecondary, color = c.inkSecondary)
             Text(summary.thermalAdvice, style = HermesType.bodySecondary, color = c.inkSecondary)
-            Text("Licenses: ${summary.licenses.joinToString()}", style = HermesType.bodySecondary, color = c.inkSecondary)
+            Text(context.getString(R.string.mm_licenses, summary.licenses.joinToString()), style = HermesType.bodySecondary, color = c.inkSecondary)
             if (summary.optionalItems.isNotEmpty()) {
                 Text(
-                    "Optional and NOT included (never auto-downloaded): ${summary.optionalItems.joinToString()} — including the local LLM; complex reasoning stays on Hermes Tower.",
+                    context.getString(R.string.mm_optional_note, summary.optionalItems.joinToString()),
                     style = HermesType.bodySecondary, color = c.inkSecondary,
                 )
             }
@@ -204,7 +235,7 @@ fun ModelManagerScreen(graph: AppGraph) {
                 Button(
                     enabled = !packRunning && included.isNotEmpty(),
                     onClick = { packConfirmOpen = true },
-                ) { Text("Install Recommended Voice Pack") }
+                ) { Text(stringResource(R.string.mm_install_pack)) }
             }
             if (packEvents.isNotEmpty()) {
                 Column(Modifier.padding(top = 4.dp)) {
@@ -216,11 +247,11 @@ fun ModelManagerScreen(graph: AppGraph) {
         }
 
         // ---------- B. Installed voice components ----------
-        SectionCard(title = "B. Installed voice components") {
+        SectionCard(title = stringResource(R.string.mm_section_b)) {
             val installed = graph.modelRegistry.snapshot().filter { it.state != "REMOVED" }
             if (installed.isEmpty()) {
                 Text(
-                    "Nothing installed yet — the console runs fully in Tower-only fallback (usable without any local model).",
+                    stringResource(R.string.mm_nothing_installed),
                     style = HermesType.bodySecondary, color = c.inkSecondary,
                 )
             }
@@ -230,11 +261,19 @@ fun ModelManagerScreen(graph: AppGraph) {
                     Text(type.displayLabel, style = HermesType.sectionLabel, color = c.bronze)
                     records.forEach { record ->
                         Text(
-                            "${record.displayName} v${record.version} — ${record.state}${if (record.active) " · ACTIVE" else ""}",
+                            context.getString(
+                                R.string.mm_component_line,
+                                record.displayName, record.version, record.state,
+                                if (record.active) context.getString(R.string.mm_active_suffix) else "",
+                            ),
                             style = HermesType.body, color = c.ink,
                         )
                         Text(
-                            "verified: ${record.lastVerificationAt ?: "never"} · qualified: ${record.lastQualificationAt ?: "never"}",
+                            context.getString(
+                                R.string.mm_verified_line,
+                                record.lastVerificationAt ?: context.getString(R.string.mm_never),
+                                record.lastQualificationAt ?: context.getString(R.string.mm_never),
+                            ),
                             style = HermesType.bodySecondary, color = c.inkSecondary,
                         )
                     }
@@ -243,7 +282,7 @@ fun ModelManagerScreen(graph: AppGraph) {
         }
 
         // ---------- C. Available components ----------
-        SectionCard(title = "C. Available components") {
+        SectionCard(title = stringResource(R.string.mm_section_c)) {
             graph.modelCatalog.all().forEach { entry ->
                 val progress = progressById[entry.identity]?.value
                 val record = graph.modelRegistry.record(entry.identity)
@@ -252,66 +291,78 @@ fun ModelManagerScreen(graph: AppGraph) {
 
                 Text(entry.displayName, style = HermesType.sectionLabel, color = c.bronze)
                 Text(
-                    "${entry.identity} · v${entry.version} · ${entry.provider} · ${entry.license}" +
-                        " · download ${formatBytes(entry.downloadSizeBytes)} · installed ${formatBytes(entry.installedSizeBytes)}" +
-                        " · RAM est. ${formatBytes(entry.ramEstimateBytes)} · ${entry.latencyClass}" +
-                        " · languages ${entry.languages.joinToString()}" +
-                        if (entry.italianSupported) " · Italian: yes" else " · Italian: no",
+                    context.getString(
+                        R.string.mm_spec_line,
+                        entry.identity, entry.version, entry.provider, entry.license,
+                        formatBytes(entry.downloadSizeBytes), formatBytes(entry.installedSizeBytes),
+                        formatBytes(entry.ramEstimateBytes), entry.latencyClass,
+                        entry.languages.joinToString(),
+                        if (entry.italianSupported) context.getString(R.string.mm_it_yes) else context.getString(R.string.mm_it_no),
+                    ),
                     style = HermesType.bodySecondary, color = c.inkSecondary,
                 )
                 Text(
-                    "Classification: ${entry.entryClassification}" +
-                        (if (entry.optionalComponent) " · OPTIONAL (never auto-downloaded)" else " · required-class") +
-                        " · state: ${record?.state ?: entry.state}" +
-                        (if (record?.active == true) " · ACTIVE" else ""),
+                    context.getString(
+                        R.string.mm_classification,
+                        entry.entryClassification,
+                        if (entry.optionalComponent) context.getString(R.string.mm_optional_suffix) else context.getString(R.string.mm_required_suffix),
+                        record?.state ?: entry.state,
+                        if (record?.active == true) context.getString(R.string.mm_active_suffix) else "",
+                    ),
                     style = HermesType.bodySecondary, color = c.inkSecondary,
                 )
                 if (updateAvailable) {
                     Text(
-                        "Update available: installed v${record?.version} → catalog v${entry.version}.",
+                        context.getString(R.string.mm_update_available, record?.version ?: "", entry.version),
                         style = HermesType.body, color = c.energy,
                     )
                 }
                 val rec = recommendation
                 val resolved = rec?.components?.firstOrNull { it.identity == entry.identity }
                 Text(
-                    "Compatibility: ${resolved?.compatible ?: false}" +
-                        (resolved?.incompatibilityReason?.let { " ($it)" } ?: ""),
+                    context.getString(
+                        R.string.mm_compat_line,
+                        (resolved?.compatible ?: false).toString(),
+                        resolved?.incompatibilityReason?.let { context.getString(R.string.mm_incompat_paren, it) } ?: "",
+                    ),
                     style = HermesType.bodySecondary, color = c.inkSecondary,
                 )
                 progress?.let {
                     if (it.state == ModelInstallState.DOWNLOADING || it.state == ModelInstallState.DOWNLOAD_PAUSED) {
                         Text(
-                            "Download: ${it.state.displayLabel} ${it.bytesDownloaded}/${it.totalBytes} bytes (${(it.fraction * 100).toInt()}%)",
+                            context.getString(
+                                R.string.mm_download_progress,
+                                it.state.displayLabel, it.bytesDownloaded, it.totalBytes, (it.fraction * 100).toInt(),
+                            ),
                             style = HermesType.body, color = c.ink,
                         )
                     }
-                    it.error?.let { err -> Text("Last download event: $err", style = HermesType.bodySecondary, color = c.warn) }
+                    it.error?.let { err -> Text(context.getString(R.string.mm_last_download_event, err), style = HermesType.bodySecondary, color = c.warn) }
                 }
 
                 if (isExpanded) {
                     // ---- Full attribute sheet (GRAPH 4 §6, all fields) ----
-                    AttributeLine("Component type", entry.componentTypeEnum().displayLabel)
-                    AttributeLine("Version", entry.version)
-                    AttributeLine("Provider", entry.provider)
-                    AttributeLine("License", entry.license + (entry.licenseUrl?.let { " ($it)" } ?: ""))
-                    AttributeLine("Installed status", record?.let { "${it.state} (v${it.version})" } ?: "not installed")
-                    AttributeLine("Qualification status", record?.lastQualificationAt?.let { "qualified at $it" } ?: entry.state)
-                    AttributeLine("Download size", formatBytes(entry.downloadSizeBytes))
-                    AttributeLine("Installed size", formatBytes(entry.installedSizeBytes))
-                    AttributeLine("RAM estimate", formatBytes(entry.ramEstimateBytes))
-                    AttributeLine("Expected usage mode", "${entry.latencyClass} latency · runs locally in its storage root")
-                    AttributeLine("Italian support", if (entry.italianSupported) "yes" else "no (${entry.languages.joinToString()})")
-                    AttributeLine("Runtime format", entry.format)
-                    AttributeLine("Quantization", entry.quantization)
-                    AttributeLine("Storage destination", entry.storageLocation)
-                    AttributeLine("Update availability", if (updateAvailable) "v${record?.version} installed, v${entry.version} available" else "current")
-                    AttributeLine("Active state", if (record?.active == true) "ACTIVE" else "inactive")
-                    AttributeLine("Fallback", ComponentFallback.forType(entry.componentType))
-                    AttributeLine("Upstream", entry.upstreamRepo ?: "n/a")
-                    AttributeLine("Revision binding", entry.revisionBinding ?: "n/a")
-                    AttributeLine("Runtime requirement", entry.runtimeRequirement ?: "none")
-                    AttributeLine("Provenance", entry.provenanceNote ?: "not yet verified")
+                    AttributeLine(stringResource(R.string.mm_attr_type), entry.componentTypeEnum().displayLabel)
+                    AttributeLine(stringResource(R.string.mm_attr_version), entry.version)
+                    AttributeLine(stringResource(R.string.mm_attr_provider), entry.provider)
+                    AttributeLine(stringResource(R.string.mm_attr_license), entry.license + (entry.licenseUrl?.let { " ($it)" } ?: ""))
+                    AttributeLine(stringResource(R.string.mm_attr_install_status), record?.let { "${it.state} (v${it.version})" } ?: context.getString(R.string.mm_not_installed))
+                    AttributeLine(stringResource(R.string.mm_attr_qualification), record?.lastQualificationAt?.let { context.getString(R.string.mm_qualified_at, it) } ?: entry.state)
+                    AttributeLine(stringResource(R.string.mm_attr_download_size), formatBytes(entry.downloadSizeBytes))
+                    AttributeLine(stringResource(R.string.mm_attr_installed_size), formatBytes(entry.installedSizeBytes))
+                    AttributeLine(stringResource(R.string.mm_attr_ram), formatBytes(entry.ramEstimateBytes))
+                    AttributeLine(stringResource(R.string.mm_attr_usage), context.getString(R.string.mm_usage_value, entry.latencyClass))
+                    AttributeLine(stringResource(R.string.mm_attr_italian), if (entry.italianSupported) context.getString(R.string.mm_italian_yes) else context.getString(R.string.mm_italian_no, entry.languages.joinToString()))
+                    AttributeLine(stringResource(R.string.mm_attr_format), entry.format)
+                    AttributeLine(stringResource(R.string.mm_attr_quant), entry.quantization)
+                    AttributeLine(stringResource(R.string.mm_attr_storage), entry.storageLocation)
+                    AttributeLine(stringResource(R.string.mm_attr_updates), if (updateAvailable) context.getString(R.string.mm_update_both, record?.version ?: "", entry.version) else context.getString(R.string.mm_update_current))
+                    AttributeLine(stringResource(R.string.mm_attr_active_state), if (record?.active == true) "ACTIVE" else context.getString(R.string.mm_inactive))
+                    AttributeLine(stringResource(R.string.mm_attr_fallback), ComponentFallback.forType(entry.componentType))
+                    AttributeLine(stringResource(R.string.mm_attr_upstream), entry.upstreamRepo ?: context.getString(R.string.mm_na))
+                    AttributeLine(stringResource(R.string.mm_attr_revision), entry.revisionBinding ?: context.getString(R.string.mm_na))
+                    AttributeLine(stringResource(R.string.mm_attr_runtime_req), entry.runtimeRequirement ?: context.getString(R.string.mm_na))
+                    AttributeLine(stringResource(R.string.mm_attr_provenance), entry.provenanceNote ?: context.getString(R.string.mm_provenance_unverified))
                     entry.knownLimitations.forEach { Text("• $it", style = HermesType.bodySecondary, color = c.inkSecondary) }
                 }
 
@@ -332,15 +383,15 @@ fun ModelManagerScreen(graph: AppGraph) {
                                     entry.copy(sha256 = ModelSha256.ofBytes(bytes)),
                                     "${server.baseUrl}/artifacts/hermes-test-artifact-v1",
                                 )
-                                statusNote = "Probe download started from the local test server (port ${server.port})."
+                                statusNote = context.getString(R.string.mm_probe_started, server.port)
                             } else {
                                 graph.modelDownloads.start(entry, entry.sourceUri)
-                                statusNote = "Download started from the verified catalog source: ${entry.sourceUri}."
+                                statusNote = context.getString(R.string.mm_download_started, entry.sourceUri)
                             }
                             registryTick++
                         },
-                    ) { Text("Download") }
-                    TextButton(onClick = { graph.modelDownloads.pause(entry.identity); statusNote = "Download paused (${entry.identity})." }) { Text("Pause") }
+                    ) { Text(stringResource(R.string.mm_download)) }
+                    TextButton(onClick = { graph.modelDownloads.pause(entry.identity); statusNote = context.getString(R.string.mm_download_paused, entry.identity) }) { Text(stringResource(R.string.mm_pause)) }
                     TextButton(
                         onClick = {
                             if (entry.identity == PROBE_IDENTITY) {
@@ -348,22 +399,22 @@ fun ModelManagerScreen(graph: AppGraph) {
                                 if (port != null) {
                                     val bytes = DeterministicTestArtifact.generate("hermes-test-artifact-v1", 4096)
                                     graph.modelDownloads.resume(entry.copy(sha256 = ModelSha256.ofBytes(bytes)), "http://127.0.0.1:$port/artifacts/hermes-test-artifact-v1")
-                                    statusNote = "Download resumed (${entry.identity})."
+                                    statusNote = context.getString(R.string.mm_download_resumed, entry.identity)
                                 } else {
-                                    statusNote = "No resumable local download server recorded."
+                                    statusNote = context.getString(R.string.mm_no_resume_server)
                                 }
                             } else {
                                 graph.modelDownloads.resume(entry, entry.sourceUri)
-                                statusNote = "Download resumed from the verified source (${entry.identity})."
+                                statusNote = context.getString(R.string.mm_download_resumed_source, entry.identity)
                             }
                         },
-                    ) { Text("Resume") }
-                    TextButton(onClick = { graph.modelDownloads.cancel(entry.identity); statusNote = "Download cancelled (${entry.identity})." }) { Text("Cancel") }
+                    ) { Text(stringResource(R.string.mm_resume)) }
+                    TextButton(onClick = { graph.modelDownloads.cancel(entry.identity); statusNote = context.getString(R.string.mm_download_cancelled, entry.identity) }) { Text(stringResource(R.string.mm_cancel)) }
                     TextButton(onClick = {
-                        statusNote = if (graph.modelDownloads.verifiedExisting(entry)) "Installed file hash verified."
-                        else "No verified installed file for ${entry.identity}."
-                    }) { Text("Verify") }
-                    TextButton(onClick = { expanded[entry.identity] = !isExpanded }) { Text(if (isExpanded) "Hide details" else "Details") }
+                        statusNote = if (graph.modelDownloads.verifiedExisting(entry)) context.getString(R.string.mm_hash_verified)
+                        else context.getString(R.string.mm_no_verified_file, entry.identity)
+                    }) { Text(stringResource(R.string.mm_verify)) }
+                    TextButton(onClick = { expanded[entry.identity] = !isExpanded }) { Text(if (isExpanded) stringResource(R.string.mm_hide_details) else stringResource(R.string.mm_details)) }
                 }
                 Row(horizontalArrangement = Arrangement.spacedBy(4.dp)) {
                     TextButton(
@@ -374,41 +425,41 @@ fun ModelManagerScreen(graph: AppGraph) {
                                 if (graph.modelDownloads.verifiedExisting(entry)) {
                                     val q = graph.modelQualification.qualify(entry)
                                     val a = if (q.qualified) graph.modelActivation.activate(entry) else null
-                                    statusNote = "Already verified — qualification ${if (q.qualified) "PASSED" else "FAILED"}" +
-                                        (a?.let { " · activation ${if (it.success) "ACTIVE" else "REFUSED: ${it.reason}"}" } ?: "")
+                                    statusNote = context.getString(R.string.mm_already_verified, if (q.qualified) "PASSED" else "FAILED") +
+                                        (a?.let { context.getString(R.string.mm_activation_suffix, if (it.success) "ACTIVE" else "REFUSED: ${it.reason}") } ?: "")
                                     registryTick++
                                 } else {
                                     val outcome = graph.modelPackInstaller.installComponent(entry, resources) { statusNote = it }
-                                    statusNote = "Install ${entry.displayName}: ${if (outcome.success) "COMPLETED" else "FAILED"} — ${outcome.reason}"
+                                    statusNote = context.getString(R.string.mm_install_result, entry.displayName, if (outcome.success) "COMPLETED" else "FAILED", outcome.reason)
                                     registryTick++
                                 }
-                            }
+                            },
                         },
-                    ) { Text("Install") }
+                    ) { Text(stringResource(R.string.mm_install)) }
                     TextButton(onClick = {
                         val result = graph.modelQualification.qualify(entry)
-                        statusNote = "Qualification ${entry.identity}: ${if (result.qualified) "PASSED" else "FAILED"} — " + result.checks.joinToString { "${it.name}=${it.passed}" }
-                    }) { Text("Qualify") }
+                        statusNote = context.getString(R.string.mm_qualify_result, entry.identity, if (result.qualified) "PASSED" else "FAILED", result.checks.joinToString { "${it.name}=${it.passed}" })
+                    }) { Text(stringResource(R.string.mm_qualify)) }
                     TextButton(onClick = {
                         val result = graph.modelActivation.activate(entry)
-                        statusNote = "Activate ${entry.identity}: ${if (result.success) "ACTIVE" else "REFUSED"} — ${result.reason}"
+                        statusNote = context.getString(R.string.mm_activate_result, entry.identity, if (result.success) "ACTIVE" else "REFUSED", result.reason)
                         registryTick++
-                    }) { Text("Activate") }
+                    }) { Text(stringResource(R.string.mm_activate)) }
                     TextButton(onClick = {
                         val result = graph.modelActivation.deactivate(entry)
-                        statusNote = "Deactivate ${entry.identity}: ${result.reason}"
+                        statusNote = context.getString(R.string.mm_deactivate_result, entry.identity, result.reason)
                         registryTick++
-                    }) { Text("Deactivate") }
+                    }) { Text(stringResource(R.string.mm_deactivate)) }
                     TextButton(onClick = {
                         val result = graph.modelRollback.rollback(entry)
-                        statusNote = "Rollback ${entry.identity}: ${if (result.success) "restored v${result.restoredVersion}" else result.reason}"
+                        statusNote = context.getString(R.string.mm_rollback_result, entry.identity, if (result.success) context.getString(R.string.mm_rollback_restored, result.restoredVersion) else result.reason)
                         registryTick++
-                    }) { Text("Roll back") }
+                    }) { Text(stringResource(R.string.mm_rollback)) }
                     TextButton(onClick = {
                         val removed = graph.modelRollback.removalCleanup(entry)
-                        statusNote = if (removed) "Removed ${entry.identity} (files + registry)." else "Nothing to remove for ${entry.identity}."
+                        statusNote = if (removed) context.getString(R.string.mm_removed, entry.identity) else context.getString(R.string.mm_nothing_to_remove, entry.identity)
                         registryTick++
-                    }) { Text("Remove") }
+                    }) { Text(stringResource(R.string.mm_remove)) }
                 }
                 Row(horizontalArrangement = Arrangement.spacedBy(4.dp)) {
                     TextButton(
@@ -417,107 +468,103 @@ fun ModelManagerScreen(graph: AppGraph) {
                             graph.modelDownloads.cancel(entry.identity)
                             val removed = graph.modelRollback.removalCleanup(entry)
                             graph.modelDownloads.start(entry, entry.sourceUri)
-                            statusNote = "Re-download ${entry.displayName}: previous copy ${if (removed) "removed" else "was absent"}, fetching from the verified source."
+                            statusNote = context.getString(R.string.mm_redownload_note, entry.displayName, if (removed) context.getString(R.string.mm_removed_word) else context.getString(R.string.mm_absent_word))
                             registryTick++
                         },
-                    ) { Text("Re-download") }
+                    ) { Text(stringResource(R.string.mm_redownload)) }
                     TextButton(
                         enabled = entry.identity != PROBE_IDENTITY && !packRunning,
                         onClick = {
                             if (graph.modelDownloads.verifiedExisting(entry)) {
-                                statusNote = "Repair ${entry.displayName}: installed file hash intact — no repair needed."
+                                statusNote = context.getString(R.string.mm_repair_ok, entry.displayName)
                             } else {
                                 graph.modelDownloads.cancel(entry.identity)
                                 graph.modelDownloads.start(entry, entry.sourceUri)
-                                statusNote = "Repair ${entry.displayName}: hash invalid or missing — fetching from the verified source."
+                                statusNote = context.getString(R.string.mm_repair_needed, entry.displayName)
                             }
                             registryTick++
                         },
-                    ) { Text("Repair") }
+                    ) { Text(stringResource(R.string.mm_repair)) }
                     TextButton(
                         enabled = updateAvailable && !packRunning,
                         onClick = {
                             graph.modelDownloads.start(entry, entry.sourceUri)
-                            statusNote = "Update ${entry.displayName}: v${record?.version} → v${entry.version} (previous version is preserved automatically)."
+                            statusNote = context.getString(R.string.mm_update_note, entry.displayName, record?.version ?: "", entry.version)
                             registryTick++
                         },
-                    ) { Text("Update") }
-                    TextButton(onClick = { diagnosticsOpen.value = !diagnosticsOpen.value }) { Text("Open diagnostics") }
+                    ) { Text(stringResource(R.string.mm_update)) }
+                    TextButton(onClick = { diagnosticsOpen.value = !diagnosticsOpen.value }) { Text(stringResource(R.string.mm_open_diagnostics)) }
                 }
             }
 
             if (diagnosticsOpen.value) {
-                Text("Diagnostics — storage roots (bytes used):", style = HermesType.sectionLabel, color = c.bronze)
+                Text(stringResource(R.string.mm_diag_roots), style = HermesType.sectionLabel, color = c.bronze)
                 graph.modelStorage.rootsUsage().forEach { (root, bytes) ->
-                    Text("• $root: ${formatBytes(bytes)}", style = HermesType.bodySecondary, color = c.inkSecondary)
+                    Text(context.getString(R.string.mm_root_line, root, formatBytes(bytes)), style = HermesType.bodySecondary, color = c.inkSecondary)
                 }
                 val receipts = com.hermestower.voiceconsole.models.ReceiptWriter.listReceipts(graph.modelStorage.receiptsDir())
                 Text(
-                    "Installation receipts: ${if (receipts.isEmpty()) "none yet" else "${receipts.size} written (latest: ${receipts.last()})"}",
+                    context.getString(
+                        R.string.mm_receipts,
+                        if (receipts.isEmpty()) context.getString(R.string.mm_receipts_none)
+                        else context.getString(R.string.mm_receipts_some, receipts.size, receipts.last()),
+                    ),
                     style = HermesType.bodySecondary, color = c.inkSecondary,
                 )
             }
         }
 
         // ---------- CP-G4-009: bundled verified delivery (no network) ----------
-        SectionCard(title = "Bundled verified delivery") {
+        SectionCard(title = stringResource(R.string.mm_bundled_title)) {
             var bundledReport by remember { mutableStateOf<List<String>>(emptyList()) }
             var bundledRunning by remember { mutableStateOf(false) }
             Text(
-                "Four physically verified ONNX artifacts (openWakeWord trio + GTCRN denoiser) ride inside " +
-                    "the APK and are delivered into the model storage roots through the same hash-gated, " +
-                    "receipted pipeline as network downloads. No network is used — provenance 'app-bundle'. " +
-                    "Delivery does NOT enable behavior: the wake word stays OFF until the FA/FR harness on " +
-                    "the Xiaomi and the denoiser stays bypassed until device qualification.",
+                stringResource(R.string.mm_bundled_explainer),
                 style = HermesType.bodySecondary, color = c.inkSecondary,
             )
             Button(
                 enabled = !bundledRunning,
                 onClick = {
                     bundledRunning = true
-                    bundledReport = listOf("Bundled delivery started…")
+                    bundledReport = listOf(context.getString(R.string.mm_bundled_started))
                     scope.launch {
                         val report = graph.bundledModelInstaller.deliverAll()
                         bundledReport = report.results.map { result ->
                             when (result) {
                                 is com.hermestower.voiceconsole.models.BundledModelInstaller.BundledInstallResult.Installed ->
-                                    "✓ ${result.artifact.asset}: INSTALLED (${result.qualificationSummary}); receipt ${result.receiptId}"
+                                    context.getString(R.string.mm_bundled_installed, result.artifact.asset, result.qualificationSummary, result.receiptId)
                                 is com.hermestower.voiceconsole.models.BundledModelInstaller.BundledInstallResult.AlreadyInstalled ->
-                                    "✓ ${result.artifact.asset}: already installed, bytes re-verified"
+                                    context.getString(R.string.mm_bundled_already, result.artifact.asset)
                                 is com.hermestower.voiceconsole.models.BundledModelInstaller.BundledInstallResult.Refused ->
-                                    "✗ ${result.artifact?.asset ?: "manifest"}: REFUSED ${result.kind} — ${result.detail}"
+                                    context.getString(R.string.mm_bundled_refused, result.artifact?.asset ?: "manifest", result.kind, result.detail)
                             }
-                        } + if (report.stoppedAt != null) "Stopped truthfully at ${report.stoppedAt}." else "All ${report.installedCount} bundled artifacts delivered."
+                        } + if (report.stoppedAt != null) context.getString(R.string.mm_bundled_stopped, report.stoppedAt) else context.getString(R.string.mm_bundled_done, report.installedCount)
                         registryTick++
                         bundledRunning = false
                     }
                 },
-            ) { Text(if (bundledRunning) "Delivering…" else "Install bundled verified models") }
+            ) { Text(if (bundledRunning) stringResource(R.string.mm_delivering) else stringResource(R.string.mm_install_bundled)) }
             bundledReport.forEach { Text(it, style = HermesType.bodySecondary, color = c.inkSecondary) }
         }
 
         // ---------- E. Modes ----------
-        SectionCard(title = "E. Modes") {
+        SectionCard(title = stringResource(R.string.mm_section_e)) {
             Text(
-                "TOWER_FIRST — wake word + VAD local, everything else to the Tower.\n" +
-                    "HYBRID_BALANCED — simple requests local; complex/uncertain/consequential to the Tower.\n" +
-                    "LOCAL_EXPERIMENTAL — full local pipeline, disabled by default, explicit activation, RAM/storage/thermal gates.\n" +
-                    "MANUAL_ADVANCED — independent per-component selection, full visibility, no silent activation.",
+                stringResource(R.string.mm_modes_text),
                 style = HermesType.body, color = c.ink,
             )
         }
 
         // ---------- F. Tower-only fallback ----------
-        SectionCard(title = "F. Tower-only fallback") {
+        SectionCard(title = stringResource(R.string.mm_section_f)) {
             Text(
-                "The console remains fully usable with zero downloaded models: wake word simulation, captions, " +
-                    "history, diagnostics and the Tower conversation run without any local LLM.",
+                stringResource(R.string.mm_fallback_text),
                 style = HermesType.body, color = c.ink,
             )
         }
 
         statusNote?.let {
-            Text("Status: $it", style = HermesType.body, color = c.energy)
+            Text(context.getString(R.string.mm_status_prefix, it), style = HermesType.body, color = c.energy)
         }
     }
 
@@ -527,16 +574,21 @@ fun ModelManagerScreen(graph: AppGraph) {
         val plan = computedPlan
         AlertDialog(
             onDismissRequest = { packConfirmOpen = false },
-            title = { Text("Install recommended voice pack?") },
+            title = { Text(stringResource(R.string.mm_pack_confirm_title)) },
             text = {
                 Column {
                     Text(
-                        "${plan?.includedItems?.size ?: 0} components · ${formatBytes(summary?.totalDownloadBytes ?: 0)} download · " +
-                            "${formatBytes(summary?.totalInstalledBytes ?: 0)} installed · reserve ${formatBytes(summary?.reserveBytes ?: 0)} kept free.",
+                        context.getString(
+                            R.string.mm_pack_confirm_summary,
+                            plan?.includedItems?.size ?: 0,
+                            formatBytes(summary?.totalDownloadBytes ?: 0),
+                            formatBytes(summary?.totalInstalledBytes ?: 0),
+                            formatBytes(summary?.reserveBytes ?: 0),
+                        ),
                     )
-                    Text("Licenses: ${summary?.licenses?.joinToString()}")
-                    Text("Optional components (including the local LLM) are NOT part of this pack.")
-                    Text("You can pause, cancel or remove each component afterwards.")
+                    Text(context.getString(R.string.mm_licenses, summary?.licenses?.joinToString() ?: ""))
+                    Text(stringResource(R.string.mm_pack_confirm_optional))
+                    Text(stringResource(R.string.mm_pack_confirm_pause))
                 }
             },
             confirmButton = {
@@ -545,23 +597,23 @@ fun ModelManagerScreen(graph: AppGraph) {
                     val p = computedPlan
                     val resources = graph.deviceResourceReader.read()
                     packRunning = true
-                    packEvents = listOf("Pack install started (${p.includedItems.size} components).")
+                    packEvents = listOf(context.getString(R.string.mm_pack_started, p.includedItems.size))
                     scope.launch {
                         val result = graph.modelPackInstaller.installPack(p, resources) { event ->
                             packEvents = packEvents + event
                         }
                         statusNote = if (result.success) {
-                            "Recommended voice pack INSTALLED — pack receipt ${result.packReceiptId}."
+                            context.getString(R.string.mm_pack_installed, result.packReceiptId)
                         } else {
-                            "Voice pack stopped truthfully: " + result.outcomes.lastOrNull()?.reason.orEmpty()
+                            context.getString(R.string.mm_pack_stopped, result.outcomes.lastOrNull()?.reason.orEmpty())
                         }
                         packRunning = false
                         registryTick++
                     }
-                }) { Text("Install") }
+                }) { Text(stringResource(R.string.mm_install)) }
             },
             dismissButton = {
-                TextButton(onClick = { packConfirmOpen = false }) { Text("Cancel") }
+                TextButton(onClick = { packConfirmOpen = false }) { Text(stringResource(R.string.mm_cancel)) }
             },
         )
     }

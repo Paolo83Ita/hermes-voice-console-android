@@ -48,6 +48,7 @@ import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.graphics.vector.ImageVector
 import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.res.stringResource
+import com.hermestower.voiceconsole.R
 import androidx.compose.ui.semantics.LiveRegionMode
 import androidx.compose.ui.semantics.contentDescription
 import androidx.compose.ui.semantics.liveRegion
@@ -546,12 +547,12 @@ fun ConsoleScreen(
     if (showDialog) {
         AlertDialog(
             onDismissRequest = { showDialog = false },
-            title = { Text("Inject text (STT stand-in)") },
+            title = { Text(stringResource(R.string.cd_inject_title)) },
             text = {
                 OutlinedTextField(
                     value = injectText,
                     onValueChange = { injectText = it },
-                    placeholder = { Text("Type what you would say…") },
+                    placeholder = { Text(stringResource(R.string.cd_inject_placeholder)) },
                     singleLine = true,
                 )
             },
@@ -560,9 +561,9 @@ fun ConsoleScreen(
                     graph.driver.submitText(injectText)
                     injectText = ""
                     showDialog = false
-                }) { Text("Send") }
+                }) { Text(stringResource(R.string.cd_send)) }
             },
-            dismissButton = { TextButton(onClick = { showDialog = false }) { Text("Cancel") } },
+            dismissButton = { TextButton(onClick = { showDialog = false }) { Text(stringResource(R.string.cd_cancel)) } },
         )
     }
 }

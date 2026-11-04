@@ -21,9 +21,12 @@ import androidx.compose.runtime.remember
 import androidx.compose.runtime.saveable.rememberSaveable
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.platform.LocalContext
+import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.input.PasswordVisualTransformation
 import androidx.compose.ui.unit.dp
 import com.hermestower.voiceconsole.app.AppGraph
+import com.hermestower.voiceconsole.R
 import com.hermestower.voiceconsole.domain.BridgeResult
 import com.hermestower.voiceconsole.tower.ImportResult
 import com.hermestower.voiceconsole.tower.TransportMode
@@ -49,6 +52,7 @@ import kotlinx.coroutines.launch
 @Composable
 fun TowerStudioScreen(graph: AppGraph, onOpenScanner: (() -> Unit)? = null) {
     val c = hermesColors
+    val context = LocalContext.current
     val existing = remember { graph.profileStore.load() }
     var name by rememberSaveable { mutableStateOf(existing?.profileName ?: "") }
     var baseUrl by rememberSaveable {
@@ -79,7 +83,7 @@ fun TowerStudioScreen(graph: AppGraph, onOpenScanner: (() -> Unit)? = null) {
     var routingThreshold by rememberSaveable { mutableStateOf((existing?.localTowerRoutingThreshold ?: 0.55f).toString()) }
     var verbosity by rememberSaveable { mutableStateOf(existing?.diagnosticsVerbosity ?: "REDACTED_SUMMARY") }
 
-    var message by remember { mutableStateOf("Configuration state: ${graph.profileStore.state().displayLabel}") }
+    var message by remember { mutableStateOf(context.getString(R.string.ts_msg_config_state, graph.profileStore.state().displayLabel)) }
     var testOutcome by remember { mutableStateOf<TowerConnectionTester.Report?>(null) }
 
     fun buildProfile(): TowerConnectionProfile {
@@ -122,22 +126,21 @@ fun TowerStudioScreen(graph: AppGraph, onOpenScanner: (() -> Unit)? = null) {
             .padding(16.dp),
         verticalArrangement = Arrangement.spacedBy(12.dp),
     ) {
-        Text("Connect Hermes Tower", style = HermesType.screenTitle, color = c.ink)
+        Text(stringResource(R.string.ts_title), style = HermesType.screenTitle, color = c.ink)
         MeanderBand(colors = hermesColors, modifier = Modifier.padding(top = 6.dp))
         Text(
-            "Name this console, enter the Tower address, choose how to connect, then test. " +
-                "Pairing codes and tokens live in the Android Keystore — never in settings, logs or exports.",
+            stringResource(R.string.ts_intro),
             style = HermesType.bodySecondary, color = c.inkSecondary,
         )
 
-        SectionCard(title = "Basic") {
-            OutlinedTextField(name, onValueChange = { name = it }, label = { Text("Connection name") }, modifier = Modifier.fillMaxWidth())
+        SectionCard(title = stringResource(R.string.ts_section_basic)) {
+            OutlinedTextField(name, onValueChange = { name = it }, label = { Text(stringResource(R.string.ts_field_connection_name)) }, modifier = Modifier.fillMaxWidth())
             OutlinedTextField(
                 baseUrl, onValueChange = { baseUrl = it },
-                label = { Text("Tower address or base URL") },
+                label = { Text(stringResource(R.string.ts_field_tower_address)) },
                 modifier = Modifier.fillMaxWidth(), enabled = mode != TransportMode.MOCK_SIMULATOR,
             )
-            Text("Connection method", style = HermesType.sectionLabel, color = c.bronze)
+            Text(stringResource(R.string.ts_label_connection_method), style = HermesType.sectionLabel, color = c.bronze)
             Row(horizontalArrangement = Arrangement.spacedBy(6.dp)) {
                 TransportMode.entries.take(3).forEach { m ->
                     FilterChip(selected = mode == m, onClick = { mode = m }, label = { Text(m.displayLabel) })
@@ -150,77 +153,76 @@ fun TowerStudioScreen(graph: AppGraph, onOpenScanner: (() -> Unit)? = null) {
             }
             Text(
                 when (mode) {
-                    TransportMode.MOCK_SIMULATOR -> "Mock mode needs no address and no secret."
-                    TransportMode.TAILSCALE_PRIVATE -> "Use the Tailscale hostname (…ts.net) or 100.x.y.z address of the Tower."
-                    else -> "Use an https:// or wss:// address."
+                    TransportMode.MOCK_SIMULATOR -> stringResource(R.string.ts_mode_mock_hint)
+                    TransportMode.TAILSCALE_PRIVATE -> stringResource(R.string.ts_mode_tailscale_hint)
+                    else -> stringResource(R.string.ts_mode_https_hint)
                 },
                 style = HermesType.bodySecondary, color = c.inkSecondary,
             )
             OutlinedTextField(
                 secret, onValueChange = { secret = it },
-                label = { Text("Pairing code or access token") },
+                label = { Text(stringResource(R.string.ts_field_secret)) },
                 visualTransformation = PasswordVisualTransformation(),
                 modifier = Modifier.fillMaxWidth(), enabled = mode != TransportMode.MOCK_SIMULATOR,
             )
-            OutlinedTextField(userRef, onValueChange = { userRef = it }, label = { Text("User or Owner reference") }, modifier = Modifier.fillMaxWidth())
-            OutlinedTextField(deviceAlias, onValueChange = { deviceAlias = it }, label = { Text("Device display name") }, modifier = Modifier.fillMaxWidth())
-            OutlinedTextField(defaultMode, onValueChange = { defaultMode = it }, label = { Text("Default operating mode") }, modifier = Modifier.fillMaxWidth())
-            OutlinedTextField(language, onValueChange = { language = it }, label = { Text("Preferred language") }, modifier = Modifier.fillMaxWidth())
+            OutlinedTextField(userRef, onValueChange = { userRef = it }, label = { Text(stringResource(R.string.ts_field_user_ref)) }, modifier = Modifier.fillMaxWidth())
+            OutlinedTextField(deviceAlias, onValueChange = { deviceAlias = it }, label = { Text(stringResource(R.string.ts_field_device_alias)) }, modifier = Modifier.fillMaxWidth())
+            OutlinedTextField(defaultMode, onValueChange = { defaultMode = it }, label = { Text(stringResource(R.string.ts_field_default_mode)) }, modifier = Modifier.fillMaxWidth())
+            OutlinedTextField(language, onValueChange = { language = it }, label = { Text(stringResource(R.string.ts_field_language)) }, modifier = Modifier.fillMaxWidth())
             Row(horizontalArrangement = Arrangement.spacedBy(12.dp)) {
                 Switch(checked = autoConnect, onCheckedChange = { autoConnect = it })
-                Text("Connect automatically", style = HermesType.body, color = c.ink)
+                Text(stringResource(R.string.ts_switch_autoconnect), style = HermesType.body, color = c.ink)
             }
             Row(horizontalArrangement = Arrangement.spacedBy(12.dp)) {
                 Switch(checked = useTailscale, onCheckedChange = { useTailscale = it })
-                Text("Use Tailscale address", style = HermesType.body, color = c.ink)
+                Text(stringResource(R.string.ts_switch_tailscale), style = HermesType.body, color = c.ink)
             }
         }
 
-        SectionCard(title = "Advanced") {
+        SectionCard(title = stringResource(R.string.ts_section_advanced)) {
             TextButton(onClick = { advanced = !advanced }) {
-                Text(if (advanced) "Hide advanced controls" else "Show advanced controls")
+                Text(if (advanced) stringResource(R.string.ts_hide_advanced) else stringResource(R.string.ts_show_advanced))
             }
             if (advanced) {
-                OutlinedTextField(restBasePath, onValueChange = { restBasePath = it }, label = { Text("REST base path") }, modifier = Modifier.fillMaxWidth())
-                OutlinedTextField(webSocketPath, onValueChange = { webSocketPath = it }, label = { Text("WebSocket path") }, modifier = Modifier.fillMaxWidth())
-                OutlinedTextField(protocolVersion, onValueChange = { protocolVersion = it }, label = { Text("Protocol version") }, modifier = Modifier.fillMaxWidth())
-                OutlinedTextField(requestTimeout, onValueChange = { requestTimeout = it }, label = { Text("Request timeout (ms)") }, modifier = Modifier.fillMaxWidth())
-                OutlinedTextField(streamingTimeout, onValueChange = { streamingTimeout = it }, label = { Text("Streaming timeout (ms)") }, modifier = Modifier.fillMaxWidth())
-                OutlinedTextField(retryCount, onValueChange = { retryCount = it }, label = { Text("Bounded retry count") }, modifier = Modifier.fillMaxWidth())
-                OutlinedTextField(queuedPolicy, onValueChange = { queuedPolicy = it }, label = { Text("Queued-request policy") }, modifier = Modifier.fillMaxWidth())
-                OutlinedTextField(routingThreshold, onValueChange = { routingThreshold = it }, label = { Text("Local/Tower routing threshold (0–1)") }, modifier = Modifier.fillMaxWidth())
-                OutlinedTextField(verbosity, onValueChange = { verbosity = it }, label = { Text("Diagnostics verbosity") }, modifier = Modifier.fillMaxWidth())
+                OutlinedTextField(restBasePath, onValueChange = { restBasePath = it }, label = { Text(stringResource(R.string.ts_field_rest_path)) }, modifier = Modifier.fillMaxWidth())
+                OutlinedTextField(webSocketPath, onValueChange = { webSocketPath = it }, label = { Text(stringResource(R.string.ts_field_ws_path)) }, modifier = Modifier.fillMaxWidth())
+                OutlinedTextField(protocolVersion, onValueChange = { protocolVersion = it }, label = { Text(stringResource(R.string.ts_field_protocol_version)) }, modifier = Modifier.fillMaxWidth())
+                OutlinedTextField(requestTimeout, onValueChange = { requestTimeout = it }, label = { Text(stringResource(R.string.ts_field_request_timeout)) }, modifier = Modifier.fillMaxWidth())
+                OutlinedTextField(streamingTimeout, onValueChange = { streamingTimeout = it }, label = { Text(stringResource(R.string.ts_field_streaming_timeout)) }, modifier = Modifier.fillMaxWidth())
+                OutlinedTextField(retryCount, onValueChange = { retryCount = it }, label = { Text(stringResource(R.string.ts_field_retry_count)) }, modifier = Modifier.fillMaxWidth())
+                OutlinedTextField(queuedPolicy, onValueChange = { queuedPolicy = it }, label = { Text(stringResource(R.string.ts_field_queue_policy)) }, modifier = Modifier.fillMaxWidth())
+                OutlinedTextField(routingThreshold, onValueChange = { routingThreshold = it }, label = { Text(stringResource(R.string.ts_field_routing_threshold)) }, modifier = Modifier.fillMaxWidth())
+                OutlinedTextField(verbosity, onValueChange = { verbosity = it }, label = { Text(stringResource(R.string.ts_field_verbosity)) }, modifier = Modifier.fillMaxWidth())
                 Row(horizontalArrangement = Arrangement.spacedBy(12.dp)) {
                     Switch(checked = consequentialConfirm, onCheckedChange = { consequentialConfirm = it })
-                    Text("Require confirmation for consequential requests", style = HermesType.body, color = c.ink)
+                    Text(stringResource(R.string.ts_switch_consequential), style = HermesType.body, color = c.ink)
                 }
-                Text("Certificate behavior", style = HermesType.sectionLabel, color = c.bronze)
+                Text(stringResource(R.string.ts_label_cert_behavior), style = HermesType.sectionLabel, color = c.bronze)
                 Row(horizontalArrangement = Arrangement.spacedBy(6.dp)) {
-                    FilterChip(selected = certPolicy == "SYSTEM", onClick = { certPolicy = "SYSTEM" }, label = { Text("System trust") })
-                    FilterChip(selected = certPolicy == "PINNED", onClick = { certPolicy = "PINNED" }, label = { Text("Pinned fingerprint") })
+                    FilterChip(selected = certPolicy == "SYSTEM", onClick = { certPolicy = "SYSTEM" }, label = { Text(stringResource(R.string.ts_cert_system)) })
+                    FilterChip(selected = certPolicy == "PINNED", onClick = { certPolicy = "PINNED" }, label = { Text(stringResource(R.string.ts_cert_pinned)) })
                 }
                 if (certPolicy == "PINNED") {
-                    OutlinedTextField(pinnedFingerprint, onValueChange = { pinnedFingerprint = it }, label = { Text("Pinned SHA-256 fingerprint") }, modifier = Modifier.fillMaxWidth())
+                    OutlinedTextField(pinnedFingerprint, onValueChange = { pinnedFingerprint = it }, label = { Text(stringResource(R.string.ts_field_pinned_fp)) }, modifier = Modifier.fillMaxWidth())
                 }
             }
         }
 
-        SectionCard(title = "Actions") {
+        SectionCard(title = stringResource(R.string.ts_section_actions)) {
             if (onOpenScanner != null) {
                 Text(
-                    "Pairing via QR: scan the Tower's hermes-pair code with the camera — the " +
-                        "strict versioned parser checks it before anything is offered for pairing.",
+                    stringResource(R.string.ts_qr_hint),
                     style = HermesType.bodySecondary, color = c.inkSecondary,
                 )
-                Button(onClick = { onOpenScanner() }) { Text("Scan pairing QR") }
+                Button(onClick = { onOpenScanner() }) { Text(stringResource(R.string.ts_action_scan_qr)) }
             }
             Row(horizontalArrangement = Arrangement.spacedBy(6.dp)) {
                 TextButton(onClick = {
                     when (val r = graph.profileStore.saveDraft(buildProfile())) {
-                        is TowerProfileWriteResult.Written -> message = "Draft saved. State: ${graph.profileStore.state().displayLabel}"
-                        is TowerProfileWriteResult.Rejected -> message = "Draft rejected: ${r.reason}"
+                        is TowerProfileWriteResult.Written -> message = context.getString(R.string.ts_msg_draft_saved, graph.profileStore.state().displayLabel)
+                        is TowerProfileWriteResult.Rejected -> message = context.getString(R.string.ts_msg_draft_rejected, r.reason)
                     }
-                }) { Text("Save draft") }
+                }) { Text(stringResource(R.string.ts_action_save_draft)) }
                 TextButton(onClick = {
                     val profile = buildProfile()
                     val report = TowerProfileValidator.validate(
@@ -228,8 +230,9 @@ fun TowerStudioScreen(graph: AppGraph, onOpenScanner: (() -> Unit)? = null) {
                         secretPresent = graph.profileStore.secretFor(profile.profileId) != null || secret.isNotBlank(),
                         nowIso = java.time.Instant.now().toString(),
                     )
-                    message = if (report.passed) "Validation passed." else "Validation failed: " + report.issues.joinToString("; ") { it.toString() }
-                }) { Text("Validate fields") }
+                    message = if (report.passed) context.getString(R.string.ts_msg_validation_passed)
+                        else context.getString(R.string.ts_msg_validation_failed, report.issues.joinToString("; ") { it.toString() })
+                }) { Text(stringResource(R.string.ts_action_validate)) }
             }
             Row(horizontalArrangement = Arrangement.spacedBy(6.dp)) {
                 TextButton(onClick = {
@@ -241,7 +244,7 @@ fun TowerStudioScreen(graph: AppGraph, onOpenScanner: (() -> Unit)? = null) {
                         nowIso = java.time.Instant.now().toString(),
                     )
                     if (!report.passed) {
-                        message = "Cannot test: " + report.issues.joinToString("; ") { it.toString() }
+                        message = context.getString(R.string.ts_msg_cannot_test, report.issues.joinToString("; ") { it.toString() })
                     } else {
                         graph.realBridge.configure(profile)
                         val r = TowerConnectionTester.test(
@@ -250,18 +253,18 @@ fun TowerStudioScreen(graph: AppGraph, onOpenScanner: (() -> Unit)? = null) {
                             java.time.Instant.now().toString(),
                         )
                         testOutcome = r
-                        message = "Connection test: ${r.outcome.name} — ${r.detail}"
+                        message = context.getString(R.string.ts_msg_connection_test, r.outcome.name, r.detail)
                     }
-                }) { Text("Test connection") }
+                }) { Text(stringResource(R.string.ts_action_test)) }
                 TextButton(onClick = {
                     val profile = buildProfile()
                     if (secret.isBlank() && graph.profileStore.secretFor(profile.profileId) == null && mode != TransportMode.MOCK_SIMULATOR) {
-                        message = "Pairing requires a pairing code or token."
+                        message = context.getString(R.string.ts_msg_pairing_required)
                     } else {
                         if (secret.isNotBlank()) graph.profileStore.setPairingCode(profile.profileId, secret.toCharArray())
-                        message = "Pairing recorded for ${profile.profileId}. Verify with Test connection."
+                        message = context.getString(R.string.ts_msg_pairing_recorded, profile.profileId)
                     }
-                }) { Text("Pair device") }
+                }) { Text(stringResource(R.string.ts_action_pair)) }
             }
             Row(horizontalArrangement = Arrangement.spacedBy(6.dp)) {
                 Button(onClick = {
@@ -270,31 +273,31 @@ fun TowerStudioScreen(graph: AppGraph, onOpenScanner: (() -> Unit)? = null) {
                     when (val r = graph.profileStore.saveValidated(profile)) {
                         is TowerProfileWriteResult.Written -> {
                             graph.realBridge.configure(r.profile)
-                            message = "Saved (${mode.displayLabel}). Use Test connection to verify; CONNECTED is shown only after an accepted handshake."
+                            message = context.getString(R.string.ts_msg_saved_use_test, mode.displayLabel)
                         }
-                        is TowerProfileWriteResult.Rejected -> message = "Save rejected: ${r.reason}"
+                        is TowerProfileWriteResult.Rejected -> message = context.getString(R.string.ts_msg_save_rejected, r.reason)
                     }
-                }) { Text("Save and connect") }
+                }) { Text(stringResource(R.string.ts_action_save_connect)) }
                 TextButton(onClick = {
                     graph.realBridge.configure(buildProfile())
                     graph.scope.launch {
                         val result = graph.realBridge.handshake()
                         message = when (result) {
-                            is BridgeResult.Success -> "Connected: handshake accepted by ${graph.realBridge.connection.value.endpointLabel}."
-                            is BridgeResult.Failure -> "Not connected: ${result.error} — ${result.message}"
+                            is BridgeResult.Success -> context.getString(R.string.ts_msg_connected, graph.realBridge.connection.value.endpointLabel)
+                            is BridgeResult.Failure -> context.getString(R.string.ts_msg_not_connected, result.error, result.message)
                         }
                     }
-                }) { Text("Connect") }
+                }) { Text(stringResource(R.string.ts_action_connect)) }
                 TextButton(onClick = {
-                    message = "Disconnected (local mock pipeline remains available)."
-                }) { Text("Disconnect") }
+                    message = context.getString(R.string.ts_msg_disconnected)
+                }) { Text(stringResource(R.string.ts_action_disconnect)) }
             }
             Row(horizontalArrangement = Arrangement.spacedBy(6.dp)) {
                 TextButton(onClick = {
                     val removed = graph.profileStore.clearSensitiveValues(existing?.profileId ?: "profile-owner-1")
                     secret = ""
-                    message = if (removed) "Sensitive values cleared; profile metadata preserved." else "No sensitive values stored."
-                }) { Text("Clear sensitive values") }
+                    message = if (removed) context.getString(R.string.ts_msg_cleared) else context.getString(R.string.ts_msg_no_sensitive)
+                }) { Text(stringResource(R.string.ts_action_clear_sensitive)) }
                 TextButton(onClick = {
                     runCatching { graph.profileStore.exportSecretClean(existing?.profileId ?: "profile-owner-1") }
                         .onSuccess { exported ->
@@ -303,17 +306,16 @@ fun TowerStudioScreen(graph: AppGraph, onOpenScanner: (() -> Unit)? = null) {
                                 exported,
                             )
                             graph.keyValueStore.putString("last_secret_clean_export", text.take(200_000))
-                            message = "Secret-clean export stored (placeholders: ${exported.accessToken}, ${exported.pairingSecret}). " +
-                                "Copy it from Diagnostics."
+                            message = context.getString(R.string.ts_msg_export_stored, exported.accessToken, exported.pairingSecret)
                         }
-                        .onFailure { message = "Export failed: ${it.message}" }
-                }) { Text("Export secret-clean profile") }
+                        .onFailure { message = context.getString(R.string.ts_msg_export_failed, it.message ?: "") }
+                }) { Text(stringResource(R.string.ts_action_export)) }
             }
             Row(horizontalArrangement = Arrangement.spacedBy(6.dp)) {
                 TextButton(onClick = {
                     val stored = graph.keyValueStore.getString("last_secret_clean_export")
                     if (stored == null) {
-                        message = "No stored export to import in this build."
+                        message = context.getString(R.string.ts_msg_no_import)
                     } else {
                         runCatching {
                             kotlinx.serialization.json.Json.decodeFromString(
@@ -322,46 +324,55 @@ fun TowerStudioScreen(graph: AppGraph, onOpenScanner: (() -> Unit)? = null) {
                             )
                         }.onSuccess { extracted ->
                             when (val r = graph.profileStore.importExported(extracted, confirmOverwrite = false)) {
-                                is ImportResult.Imported -> message = "Imported profile '${r.profile.profileName}'."
-                                is ImportResult.Conflict -> message = "Conflict: ${r.message} Confirm to replace (previous preserved)."
-                                is ImportResult.Rejected -> message = "Import rejected: ${r.reason}"
+                                is ImportResult.Imported -> message = context.getString(R.string.ts_msg_imported, r.profile.profileName)
+                                is ImportResult.Conflict -> message = context.getString(R.string.ts_msg_import_conflict, r.message)
+                                is ImportResult.Rejected -> message = context.getString(R.string.ts_msg_import_rejected, r.reason)
                             }
-                        }.onFailure { message = "Import failed: ${it.message}" }
+                        }.onFailure { message = context.getString(R.string.ts_msg_import_failed, it.message ?: "") }
                     }
-                }) { Text("Import profile") }
+                }) { Text(stringResource(R.string.ts_action_import)) }
                 TextButton(onClick = {
                     when (val r = graph.profileStore.restorePrevious()) {
-                        is TowerProfileWriteResult.Written -> message = "Previous configuration restored ('${r.profile.profileName}')."
+                        is TowerProfileWriteResult.Written -> message = context.getString(R.string.ts_msg_restored, r.profile.profileName)
                         is TowerProfileWriteResult.Rejected -> message = r.reason
                     }
-                }) { Text("Restore previous") }
+                }) { Text(stringResource(R.string.ts_action_restore)) }
                 TextButton(onClick = {
                     when (val r = graph.profileStore.resetToMock()) {
                         is TowerProfileWriteResult.Written -> {
                             mode = TransportMode.MOCK_SIMULATOR
                             baseUrl = ""
                             secret = ""
-                            message = "Reset to Mock mode ('${r.profile.profileName}')."
+                            message = context.getString(R.string.ts_msg_reset_mock, r.profile.profileName)
                         }
                         is TowerProfileWriteResult.Rejected -> message = r.reason
                     }
-                }) { Text("Reset to Mock mode") }
+                }) { Text(stringResource(R.string.ts_action_reset_mock)) }
             }
         }
 
         testOutcome?.let { r ->
-            SectionCard(title = "Last connection test") {
-                Text("Outcome: ${r.outcome.name}", style = HermesType.body, color = c.ink)
+            SectionCard(title = stringResource(R.string.ts_section_last_test)) {
+                Text(context.getString(R.string.ts_msg_outcome, r.outcome.name), style = HermesType.body, color = c.ink)
                 Text(
-                    "DNS: ${r.dnsResolved} · transport: ${r.transportConnected} · TLS: ${r.tlsStatus} · handshake: ${r.handshakeStatus}",
+                    context.getString(
+                        R.string.ts_msg_dns_line,
+                        r.dnsResolved, r.transportConnected, r.tlsStatus, r.handshakeStatus,
+                    ),
                     style = HermesType.bodySecondary, color = c.inkSecondary,
                 )
                 Text(
-                    "Protocol compatible: ${r.protocolCompatible} · auth: ${r.authenticationStatus} · Tower accepted: ${r.towerAccepted}",
+                    context.getString(
+                        R.string.ts_msg_proto_line,
+                        r.protocolCompatible, r.authenticationStatus, r.towerAccepted,
+                    ),
                     style = HermesType.bodySecondary, color = c.inkSecondary,
                 )
                 Text(
-                    "Latency: ${r.latencyMs ?: "n/a"} ms · streaming: ${r.streamingCapability} · at ${r.testedAt}",
+                    context.getString(
+                        R.string.ts_msg_latency_line,
+                        r.latencyMs ?: context.getString(R.string.mm_na), r.streamingCapability, r.testedAt,
+                    ),
                     style = HermesType.bodySecondary, color = c.inkSecondary,
                 )
             }

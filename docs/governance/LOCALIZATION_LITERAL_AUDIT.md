@@ -145,3 +145,26 @@ certificate behavior, pinned fingerprint), every action (`Save draft`, `Validate
 
 Wave-1+2+3 migration status is tracked in the checkpoint receipt; this file is the
 audit source of truth and is re-scanned after every UI wave (directive §16).
+
+## 5. Wave 2-tail EXECUTED (2026-11-04) — full-body migration complete
+
+- **TowerStudioScreen** (43 literal sites) and **ModelManagerScreen** (58 literal sites
+  incl. pack-confirmation dialog and attribute sheet) migrated to resources:
+  `ts_*` (63 keys), `mm_*` (150 keys); **ConsoleScreen** text-injection dialog →
+  `cd_*` (4 keys). Callback/coroutine strings resolve via `context.getString`;
+  composable-context strings via `stringResource`. All format args positional
+  (%1$s style); values with leading whitespace quoted in XML.
+- **Live re-scan after migration**: ordinary-English `Text("…")` residuals = ZERO
+  across ui/screens + AppNav + MonumentalChrome. Remaining fixed strings are all in
+  the §2 allowlist classes: brand friezes (`HERMES`, `TOWER`, `HERMES TOWER`),
+  `MODEL SANCTUM` identity, seal glyphs (`◤`/`◥`), bullet glyph, E2E-pinned en
+  defaults (identical strings, keyed), diagnostic/state codes (PASSED/FAILED/ACTIVE/
+  REFUSED/INSTALLED…), enum `displayLabel`s (engine-side identity), SI byte units.
+- **Wave 3 disposition (MockTowerArchive generated titles)**: classified
+  SIMULATED_SAMPLE_DATA, not UI chrome — the mock titles/turns are deterministic
+  dataset content shown under the localized SIMULATED badge (directive §15);
+  localizing fabricated sample content would fake localization of data the real
+  Tower will replace. The surrounding Archive chrome is fully localized.
+- Parity after the wave: **591 keys × 5 locales** (en/it/es/fr/de), zero key-set
+  mismatches, zero non-positional placeholders, zero empty values
+  (LocalizationParityTest rules re-run in CI at the wave commit).
