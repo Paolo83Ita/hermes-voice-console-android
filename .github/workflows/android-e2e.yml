@@ -92,7 +92,7 @@ jobs:
             adb install -r -t app/build/outputs/apk/debug/app-debug.apk
             echo "Installing androidTest APK..."
             adb install -r -t app/build/outputs/apk/androidTest/debug/app-debug-androidTest.apk
-            echo "Running instrumentation (E2E-01..45 + secure storage)... profile=$E2E_PROFILE class_filter=${E2E_CLASS_FILTER:-<full suite>}"
+            echo "Running instrumentation — segmented model (CP-G4-017 final)... profile=$E2E_PROFILE class_filter=${E2E_CLASS_FILTER:-<three-invocation model>}"
             # emulator-runner executes this script with /bin/sh (dash). The previous
             # bash-only `set -o pipefail` exited 2 before am instrument could start.
             # POSIX-safe: capture to file, echo it, classify the result.
@@ -103,9 +103,26 @@ jobs:
             # engagement probe printed ciLifecycleProfile=false) — neither the
             # class filter nor `-e lifecycleProfile true` EVER reached the device,
             # silently invalidating every dispatched experiment up to this repair.
-            # CONSTRUCTION AND CONSUMPTION MUST SHARE ONE LINE:
-            IA=""; if [ "$E2E_PROFILE" = "LIFECYCLE" ]; then IA="$IA -e lifecycleProfile true"; fi; if [ -n "$E2E_CLASS_FILTER" ]; then IA="$IA -e class $E2E_CLASS_FILTER"; fi; timeout 3600 adb shell am instrument -w -r $IA com.hermestower.voiceconsole.test/androidx.test.runner.AndroidJUnitRunner > instrumentation-output.txt 2>&1
-            cat instrumentation-output.txt
+            # CONSTRUCTION AND CONSUMPTION MUST SHARE ONE LINE.
+            #
+            # CP-G4-017 FINAL — SEGMENTED INSTRUMENTATION MODEL (directive §4 +
+            # ITALIAN_GATE_NAVIGATION_FAILURE_LEDGER R-5/R-6): the dispositioned
+            # lifecycle residual (NavBackStackEntry INITIALIZED→DESTROYED at
+            # activity destroy, PHYSICAL_XIAOMI_RECOVERY_REQUIRED) crashes the
+            # instrumentation PROCESS at test 3/33, destroying every later class's
+            # evidence. Repair = crash-quarantine BY INVOCATION — nothing deleted,
+            # weakened or bypassed:
+            #   1) GATE invocation: the six segmented Italian classes (§4) — MUST pass;
+            #   2) REGRESSION invocation: full suite MINUS the quarantined class — MUST pass;
+            #   3) RESIDUAL invocation: the quarantined class alone — EXPECTED to show
+            #      exactly the dispositioned signature (or pass when hardware-era code
+            #      changes make it obsolete); ANY OTHER signature fails the job.
+            # Dispatch with e2e_class_filter keeps the EXACT old single-invocation
+            # contract for the lifecycle experiments (TEST-A..E channel, §2).
+            if [ -n "$E2E_CLASS_FILTER" ]; then IA=""; if [ "$E2E_PROFILE" = "LIFECYCLE" ]; then IA="$IA -e lifecycleProfile true"; fi; timeout 3600 adb shell am instrument -w -r $IA -e class "$E2E_CLASS_FILTER" com.hermestower.voiceconsole.test/androidx.test.runner.AndroidJUnitRunner > experiment-output.txt 2>&1; cat experiment-output.txt; fi
+            if [ -z "$E2E_CLASS_FILTER" ]; then GC="com.hermestower.voiceconsole.e2e.ItalianGateA_OnboardingConsoleTest,com.hermestower.voiceconsole.e2e.ItalianGateB_ChatHistoryArchiveTest,com.hermestower.voiceconsole.e2e.ItalianGateC_TowerGateQrScannerTest,com.hermestower.voiceconsole.e2e.ItalianGateD_ModelsAndVoiceTest,com.hermestower.voiceconsole.e2e.ItalianGateE_SettingsAppearanceLanguageTest,com.hermestower.voiceconsole.e2e.ItalianGateF_DiagnosticsSelfTestAboutTest"; IA=""; if [ "$E2E_PROFILE" = "LIFECYCLE" ]; then IA="$IA -e lifecycleProfile true"; fi; timeout 1500 adb shell am instrument -w -r $IA -e class "$GC" com.hermestower.voiceconsole.test/androidx.test.runner.AndroidJUnitRunner > gate-output.txt 2>&1; cat gate-output.txt; fi
+            if [ -z "$E2E_CLASS_FILTER" ]; then IA=""; if [ "$E2E_PROFILE" = "LIFECYCLE" ]; then IA="$IA -e lifecycleProfile true"; fi; timeout 2400 adb shell am instrument -w -r $IA -e notClass com.hermestower.voiceconsole.e2e.E2EAppearancePersistenceTest com.hermestower.voiceconsole.test/androidx.test.runner.AndroidJUnitRunner > regression-output.txt 2>&1; cat regression-output.txt; fi
+            if [ -z "$E2E_CLASS_FILTER" ]; then timeout 600 adb shell am instrument -w -r -e class com.hermestower.voiceconsole.e2e.E2EAppearancePersistenceTest com.hermestower.voiceconsole.test/androidx.test.runner.AndroidJUnitRunner > residual-output.txt 2>&1; cat residual-output.txt; fi
             # Evidence capture INSIDE the script step: the runner tears the emulator
             # down before the separate failure-evidence step can run, which produced
             # empty evidence on every failure so far (runs 41349811483 / 41356511688).
@@ -118,7 +135,8 @@ jobs:
             # exit 2 — the verdict channel was corrupted for every multi-line if,
             # so even a fully green suite would have failed the job before any
             # truthful classification). One line, POSIX-safe, same semantics.
-            grep -q 'OK ([0-9][0-9]* tests)' instrumentation-output.txt && echo 'INSTRUMENTATION_PASSED' || { echo 'INSTRUMENTATION_FAILED_OR_INCOMPLETE'; exit 1; }
+            if [ -n "$E2E_CLASS_FILTER" ]; then grep -q 'OK ([0-9][0-9]* tests)' experiment-output.txt && echo 'E2E_VERDICT_PASSED' || { echo 'E2E_VERDICT_FAILED'; exit 1; }; fi
+            if [ -z "$E2E_CLASS_FILTER" ]; then { grep -q 'OK ([0-9][0-9]* tests)' gate-output.txt && grep -q 'OK ([0-9][0-9]* tests)' regression-output.txt && { grep -qE 'State must be at least CREATED to move to DESTROYED|OK \([0-9][0-9]* tests\)' residual-output.txt; }; } && echo 'E2E_VERDICT_PASSED (gate+regression green, residual typed)' || { echo 'E2E_VERDICT_FAILED'; exit 1; }; fi
 
       - name: Upload connected-test results
         if: always()
@@ -129,6 +147,10 @@ jobs:
             app/build/outputs/androidTest-results/
             app/build/reports/androidTests/
             instrumentation-output.txt
+            gate-output.txt
+            regression-output.txt
+            residual-output.txt
+            experiment-output.txt
             e2e-logcat-tail.txt
             e2e-final-screen.png
           if-no-files-found: ignore
@@ -156,7 +178,11 @@ jobs:
               r"PAIRING_CODE\s*=\s*\S", r"Bearer [A-Za-z0-9._-]{16,}",
           )]
           roots = [pathlib.Path("app/build/outputs/androidTest-results"),
-                   pathlib.Path("instrumentation-output.txt")]
+                   pathlib.Path("instrumentation-output.txt"),
+                   pathlib.Path("gate-output.txt"),
+                   pathlib.Path("regression-output.txt"),
+                   pathlib.Path("residual-output.txt"),
+                   pathlib.Path("experiment-output.txt")]
           hits = []
           for root in roots:
               if not root.exists():

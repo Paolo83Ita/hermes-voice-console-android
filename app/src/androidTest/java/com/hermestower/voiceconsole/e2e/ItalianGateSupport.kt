@@ -1,0 +1,315 @@
+package com.hermestower.voiceconsole.e2e
+
+import androidx.compose.ui.semantics.SemanticsActions
+import androidx.compose.ui.semantics.SemanticsProperties
+import androidx.compose.ui.test.onAllNodesWithContentDescription
+import androidx.compose.ui.test.onAllNodesWithText
+import androidx.compose.ui.test.onNodeWithContentDescription
+import androidx.compose.ui.test.performClick
+import androidx.test.platform.app.InstrumentationRegistry
+import com.hermestower.voiceconsole.R
+import com.hermestower.voiceconsole.locale.AppLanguage
+import com.hermestower.voiceconsole.ui.screens.Onboarding
+import java.util.Locale
+
+/**
+ * GRAPH 4 directive §4 — shared harness for the SEGMENTED Italian completeness
+ * gate (classes ItalianGateA..F). Replaces the monolithic audit
+ * (superseded class E2EItalianCompletenessTest, failure ledger
+ * ITALIAN_GATE_NAVIGATION_FAILURE_LEDGER.md R-1..R-7).
+ *
+ * The classification vocabulary is carried over VERBATIM from the monolithic
+ * gate — the banned-English list, the invariant identities, the technical
+ * shapes and the runtime Italian pool are UNCHANGED. Nothing is weakened: the
+ * six segments together cover a SUPERSET of the monolithic flow (Onboarding
+ * and the explicit scanner Back navigation were never covered before).
+ *
+ * Evidence-based physics (each item traces to a ledger run):
+ *  - destination-composition floor 60 s: R-7 proved the destination composes
+ *    past the 20 s wait (anchor present in the timeout dump); the floor is
+ *    raised ONLY for destination composition and ONLY with that evidence;
+ *  - every direct semantics activation dispatches on the main thread (R-3:
+ *    NavController.navigate demands it);
+ *  - the scanner is left via its own Back path before any drawer navigation
+ *    (R-4: full-screen route, no drawer) and the Back return is ASSERTED;
+ *  - locale switches use the system-driven relaunch only — no explicit
+ *    recreate races (R-1); the activity baseline is re-established by the
+ *    shared @Before helper (wizard-visible self-healing).
+ */
+
+object ItalianGate {
+
+    /** Reviewed ordinary-English words that must never render under Italian. */
+    val bannedEnglish = setOf(
+        "the", "and", "with", "for", "you", "your", "yours", "from", "into", "will",
+        "are", "was", "were", "been", "being", "have", "has", "had", "does", "did",
+        "not", "all", "any", "can", "could", "should", "would", "shall", "may", "might",
+        "now", "new", "more", "most", "when", "then", "than", "that", "this", "these",
+        "those", "there", "here", "what", "which", "where", "who", "how", "why",
+        "its", "also", "only", "just", "even", "still", "already", "after", "before",
+        "between", "during", "through", "under", "over", "again", "once", "both",
+        "each", "every", "some", "such", "own", "same", "too", "very", "well",
+        "best", "better", "need", "needs", "needed", "get", "gets", "got", "put",
+        "make", "makes", "made", "use", "used", "uses",
+        "settings", "download", "downloads", "install", "installed", "uninstall",
+        "search", "save", "saved", "cancel", "send", "delete", "remove", "removed",
+        "open", "close", "start", "stop", "pause", "resume", "retry", "retries",
+        "connect", "connected", "disconnect", "disconnected", "pair", "pairing",
+        "scan", "share", "copy", "paste", "clear", "reset", "restore", "import",
+        "export", "name", "address", "language", "voice", "model", "models",
+        "history", "about", "advanced", "details", "status", "version", "update",
+        "updates", "storage", "space", "network", "device", "screen", "theme",
+        "dark", "light", "motion", "notifications", "notification", "permission",
+        "permissions", "allow", "deny", "grant", "error", "errors", "warning",
+        "warnings", "loading", "please", "wait", "try", "later", "yes", "none",
+        "never", "always", "available", "unavailable", "unknown", "current",
+        "recommended", "configuration", "profile", "profiles", "connection",
+        "component", "components", "free", "reserve", "size", "duration", "expected",
+        "minimum", "maximum", "verified", "qualified", "active", "inactive",
+        "previous", "next", "state", "states", "compatibility", "licenses", "license",
+        "optional", "required", "classification", "provider", "provenance",
+    )
+
+    /** Invariant identities (audit §2) allowed verbatim. */
+    val invariantTokens = setOf(
+        "hermes", "tower", "model", "sanctum", "simulated", "stt", "tts", "llm",
+        "vad", "qr", "abi", "abis", "ram", "dns", "tls", "rest", "websocket",
+        "sha", "onnx", "openwakeword", "gtcrn", "keystore", "tailscale", "android",
+        "google", "xiaomi", "apk", "fa", "fr", "v0", "hermes-pair", "push-to-talk",
+    )
+
+    val technicalShape = listOf(
+        Regex("^[A-Z0-9_]+$"),                          // ALL-CAPS codes: PASSED, TOWER_FIRST
+        Regex(".*[a-z][A-Z].*"),                        // camelCase identifiers
+        Regex("^(https?|wss?|mock)://.*"),              // URLs
+        Regex(".*://.*"),
+        Regex("v?\\d.*"),                               // versions, sizes, times
+        Regex(".*\\d.*"),
+        Regex("^[a-z0-9]+([-_.][a-z0-9_.-]+)*$"),       // snake/kebab/dotted identifiers
+        Regex(".*(/|\\\\|\\||·|—|–|%%|%|•|⚠|✓|✗|：).*"),
+    )
+
+    fun tokenize(text: String): Set<String> =
+        text.split(Regex("[^\\p{L}\\p{Nd}]+"))
+            .filter { it.length >= 2 }
+            .map { it.lowercase(Locale.ROOT) }
+            .toSet()
+
+    /** Every app string resolved under an Italian configuration (runtime pool). */
+    fun italianPool(): Set<String> {
+        val ctx = InstrumentationRegistry.getInstrumentation().targetContext
+        val itCfg = android.content.res.Configuration(ctx.resources.configuration)
+        val locale = Locale.forLanguageTag("it")
+        itCfg.setLocale(locale)
+        itCfg.setLocales(android.os.LocaleList(locale))
+        val itCtx = ctx.createConfigurationContext(itCfg)
+        val pool = mutableSetOf<String>()
+        for (field in R.string::class.java.fields) {
+            runCatching { pool += tokenize(itCtx.getString(field.getInt(null))) }
+                .onFailure { /* non-string resource skipped */ }
+        }
+        return pool
+    }
+
+    /** Any app string resolved under an explicit locale configuration. */
+    fun localizedString(resId: Int, code: String): String {
+        val ctx = InstrumentationRegistry.getInstrumentation().targetContext
+        val cfg = android.content.res.Configuration(ctx.resources.configuration)
+        val locale = Locale.forLanguageTag(code)
+        cfg.setLocale(locale)
+        cfg.setLocales(android.os.LocaleList(locale))
+        return ctx.createConfigurationContext(cfg).getString(resId)
+    }
+
+    fun violationsFor(text: String, pool: Set<String>): List<String> =
+        tokenize(text).filter { token ->
+            when {
+                token in pool -> false
+                token in invariantTokens -> false
+                technicalShape.any { it.matches(token) } -> false
+                token in bannedEnglish -> true
+                else -> false
+            }
+        }
+}
+
+/**
+ * Baseline for every gate class: onboarding done, Console front, documented
+ * English locale. Self-healing — a previous class that died inside the wizard
+ * (no drawer) is recovered here by re-marking the flag and recreating once.
+ */
+fun HermesComposeRule.gateEnsureBaseline() {
+    val ctx = InstrumentationRegistry.getInstrumentation().targetContext
+    Onboarding.markDone(ctx)
+    val enDesc = ItalianGate.localizedString(R.string.nav_open_drawer, "en")
+    val itDesc = ItalianGate.localizedString(R.string.nav_open_drawer, "it")
+    val drawerVisible = runCatching {
+        onAllNodesWithContentDescription(enDesc, substring = true).fetchSemanticsNodes().isNotEmpty() ||
+            onAllNodesWithContentDescription(itDesc, substring = true).fetchSemanticsNodes().isNotEmpty()
+    }.getOrDefault(false)
+    if (!drawerVisible) {
+        composeRuleScenarioRecreate()
+        pumpUntil(30_000) {
+            runCatching {
+                onAllNodesWithContentDescription(enDesc, substring = true).fetchSemanticsNodes().isNotEmpty() ||
+                    onAllNodesWithContentDescription(itDesc, substring = true).fetchSemanticsNodes().isNotEmpty()
+            }.getOrDefault(false)
+        }
+    }
+    // Restore the documented English baseline (no-op relaunch when already en).
+    runCatching { gateSwitchLocaleAndAwait("en") }
+}
+
+private fun HermesComposeRule.composeRuleScenarioRecreate() {
+    activityRule.scenario.recreate()
+}
+
+/** NAVIGATION DEFECT R-1: never recreate() while a locale relaunch is in flight. */
+fun HermesComposeRule.gateSwitchLocaleAndAwait(code: String, timeoutMs: Long = 45_000) {
+    val ctx = InstrumentationRegistry.getInstrumentation().targetContext
+    val wizardVisible = runCatching {
+        onAllNodesWithText(
+            ItalianGate.localizedString(com.hermestower.voiceconsole.R.string.ob_title, "en"),
+            substring = true,
+        ).fetchSemanticsNodes().isNotEmpty() ||
+            onAllNodesWithText(
+                ItalianGate.localizedString(com.hermestower.voiceconsole.R.string.ob_title, "it"),
+                substring = true,
+            ).fetchSemanticsNodes().isNotEmpty()
+    }.getOrDefault(false)
+    val anchor = if (wizardVisible) {
+        ItalianGate.localizedString(R.string.ob_title, code)
+    } else {
+        ItalianGate.localizedString(R.string.nav_open_drawer, code)
+    }
+    AppLanguage.apply(ctx, code)
+    val deadline = System.currentTimeMillis() + timeoutMs
+    while (System.currentTimeMillis() < deadline) {
+        val found = runCatching {
+            if (wizardVisible) {
+                onAllNodesWithText(anchor, substring = true).fetchSemanticsNodes().isNotEmpty()
+            } else {
+                onAllNodesWithContentDescription(anchor, substring = true).fetchSemanticsNodes().isNotEmpty()
+            }
+        }.getOrDefault(false)
+        if (found) return
+        if (!ciLifecycleProfileRequested) mainClock.advanceTimeBy(100)
+        Thread.sleep(50)
+    }
+    error("locale '$code' relaunch not observed within $timeoutMs ms (anchor: '$anchor')")
+}
+
+/** Drawer open through the REAL affordance. */
+fun HermesComposeRule.gateOpenDrawer() {
+    val openDesc = ItalianGate.localizedString(R.string.nav_open_drawer, "it")
+    onNodeWithContentDescription(openDesc).performClick()
+}
+
+/**
+ * Activates the first clickable node labeled [label] (drawer rows, hub rows,
+ * screen buttons) — the accessible OnClick dispatched ON MAIN (ledger R-3).
+ * Bounded virtual pump first (frozen-clock physics, CP-G4-007).
+ */
+fun HermesComposeRule.gateActivateRow(label: String): Boolean {
+    var advanced = 0L
+    while (advanced < 5_000L) {
+        mainClock.advanceTimeBy(100)
+        advanced += 100
+        val found = runCatching {
+            onAllNodesWithText(label, substring = true).fetchSemanticsNodes()
+                .firstOrNull { it.config[SemanticsActions.OnClick]?.action != null }
+        }.getOrNull()
+        if (found != null) break
+    }
+    val row = runCatching {
+        onAllNodesWithText(label, substring = true).fetchSemanticsNodes()
+            .firstOrNull { it.config[SemanticsActions.OnClick]?.action != null }
+    }.getOrNull() ?: return false
+    val click = row.config[SemanticsActions.OnClick]?.action ?: return false
+    androidx.test.platform.app.InstrumentationRegistry.getInstrumentation().runOnMainSync { click() }
+    return true
+}
+
+/**
+ * Destination-composition wait: ANY of [anchors] visible. Floor 60 s with the
+ * R-7 evidence (destination composes past 20 s at the Console→Archive
+ * boundary); the error carries the visible tree for the ledger.
+ */
+fun HermesComposeRule.gateAwaitAnchor(vararg anchors: String, timeoutMs: Long = 60_000) {
+    val deadline = System.currentTimeMillis() + timeoutMs
+    while (System.currentTimeMillis() < deadline) {
+        val found = runCatching {
+            anchors.any { anchor ->
+                onAllNodesWithText(anchor, substring = true).fetchSemanticsNodes().isNotEmpty()
+            }
+        }.getOrDefault(false)
+        if (found) {
+            // settle window: transition + layout complete before further activation
+            if (!ciLifecycleProfileRequested) mainClock.advanceTimeBy(600)
+            return
+        }
+        if (!ciLifecycleProfileRequested) mainClock.advanceTimeBy(100)
+        Thread.sleep(20)
+    }
+    error(
+        "no anchor of [${anchors.joinToString("|")}] composed within $timeoutMs ms; " +
+            "visible texts: " + gateVisibleTexts(),
+    )
+}
+
+/** Visible semantics text (Text + contentDescription) of the current screen. */
+fun HermesComposeRule.gateVisibleTexts(): List<String> {
+    val texts = runCatching {
+        onAllNodesWithText("", substring = true)
+            .fetchSemanticsNodes()
+            .mapNotNull { n -> n.config.get(SemanticsProperties.Text)?.joinToString(" ") { it.text } }
+    }.getOrDefault(emptyList())
+    val descs = runCatching {
+        onAllNodesWithContentDescription("", substring = true)
+            .fetchSemanticsNodes()
+            .mapNotNull { n -> n.config.get(SemanticsProperties.ContentDescription)?.joinToString(" ") { it } }
+    }.getOrDefault(emptyList())
+    return (texts + descs).filter { it.isNotBlank() }
+}
+
+/**
+ * Drawer → (optionally the Settings hub) → row, then the destination anchor.
+ * Identical product path to the monolithic gate (drawer row first; hub-row
+ * fallback through Settings — the five-destination navigation contract).
+ */
+fun HermesComposeRule.gateNavigate(labelRes: Int, anchorRes: Int, timeoutMs: Long = 60_000) =
+    gateNavigateTo(labelRes, ItalianGate.localizedString(anchorRes, "it"), timeoutMs)
+
+/** Same product path with a LITERAL anchor (invariant identities: HERMES, MODEL SANCTUM). */
+fun HermesComposeRule.gateNavigateTo(labelRes: Int, anchor: String, timeoutMs: Long = 60_000) {
+    val label = ItalianGate.localizedString(labelRes, "it")
+    gateOpenDrawer()
+    if (!gateActivateRow(label)) {
+        val settingsLabel = ItalianGate.localizedString(R.string.dest_settings, "it")
+        check(gateActivateRow(settingsLabel)) { "Settings row missing from drawer (it)" }
+        gateAwaitAnchor(label, timeoutMs = 30_000)
+        val hubRow = runCatching {
+            onAllNodesWithText(label, substring = true).fetchSemanticsNodes()
+                .firstOrNull { it.config[SemanticsActions.OnClick]?.action != null }
+        }.getOrNull() ?: error("settings-hub row '$label' not found (it)")
+        val click = hubRow.config[SemanticsActions.OnClick]?.action
+            ?: error("settings-hub row '$label' has no OnClick (it)")
+        androidx.test.platform.app.InstrumentationRegistry.getInstrumentation().runOnMainSync { click() }
+    }
+    gateAwaitAnchor(anchor, timeoutMs = timeoutMs)
+    if (!ciLifecycleProfileRequested) {
+        runCatching { waitForIdle() }
+    }
+}
+
+/** Collects classified violations of the current tree for one destination. */
+fun HermesComposeRule.gateCollectViolations(destination: String, pool: Set<String>): List<String> =
+    gateVisibleTexts().flatMap { text ->
+        ItalianGate.violationsFor(text, pool).map { token -> "$destination: '$token' in \"$text\"" }
+    }
+
+/** Leave the QR scanner through its OWN back path and PROVE the return route. */
+fun HermesComposeRule.gateLeaveScannerBack(expectedReturnAnchor: String) {
+    androidx.test.espresso.Espresso.pressBack()
+    gateAwaitAnchor(expectedReturnAnchor, timeoutMs = 60_000)
+}

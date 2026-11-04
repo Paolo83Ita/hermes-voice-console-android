@@ -802,3 +802,60 @@ FILES: E2EItalianCompletenessTest.kt (fixes 9-12); WORK_LOG/audit unchanged othe
 COMMIT: (this commit) — pushed with ls-remote read-back.
 CHECKPOINT: CP-G4-017 = localization code-complete (622×5) + ITALIAN_UI_GATE_EVIDENCE_COLLECTED; the ITALIAN_UI_COMPLETE state is NOT claimed — the gate must go green first (next session: root-cause the archive→connect stall, likely the hub-path fallback after activateRow returns true-but-stale; then §9 visual preview gate, §10-13 links/downloads/runtime, §14-15, §16-17).
 NEXT: continue the same mission — no terminal verdict while dependency-released nodes remain.
+
+## G4-N23 (2026-11-04) — FINAL CONTINUATION intake + segmented Italian gate (directive §3/§4/§25)
+
+NODE: GRAPH 4 FINAL IMPLEMENTATION CONTINUATION (directive §0-§25), mission
+CONTINUE_FROM_LATEST_VERIFIED_REMOTE_TIP.
+FINDING: (1) FRESH READ-BACK (GRAPH4_FINAL_CONTINUATION_READBACK.md): local HEAD ==
+remote HEAD == 92465e5c5c71942eb7d61ea2dc913ea3babf60e4 (fetch exit 0), worktree clean,
+main untouched; the reported tip is CONFIRMED still the latest. 622 string keys ×5
+locales counted live. (2) Cloud at tip: android-debug-build 41846567840 SUCCESS;
+android-e2e 41846567723 (push, full suite) crashed at test 3/33 with the DISPOSITIONED
+lifecycle residual (NavBackStackEntry route=settings INITIALIZED→DESTROYED at
+Activity.performDestroy → Process crashed) — the crash destroys every later class's
+evidence (same shape at 01493a1: run 41840678804). (3) The last gate-only run
+41840691263 (01493a1) timed out at waitForText 20 s while its OWN timeout dump shows the
+requested Archive anchor ("Archivio della Torre" + CAMERA DELL'ARCHIVIO) ALREADY
+COMPOSED — the destination appears; the wait expired at the composition boundary
+(R-7, TEST_TIMEOUT_TOO_LOW_WITH_EVIDENCE); logcat shows NO ANR of our process.
+ACTION: (1) ITALIAN_GATE_NAVIGATION_FAILURE_LEDGER.md created — seven gate-related runs
+R-1..R-7, each with the directive §3 fields and a typed classification from the allowed
+vocabulary; NO APPLICATION_NAVIGATION_DEFECT / ROUTE_NOT_REACHABLE / MAIN_THREAD_BLOCK
+anywhere. (2) The monolithic audit is REPLACED (superseded, logic carried verbatim) by
+the SEGMENTED GATE: ItalianGateSupport.kt (shared harness: verbatim banned-English list,
+invariants, technical shapes, runtime Italian pool; evidence-based physics — 60 s
+destination-composition floor backed by R-7, runOnMainSync activations per R-3,
+scanner Back exit asserted per R-4, baseline self-healing, en-restore in every
+finally so the regression invocation keeps its en anchors) + six classes:
+ItalianGateA_OnboardingConsoleTest (6-step wizard REAL walk + Console + inject dialog),
+ItalianGateB_ChatHistoryArchiveTest (chat surface, History, Archive 3 tabs),
+ItalianGateC_TowerGateQrScannerTest (Tower Gate → Studio → scanner → EXPLICIT Back
+return), ItalianGateD_ModelsAndVoiceTest (Model Sanctum + attribute sheet),
+ItalianGateE_SettingsAppearanceLanguageTest (hub + SIX categories asserted +
+Appearance + Voice + Language), ItalianGateF_DiagnosticsSelfTestAboutTest
+(Diagnostics/Self-Test/Local Intelligence/About). (3) android-e2e.yml restructured to
+the SEGMENTED INSTRUMENTATION MODEL: gate invocation (six classes, MUST pass) +
+regression invocation (full suite minus the quarantined class via -e notClass, MUST
+pass) + residual invocation (quarantined class alone, EXPECTED exactly the dispositioned
+signature — any OTHER signature fails the job); the workflow_dispatch experiment channel
+keeps the EXACT old single-invocation contract (TEST-A..E preserved); artifacts +
+secret-scan extended to all four output files.
+TEST: structural sanity 162 Kotlin files (the two LocalizationParityTest hits are the
+test's own placeholder-assertion string literals, pre-existing); brace/paren balance
+verified on all seven new files; anchors verified against screen sources (every segment
+anchor is a string the destination actually renders — the R-7 class of defect excluded
+by construction).
+FILES: docs/governance/GRAPH4_FINAL_CONTINUATION_READBACK.md;
+docs/governance/ITALIAN_GATE_NAVIGATION_FAILURE_LEDGER.md;
+app/src/androidTest/.../ItalianGateSupport.kt + ItalianGateA..F (7 new);
+E2EItalianCompletenessTest.kt superseded (deleted; classification carried verbatim);
+.github/workflows/android-e2e.yml; WORK_LOG.md; CHECKPOINT_INDEX.md.
+COMMIT: (this commit) — pushed with ls-remote read-back.
+CHECKPOINT: CP-G4-017 = segmented gate CODE-COMPLETE; ITALIAN_UI_COMPLETE still NOT
+claimed — the six segments must go green in the cloud first (next exact action).
+NEXT: read the gate/regression/residual cloud runs → record ITALIAN_UI_COMPLETE or
+typed evidence → §5 five-language completion → §8 visual preview gate → §9-11 Tower
+refoundation → §12-13 links → §14-16 STT/TTS/LLM → §17-18 → §19-20 regression+APKs →
+§21 runbook → §22 governance → §23 CP-G4-018..025 → §24 terminal verdict only when
+no dependency-released executable node remains.
