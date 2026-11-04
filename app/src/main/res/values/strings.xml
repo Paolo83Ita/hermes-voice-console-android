@@ -451,7 +451,7 @@
     <string name="mm_subtitle">Models and Voice</string>
     <string name="mm_intro">Local intelligence is optional and independent per component; complex, uncertain and consequential reasoning always belongs to Hermes Tower. No model is downloaded without your explicit confirmation.</string>
     <string name="mm_section_a">A. Recommended setup</string>
-    <string name="mm_detected_device">Detected device: %1$s (Android %2$s)</string>
+    <string name="mm_detected_device">Detected device: %1$s (Android %2$d)</string>
     <string name="mm_resources_line">ABIs: %1$s · RAM available: %2$s · Storage free: %3$s</string>
     <string name="mm_tts_engines">TTS engines on device: %1$s</string>
     <string name="mm_tts_none">none reported</string>
@@ -493,7 +493,7 @@
     <string name="mm_update_available">Update available: installed v%1$s → catalog v%2$s.</string>
     <string name="mm_compat_line">Compatibility: %1$s%2$s</string>
     <string name="mm_incompat_paren"> (%1$s)</string>
-    <string name="mm_download_progress">Download: %1$s %2$s/%3$s bytes (%4$d%%)</string>
+    <string name="mm_download_progress">Download: %1$s %2$d/%3$d bytes (%4$d%%)</string>
     <string name="mm_last_download_event">Last download event: %1$s</string>
     <string name="mm_attr_type">Component type</string>
     <string name="mm_attr_version">Version</string>
@@ -595,8 +595,8 @@ MANUAL_ADVANCED — independent per-component selection, full visibility, no sil
     <string name="cd_send">Send</string>
     <string name="cd_cancel">Cancel</string>
     <string name="ts_msg_outcome">Outcome: %1$s</string>
-    <string name="ts_msg_dns_line">DNS: %1$s · transport: %2$s · TLS: %3$s · handshake: %4$s</string>
-    <string name="ts_msg_proto_line">Protocol compatible: %1$s · auth: %2$s · Tower accepted: %3$s</string>
+    <string name="ts_msg_dns_line">DNS: %1$b · transport: %2$b · TLS: %3$s · handshake: %4$s</string>
+    <string name="ts_msg_proto_line">Protocol compatible: %1$b · auth: %2$s · Tower accepted: %3$b</string>
     <string name="ts_msg_latency_line">Latency: %1$s ms · streaming: %2$s · at %3$s</string>
     <string name="mm_rollback_restored">restored v%1$s</string>
     <string name="mm_pack_confirm_title">Install recommended voice pack?</string>
