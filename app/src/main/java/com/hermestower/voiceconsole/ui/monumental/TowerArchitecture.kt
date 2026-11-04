@@ -17,6 +17,7 @@ import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.graphics.Path
 import androidx.compose.ui.graphics.drawscope.DrawScope
 import androidx.compose.ui.graphics.drawscope.Stroke
+import androidx.compose.ui.graphics.drawscope.clipPath
 import com.hermestower.voiceconsole.core.state.ConsoleState
 
 /**
@@ -167,6 +168,20 @@ private fun DrawScope.drawLowerStructure(w: Width, h: Height, m: MonumentalColor
     }
     drawPath(opening, Color(0xFF05070C))
     drawPath(opening, m.bronzeEdge, style = Stroke(width = 2.4f))
+    // G4-VISUAL D6 repair (MONUMENTAL_TOWER_VISUAL_GAP_GRAPH4_FINAL.md): the
+    // opening read at ≈1.9:1 against the plinth (threshold invisible without the
+    // rim). A controlled warm interior glow gives the gateway presence while
+    // staying inside the OLED budget (mean-L impact < 1%). Clipped to the
+    // opening so the glow never bleeds onto the plinth or stairs.
+    clipPath(opening) {
+        drawCircle(
+            Brush.radialGradient(
+                listOf(m.gold.copy(alpha = 0.14f), m.bronzeDeep.copy(alpha = 0.05f), Color.Transparent),
+            ),
+            radius = archW * 0.78f,
+            center = Offset(archCenter.x, archCenter.y + archH * 0.42f),
+        )
+    }
     // Stairs descending from the arch toward the viewer (five steps, deterministic).
     for (i in 0 until 5) {
         val sy = archCenter.y + archH + (h - archCenter.y - archH) * (i / 5f)
@@ -188,14 +203,27 @@ private fun DrawScope.drawMessengerPath(
     quality: QualityBudget,
 ) {
     val flowing = phase > 0f
-    val start = Offset(w / 2f, h * 0.86f)
-    val end = Offset(w / 2f, h * 0.985f)
+    // G4-VISUAL D1 repair (MONUMENTAL_TOWER_VISUAL_GAP_GRAPH4_FINAL.md): the band
+    // previously ran h*0.86→h*0.985 and the bottom-center StateOverlayChip (top
+    // edge ≈ h*0.8985) occluded ≈71% of it — including the pulse centers. The
+    // messenger path now runs from below the Oracle Core, THROUGH the gateway,
+    // and ends CLEAR of the chip (h*0.875): the §7 "energy path toward the user"
+    // is fully visible in exactly the states that advertise it.
+    val start = Offset(w / 2f, h * 0.62f)
+    val end = Offset(w / 2f, h * 0.875f)
     // Carved conduit (always visible, quiet).
     drawLine(m.cyanDeep.copy(alpha = 0.55f), start, end, strokeWidth = w * 0.012f)
     drawLine(m.cyanAbyss.copy(alpha = 0.8f), start, end, strokeWidth = w * 0.006f)
     // Flowing energy only when the app state drives it (directive §8).
     if (flowing) {
-        val pulses = if (quality.particleCount >= 40) 4 else 2
+        // G4-VISUAL D2 repair: the former `particleCount >= 40` branch was dead
+        // code (the ladder tops out at 12) so the HIGH profile rendered
+        // byte-identically to BALANCED. Real budgets: LOW=0, BALANCED=6, HIGH=12.
+        val pulses = when {
+            quality.particleCount >= 12 -> 4
+            quality.particleCount > 0 -> 2
+            else -> 0
+        }
         for (i in 0 until pulses) {
             val t = ((phase + i.toFloat() / pulses) % 1f)
             val pos = Offset(start.x, start.y + (end.y - start.y) * t)

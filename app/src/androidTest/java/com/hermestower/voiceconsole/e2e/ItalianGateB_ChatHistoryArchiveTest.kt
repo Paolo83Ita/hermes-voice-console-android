@@ -4,6 +4,7 @@ import androidx.compose.ui.test.onNodeWithContentDescription
 import androidx.compose.ui.test.onNodeWithText
 import androidx.compose.ui.test.performClick
 import androidx.test.ext.junit.runners.AndroidJUnit4
+import com.hermestower.voiceconsole.R
 import org.junit.Assert.assertTrue
 import org.junit.Before
 import org.junit.Rule

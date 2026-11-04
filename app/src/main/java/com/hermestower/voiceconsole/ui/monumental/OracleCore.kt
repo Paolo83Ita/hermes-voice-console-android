@@ -113,7 +113,12 @@ private fun DrawScope.drawOracleCore(
     // design space is 1080 x 1420 with the core center at y=620 — keep the exact
     // normalized mapping so the Canvas dynamics align with the WebP depth layers.
     val cy = h * (620f / 1420f)
-    val scale = w / 1080f
+    // G4-VISUAL D4 repair (MONUMENTAL_TOWER_VISUAL_GAP_GRAPH4_FINAL.md): scale was
+    // width-only, so the chat-focused 0.52 stage kept width-based rings and the
+    // outer ring clipped ≈27% at the top. The height term keeps the whole
+    // mechanism inside the shrunken stage (at the designed aspect the value is
+    // unchanged, so the full-screen render is pixel-identical).
+    val scale = minOf(w / 1080f, h / 1420f)
 
     // ---- L0 deep atmosphere (skipped when the WebP layer provides it) ----
     if (!staticLayersFromBitmaps) {

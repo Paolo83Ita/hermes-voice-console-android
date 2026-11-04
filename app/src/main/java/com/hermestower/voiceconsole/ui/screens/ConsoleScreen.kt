@@ -310,17 +310,9 @@ fun ConsoleScreen(
                 )
             }
             // Typed refusal from the voice coordinator (mute/permission/unavailable).
-            if (!lastRefusal.isNullOrEmpty()) {
-                Text(
-                    lastRefusal!!,
-                    style = MonumentalType.bodySecondary,
-                    color = m.redBronze,
-                    modifier = Modifier
-                        .padding(horizontal = 18.dp, vertical = 2.dp)
-                        .semantics { liveRegion = LiveRegionMode.Assertive },
-                )
-            }
-            // Typed refusal from the voice coordinator (mute/permission/unavailable).
+            // G4-VISUAL D8 repair: this Text was rendered TWICE (two identical
+            // blocks — MONUMENTAL_TOWER_VISUAL_GAP_GRAPH4_FINAL.md defect D8); a
+            // typed refusal appeared doubled on screen and in the semantics tree.
             if (!lastRefusal.isNullOrEmpty()) {
                 Text(
                     lastRefusal!!,

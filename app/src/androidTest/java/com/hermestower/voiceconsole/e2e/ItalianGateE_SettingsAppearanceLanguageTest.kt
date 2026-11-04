@@ -1,6 +1,7 @@
 package com.hermestower.voiceconsole.e2e
 
 import androidx.test.ext.junit.runners.AndroidJUnit4
+import com.hermestower.voiceconsole.R
 import org.junit.Assert.assertTrue
 import org.junit.Before
 import org.junit.Rule

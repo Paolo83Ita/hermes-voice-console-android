@@ -120,4 +120,63 @@ class LocalizationParityTest {
         assertEquals("Modelli e voce", it["dest_models"])
         assertEquals("Archivio Tower", it["dest_archive"])
     }
+
+    /**
+     * GRAPH 4 FINAL directive §5 — required COVERAGE areas: every ordinary
+     * product surface must carry translated keys in ALL FIVE locales. A key
+     * present in one locale but missing in another is impossible (key-set
+     * parity above); this test pins the AREAS themselves so a future key
+     * removal cannot silently de-localize a surface (no accidental fallback).
+     */
+    @Test
+    fun `required coverage areas are translated in all five locales`() {
+        val areas = mapOf(
+            "screen titles" to listOf(
+                "connection_title", "archive_title", "ts_title", "qr_title",
+                "settings_title", "appearance_title", "voice_title",
+                "st_title", "diag_title", "history_title", "li_title", "about_title",
+            ),
+            "dialogs" to listOf(
+                "cd_inject_title", "cd_inject_placeholder", "cd_send", "cd_cancel",
+                "history_clear_dialog_title",
+            ),
+            "accessibility descriptions" to listOf(
+                "nav_open_drawer", "inject_cd", "composer_cd",
+            ),
+            "onboarding" to listOf(
+                "ob_title", "ob_s1_title", "ob_s2_title", "ob_s3_title",
+                "ob_s4_title", "ob_s5_title", "ob_s6_title", "ob_continue", "ob_s6_finish",
+            ),
+            "pairing" to listOf(
+                "qr_intro", "qr_pair_button", "qr_mock_note", "qr_permission_card",
+            ),
+            "download states" to listOf(
+                "common_download", "mm_download_total", "mm_download_progress",
+                "mm_attr_download_size", "mm_last_download_event",
+            ),
+            "archive" to listOf(
+                "archive_tab_conversations", "archive_tab_missions",
+                "archive_tab_artifacts", "archive_simulated_badge",
+            ),
+            "self-test" to listOf(
+                "st_title", "st_intro", "st_none_yet",
+            ),
+        )
+        val langs = listOf("en", "it", "es", "fr", "de")
+        for ((area, keys) in areas) {
+            for (lang in langs) {
+                val keysOfLang = parseKeys(lang)
+                for (key in keys) {
+                    assertTrue(
+                        "coverage area '$area' key '$key' missing in $lang",
+                        keysOfLang.containsKey(key),
+                    )
+                    assertTrue(
+                        "coverage area '$area' key '$key' empty in $lang",
+                        keysOfLang[key]!!.isNotBlank(),
+                    )
+                }
+            }
+        }
+    }
 }
