@@ -66,9 +66,9 @@ is legacy and not instantiated). The profile reuses the app's own reduced-motion
 | --- | --- | --- | --- | --- | --- |
 | TEST-A | e2e_35_36 alone | NORMAL_VISUAL_PROFILE | residual reproduces (control) | 41645556871 @ bd1606c = compile fail (harness defect, repaired); 41647987018 @ c6476a1 = install infra failure (`Can't find service: package`, zero tests); 41657209419 @ b0be658 = **args-transport defect + system collapse** (§4c, E2E_BLOCKED_EMULATOR_ENVIRONMENT) — no clean isolated control has executed yet | PENDING (re-dispatch on the repaired channel) |
 | TEST-B | e2e_35_36 alone | CI_LIFECYCLE_PROFILE | passes with real navigation | **41718228168 @ 3893e88: EXECUTED CLEANLY — numtests=1 (filter AND `-e lifecycleProfile true` transmitted; probe `ciLifecycleProfile=true` at 21:48:02); RESIDUAL REPRODUCED WITH THE PROFILE ENGAGED** — `Unable to destroy activity … IllegalStateException … route=appearance` at 21:51:15 (§4d) | **REPRODUCED (profile-engaged, probe-verified)** |
-| TEST-C | E2EAppearancePersistenceTest whole class | CI_LIFECYCLE_PROFILE | passes | PENDING | PENDING |
-| TEST-D | complete instrumentation suite | CI_LIFECYCLE_PROFILE | 0 failures | PENDING | PENDING |
-| TEST-E | normal appearance navigation ×20, one session | CI_LIFECYCLE_PROFILE | no entry-lifecycle crash | PENDING | PENDING |
+| TEST-C | E2EAppearancePersistenceTest whole class | CI_LIFECYCLE_PROFILE | passes | 1st dispatch 41726653270 @ a0a5357 = **died pre-install** (`adb install … Broken pipe (32)` at 22:21:18 — E2E_BLOCKED_EMULATOR_ENVIRONMENT, instrumentation never started); re-dispatch **41802826358 @ c5b2cc9** in flight. Accidental NORMAL-profile breadth evidence in the meantime: push-run 41726726187 @ c5b2cc9 (default inputs) ran the full suite — numtests=31, crashed at the 3rd started test (`e2e_35_36`, 22:48:01) with the SAME signature on `route=settings` (THIRD distinct route; probe lines in logcat confirm `ciLifecycleProfile=false`, i.e. default profile) | REPRODUCED under NORMAL at class breadth; LIFECYCLE breadth pending re-dispatch |
+| TEST-D | complete instrumentation suite | CI_LIFECYCLE_PROFILE | 0 failures | **41802836756 @ c5b2cc9 dispatched** (full suite + `-e lifecycleProfile true`), in flight at read-back time | PENDING |
+| TEST-E | normal appearance navigation ×20, one session | CI_LIFECYCLE_PROFILE | no entry-lifecycle crash | **41802846917 @ c5b2cc9: EXECUTED on the repaired channel — numtests=1, filter `E2ELifecycleProfileTest` + `-e lifecycleProfile true` transmitted; the test FAILED BEFORE the soak could exercise navigation: `AppNotIdleException: Looped for 1 iterations over 60 SECONDS — ASYNC_TASKS_HAVE_IDLED` (Espresso idle sync during session startup), NOT the lifecycle residual** (no `Unable to destroy activity` / INITIALIZED→DESTROYED anywhere in the captured evidence) | **INCONCLUSIVE_EMULATOR_IDLE_SYNC** — environment/harness idle-sync limitation, distinct typed outcome; the soak never reached the first iteration on this emulator run |
 
 ## 4b. MAJOR FINDING (2026-11-03, run 41648000740 @ c6476a1) — the frozen clock is NOT the sole mechanism
 
@@ -222,11 +222,30 @@ Consequences:
 
 ## 5. Outcome disposition (to be set from the matrix)
 
-> **SET 2026-11-04 (§4d)**: **PHYSICAL_XIAOMI_RECOVERY_REQUIRED** — TEST-B reproduced the
-> residual with the CI_LIFECYCLE_PROFILE engaged (probe `ciLifecycleProfile=true`,
-> numtests=1, run 41718228168 @ 3893e88). The emulator cannot host the navigation
-> lifecycle qualification in either visual profile; the physical device arbitrates.
-> TEST-C/D/E remain in the matrix as breadth/confirmation evidence.
+> **SET 2026-11-04 (§4d), STRENGTHENED 2026-11-04 (§5a — TEST-D/TEST-E evidence)**:
+> **PHYSICAL_XIAOMI_RECOVERY_REQUIRED** — the residual is now proven
+> **profile-independent** (reproduced under the NORMAL profile in push runs AND with the
+> CI_LIFECYCLE_PROFILE engaged: TEST-B single-test probe-verified `route=appearance`;
+> TEST-D full-suite probe-verified `ciLifecycleProfile=true`, crash at the first
+> navigation test, `route=appearance`, run 41802836756 @ c5b2cc9), **route-independent**
+> (`appearance`, `settings` — third distinct route) and **position-independent**
+> (suite positions 3/31 across runs). TEST-E added a second, distinct typed environment
+> outcome (`INCONCLUSIVE_EMULATOR_IDLE_SYNC` — Espresso idle sync died pre-soak,
+> run 41802846917). The emulator fleet cannot host the navigation lifecycle
+> qualification in either visual profile; the physical Xiaomi arbitrates. This is the
+> strongest emulator-side evidence obtainable; TEST-C re-dispatch (41802826358) remains
+> in flight as class-breadth confirmation. Per directive §2 this evidence does NOT
+> block dependency-released product nodes.
+
+### 5a. Consolidated experiment ledger (2026-11-04)
+
+| ID | Run | Profile engaged | Outcome |
+| --- | --- | --- | --- |
+| TEST-A | 41645556871 / 41647987018 / 41657209419 | n/a | never executed cleanly (compile fail → install infra → args-transport + collapse) — E2E_BLOCKED_EMULATOR_ENVIRONMENT |
+| TEST-B | 41718228168 @ 3893e88 | YES (probe true) | residual REPRODUCED (`route=appearance`) |
+| TEST-C | 41726653270 died pre-install; re-dispatch 41802826358 in flight | (pending) | breadth confirmation pending; accidental NORMAL-profile breadth reproduction captured (push-run 41726726187, `route=settings`) |
+| TEST-D | 41802836756 @ c5b2cc9 | YES (probe true ×2) | residual REPRODUCED at suite breadth (numtests=31, abort at e2e_35_36, `route=appearance`) |
+| TEST-E | 41802846917 @ c5b2cc9 | YES (channel verified, probe rotated out of tail) | INCONCLUSIVE_EMULATOR_IDLE_SYNC (AppNotIdleException 60 s ASYNC_TASKS pre-soak; NOT the lifecycle residual) |
 
 - SOURCE_DEFECT_REPAIRED — EXCLUDED: no application defect has been shown;
   the defect class is framework+environment interaction.
