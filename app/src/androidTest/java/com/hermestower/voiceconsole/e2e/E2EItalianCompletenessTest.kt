@@ -182,13 +182,41 @@ class E2EItalianCompletenessTest {
             violationsFor(text, pool).map { token -> "$destination: '$token' in \"$text\"" }
         }
 
+    /**
+     * Switches the per-app locale and WAITS for the system-driven activity
+     * relaunch (API 33+ LocaleManager recreates the activity automatically —
+     * an explicit scenario.recreate() races the relaunch and dies with
+     * "stage must be [...] but was DESTROYED", evidence run 41814872419).
+     * The wait polls for the drawer open-description resolved under the NEW
+     * locale, tolerating the no-activity windows during relaunch.
+     */
+    private fun switchLocaleAndAwait(code: String, timeoutMs: Long = 45_000) {
+        val ctx = targetContext()
+        AppLanguage.apply(ctx, code)
+        val locale = Locale.forLanguageTag(code)
+        val cfg = android.content.res.Configuration(ctx.resources.configuration)
+        cfg.setLocale(locale)
+        cfg.setLocales(android.os.LocaleList(locale))
+        val localizedDesc = ctx.createConfigurationContext(cfg)
+            .getString(R.string.nav_open_drawer)
+        val deadline = System.currentTimeMillis() + timeoutMs
+        while (System.currentTimeMillis() < deadline) {
+            val found = runCatching {
+                compose.onAllNodesWithContentDescription(localizedDesc, substring = true)
+                    .fetchSemanticsNodes().isNotEmpty()
+            }.getOrDefault(false)
+            if (found) return
+            if (!ciLifecycleProfileRequested) compose.mainClock.advanceTimeBy(100)
+            Thread.sleep(50)
+        }
+        error("locale '$code' relaunch not observed within ${timeoutMs} ms")
+    }
+
     @Test
     fun e2e_italian_ui_completeness_gate() {
         val appContext = targetContext()
         val violations = mutableListOf<String>()
-        AppLanguage.apply(appContext, "it")
-        compose.activityRule.scenario.recreate()
-        compose.waitForIdle()
+        switchLocaleAndAwait("it")
         try {
             val pool = italianPool()
 
@@ -251,10 +279,9 @@ class E2EItalianCompletenessTest {
                 report.isEmpty(),
             )
         } finally {
-            // Restore the documented en anchors for the rest of the suite.
-            AppLanguage.apply(appContext, "en")
-            compose.activityRule.scenario.recreate()
-            compose.waitForIdle()
+            // Restore the documented en anchors for the rest of the suite
+            // (system-driven relaunch awaited, same physics as the switch above).
+            runCatching { switchLocaleAndAwait("en") }
         }
     }
 }
