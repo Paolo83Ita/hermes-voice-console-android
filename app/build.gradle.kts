@@ -70,6 +70,9 @@ dependencies {
     // CP-G4-008: real ONNX runtime for the verified voice assets (GTCRN denoiser,
     // openWakeWord melspec/embed/head chain). Version pinned in DEPENDENCY_PINNING.md.
     implementation(libs.onnxruntime.android)
+    // GRAPH 4 FINAL §14: REAL offline Italian STT runtime for the verified
+    // vosk-model-small-it-0.22 delivery (§12 catalog, Maven Central, Apache-2.0).
+    implementation(libs.vosk.android)
     // CP-G4-010 wave 2: in-app QR pairing scanner — CameraX capture pipeline +
     // ML Kit bundled on-device barcode scanning (no Play Services dependency).
     // Versions pinned in DEPENDENCY_PINNING.md with license verification.

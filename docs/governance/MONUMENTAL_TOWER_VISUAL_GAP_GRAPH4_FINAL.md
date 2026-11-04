@@ -120,3 +120,52 @@ Resting states stay ≈94% sub-threshold (L≤60) — genuine OLED discipline; t
 D3/D5/D7/D8 are hygiene items for the next code sweep. Every §9 target layer exists, state truthfulness holds in all 11 rendered states, OLED load is verified low, and the stage occupies 62.28% of portrait height — inside the authorized 55–65% window.
 
 *Audited renders: 23 PNG + 1 comparison sheet in `download/graph4-monumental-preview-pack/`; renderer: `scripts/render_graph4_monumental_previews.py`; no app source modified; nothing committed.*
+
+## 6. Post-repair re-render (2026-11-04, commit 3eac29a)
+
+Appended section — history above is untouched. Commit `3eac29a` shipped the four narrow repairs D1/D2/D4/D6 (+ D8 hygiene, no render impact). The preview renderer was synced to the post-repair geometry and the whole pack re-rendered; every number below is measured with PIL/numpy on the re-rendered PNGs against the pre-repair pack (preserved at `/tmp/graph4-pack-prerepair/` for reproduction).
+
+| | |
+|---|---|
+| **Renderer (synced)** | `scripts/render_graph4_monumental_previews.py` — mirrors `TowerArchitecture.kt` band `h*0.62→h*0.875` + pulse ladder + `clipPath` gateway glow, and `OracleCore.kt` `scale = min(w/1080, h/1420)` |
+| **Verification script** | `scripts/verify_graph4_postrepair.py` (deterministic; prints every number below) |
+| **Re-rendered** | full pack: 22 PNG + comparison sheet (all 11 console states re-rendered incl. the 5 minimum-required frames, quality variants, full column, sheet) |
+| **App source touched** | **NONE** — renderer/verification live outside the repo; `git status` shows no `app/` modification; nothing committed by this task |
+
+### Repairs verified (before → after, measured)
+
+| Defect | Pre-repair (measured) | Post-repair (measured) | Verdict |
+|---|---|---|---|
+| **D1** chip occludes messenger path | band `h*0.86→h*0.985` = abs rows 1684–1862 (177.5px); chip rows 1736–1867 (pixel-detected top 1736) → **125.5px overlap = 70.7% occluded, pulse-band visibility 29.3%** | band `h*0.62→h*0.875` = abs rows 1343–1706 (362.1px); **overlap with chip 0.0px, gap 31.2px → visibility 100.0%**; pixel row-overlap band∩chip = 0 rows | **CLOSED** |
+| **D2** HIGH byte-identical to BALANCED | `md5(console_tower_processing) == md5(…_quality_high)` = `442bda37…` (defect reproduced); full pulse cores visible in band: **0 / 0** (both centers at rows 1746/1835 behind the chip; only a 14px halo-sliver of the carve line at rows 1721–1734) | md5 **differ**: `492f8c36…` (BAL) vs `329975d6…` (HIGH); pulse cores in band (phase 0.35, halo-brightened carve line merged, erosion-isolated): **BALANCED = 2, HIGH = 4** | **CLOSED** |
+| **D4** chat-focus clips outer ring | scale `w/1080 = 1.0`, r3=440 → ring span y **−117.8…762.2** vs stage 0…738 → clipped both ends; pixel ring crown top row **0** (touching the bound) | scale `min(1.0, 738/1420) = 0.5197`, r3=228.7 → ring span y **93.5…550.9** → fully inside stage 0…738; pixel crown top row **77** (> 0) | **CLOSED** |
+| **D6** gateway opening reads as rim outline | opening mean-L **9.62** (reproduces the filed 9.7); warm-chroma (r>b) share in opening **2.0%**; plinth:opening 1.20:1 | opening mean-L **14.42** (+4.80, +50%); warm share **9.2%**; plinth:opening **0.80:1** (opening now the brighter, warm element); plinth face 11.59 and first stair band 40.27 unchanged, and the entire lower structure outside the opening polygon is **bit-stable pre→post (Δ +0.0000)** → the `clipPath` glow never bleeds | **CLOSED** |
+
+Region notes (reproducibility): opening = the exact gateway-opening bézier polygon (stage rows ≈912–1283); plinth face = top plinth step rows 994–1136 excluding the opening bbox; the §4/D6 "plinth 18.9" figure used a broader lower-structure sampling region — the decisive pre→post facts are the opening delta (+50% mean-L, +7.2pp warm share) and the zero-delta outside the clip.
+
+### OLED budget — re-rendered states (pre → post)
+
+| State | mean-L pre → post (Δ) | L>60 % pre → post | L>180 % pre → post |
+|---|---|---|---|
+| IDLE | 24.00 → 24.16 (+0.16) | 6.19 → 6.27 | 1.14 → 1.14 |
+| LISTENING | 25.77 → 25.92 (+0.16) | 10.68 → 10.77 | 0.94 → 0.94 |
+| TOWER_PROCESSING | 27.19 → 27.39 (+0.20) | 11.53 → 11.65 | 1.54 → 1.54 |
+| SPEAKING | 27.38 → 27.54 (+0.16) | 11.55 → 11.63 | 1.39 → 1.39 |
+| DISCONNECTED | 23.78 → 23.95 (+0.16) | 6.27 → 6.35 | 1.06 → 1.06 |
+| TRANSCRIBING | 25.66 → 25.82 (+0.16) | 8.24 → 8.32 | 1.23 → 1.23 |
+| UNDERSTANDING_LOCAL | 26.45 → 26.61 (+0.16) | 10.86 → 10.94 | 1.37 → 1.37 |
+| CONTACTING_TOWER | 26.22 → 26.42 (+0.21) | 10.81 → 10.94 | 1.29 → 1.29 |
+| REQUEST_QUEUED | 25.18 → 25.39 (+0.21) | 7.94 → 8.07 | 1.08 → 1.08 |
+| PRIVACY_MUTED | 23.93 → 24.09 (+0.16) | 6.56 → 6.65 | 1.08 → 1.08 |
+| ERROR | 24.57 → 24.73 (+0.16) | 6.89 → 6.98 | 1.06 → 1.06 |
+| IDLE (chat-focused) | 26.43 → 25.48 (−0.95) | 4.00 → 3.78 | 0.73 → 0.73 |
+| TOWER_PROCESSING @HIGH | 27.19 → 27.45 (+0.26) | 11.53 → 11.69 | 1.54 → 1.54 |
+| IDLE @LOW | 25.12 → 25.28 (+0.16) | 6.30 → 6.39 | 1.14 → 1.14 |
+
+The longer carved band (D1) and the warm glow (D6) shift mean-L by **≤ +0.26 absolute (≈0.9% relative — inside the <1% impact envelope D6 declared)**; L>180 is unchanged (max 1.54%, the pre-existing worst). Honest flag: SPEAKING (27.54) and TOWER_PROCESSING @HIGH (27.45) now sit +0.14 / +0.05 above the previous §5 worst case of 27.4 — the OLED axis holds in substance (resting states still ≈94% sub-60) and the envelope movement is bounded and declared here. The chat-focused frame gets *darker* (−0.95) because the D4 min-scale ring spreads the same bronze over fewer pixels.
+
+Residual watch-items (not reopenings): at the 0.52 chat-focus stage the screen-space chip top sits at `h*0.801`, so the *static* carved band tail (h*0.801–0.875) passes behind the chip there — no flowing state is rendered in chat focus and all three flow states render at the full-screen stage where the band is 100% clear; if IME + TOWER_PROCESSING can co-occur on-device, the same geometry applies and is worth one emulator look during the next visual pass. D3/D5/D7/D8 remain hygiene items for the next code sweep (D8 shipped in `3eac29a`, no render impact).
+
+**Updated verdict: the four narrow repairs D1/D2/D4/D6 are measurably CLOSED on the re-rendered pack (visibility 29.3%→100%, HIGH md5 diverged with 2→4 pulse cores, chat ring span −118…762 → 94…551 inside the 738px stage, opening mean-L 9.6→14.4 with zero bleed outside the clip); OLED discipline retained (worst mean-L 27.54, +0.14 over the previous worst, L>180 unchanged). PROCEED status unchanged — full legacy-visual replacement may proceed.**
+
+*Post-repair renders: 23 files in `download/graph4-monumental-preview-pack/` (re-rendered 2026-11-04); renderer synced at `scripts/render_graph4_monumental_previews.py`; measurements: `scripts/verify_graph4_postrepair.py`; no app source modified; nothing committed.*

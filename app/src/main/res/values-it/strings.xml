@@ -516,6 +516,16 @@
     <string name="mm_attr_revision">Binding di revisione</string>
     <string name="mm_attr_runtime_req">Requisito di runtime</string>
     <string name="mm_attr_provenance">Provenienza</string>
+    <string name="mm_link_no_browser">nessuna app può aprire collegamenti su questo dispositivo</string>
+    <string name="mm_link_opened">Aperto: %1$s</string>
+    <string name="mm_copied_identity">Copiato negli appunti: %1$s</string>
+    <string name="mm_retry_source_check">Ripeti la verifica sorgente</string>
+    <string name="mm_link_blocked_fmt">Verifica sorgente non riuscita per %1$s (%2$s) — non è stato aperto nulla</string>
+    <string name="mm_included_label">Incluso nell’applicazione</string>
+    <string name="mm_attr_sha256">SHA-256</string>
+    <string name="mm_copy_identity">Copia l’identità del modello</string>
+    <string name="mm_open_license">Apri la licenza</string>
+    <string name="mm_open_source">Apri la sorgente</string>
     <string name="mm_not_installed">non installato</string>
     <string name="mm_qualified_at">qualificato il %1$s</string>
     <string name="mm_usage_value">latenza %1$s · gira localmente nella sua root di archiviazione</string>
@@ -637,4 +647,11 @@ MANUAL_ADVANCED — selezione indipendente per componente, visibilità totale, n
     <string name="ob_s6_title">Configurazione completata</string>
     <string name="ob_s6_body">La console è pronta. Puoi connettere una Tower, gestire i modelli e cambiare ogni impostazione più avanti.</string>
     <string name="ob_s6_finish">Apri la Console</string>
+    <string name="diag_runtime_card">Runtime attivo</string>
+    <string name="diag_stt_engine_fmt">Riconoscimento vocale in uso: %1$s</string>
+    <string name="diag_stt_frame_fmt">Stato del modello offline: %1$s</string>
+    <string name="diag_tts_engine_fmt">Uscita vocale in uso: %1$s</string>
+    <string name="diag_llm_state_fmt">Intelligenza locale: %1$s</string>
+    <string name="diag_onnx_fmt">Runtime di inferenza: %1$s</string>
+    <string name="diag_runtime_note">Le identità sono lette dai motori attivi; gli stati non sono mai inventati.</string>
 </resources>

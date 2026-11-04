@@ -105,6 +105,36 @@ fun DiagnosticsScreen(graph: AppGraph, onOpenStudio: () -> Unit = {}, onOpenSelf
             )
         }
 
+        // GRAPH 4 FINAL §13: ACTIVE-RUNTIME READ-BACK — safe view of the live
+        // engines (identities and states only; no secrets, no raw paths).
+        SectionCard(title = stringResource(Res.string.diag_runtime_card)) {
+            Text(
+                stringResource(Res.string.diag_stt_engine_fmt, graph.activeRuntimeReadback.sttActiveEngine),
+                style = HermesType.body, color = c.ink,
+            )
+            Text(
+                stringResource(Res.string.diag_stt_frame_fmt, graph.activeRuntimeReadback.sttFrameState),
+                style = HermesType.body, color = c.ink,
+            )
+            Text(
+                stringResource(Res.string.diag_tts_engine_fmt, graph.activeRuntimeReadback.ttsActiveEngine),
+                style = HermesType.body, color = c.ink,
+            )
+            Text(
+                stringResource(Res.string.diag_llm_state_fmt, graph.activeRuntimeReadback.llmState),
+                style = HermesType.body, color = c.ink,
+            )
+            Text(
+                stringResource(Res.string.diag_onnx_fmt, graph.activeRuntimeReadback.onnxRuntime),
+                style = HermesType.body, color = c.ink,
+            )
+            Text(
+                stringResource(Res.string.diag_runtime_note),
+                style = HermesType.bodySecondary,
+                color = c.inkSecondary,
+            )
+        }
+
         SectionCard(title = stringResource(Res.string.diag_service_card)) {
             Row(horizontalArrangement = Arrangement.spacedBy(8.dp)) {
                 TruthBadge(stringResource(Res.string.diag_service_badge), c.warn)

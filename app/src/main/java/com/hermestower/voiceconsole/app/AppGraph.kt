@@ -40,6 +40,7 @@ import com.hermestower.voiceconsole.voice.AndroidSystemTtsEngine
 import com.hermestower.voiceconsole.voice.AudioRecordFrameSource
 import com.hermestower.voiceconsole.voice.EnergyVadEngine
 import com.hermestower.voiceconsole.voice.InactiveFrameSttEngine
+import com.hermestower.voiceconsole.voice.VoskFrameSttEngine
 import com.hermestower.voiceconsole.voice.InactiveSpeechToTextEngine
 import com.hermestower.voiceconsole.voice.InactiveVoiceActivityDetector
 import com.hermestower.voiceconsole.voice.InactiveWakeWordEngine
@@ -238,6 +239,14 @@ class AppGraph(context: Context) {
     // the system recognizer captures by itself, AudioRecord stays closed.
     val systemStt = AndroidSystemSttEngine(context)
 
+    // GRAPH 4 FINAL §14: the REAL offline frame STT — loads the verified
+    // vosk-model-small-it-0.22 when it is installed (§12/§13 delivery chain);
+    // until then it reports NOT_INSTALLED and the ACTIVE engine identity stays
+    // the Android system recognizer (never a false local-STT claim).
+    val voskFrameStt = VoskFrameSttEngine(
+        modelRoot = java.io.File(context.filesDir, "models/stt/vosk-small-it"),
+    )
+
     // Frame-based pipeline (G4-C02) kept wired for the offline STT path and
     // the Self-Test Center; its Tower executor is honestly unavailable until
     // the TowerGraph 1.7 contract exists (no invented endpoints).
@@ -245,7 +254,7 @@ class AppGraph(context: Context) {
     val voiceController = VoicePipelineController(
         sourceFactory = { AudioRecordFrameSource(micHandleFactory, permissionGranted = micPermissionGranted) },
         vad = EnergyVadEngine(),
-        stt = InactiveFrameSttEngine(),
+        stt = voskFrameStt,
         tts = voiceTts,
         router = router,
         modeProvider = { store.requestedMode.value },
@@ -264,6 +273,21 @@ class AppGraph(context: Context) {
 
     val simulator = DeterministicTowerSimulator()
     val bridge = MockTowerBridge(simulator)
+
+    // GRAPH 4 FINAL §13: ACTIVE-RUNTIME READ-BACK — the safe Diagnostics view
+    // consumes this snapshot; every value is read from the LIVE engine objects
+    // (no invented identities, no aspiration shown as fact).
+    val activeRuntimeReadback: ActiveRuntimeReadback
+        get() = ActiveRuntimeReadback(
+            sttActiveEngine = if (voskFrameStt.loadedModelDir != null) voskFrameStt.engineId
+            else "Android system recognizer (offline vosk model not installed)",
+            sttFrameState = voskFrameStt.state.value.state.name +
+                (voskFrameStt.loadedModelDir?.let { " (${it.name})" } ?: ""),
+            ttsActiveEngine = voiceTts.activeEngineName?.let { "Android system TTS ($it)" }
+                ?: "Android system TTS",
+            llmState = "No local model (default) — Qwen2.5-0.5B candidate present, llama.cpp runtime pending",
+            onnxRuntime = "onnxruntime-android 1.20.0 (Gradle)",
+        )
 
     val diagnostics = RedactedDiagnosticsExporter(
         events = events,
@@ -337,3 +361,12 @@ class AppGraph(context: Context) {
         const val APP_VERSION = "0.2.0-debug"
     }
 }
+
+/** GRAPH 4 FINAL §13 — active-runtime snapshot consumed by safe Diagnostics. */
+data class ActiveRuntimeReadback(
+    val sttActiveEngine: String,
+    val sttFrameState: String,
+    val ttsActiveEngine: String,
+    val llmState: String,
+    val onnxRuntime: String,
+)

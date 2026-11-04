@@ -14,8 +14,9 @@ import java.time.Instant
  *  - a required type with no verified production source (e.g. the custom Italian
  *    wake word) appears as an honest BLOCKED gap with its reason — it is never
  *    substituted silently by an unrelated model;
- *  - a bundled runtime (sherpa-onnx TTS via Gradle) appears as BUNDLED, not as a
- *    download;
+ *  - a bundled foundation (the ONNX trio + denoiser via Gradle runtimes) appears
+ *    as INCLUDED WITH THE APPLICATION, not as a download; the sherpa-onnx TTS
+ *    runtime is NOT bundled (§13 honesty correction, ACTIVE_RUNTIME_READBACK §5);
  *  - execution is sequential download → hash → atomic install → registry read-back
  *    → qualification → activation; it STOPS truthfully at the first failure and
  *    writes per-component MODEL_INSTALLATION_RECEIPTs plus a pack receipt (§7);

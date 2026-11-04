@@ -20,8 +20,10 @@ import androidx.compose.runtime.remember
 import androidx.compose.runtime.rememberCoroutineScope
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.platform.LocalClipboardManager
 import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.res.stringResource
+import androidx.compose.ui.text.AnnotatedString
 import androidx.compose.ui.unit.dp
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import com.hermestower.voiceconsole.app.AppGraph
@@ -29,8 +31,11 @@ import com.hermestower.voiceconsole.R
 import com.hermestower.voiceconsole.models.ComponentFallback
 import com.hermestower.voiceconsole.models.DeterministicTestArtifact
 import com.hermestower.voiceconsole.models.ModelInstallState
+import com.hermestower.voiceconsole.models.ModelLinks
 import com.hermestower.voiceconsole.models.ModelSha256
 import com.hermestower.voiceconsole.models.VoiceModelProfile
+import android.content.Intent
+import android.net.Uri
 import com.hermestower.voiceconsole.towersim.LocalTowerMockServer
 import com.hermestower.voiceconsole.ui.components.SectionCard
 import com.hermestower.voiceconsole.ui.components.MeanderBand
@@ -57,6 +62,7 @@ internal fun formatBytes(bytes: Long): String = when {
 fun ModelManagerScreen(graph: AppGraph) {
     val c = hermesColors
     val context = LocalContext.current
+    val clipboard = LocalClipboardManager.current
     val scope = rememberCoroutineScope()
     var selectedProfile by remember { mutableStateOf(VoiceModelProfile.TOWER_FIRST) }
     var recommendation by remember { mutableStateOf<com.hermestower.voiceconsole.models.VoicePackRecommendation?>(null) }
@@ -346,7 +352,7 @@ fun ModelManagerScreen(graph: AppGraph) {
                     AttributeLine(stringResource(R.string.mm_attr_version), entry.version)
                     AttributeLine(stringResource(R.string.mm_attr_provider), entry.provider)
                     AttributeLine(stringResource(R.string.mm_attr_license), entry.license + (entry.licenseUrl?.let { " ($it)" } ?: ""))
-                    AttributeLine(stringResource(R.string.mm_attr_install_status), record?.let { "${it.state} (v${it.version})" } ?: context.getString(R.string.mm_not_installed))
+                    AttributeLine(stringResource(R.string.mm_attr_install_status), entry.takeIf { it.entryClassification == "RUNTIME_BUNDLED" }?.let { context.getString(R.string.mm_included_label) } ?: (record?.let { "${it.state} (v${it.version})" } ?: context.getString(R.string.mm_not_installed)))
                     AttributeLine(stringResource(R.string.mm_attr_qualification), record?.lastQualificationAt?.let { context.getString(R.string.mm_qualified_at, it) } ?: entry.state)
                     AttributeLine(stringResource(R.string.mm_attr_download_size), formatBytes(entry.downloadSizeBytes))
                     AttributeLine(stringResource(R.string.mm_attr_installed_size), formatBytes(entry.installedSizeBytes))
@@ -363,7 +369,78 @@ fun ModelManagerScreen(graph: AppGraph) {
                     AttributeLine(stringResource(R.string.mm_attr_revision), entry.revisionBinding ?: context.getString(R.string.mm_na))
                     AttributeLine(stringResource(R.string.mm_attr_runtime_req), entry.runtimeRequirement ?: context.getString(R.string.mm_na))
                     AttributeLine(stringResource(R.string.mm_attr_provenance), entry.provenanceNote ?: context.getString(R.string.mm_provenance_unverified))
+                    AttributeLine(stringResource(R.string.mm_attr_sha256), entry.sha256)
                     entry.knownLimitations.forEach { Text("• $it", style = HermesType.bodySecondary, color = c.inkSecondary) }
+
+                    // ---- GRAPH 4 FINAL §12: REAL, physically clickable links. ----
+                    // The open action validates first (directive pre-conditions);
+                    // a blocked or un-openable link NEVER substitutes a source —
+                    // it shows the localized explanation and offers the retry.
+                    Row(horizontalArrangement = Arrangement.spacedBy(4.dp)) {
+                        TextButton(onClick = {
+                            val check = ModelLinks.validateForOpen(entry.sourceUri)
+                            if (!check.ok) {
+                                statusNote = context.getString(
+                                    R.string.mm_link_blocked_fmt,
+                                    context.getString(R.string.mm_open_source),
+                                    check.reason ?: "?",
+                                )
+                            } else {
+                                runCatching {
+                                    context.startActivity(
+                                        Intent(Intent.ACTION_VIEW, Uri.parse(entry.sourceUri)),
+                                    )
+                                    statusNote = context.getString(R.string.mm_link_opened, entry.sourceUri)
+                                }.onFailure {
+                                    statusNote = context.getString(
+                                        R.string.mm_link_blocked_fmt,
+                                        context.getString(R.string.mm_open_source),
+                                        context.getString(R.string.mm_link_no_browser),
+                                    )
+                                }
+                            }
+                        }) { Text(stringResource(R.string.mm_open_source)) }
+                        TextButton(onClick = {
+                            val check = ModelLinks.licenseCheck(entry)
+                            if (!check.ok) {
+                                statusNote = context.getString(
+                                    R.string.mm_link_blocked_fmt,
+                                    context.getString(R.string.mm_open_license),
+                                    check.reason ?: "?",
+                                )
+                            } else {
+                                val url = entry.licenseUrl!!
+                                runCatching {
+                                    context.startActivity(Intent(Intent.ACTION_VIEW, Uri.parse(url)))
+                                    statusNote = context.getString(R.string.mm_link_opened, url)
+                                }.onFailure {
+                                    statusNote = context.getString(
+                                        R.string.mm_link_blocked_fmt,
+                                        context.getString(R.string.mm_open_license),
+                                        context.getString(R.string.mm_link_no_browser),
+                                    )
+                                }
+                            }
+                        }) { Text(stringResource(R.string.mm_open_license)) }
+                        TextButton(onClick = {
+                            clipboard.setText(AnnotatedString(entry.identity))
+                            statusNote = context.getString(R.string.mm_copied_identity, entry.identity)
+                        }) { Text(stringResource(R.string.mm_copy_identity)) }
+                        TextButton(onClick = {
+                            // Retry source check — re-runs the directive §12
+                            // pre-conditions and reports the result honestly.
+                            val check = ModelLinks.validateForOpen(entry.sourceUri)
+                            statusNote = if (check.ok) {
+                                context.getString(R.string.mm_link_opened, entry.sourceUri)
+                            } else {
+                                context.getString(
+                                    R.string.mm_link_blocked_fmt,
+                                    context.getString(R.string.mm_retry_source_check),
+                                    check.reason ?: "?",
+                                )
+                            }
+                        }) { Text(stringResource(R.string.mm_retry_source_check)) }
+                    }
                 }
 
                 // ---------- D. Lifecycle actions (all wired to the real engine) ----------

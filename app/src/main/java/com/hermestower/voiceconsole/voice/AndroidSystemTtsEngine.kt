@@ -25,6 +25,11 @@ class AndroidSystemTtsEngine(private val context: Context) : TtsEngine {
     private var tts: TextToSpeech? = null
     private var ready = false
 
+    /** GRAPH 4 FINAL §13: the ACTUAL system engine identity (read-back). */
+    @Volatile
+    var activeEngineName: String? = null
+        private set
+
     private val initListener = TextToSpeech.OnInitListener { status ->
         ready = status == TextToSpeech.SUCCESS
         if (ready) {
@@ -32,6 +37,8 @@ class AndroidSystemTtsEngine(private val context: Context) : TtsEngine {
             // (state stays READY but the pipeline reports the engine as usable
             // only when speak() succeeds — no invented qualification).
             runCatching { tts?.language = Locale.ITALY }
+            // §13 read-back: capture the ACTUAL engine package (honest identity).
+            activeEngineName = runCatching { tts?.defaultEngine }.getOrNull()
             _state.value = TtsOutput(TtsState.READY)
         } else {
             _state.value = TtsOutput(TtsState.FAILED, error = "Android system TTS init failed (status $status)")

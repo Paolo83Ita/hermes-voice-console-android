@@ -516,6 +516,16 @@
     <string name="mm_attr_revision">Revisionsbindung</string>
     <string name="mm_attr_runtime_req">Laufzeitanforderung</string>
     <string name="mm_attr_provenance">Herkunft</string>
+    <string name="mm_link_no_browser">keine App kann Links auf diesem Gerät öffnen</string>
+    <string name="mm_link_opened">Geöffnet: %1$s</string>
+    <string name="mm_copied_identity">In die Zwischenablage kopiert: %1$s</string>
+    <string name="mm_retry_source_check">Quellenprüfung wiederholen</string>
+    <string name="mm_link_blocked_fmt">Quellenprüfung für %1$s fehlgeschlagen (%2$s) — nichts wurde geöffnet</string>
+    <string name="mm_included_label">Mit der Anwendung enthalten</string>
+    <string name="mm_attr_sha256">SHA-256</string>
+    <string name="mm_copy_identity">Modell-Identität kopieren</string>
+    <string name="mm_open_license">Lizenz öffnen</string>
+    <string name="mm_open_source">Quelle öffnen</string>
     <string name="mm_not_installed">nicht installiert</string>
     <string name="mm_qualified_at">qualifiziert am %1$s</string>
     <string name="mm_usage_value">%1$s Latenz · läuft lokal in seinem Speicherroot</string>
@@ -637,4 +647,11 @@ MANUAL_ADVANCED — unabhängige Auswahl pro Komponente, volle Sichtbarkeit, kei
     <string name="ob_s6_title">Einrichtung abgeschlossen</string>
     <string name="ob_s6_body">Die Konsole ist bereit. Sie können später eine Tower verbinden, Modelle verwalten und jede Einstellung ändern.</string>
     <string name="ob_s6_finish">Konsole öffnen</string>
+    <string name="diag_runtime_card">Aktive Laufzeit</string>
+    <string name="diag_stt_engine_fmt">Spracherkennung in Verwendung: %1$s</string>
+    <string name="diag_stt_frame_fmt">Status des Offline-Modells: %1$s</string>
+    <string name="diag_tts_engine_fmt">Sprachausgabe in Verwendung: %1$s</string>
+    <string name="diag_llm_state_fmt">Lokale Intelligenz: %1$s</string>
+    <string name="diag_onnx_fmt">Inferenz-Laufzeit: %1$s</string>
+    <string name="diag_runtime_note">Identitäten werden von den aktiven Engines gelesen; Zustände werden nie erfunden.</string>
 </resources>

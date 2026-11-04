@@ -516,6 +516,16 @@
     <string name="mm_attr_revision">Revision binding</string>
     <string name="mm_attr_runtime_req">Runtime requirement</string>
     <string name="mm_attr_provenance">Provenance</string>
+    <string name="mm_link_no_browser">no app can open links on this device</string>
+    <string name="mm_link_opened">Opened: %1$s</string>
+    <string name="mm_copied_identity">Copied to clipboard: %1$s</string>
+    <string name="mm_retry_source_check">Retry source check</string>
+    <string name="mm_link_blocked_fmt">Source check failed for %1$s (%2$s) — nothing was opened</string>
+    <string name="mm_included_label">Included with the application</string>
+    <string name="mm_attr_sha256">SHA-256</string>
+    <string name="mm_copy_identity">Copy model identity</string>
+    <string name="mm_open_license">Open license</string>
+    <string name="mm_open_source">Open source</string>
     <string name="mm_not_installed">not installed</string>
     <string name="mm_qualified_at">qualified at %1$s</string>
     <string name="mm_usage_value">%1$s latency · runs locally in its storage root</string>
@@ -637,4 +647,11 @@ MANUAL_ADVANCED — independent per-component selection, full visibility, no sil
     <string name="ob_s6_title">Setup complete</string>
     <string name="ob_s6_body">The console is ready. You can connect a Tower, manage models and change every setting later.</string>
     <string name="ob_s6_finish">Open the Console</string>
+    <string name="diag_runtime_card">Active runtime</string>
+    <string name="diag_stt_engine_fmt">Speech recognition in use: %1$s</string>
+    <string name="diag_stt_frame_fmt">Offline model state: %1$s</string>
+    <string name="diag_tts_engine_fmt">Voice output in use: %1$s</string>
+    <string name="diag_llm_state_fmt">Local intelligence: %1$s</string>
+    <string name="diag_onnx_fmt">Inference runtime: %1$s</string>
+    <string name="diag_runtime_note">Identities are read from the live engines; states are never invented.</string>
 </resources>

@@ -275,7 +275,7 @@
       "upstreamRepo": "https://github.com/Xiaobin-Rong/gtcrn",
       "revisionBinding": "sherpa-onnx release tag speech-enhancement-models (asset pinned by sha256)",
       "licenseUrl": "https://github.com/Xiaobin-Rong/gtcrn",
-      "runtimeRequirement": "sherpa-onnx-android denoiser API (Gradle)",
+      "runtimeRequirement": "onnxruntime-android 1.20.0 (Gradle) — INTEGRATED (GtcrnDenoiserEngine, real ORT inference)",
       "provenanceNote": "Downloaded and SHA-256-verified 2026-11-02 (535,638 bytes); upstream license read from the Xiaobin-Rong/gtcrn GitHub API (MIT).",
       "recommended": false,
       "optionalComponent": true
@@ -315,8 +315,8 @@
       "upstreamRepo": "https://github.com/alphacep/vosk-api",
       "revisionBinding": "model small-it-0.22 (frozen archive URL on alphacephei.com)",
       "licenseUrl": "https://github.com/alphacep/vosk-api/blob/master/LICENSE",
-      "runtimeRequirement": "com.alphacephei:vosk-android (Gradle, Maven Central)",
-      "provenanceNote": "Downloaded from alphacephei.com and SHA-256-verified 2026-11-02 (49,665,141 bytes).",
+      "runtimeRequirement": "com.alphacephei:vosk-android:0.3.75 (Gradle, Maven Central) — INTEGRATED (Graph 4 FINAL §14)",
+      "provenanceNote": "Downloaded from alphacephei.com and SHA-256-verified 2026-11-02 (49,665,141 bytes). Runtime integrated as of Graph 4 FINAL: vosk-android 0.3.75 consumes this model from filesDir/models/stt/vosk-small-it.",
       "recommended": true,
       "optionalComponent": false
     },
@@ -325,7 +325,7 @@
       "identity": "org.sherpa-onnx.tts.runtime",
       "displayName": "sherpa-onnx TTS runtime",
       "version": "gradle-pinned",
-      "sourceUri": "gradle://sherpa-onnx-android",
+      "sourceUri": "unresolved://tts-runtime/sherpa-onnx-android",
       "provider": "k2-fsa (sherpa-onnx)",
       "license": "Apache-2.0",
       "licenseApproved": true,
@@ -350,12 +350,12 @@
         "Code runtime, not a downloadable model: ships inside the APK via the Gradle dependency (RUNTIME_BUNDLED).",
         "The exact Gradle coordinate and version are pinned in gradle/libs.versions.toml; no separate download is offered."
       ],
-      "entryClassification": "RUNTIME_BUNDLED",
+      "entryClassification": "CANDIDATE_PENDING_DISCOVERY",
       "upstreamRepo": "https://github.com/k2-fsa/sherpa-onnx",
-      "revisionBinding": "pinned in gradle/libs.versions.toml",
+      "revisionBinding": null,
       "licenseUrl": "https://github.com/k2-fsa/sherpa-onnx/blob/master/LICENSE",
-      "runtimeRequirement": "Gradle dependency (bundled)",
-      "provenanceNote": "Engine code verified as the upstream project k2-fsa/sherpa-onnx (Apache-2.0); asset-level hash does not apply.",
+      "runtimeRequirement": "sherpa-onnx Android runtime — PENDING INTEGRATION (pre-built AAR ships via k2-fsa GitHub releases; not on Maven Central)",
+      "provenanceNote": "HONESTY CORRECTION (Graph 4 FINAL §13, 2026-11-04): this runtime was previously labeled RUNTIME_BUNDLED/pinned-in-gradle, which was FALSE — no sherpa-onnx dependency exists in the build. The ACTIVE TTS path is the Android system engine; the natural Piper voices stay real downloadable candidates pending this runtime.",
       "recommended": true,
       "optionalComponent": false
     },
@@ -395,7 +395,7 @@
       "upstreamRepo": "https://github.com/rhasspy/piper-voices",
       "revisionBinding": "sherpa-onnx release tag tts-models (asset pinned by sha256)",
       "licenseUrl": "https://github.com/rhasspy/piper-voices/blob/master/LICENSE",
-      "runtimeRequirement": "sherpa-onnx TTS (bundled runtime)",
+      "runtimeRequirement": "sherpa-onnx TTS runtime — PENDING INTEGRATION (active path today: Android system TTS)",
       "provenanceNote": "Downloaded from the k2-fsa/sherpa-onnx tts-models release and SHA-256-verified 2026-11-02 (26,496,614 bytes).",
       "recommended": true,
       "optionalComponent": false
@@ -434,7 +434,7 @@
       "upstreamRepo": "https://github.com/rhasspy/piper-voices",
       "revisionBinding": "sherpa-onnx release tag tts-models (asset pinned by sha256)",
       "licenseUrl": "https://github.com/rhasspy/piper-voices/blob/master/LICENSE",
-      "runtimeRequirement": "sherpa-onnx TTS (bundled runtime)",
+      "runtimeRequirement": "sherpa-onnx TTS runtime — PENDING INTEGRATION (active path today: Android system TTS)",
       "provenanceNote": "Downloaded from the k2-fsa/sherpa-onnx tts-models release and SHA-256-verified 2026-11-02 (67,221,173 bytes).",
       "recommended": false,
       "optionalComponent": true
