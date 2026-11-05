@@ -1064,3 +1064,22 @@ COMMIT: (this commit).
 CHECKPOINT: CP-G4-023 fix 8 (R-18..R-22); CP-G4-024 STAGED.
 NEXT: the push run at the fix-8 tip arbitrates ITALIAN_UI_COMPLETE (or the next
 typed row).
+
+## G4-N30 — CP-G4-023 fix 9 / R-23 (transport recovery at class boundaries)
+
+Run #138 (42009479297 @ 29447ae): the fix-8 repairs were live (the R-18 pattern
+log-proven; R-17 gate OK; both installs OK; A1 PASSED for the 3rd consecutive
+cloud sample) and the guest died DURING gate A2 — death #10, the stream broke,
+every later boundary typed DEVICE_OFFLINE_ABORT, honest verdict. Run #137
+already PROVED a healthy sample completes the whole model. Repair R-23 (the
+R-14/R-17 precedent): one bounded ~45 s transport recovery (adb reconnect
+offline + kill/start-server) at every class boundary BEFORE the typed abort —
+recovered → the remaining classes continue; not recovered → unchanged typed
+abort. Gate/regression/residual guards + cap 300→310 (≈273 min worst case).
+No test deleted, skipped or weakened; no assertion touched.
+FILES: .github/workflows/android-e2e.yml; docs/governance/
+{ITALIAN_GATE_NAVIGATION_FAILURE_LEDGER,WORK_LOG,GRAPH46_READBACK,CHECKPOINT_INDEX}.md.
+COMMIT: (this commit).
+CHECKPOINT: CP-G4-023 fix 9 (R-23); CP-G4-024 STAGED.
+NEXT: the push run at the fix-9 tip arbitrates ITALIAN_UI_COMPLETE (or the next
+typed row).

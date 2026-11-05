@@ -334,3 +334,15 @@ diagnosable from the log alone. Gate B: no code change — the infrastructure
 rerun channel (R-15 precedent).
 
 No test deleted, skipped or weakened; no assertion touched.
+
+## R-23 — mid-gate transport death #10; typed bounded recovery at every class boundary (run #138 42009479297 @ 29447ae)
+
+| Field | Value |
+| --- | --- |
+| Run ID / commit | #138 (job 127184526362, 10:17→11:06 UTC) @ 29447ae (fix 8 tip, fetch-verified) |
+| What WORKED | the fix-8 repairs were LIVE: the R-18 singular pattern is in the executed script (log-proven); the R-17 guest health gate passed (10:37:12); both APKs installed (10:51/10:52); **gate A1 PASSED for the 3rd consecutive cloud sample** (STATUS_CODE 0 at 11:04:36 — the R-16 240 s policy holds; A1 green at bba1ebc, #137, #138) |
+| Failure | **fleet death #10 (7 infra failures in 11 executions)**: the guest died DURING gate A2 (A2's start marker printed 11:04:36, then the stream broke — the host-side `am instrument` exited with the partial file; `adb get-state` failed at every later boundary) → A = no verdict (honest), B–F + regression + residual = typed `DEVICE_OFFLINE_ABORT` (the containment worked exactly as designed), `E2E_VERDICT_FAILED` printed honestly |
+| Pattern | run #137 SURVIVED the entire instrumentation (proof a healthy sample completes); 6 of the last 9 E2E executions died — the fleet is the binding constraint, the code repairs (R-18..R-22) await a healthy sample to arbitrate |
+| Typed classification | **INFRASTRUCTURE_FAILURE (E2E_BLOCKED_EMULATOR_ENVIRONMENT — mid-class transport death)** |
+| Narrow repair | **R-23** (the R-14/R-17 precedent): at EVERY class boundary the offline-guard first attempts ONE bounded transport recovery (`adb reconnect offline` + `adb kill-server`/`start-server`, ≈45 s) and re-checks `adb get-state` — recovered → the remaining classes CONTINUE (a dead class's evidence is already written; the REAL walks unchanged); not recovered → the same typed abort (unchanged). Applied to the gate loop, the regression loop and the residual guard. Job cap 300→310 (worst case ≈273 min with recoveries at every one of the 13 boundaries; hosted ceiling 360) |
+| Complete gate rerun | THIS commit's push run |

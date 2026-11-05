@@ -281,3 +281,29 @@ This governance commit's push run is the deciding evidence: gate 6/6
 ITALIAN_UI_REPORT §6 and GRAPH_46_TERMINAL_RECEIPT §2 ONLY from that run → then,
 and only then, §10 terminality. Any other outcome → next typed ledger row +
 narrow repair + full rerun.
+
+## 10. §0 fresh read-back — session of 2026-11-05, part 3 (fix 9 / R-23)
+
+### 10.1 Authority + cloud evidence
+
+| Item | Result |
+| --- | --- |
+| Push-verified tip | `29447ae` (fix 8) — pushed and run-confirmed this session |
+| Build at 29447ae | **SUCCESS** (42009479286 — the R-19/20/21/22 Kotlin edits compile; unit + lint green) |
+| E2E #138 (42009479297) | fleet death #10 DURING gate A2 — A1 PASSED (3rd consecutive cloud sample); fix-8 repairs LIVE (the R-18 pattern log-proven); containment typed everywhere; honest verdict |
+| Statistics | 7 infra failures in 11 E2E executions; #137 PROVES a healthy sample completes the whole model |
+
+### 10.2 Repair executed (fix 9 / R-23)
+
+ONE bounded ≈45 s transport recovery (`adb reconnect offline` + adb-server
+restart) at EVERY class boundary BEFORE the typed abort — recovered → remaining
+classes continue; not recovered → unchanged typed abort. Cap 310 (≈273 min
+worst case). No test deleted, skipped or weakened.
+
+### 10.3 Untouched terminality + Next Exact Action
+
+Both placeholders remain INTACT; ITALIAN_UI_COMPLETE still not claimed; CP-G4-024
+STAGED. This commit's push run is the deciding evidence: gate 6/6 green +
+regression green-or-typed + residual typed → fill the two placeholders ONLY from
+that run → §10 terminality. Any other outcome → next typed row + narrow repair +
+full rerun.
