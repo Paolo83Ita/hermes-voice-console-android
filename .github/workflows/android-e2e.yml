@@ -306,8 +306,6 @@ jobs:
           path: VERDICT.txt
           if-no-files-found: ignore
           retention-days: 14
-          if-no-files-found: ignore
-          retention-days: 14
 
       - name: Shut down emulator cleanly
         if: always()
