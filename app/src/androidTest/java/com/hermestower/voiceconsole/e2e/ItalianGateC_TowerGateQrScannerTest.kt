@@ -37,7 +37,14 @@ class ItalianGateC_TowerGateQrScannerTest {
         compose.gateSwitchLocaleAndAwait("it")
 
         // ---- Tower Gate (Connection) through the drawer row. ----
-        compose.gateNavigate(R.string.dest_connect, R.string.connection_title)
+        // R-19 (run 41990077345 @ e89d014 — dump-proven navigation defect): the
+        // segment used dest_connect, but the drawer row "Connetti a Hermes
+        // Tower" routes DIRECTLY to the Tower Studio (AppRoutes.TOWER_STUDIO,
+        // AppNav.kt) — the open-studio control lives on the CONNECTION screen
+        // (dest_connection → AppRoutes.CONNECTION), so the old step could never
+        // find it. The walk now follows the REAL product path: Connection
+        // screen → open-studio → Tower Studio → scanner → back.
+        compose.gateNavigate(R.string.dest_connection, R.string.connection_title)
         violations += compose.gateCollectViolations("Tower Gate (connection)", pool)
 
         // ---- Tower Connection Studio through the REAL control. ----

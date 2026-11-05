@@ -1035,3 +1035,32 @@ COMMIT: (this commit).
 CHECKPOINT: CP-G4-023 fix 7 (R-17); CP-G4-024 STAGED.
 NEXT: the push run at the R-17 tip arbitrates ITALIAN_UI_COMPLETE (or the next
 typed row).
+
+## G4-N29 — CP-G4-023 fix 8 (run #137 full-matrix evidence → R-18..R-22)
+
+Run #137 (41990077345 @ e89d014, 1 h 27 m) was the FIRST run in 10 E2E
+executions to complete the entire instrumentation phase: the R-17 guest health
+gate passed, both APKs installed, all six gate classes + six regression classes
++ residual ran, the verdict printed honestly (E2E_VERDICT_FAILED). The parsed
+evidence re-classified: gates A+F truly PASSED (F was a classification
+false-negative: `OK (1 test)` singular vs the plural-only pattern — R-18);
+gate C was a PROVEN navigation defect (dest_connect routes to the Tower Studio
+directly; the open-studio control lives on dest_connection — R-19); gate E's
+"missing" categories were dump-proven VISIBLE uppercase (R-20); onboarding's
+regression failure was the same case-transform class on the harness waitForText
+(R-22); gate D's hub fallback awaited a row label that body text can false-match
+and left no evidence — the fallback now awaits the hub TITLE, retries the
+unmerged tree, and dumps visible texts (R-21); gate B was a fleet-speed
+infrastructure failure (baseline consumed 899/900 s, ColorBuffer errors in the
+window). Repairs: workflow classification accepts singular+plural at all five
+sites; gate C walks the real product path; gate E + waitForText match
+ignoreCase (R-8 lineage, matcher-only, banned-English classifier unchanged);
+gateNavigateTo robustness + observability. No test deleted, skipped or weakened.
+FILES: .github/workflows/android-e2e.yml; app/src/androidTest/java/com/
+hermestower/voiceconsole/e2e/{ItalianGateSupport,ItalianGateC_TowerGateQrScannerTest,
+ItalianGateE_SettingsAppearanceLanguageTest,E2ECommon}.kt; docs/governance/
+{ITALIAN_GATE_NAVIGATION_FAILURE_LEDGER,WORK_LOG,GRAPH46_READBACK,CHECKPOINT_INDEX}.md.
+COMMIT: (this commit).
+CHECKPOINT: CP-G4-023 fix 8 (R-18..R-22); CP-G4-024 STAGED.
+NEXT: the push run at the fix-8 tip arbitrates ITALIAN_UI_COMPLETE (or the next
+typed row).

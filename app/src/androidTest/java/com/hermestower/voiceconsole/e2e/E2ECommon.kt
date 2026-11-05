@@ -251,7 +251,14 @@ fun HermesComposeRule.pumpUntil(timeoutMs: Long = 20_000, condition: () -> Boole
 }
 
 fun HermesComposeRule.waitForText(text: String, timeoutMs: Long = 20_000) {
-    pumpUntil(timeoutMs) { onAllNodesWithText(text, substring = true).fetchSemanticsNodes().isNotEmpty() }
+    // R-22 (run 41990077345 @ e89d014 — dump-proven): SectionCard titles render
+    // CASE-TRANSFORMED (Chrome.kt uppercases the title — the onboarding step 2
+    // shows "CONNECT TO HERMES TOWER" while the resource is "Connect to Hermes
+    // Tower"), so a case-sensitive wait can never see the composed text.
+    // Matching is ignoreCase (the R-8 semantics: the matcher follows the
+    // rendered typography; nothing about the assertions or the banned-English
+    // classifier changes).
+    pumpUntil(timeoutMs) { onAllNodesWithText(text, substring = true, ignoreCase = true).fetchSemanticsNodes().isNotEmpty() }
 }
 
 /** Bounded diagnostics for anchor-timeout triage (labels only, no secrets). */

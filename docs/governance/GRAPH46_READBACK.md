@@ -225,3 +225,59 @@ or weakened). This governance commit's push run is the deciding evidence: gate
 ITALIAN_UI_REPORT §6 and GRAPH_46_TERMINAL_RECEIPT §2 ONLY from that run → then,
 and only then, §10 terminality. Any other outcome → next typed ledger row +
 narrow repair + full rerun.
+
+## 9. §0 fresh read-back — session of 2026-11-05, part 2 (fix 8 / R-18..R-22)
+
+### 9.1 Authority verification
+
+| Check | Result |
+| --- | --- |
+| Remote tip after the fix-7 push | `e89d014` (CP-G4-023 fix 7 / R-17) — pushed from this session, fetch-echo confirmed (`982877c..e89d014`) |
+| `main` | untouched; forward-only history preserved |
+
+### 9.2 Cloud evidence at e89d014 (parsed from the FULL job log THIS session)
+
+| Run | Workflow | Outcome |
+| --- | --- | --- |
+| 41990077160 | android-debug-build | **SUCCESS** at e89d014 |
+| 41990077345 (#137) | android-e2e | **FIRST FULL-INSTRUMENTATION EVIDENCE in 10 E2E executions** (1 h 27 m): R-17 GUEST_HEALTH_OK → both APKs installed → gates A–F all invoked (A OK 2 tests 588.6 s; B timeout-killed at ~899 s with only the start header — fleet-speed baseline stall with ColorBuffer errors; C FAIL open-studio-not-found; D FAIL hub-row-not-found; E FAIL categories-reported-missing; F **OK (1 test)** 239.0 s but counted FAILED) → regression per-class (FreshInstall residual-typed; **LifecycleProfile OK (1 test) but counted FAILED**; ModelManager residual-typed; Onboarding FAIL 20 s case-sensitive wait vs "CONNECT TO HERMES TOWER"; SelfTest residual-typed; VoiceFlow OK (6 tests)) → residual typed (the dispositioned signature — expected) → E2E_VERDICT_FAILED printed honestly |
+| TRUE tally after re-classification | — | gates **A+F = 2/6 truly green**; regression **2 OK + 3 residual-typed + 1 real failure (onboarding, R-22)**; residual typed ✓ |
+
+### 9.3 The typed findings (ledger R-18..R-22) and the repairs (fix 8)
+
+- **R-18** harness false-negative: the classification pattern was plural-only —
+  `OK (1 test)` (the instrument's SINGULAR verdict) counted as failure (gate F,
+  regression LifecycleProfile). Repaired at ALL five sites with
+  `grep -qE 'OK \([0-9][0-9]* tests?\)'` — a FALSE-NEGATIVE repair (the opposite
+  of flake-hiding), nothing weakened.
+- **R-19** gate C navigation defect (route-table-proven): dest_connect routes
+  DIRECTLY to AppRoutes.TOWER_STUDIO; the open-studio control lives on the
+  CONNECTION screen (dest_connection). The walk now follows the real product
+  path: Connection → open-studio → Tower Studio → scanner → back.
+- **R-20** gate E: the failure dump PROVED all six categories visible
+  ("GENERALE", "CONNESSIONE ALLA TORRE", "DISPLAY" — SectionCard uppercases
+  titles); the case-sensitive contains() could never match → ignoreCase (R-8
+  lineage, matcher-only).
+- **R-21** gateNavigateTo: the fallback awaits the Settings hub TITLE (the row
+  label can false-match body text — the VOICE engine_row contains "Modelli e
+  voce"), the hub-row lookup retries on the unmerged tree, and the not-found
+  error now carries gateVisibleTexts() (observability contract = gateAwaitAnchor).
+  Gate D's drawer-row lookup mechanism stays UNRESOLVED-by-evidence — the next
+  occurrence decides from the dump.
+- **R-22** waitForText ignoreCase (the onboarding regression failure class).
+- **Gate B**: no code change — fleet-speed infrastructure failure (baseline
+  consumed 899/900 s; C/D/E/F baselines normal minutes later) → the R-15 rerun
+  channel.
+
+### 9.4 Untouched terminality
+
+The two placeholders (GRAPH_46_TERMINAL_RECEIPT §2, ITALIAN_UI_REPORT §6) remain
+INTACT — ITALIAN_UI_COMPLETE is still not claimed anywhere; CP-G4-024 STAGED.
+
+### 9.5 Next Exact Action (executed this session → CP-G4-023 fix 8)
+
+This governance commit's push run is the deciding evidence: gate 6/6
+`OK (… test[s])` + per-class regression green-or-typed + residual typed → fill
+ITALIAN_UI_REPORT §6 and GRAPH_46_TERMINAL_RECEIPT §2 ONLY from that run → then,
+and only then, §10 terminality. Any other outcome → next typed ledger row +
+narrow repair + full rerun.

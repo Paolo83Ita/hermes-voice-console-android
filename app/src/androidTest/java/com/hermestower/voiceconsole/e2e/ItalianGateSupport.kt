@@ -363,11 +363,30 @@ fun HermesComposeRule.gateNavigateTo(labelRes: Int, anchor: String, timeoutMs: L
     if (!gateActivateRow(label)) {
         val settingsLabel = ItalianGate.localizedString(R.string.dest_settings, "it")
         check(gateActivateRow(settingsLabel)) { "Settings row missing from drawer (it)" }
-        gateAwaitAnchor(label, timeoutMs = 30_000)
+        // R-21 (run 41990077345 @ e89d014): the fallback used to await the ROW
+        // label itself — but hub body text can contain the same words (the VOICE
+        // section's engine_row contains "Modelli e voce"), so the await could
+        // pass while the hub was never proven. The fallback now awaits the
+        // Settings hub TITLE (the hub identity), then looks the row up.
+        gateAwaitAnchor(ItalianGate.localizedString(R.string.settings_title, "it"), timeoutMs = 30_000)
+        // R-21: the lookup tries the merged tree first, then the UNMERGED tree
+        // (a clickable whose label lives in a non-merged child is still the real
+        // control); both lookups are matcher-only — nothing weakened.
         val hubRow = runCatching {
             onAllNodesWithText(label, substring = true, ignoreCase = true).fetchSemanticsNodes()
                 .firstOrNull { it.config[SemanticsActions.OnClick]?.action != null }
-        }.getOrNull() ?: error("settings-hub row '$label' not found (it)")
+        }.getOrNull() ?: runCatching {
+            onAllNodesWithText(label, substring = true, ignoreCase = true, useUnmergedTree = true)
+                .fetchSemanticsNodes()
+                .firstOrNull { it.config[SemanticsActions.OnClick]?.action != null }
+        }.getOrNull()
+        // R-21: the error now carries the visible semantics (Text +
+        // contentDescription) — the same observability contract as
+        // gateAwaitAnchor — so a repeat is diagnosable from the log alone.
+            ?: error(
+                "settings-hub row '$label' not found (it); visible texts: " +
+                    gateVisibleTexts().take(40),
+            )
         val click = hubRow.config[SemanticsActions.OnClick]?.action
             ?: error("settings-hub row '$label' has no OnClick (it)")
         androidx.test.platform.app.InstrumentationRegistry.getInstrumentation().runOnMainSync { click() }

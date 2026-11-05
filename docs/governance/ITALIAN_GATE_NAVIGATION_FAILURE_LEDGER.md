@@ -295,3 +295,42 @@ isolation), not the disposition.
 | Typed classification | **INFRASTRUCTURE_FAILURE (E2E_BLOCKED_EMULATOR_ENVIRONMENT — post-boot service collapse)** |
 | Narrow repair | **R-17** (R-14/R-16 precedent: ONE typed bounded recovery for the ONE evidence-proven collapse mode): a guest health gate before the installs — `pm list packages` probe; dead → `adb reboot` + bounded re-wait 1200 s (observed cold boots 968–1110 s; warm reboots faster) + sleep-60 settle + ONE re-probe; still dead → typed `E2E_BLOCKED_EMULATOR_ENVIRONMENT` honest abort; healthy → the real walk proceeds UNCHANGED. Both install lines additionally typed (`… || { echo 'E2E_BLOCKED_EMULATOR_ENVIRONMENT — …'; exit 1; }`) so non-collapse failures abort honestly WITHOUT a blind retry (a flake-hiding retry would be dishonest). Exactly ONE recovery per run keeps the 300-min cap arithmetic safe (worst case ≈289 min: build 8 + boot 40 + settle 6 + recovery 23 + installs 30 + gates 90 + regression 60 + residual 15 + evidence 15) |
 | Complete gate rerun | THIS commit's push run (the deciding evidence channel, unchanged) |
+
+## R-18 — the FIRST full-instrumentation run: the harness miscounted REAL passes (run #137 41990077345 @ e89d014, 2026-11-05 07:50→09:18 UTC)
+
+The R-17 health gate WORKED (GUEST_HEALTH_OK at T+60s, both APKs installed, ZERO
+fleet deaths) and the per-class model ran to completion for the first time in 10
+E2E executions. Honest verdict E2E_VERDICT_FAILED. The evidence re-classified:
+
+| Segment | Printed result | TRUE result (evidence) |
+| --- | --- | --- |
+| Gate A (588.6 s) | OK (2 tests) → counted | **PASSED** (A1+A2 — the R-16 240 s policy held) |
+| Gate B | timeout 900 killed at ~899 s, only the stream header | **FLEET-SPEED INFRASTRUCTURE FAILURE**: the baseline consumed the whole class budget (test STARTED at 08:50:04 = second 899); ColorBuffer errors 08:47–08:50 in the window; C/D/E/F baselines normal minutes later — not a code property |
+| Gate C (156.9 s) | FAIL: open-studio control not found (it) | **TEST_NAVIGATION_DEFECT (R-19)**: dest_connect routes DIRECTLY to the Tower Studio (AppNav: Destination(TOWER_STUDIO, dest_connect)) — the open-studio control lives on the CONNECTION screen (dest_connection); the step could never succeed |
+| Gate D (146.2 s) | FAIL: settings-hub row 'Modelli e voce' not found | **HARNESS ROBUSTNESS (R-21)**: drawer-row lookup failed (mechanism unresolved — no dump existed) AND the fallback awaited the ROW label, which the VOICE section's engine_row text ("…in attesa in Modelli e voce…") can false-match; the hub-row OnClick lookup then failed without evidence |
+| Gate E (112.8 s) | FAIL: missing [Generale, Connessione alla Torre, Display] | **TEST_ANCHOR_DEFECT (R-20)**: the failure dump PROVES all six categories visible — "GENERALE", "CONNESSIONE ALLA TORRE", "DISPLAY" (SectionCard uppercases titles, Chrome.kt) — the case-sensitive contains() could never match |
+| Gate F (239.0 s) | counted FAILED | **PASSED — FALSE NEGATIVE (R-18)**: the instrument prints `OK (1 test)` (SINGULAR) and the classification pattern `OK ([0-9][0-9]* tests)` (plural-only) missed it |
+| Regression | ok=1 residual=3 failed=[Lifecycle, Onboarding] | **TRUE: ok=2** (LifecycleProfile `OK (1 test)` miscounted by R-18; VoiceFlow `OK (6 tests)`) **+ residual-typed 3** (FreshInstall/ModelManager/SelfTest — the dispositioned signature, job-neutral by design) **+ 1 real failure**: e2e_onboarding_sixSteps_reachConsole waited 20 s for "Connect to Hermes Tower" while the screen shows "CONNECT TO HERMES TOWER" → **R-22 (R-8 lineage)** |
+| Residual | dispositioned signature | typed ✓ (expected, PHYSICAL_XIAOMI_RECOVERY_REQUIRED) |
+
+**R-18 (harness false-negative)**: classification accepts `OK (N test)` AND
+`OK (N tests)` — `grep -qE 'OK \([0-9][0-9]* tests?\)'` at ALL sites (gate loop,
+regression loop, experiment check, verdict loop, residual check). This is a
+FALSE-NEGATIVE repair (a real pass was counted as a failure — the OPPOSITE of
+flake-hiding); nothing weakened.
+
+**R-19 (test navigation)**: gate C walks `dest_connection` → Connection screen →
+open-studio → Tower Studio → scanner → back (the REAL product path).
+
+**R-20/R-22 (R-8 lineage, matcher-only)**: gate E's category assertion and the
+harness waitForText match ignoreCase — the rendered typography (uppercased
+SectionCard titles) is authoritative; the banned-English classifier is unchanged.
+
+**R-21 (gateNavigateTo robustness + observability)**: the fallback awaits the
+Settings hub TITLE (proves the hub, not a body-text coincidence); the hub-row
+lookup retries on the UNMERGED tree; the not-found error now carries
+gateVisibleTexts() (the same contract as gateAwaitAnchor) so a repeat is
+diagnosable from the log alone. Gate B: no code change — the infrastructure
+rerun channel (R-15 precedent).
+
+No test deleted, skipped or weakened; no assertion touched.

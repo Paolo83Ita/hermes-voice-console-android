@@ -40,6 +40,12 @@ class ItalianGateE_SettingsAppearanceLanguageTest {
         violations += compose.gateCollectViolations("Settings hub", pool)
 
         // All six prescribed categories must be visible (directive §5).
+        // R-20 (run 41990077345 @ e89d014 — dump-proven): the hub renders the
+        // category headers CASE-TRANSFORMED ("GENERALE", "CONNESSIONE ALLA
+        // TORRE", "DISPLAY" — all six WERE visible in the failure dump); the
+        // case-sensitive contains() reported them missing. Matching follows the
+        // R-8 semantics: the matcher follows the rendered typography; the
+        // banned-English classifier is unchanged.
         val hubTexts = compose.gateVisibleTexts()
         val missingCats = listOf(
             R.string.settings_cat_general,
@@ -49,7 +55,7 @@ class ItalianGateE_SettingsAppearanceLanguageTest {
             R.string.settings_cat_display,
             R.string.settings_cat_diagnostics,
         ).map { catRes -> ItalianGate.localizedString(catRes, "it") }
-            .filter { cat -> hubTexts.none { it.contains(cat) } }
+            .filter { cat -> hubTexts.none { it.contains(cat, ignoreCase = true) } }
         assertTrue(
             "Settings hub is missing prescribed categories (it): $missingCats; " +
                 "visible: ${compose.gateVisibleTexts().take(20)}",
