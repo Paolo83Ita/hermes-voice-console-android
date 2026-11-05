@@ -6,6 +6,7 @@ import androidx.compose.ui.test.onAllNodesWithContentDescription
 import androidx.compose.ui.test.onAllNodesWithText
 import androidx.compose.ui.test.onNodeWithContentDescription
 import androidx.compose.ui.test.performClick
+import androidx.compose.ui.test.performTouchInput
 import androidx.test.espresso.AppNotIdleException
 import androidx.test.espresso.IdlingPolicies
 import androidx.test.platform.app.InstrumentationRegistry
@@ -380,16 +381,36 @@ fun HermesComposeRule.gateNavigateTo(labelRes: Int, anchor: String, timeoutMs: L
                 .fetchSemanticsNodes()
                 .firstOrNull { it.config[SemanticsActions.OnClick]?.action != null }
         }.getOrNull()
-        // R-21: the error now carries the visible semantics (Text +
-        // contentDescription) — the same observability contract as
-        // gateAwaitAnchor — so a repeat is diagnosable from the log alone.
-            ?: error(
+        if (hubRow != null) {
+            val click = hubRow.config[SemanticsActions.OnClick]?.action
+                ?: error("settings-hub row '$label' has no OnClick (it)")
+            androidx.test.platform.app.InstrumentationRegistry.getInstrumentation().runOnMainSync { click() }
+        } else {
+            // R-26 (runs #137 + #142 lane 1 — the SAME failure signature twice,
+            // now with full dumps): the row text is dump-proven present ("Modelli
+            // e Voce Componenti installati…", "Torre attuale e riconnessione…")
+            // while NO text-matching node exposes OnClick in EITHER tree on this
+            // fleet. The last-mile fallback is the REAL user path: one physical
+            // tap at the center of the node whose text STARTS WITH the row label
+            // (the hub row renders label+sub merged, so the row's text begins
+            // with its label; body text like the console engine_row can CONTAIN
+            // "Modelli e voce" without starting with it — the prefix
+            // discriminates). The destination anchor after this block still
+            // decides success — a tap that does not navigate fails the anchor
+            // honestly with the visible dump. Nothing weakened.
+            val nodes = runCatching {
+                onAllNodesWithText(label, substring = true, ignoreCase = true).fetchSemanticsNodes()
+            }.getOrDefault(emptyList())
+            val tapIdx = nodes.indexOfFirst { n ->
+                n.config.get(SemanticsProperties.Text)?.any { it.text.startsWith(label, ignoreCase = true) } == true
+            }
+            check(tapIdx >= 0) {
                 "settings-hub row '$label' not found (it); visible texts: " +
-                    gateVisibleTexts().take(40),
-            )
-        val click = hubRow.config[SemanticsActions.OnClick]?.action
-            ?: error("settings-hub row '$label' has no OnClick (it)")
-        androidx.test.platform.app.InstrumentationRegistry.getInstrumentation().runOnMainSync { click() }
+                    gateVisibleTexts().take(40)
+            }
+            onAllNodesWithText(label, substring = true, ignoreCase = true)[tapIdx]
+                .performTouchInput { click() }
+        }
     }
     gateAwaitAnchor(anchor, timeoutMs = timeoutMs)
     // R-10 (run 41868118783, gate C hang): the unconditional waitForIdle here

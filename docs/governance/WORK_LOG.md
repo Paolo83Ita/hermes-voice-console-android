@@ -1135,3 +1135,21 @@ FILES: .github/workflows/android-e2e.yml.
 COMMIT: (this commit).
 CHECKPOINT: CP-G4-023 fix 11 (R-25) deployment repair; CP-G4-024 STAGED.
 NEXT: the two-sample push runs arbitrate ITALIAN_UI_COMPLETE.
+
+## G4-N34 — CP-G4-023 fix 12 / R-26 (prefix-discriminated tap fallback)
+
+Run #142 (42034394075 @ 06eaa62, two samples): lane 2 died early (death fleet);
+lane 1 SURVIVED 104 MINUTES — the best sample since #137: A1 green (5th
+consecutive), E green (R-20 cloud-verified), C+D failed at the OnClick lookup
+WITH full dumps (the R-21 observability paid off: the hub rows' text is present,
+OnClick unfindable in either tree, dest_connection not a drawer row), F died
+(death #13). R-26: gate C walks the hub row settings_tower_status; the
+gateNavigateTo fallback taps the prefix-matching row (real user path) when both
+OnClick lookups fail — the destination anchor still decides. No test deleted,
+skipped or weakened.
+FILES: app/src/androidTest/java/com/hermestower/voiceconsole/e2e/
+{ItalianGateSupport,ItalianGateC_TowerGateQrScannerTest}.kt; docs/governance/
+{ITALIAN_GATE_NAVIGATION_FAILURE_LEDGER,WORK_LOG,GRAPH46_READBACK,CHECKPOINT_INDEX}.md.
+COMMIT: (this commit).
+CHECKPOINT: CP-G4-023 fix 12 (R-26); CP-G4-024 STAGED.
+NEXT: the two-sample push runs arbitrate ITALIAN_UI_COMPLETE.

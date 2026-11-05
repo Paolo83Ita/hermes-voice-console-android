@@ -365,3 +365,34 @@ CP-G4-024 STAGED. This commit's dual-sample push runs are the deciding
 evidence: ANY lane showing gate 6/6 green + regression green-or-typed + residual
 typed → fill the two placeholders ONLY from that lane's artifacts → §10
 terminality. Any other outcome → next typed row + narrow repair + full rerun.
+
+## 13. §0 fresh read-back — session of 2026-11-05, part 6 (fix 12 / R-26)
+
+### 13.1 Cloud evidence at 06eaa62 (two-sample run #142)
+
+Lane 2 died early (fleet). **Lane 1 SURVIVED 104 MINUTES — the best sample since
+#137**: R-17 OK, R-24 warm-up complete, **A1 green (5th consecutive cloud
+sample)**, A2 budget-stalled mid-class (fleet stall), **GATE E PASSED — R-20
+CLOUD-VERIFIED**, gates C+D failed at the OnClick lookup WITH FULL DUMPS (the
+R-21 observability contract paid off), the guest died during gate F (death #13);
+regression/residual typed aborts; honest verdict. The dumps DECIDE: the hub
+rows' text is present ("Modelli e Voce Componenti installati…", "Torre attuale e
+riconnessione…"), no OnClick is findable in either tree, and dest_connection is
+not a drawer row (primaryDestinations: CONSOLE/ARCHIVE/TOWER_STUDIO/
+MODEL_MANAGER/SETTINGS).
+
+### 13.2 Repair executed (fix 12 / R-26)
+
+Gate C navigates via the hub row's REAL label (settings_tower_status → the
+CONNECTION route). gateNavigateTo's fallback: when both OnClick-filtered lookups
+fail BUT a node whose text STARTS WITH the row label exists, the harness
+performs ONE physical tap at that node's center (the real user path) — the
+destination anchor still decides success; the no-node error path is unchanged.
+Nothing deleted, skipped or weakened.
+
+### 13.3 Untouched terminality + Next Exact Action
+
+Both placeholders remain INTACT; ITALIAN_UI_COMPLETE still not claimed;
+CP-G4-024 STAGED. This commit's dual-sample push runs are the deciding evidence:
+ANY lane showing gate 6/6 green + regression green-or-typed + residual typed →
+fill the two placeholders ONLY from that lane's artifacts → §10 terminality.
