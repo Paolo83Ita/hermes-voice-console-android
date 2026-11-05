@@ -94,6 +94,27 @@ jobs:
             timeout 300 bash -c 'until [ "$(adb shell getprop sys.boot_completed | tr -d "\r")" = "1" ]; do sleep 5; done'
             sleep 60
             adb shell getprop ro.build.version.sdk
+            echo "R-17 guest health gate before the installs..."
+            # CP-G4-023 fix 7 / R-17 (run 41983695658 @ 982877c — the 8th fleet
+            # death, a NEW collapse mode: emulator BOOT COMPLETED in 968 s at
+            # 07:16:41, then system_server lost activity/package services within
+            # ~1 min — the runner's multidisplay broadcast hit "Can't find
+            # service: activity" at 07:17:27 and `adb install` failed with "cmd:
+            # Can't find service: package" at 07:18:15; ZERO instrumentation
+            # ran). The unguarded window is boot→install: the settle loop only
+            # waits for the boot FLAG, never proving the package service is
+            # usable. R-17 (the R-14/R-16 precedent: a single, typed, bounded
+            # recovery for the one evidence-proven collapse mode; the REAL walk
+            # unchanged, nothing deleted, skipped or weakened): probe
+            # `pm list packages` — if the service is dead, adb reboot + bounded
+            # re-wait (1200 s; observed cold boots 968–1110 s, warm reboots are
+            # faster) + ONE re-probe; still dead → typed honest abort. Exactly
+            # ONE recovery per run keeps the 300-min cap arithmetic safe
+            # (worst case ≈289 min: build 8 + boot 40 + settle 6 + recovery 23
+            # + installs 30 + gates 90 + regression 60 + residual 15 + evidence
+            # 15). Non-collapse install failures still abort honestly with no
+            # blind retry (a flake-hiding retry would be dishonest).
+            if timeout 60 adb shell pm list packages >/dev/null 2>&1; then echo "R-17 GUEST_HEALTH_OK (package service alive at T+60s)"; else echo "R-17 GUEST_COLLAPSE: package service dead after boot (run 41983695658 signature: Can't find service: package 94s after boot completed) — adb reboot + bounded re-wait 1200s + one re-probe"; timeout 60 adb reboot || true; sleep 20; timeout 1200 bash -c 'until [ "$(adb shell getprop sys.boot_completed | tr -d "\r")" = "1" ]; do sleep 5; done' || true; sleep 60; if timeout 60 adb shell pm list packages >/dev/null 2>&1; then echo "R-17 RECOVERY_OK: guest healthy after reboot — proceeding to installs"; else echo 'E2E_BLOCKED_EMULATOR_ENVIRONMENT — guest services still dead after the single R-17 recovery (typed honest abort)'; exit 1; fi; fi
             echo "Installing application APK..."
             # CP-G4-023 fix 2 (runs 41884838553 @ c97a02f + 41883447613 @ 6545969 —
             # boot 17.4 min, then `adb: failed to stat app-debug.apk: No such file
@@ -101,9 +122,9 @@ jobs:
             # universal APK is now app-universal-debug.apk (app-debug.apk no longer
             # exists). The universal carries x86_64 (this emulator) + every ABI.
             # GRAPH 4.6 (GRAPH46_READBACK §2): installs stay bounded.
-            timeout 900 adb install -r -t app/build/outputs/apk/debug/app-universal-debug.apk
+            timeout 900 adb install -r -t app/build/outputs/apk/debug/app-universal-debug.apk || { echo 'E2E_BLOCKED_EMULATOR_ENVIRONMENT — app APK install failed after the R-17 health gate (typed honest abort; the single recovery covers only the post-boot collapse window, no blind retry of non-collapse signatures)'; exit 1; }
             echo "Installing androidTest APK..."
-            timeout 900 adb install -r -t $(ls app/build/outputs/apk/androidTest/debug/*androidTest*.apk | head -1)
+            timeout 900 adb install -r -t $(ls app/build/outputs/apk/androidTest/debug/*androidTest*.apk | head -1) || { echo 'E2E_BLOCKED_EMULATOR_ENVIRONMENT — androidTest APK install failed after the R-17 health gate (typed honest abort)'; exit 1; }
             echo "Running instrumentation — segmented model (CP-G4-017 final)... profile=$E2E_PROFILE class_filter=${E2E_CLASS_FILTER:-<three-invocation model>}"
             # emulator-runner executes this script with /bin/sh (dash). The previous
             # bash-only `set -o pipefail` exited 2 before am instrument could start.

@@ -1014,3 +1014,24 @@ COMMIT: (this commit).
 CHECKPOINT: CP-G4-023 fix 6 (R-16); CP-G4-024 STAGED.
 NEXT: run #136 verdict at this tip arbitrates ITALIAN_UI_COMPLETE (or the next
 typed row).
+
+## G4-N28 — CP-G4-023 fix 7 / R-17 (post-boot service collapse repair)
+
+Run #136 (41983695658 @ 982877c, job 127099393926) parsed from the full job log:
+boot COMPLETED in 968 s, then system_server lost activity/package services within
+~1 min (multidisplay broadcast "Can't find service: activity" at 07:17:27; app
+install "cmd: Can't find service: package" at 07:18:15) — ZERO instrumentation,
+death #8, the boot→install window was the last unguarded collapse segment.
+R-17 (R-14/R-16 precedent, evidence-backed single recovery): guest health gate
+BEFORE the installs — `pm list packages` probe; dead → `adb reboot` + bounded
+re-wait 1200 s + sleep-60 settle + ONE re-probe; still dead → typed
+E2E_BLOCKED_EMULATOR_ENVIRONMENT honest abort; healthy → the REAL walk proceeds
+unchanged; both install lines typed `|| { …; exit 1; }` so non-collapse failures
+abort honestly with NO blind retry. ONE recovery per run keeps the 300-min cap
+safe (worst ≈289 min). No test deleted, skipped or weakened; no assertion touched.
+FILES: .github/workflows/android-e2e.yml; docs/governance/
+{ITALIAN_GATE_NAVIGATION_FAILURE_LEDGER,WORK_LOG,GRAPH46_READBACK,CHECKPOINT_INDEX}.md.
+COMMIT: (this commit).
+CHECKPOINT: CP-G4-023 fix 7 (R-17); CP-G4-024 STAGED.
+NEXT: the push run at the R-17 tip arbitrates ITALIAN_UI_COMPLETE (or the next
+typed row).

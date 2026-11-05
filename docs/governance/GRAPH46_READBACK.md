@@ -189,3 +189,39 @@ may only be filled from a real cloud run that shows every gate class
    typed → fill ITALIAN_UI_REPORT §6 and GRAPH_46_TERMINAL_RECEIPT §2 ONLY from
    that run → then, and only then, §10 terminality. Any other outcome → next
    typed ledger row + narrow repair + full rerun.
+
+## 8. §0 fresh read-back — session of 2026-11-05 (fix 7 / R-17)
+
+### 8.1 Authority verification (fetch-first, memory rejected)
+
+| Check | Result |
+| --- | --- |
+| `git fetch origin` | exit 0 |
+| Remote tip `origin/graph-4/real-voice-pairing-archive-e2e` | **`982877c`** (CP-G4-023 fix 6 / R-16) — the briefing's `92465e5` was NOT the tip and was NOT trusted |
+| Local HEAD | `982877c1c0fa478ed1cac1f5cab6d4f9a5956238` — equal to remote (rev-parse identical) |
+| `main` | untouched, not checked out; working tree clean at read-back |
+
+### 8.2 Cloud evidence at the verified tip (parsed from the job log THIS session)
+
+| Run | Workflow | Commit | Outcome |
+| --- | --- | --- | --- |
+| 41983695691 | android-debug-build | 982877c | **SUCCESS** — unit + lint green at the R-16 tip |
+| 41983695658 (#136) | android-e2e | 982877c | **INFRASTRUCTURE FAILURE — fleet death #8, NEW mode**: boot COMPLETED in 968 s (07:16:41), then system_server lost activity/package services within ~1 min (`Can't find service: activity` at 07:17:27; install failed `cmd: Can't find service: package` at 07:18:15); ZERO instrumentation; job failed honestly in 23 min → ledger **R-17** |
+
+### 8.3 Untouched terminality (intake discipline re-verified)
+
+`docs/receipts/GRAPH_46_TERMINAL_RECEIPT.md` §2 `<!-- TERMINAL_VERDICT_PLACEHOLDER -->`
+and `docs/receipts/ITALIAN_UI_REPORT.md` §6 `<!-- VERDICT_PLACEHOLDER -->` are both
+INTACT — ITALIAN_UI_COMPLETE is not claimed anywhere; CP-G4-024 remains STAGED.
+
+### 8.4 Next Exact Action (executed this session → CP-G4-023 fix 7 / R-17)
+
+The unguarded boot→install window received the R-17 typed recovery (guest health
+gate: `pm list packages` probe → `adb reboot` + re-wait 1200 s + one re-probe;
+typed honest aborts on both install lines; ONE recovery per run; 300-min cap
+arithmetic ≈289 min worst case; the REAL walk unchanged, nothing deleted, skipped
+or weakened). This governance commit's push run is the deciding evidence: gate
+6/6 `OK (… tests)` + per-class regression green-or-typed + residual typed → fill
+ITALIAN_UI_REPORT §6 and GRAPH_46_TERMINAL_RECEIPT §2 ONLY from that run → then,
+and only then, §10 terminality. Any other outcome → next typed ledger row +
+narrow repair + full rerun.
