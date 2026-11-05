@@ -346,3 +346,16 @@ No test deleted, skipped or weakened; no assertion touched.
 | Typed classification | **INFRASTRUCTURE_FAILURE (E2E_BLOCKED_EMULATOR_ENVIRONMENT — mid-class transport death)** |
 | Narrow repair | **R-23** (the R-14/R-17 precedent): at EVERY class boundary the offline-guard first attempts ONE bounded transport recovery (`adb reconnect offline` + `adb kill-server`/`start-server`, ≈45 s) and re-checks `adb get-state` — recovered → the remaining classes CONTINUE (a dead class's evidence is already written; the REAL walks unchanged); not recovered → the same typed abort (unchanged). Applied to the gate loop, the regression loop and the residual guard. Job cap 300→310 (worst case ≈273 min with recoveries at every one of the 13 boundaries; hosted ceiling 360) |
 | Complete gate rerun | THIS commit's push run |
+
+## R-24 — the FIRST instrument invocation pays one-time cold-start physics inside the class budget (runs #137/#138/#139); typed pre-instrumentation warm-up (run #139 42017388466 @ 3eecf76)
+
+| Field | Value |
+| --- | --- |
+| Run ID / commit | #139 (11:14→11:59 UTC) @ 3eecf76 (fix 9 tip, fetch-verified) |
+| What WORKED | boot 813809 ms (13.6 min — fastest yet); R-17 gate OK (11:34:57); both APKs installed; **the R-23 recovery mechanism executed exactly as designed** (bounded attempts at the B boundary and the regression/residual guards, typed aborts when the guest was truly dead, honest verdict) |
+| Failure | **fleet death #11 (8 infra failures in 12 executions)**: gate A's invocation consumed its ENTIRE 900 s class budget on the cold-start baseline and produced ONLY its start marker (11:57:06 — launch + recreate + settle on a starved guest; ColorBuffer errors in the window); the guest was dead at the B boundary (adb get-state failed; the R-23 transport recovery correctly could NOT revive a dead guest) |
+| Cross-run physics | the FIRST instrument invocation after install repeatedly pays huge one-time costs INSIDE the class budget: #139 gate A burned 900 s → start marker only; #137 gate A needed 588 s total; #138 A1 finished ~747 s — the same stall signature (ColorBuffer + slow baseline) every time |
+| Typed classification | **INFRASTRUCTURE_FAILURE (E2E_BLOCKED_EMULATOR_ENVIRONMENT — cold-start budget exhaustion) + guest death #11** |
+| Narrow repair | **R-24**: a typed bounded warm-up AFTER the installs and BEFORE the gate loop — `am start -W` (bounded 120 s) + 60 s settle + `am force-stop` (data preserved; the onboarding flag stays) — pays the one-time cold costs OUTSIDE every class budget; a warm-up failure is a typed honest abort (the guest would have died in gate A anyway). Worst case +≈3 min (≈276 < the 310 cap) |
+| R-23 status | RETAINED — it is the correct mechanism for transport-level wedges and worked to spec in #139; it cannot (and must not) revive a dead guest |
+| Complete gate rerun | THIS commit's push run |

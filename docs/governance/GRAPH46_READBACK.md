@@ -307,3 +307,30 @@ STAGED. This commit's push run is the deciding evidence: gate 6/6 green +
 regression green-or-typed + residual typed → fill the two placeholders ONLY from
 that run → §10 terminality. Any other outcome → next typed row + narrow repair +
 full rerun.
+
+## 11. §0 fresh read-back — session of 2026-11-05, part 4 (fix 10 / R-24)
+
+### 11.1 Cloud evidence at 3eecf76
+
+Run #139 (42017388466): boot 13.6 min, R-17 gate OK, both installs OK, gate A
+consumed its whole 900 s budget on the cold-start baseline (only its start
+marker printed), the guest was dead at the B boundary — death #11 (8 infra
+failures in 12 executions). The R-23 recovery executed to spec: bounded
+attempts, typed aborts, honest verdict — it correctly cannot revive a dead
+guest.
+
+### 11.2 Repair executed (fix 10 / R-24)
+
+Typed bounded warm-up AFTER the installs and BEFORE the gate loop:
+`am start -W` (120 s cap) + 60 s settle + `am force-stop` (data preserved) —
+the evidenced one-time cold-start costs (#137: gate A 588 s; #138: A1 ~747 s;
+#139: 900 s → marker only) are paid OUTSIDE every class budget. A warm-up
+failure is a typed honest abort. Worst case ≈276 min < the 310 cap.
+
+### 11.3 Untouched terminality + Next Exact Action
+
+Both placeholders remain INTACT; ITALIAN_UI_COMPLETE still not claimed;
+CP-G4-024 STAGED. This commit's push run is the deciding evidence: gate 6/6
+green + regression green-or-typed + residual typed → fill the two placeholders
+ONLY from that run → §10 terminality. Any other outcome → next typed row +
+narrow repair + full rerun.

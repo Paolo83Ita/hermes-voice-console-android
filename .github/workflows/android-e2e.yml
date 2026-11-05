@@ -127,6 +127,22 @@ jobs:
             timeout 900 adb install -r -t app/build/outputs/apk/debug/app-universal-debug.apk || { echo 'E2E_BLOCKED_EMULATOR_ENVIRONMENT — app APK install failed after the R-17 health gate (typed honest abort; the single recovery covers only the post-boot collapse window, no blind retry of non-collapse signatures)'; exit 1; }
             echo "Installing androidTest APK..."
             timeout 900 adb install -r -t $(ls app/build/outputs/apk/androidTest/debug/*androidTest*.apk | head -1) || { echo 'E2E_BLOCKED_EMULATOR_ENVIRONMENT — androidTest APK install failed after the R-17 health gate (typed honest abort)'; exit 1; }
+            echo "R-24 cold-start warm-up (typed, bounded)..."
+            # CP-G4-023 fix 10 / R-24 (runs #137/#138/#139 @ e89d014/29447ae/3eecf76
+            # — the FIRST instrument invocation after install repeatedly consumed
+            # its whole class budget on cold-start physics: #139 gate A burned
+            # 900 s producing ONLY its start marker (baseline launch + recreate
+            # + settle on a starved guest), #137 gate A needed 588 s total,
+            # #138 A1 finished at ~747 s. The one-time costs (dexopt, first
+            # layout, Onboarding flag write) are paid HERE, OUTSIDE every class
+            # budget: launch (am start -W, bounded 120 s), settle 60 s,
+            # force-stop (data preserved — the onboarding-complete flag stays).
+            # The guest going away HERE is a typed honest abort — it would have
+            # died in gate A anyway.
+            timeout 120 adb shell am start -W -n com.hermestower.voiceconsole/.ui.MainActivity || { echo 'E2E_BLOCKED_EMULATOR_ENVIRONMENT — R-24 warm-up am start failed (typed honest abort)'; exit 1; }
+            sleep 60
+            timeout 60 adb shell am force-stop com.hermestower.voiceconsole || true
+            echo "R-24 warm-up complete — proceeding to instrumentation"
             echo "Running instrumentation — segmented model (CP-G4-017 final)... profile=$E2E_PROFILE class_filter=${E2E_CLASS_FILTER:-<three-invocation model>}"
             # emulator-runner executes this script with /bin/sh (dash). The previous
             # bash-only `set -o pipefail` exited 2 before am instrument could start.

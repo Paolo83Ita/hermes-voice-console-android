@@ -1083,3 +1083,22 @@ COMMIT: (this commit).
 CHECKPOINT: CP-G4-023 fix 9 (R-23); CP-G4-024 STAGED.
 NEXT: the push run at the fix-9 tip arbitrates ITALIAN_UI_COMPLETE (or the next
 typed row).
+
+## G4-N31 — CP-G4-023 fix 10 / R-24 (pre-instrumentation cold-start warm-up)
+
+Run #139 (42017388466 @ 3eecf76): boot 13.6 min, R-17 OK, installs OK, gate A's
+invocation consumed its whole 900 s budget on the cold-start baseline (only the
+start marker printed) and the guest was dead at the B boundary — death #11. The
+R-23 recovery executed to spec (bounded, typed, honest) but cannot revive a dead
+guest. Cross-run physics: the FIRST instrument invocation after install pays
+one-time cold costs INSIDE the class budget (#137: 588 s; #138: A1 at ~747 s;
+#139: 900 s → marker only). Repair R-24: typed bounded warm-up after installs
+(am start -W 120 s + settle 60 s + force-stop, data preserved) BEFORE the gate
+loop — the one-time costs are paid outside every class budget; a warm-up failure
+is a typed honest abort. No test deleted, skipped or weakened.
+FILES: .github/workflows/android-e2e.yml; docs/governance/
+{ITALIAN_GATE_NAVIGATION_FAILURE_LEDGER,WORK_LOG,GRAPH46_READBACK,CHECKPOINT_INDEX}.md.
+COMMIT: (this commit).
+CHECKPOINT: CP-G4-023 fix 10 (R-24); CP-G4-024 STAGED.
+NEXT: the push run at the fix-10 tip arbitrates ITALIAN_UI_COMPLETE (or the next
+typed row).
