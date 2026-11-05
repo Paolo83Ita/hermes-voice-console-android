@@ -258,3 +258,15 @@ isolation), not the disposition.
 | R-12 | TEST_NAVIGATION_DEFECT + INFRASTRUCTURE_FAILURE (emulator death) |
 | R-13 | (fix-4 repair designation, commit a2d0b27 — baseline recreate settle+retry; no separate run row) |
 | R-14 | INFRASTRUCTURE_FAILURE (fleet death #4 + unbounded adb capture hang) + recreate idle-sync flake (AppNotIdleException at both gate recreate sites) |
+
+## R-15 — two fleet collapses in ONE push wave; fix-5 mechanics VERIFIED under collapse (runs 41972674909 #133 + #134 @ 8bffd60/7c57025)
+
+| Field | Value |
+| --- | --- |
+| Runs | #133 (41972674909 @ 8bffd60, fix-5 tip) and #134 (@ 7c57025, docs follow-up) — both push-triggered, ~concurrent |
+| #134 | **BOOT-LEVEL collapse** (NEW mode, 5th infra failure): emulator process launched 05:19:42 UTC but `adb -s emulator-5554` reported `device offline` CONTINUOUSLY 05:19:53→05:37 — the guest never became reachable; ZERO instrumentation ran; job failed honestly at ~35 min |
+| #133 | the fleet died **at the very START of gate A** (6th infra failure): gate_A.txt holds only A1's stream header (STATUS_CODE 1 = test started 05:46:37) then the device went offline mid-invocation; B–F and regression typed `DEVICE_OFFLINE_ABORT`; tally honestly 0/6 |
+| fix-5 mechanics VERIFIED in the collapse | (1) residual offline-guard wrote the typed `DEVICE_OFFLINE_ABORT` INTO residual-output.txt (verdict channel intact); (2) logcat/screencap bounded `timeout 60` — the residual-abort→verdict gap is exactly 60 s (NO 2 h hang); (3) `E2E_VERDICT_FAILED` printed honestly; (4) total job ~1 h 05 m instead of the previous 3 h+; (5) `assembleDebugAndroidTest` SUCCESS at 8bffd60 — the R-14 `gateRecreateSteadily()` code COMPILES and the gate instrument started |
+| Typed classification | **INFRASTRUCTURE_FAILURE ×2 (E2E_BLOCKED_EMULATOR_ENVIRONMENT)** — six deaths across the last six E2E executions (4 mid-gate, 1 boot-level, 1 gate-A-start); NOT a code property: the same gate harness PASSED A1 (bba1ebc) and A2 (e084be8 + a2d0b27) on healthier fleet samples |
+| Narrow repair | none required in code — the established "complete rerun on infrastructure failure" contract; this governance commit re-enters the queue at the current tip |
+| Complete gate rerun | THIS commit's push run |

@@ -968,3 +968,26 @@ regression green-or-residual-typed + residual typed.
 NEXT: run #133 verdict → ITALIAN_UI_REPORT §6 + GRAPH_46_TERMINAL_RECEIPT §2 filled
 ONLY from that run → GRAPH_4_IMPLEMENTATION_COMPLETE_XIAOMI_QUALIFICATION_PENDING
 (or the next typed fix row).
+
+## G4-N26 (2026-11-05) — R-15: two fleet collapses in one wave; fix-5 mechanics verified; rerun re-entered
+
+NODE: GRAPH 4.6 §11 — monitor the fix-5 tip runs and classify.
+FINDING: both push-triggered E2E samples of the fix-5 wave died on INFRASTRUCTURE,
+not code — #134 never brought the guest online (boot-level, `adb: device offline`
+05:19:53→05:37, zero instrumentation); #133 booted, installed, compiled the gate
+(assembleDebugAndroidTest SUCCESS — R-14 code compiles) and died at gate A's first
+invocation (gate_A.txt holds only A1's stream header). Every fix-5 mechanism worked
+under collapse: typed offline-guard into residual-output.txt, bounded 60 s
+logcat/screencap (residual→verdict gap exactly 60 s), honest E2E_VERDICT_FAILED,
+~1 h 05 m total instead of 3 h+. Builds #115/#116 SUCCESS at both tips (unit 260/260
+COUNTED from the 7c57025 artifact; lint 0 errors; APK sizes byte-identical:
+105,247,044 / 206,679,899 / 109,176,588).
+ACTION: ledger R-15 + this entry + read-back addendum; governance-only commit
+re-enters the E2E queue at the current tip (the established infrastructure rerun
+channel — no test touched).
+FILES: docs/governance/{ITALIAN_GATE_NAVIGATION_FAILURE_LEDGER,WORK_LOG,
+GRAPH46_READBACK,CHECKPOINT_INDEX}.md.
+COMMIT: (this commit).
+CHECKPOINT: CP-G4-023 fix 5 (R-15 addendum); CP-G4-024 STAGED.
+NEXT: the rerun verdict at this tip arbitrates ITALIAN_UI_COMPLETE (or the next
+typed row).
