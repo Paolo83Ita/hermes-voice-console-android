@@ -103,6 +103,10 @@ dependencies {
     androidTestImplementation(libs.androidx.test.runner)
     androidTestImplementation(libs.androidx.test.rules)
     androidTestImplementation(libs.espresso.core)
+    // R-30 (run #145 lane 1): the scanner back path is the SYSTEM back button —
+    // device-level injection (UiAutomator) needs no window focus, unlike
+    // Espresso.pressBack (RootViewWithoutFocusException on the CameraX screen).
+    androidTestImplementation(libs.androidx.test.uiautomator)
     androidTestImplementation(libs.compose.ui.test.junit4)
     debugImplementation(libs.compose.ui.test.manifest)
     debugImplementation(libs.compose.ui.tooling)

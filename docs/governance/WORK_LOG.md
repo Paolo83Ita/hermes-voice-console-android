@@ -1191,3 +1191,24 @@ docs/governance/{ITALIAN_GATE_NAVIGATION_FAILURE_LEDGER,WORK_LOG,GRAPH46_READBAC
 COMMIT: (this commit).
 CHECKPOINT: CP-G4-023 fix 14 (R-28); CP-G4-024 STAGED.
 NEXT: the dual-sample push runs arbitrate ITALIAN_UI_COMPLETE.
+
+## G4-N37 — CP-G4-023 fix 15 / R-29+R-30 (pkill self-match + scanner back focus)
+
+Run #145 (42067858465 @ b69a5e6): lane 2 died at ~43 min from R-28's own
+`pkill -f "qemu-system-x86_64"` matching the script's own sh -c command line
+(exit code null — killed by its own signal; the relaunch never ran).
+Lane 1 ran 116 MINUTES fully alive (R-23/R-28 never fired) and produced the
+first REAL live-guest test outcomes: A/E/F green (7th consecutive A), B =
+stream broke silently at ~813 s (ColorBuffer in-window), C = 753 s walk
+SUCCEEDED then Espresso.pressBack threw RootViewWithoutFocusException
+(has-window-focus=false), D = MODEL SANCTUM anchor timeout (mechanism
+unproven on a degraded guest — no blind repair). R-29: variable-split pkill
+pattern at all 6 sites. R-30: gateLeaveScannerBack → UiDevice.pressBack
+(uiautomator 2.3.0, Apache-2.0). B and D walks untouched.
+FILES: .github/workflows/android-e2e.yml;
+app/src/androidTest/java/com/hermestower/voiceconsole/e2e/ItalianGateSupport.kt;
+gradle/libs.versions.toml; app/build.gradle.kts;
+docs/governance/{ITALIAN_GATE_NAVIGATION_FAILURE_LEDGER,WORK_LOG,GRAPH46_READBACK,CHECKPOINT_INDEX}.md.
+COMMIT: (this commit).
+CHECKPOINT: CP-G4-023 fix 15 (R-29+R-30); CP-G4-024 STAGED.
+NEXT: the dual-sample push runs arbitrate ITALIAN_UI_COMPLETE.

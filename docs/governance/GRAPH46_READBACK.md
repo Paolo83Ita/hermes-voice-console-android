@@ -471,3 +471,35 @@ Cap 310→340 (worst ≈337). Both placeholders remain INTACT; CP-G4-024 STAGED.
 THIS commit's dual-sample push runs are the deciding evidence: ANY lane showing
 gate 6/6 green + regression green-or-typed + residual typed → fill the two
 placeholders ONLY from that lane's artifacts → §10 terminality.
+
+## 16. §0 fresh read-back — session of 2026-11-05, part 9 (fix 15 / R-29+R-30)
+
+### 16.1 Authority verification
+
+Fresh fetch read-back: remote tip = local HEAD = `b69a5e6` (fix 14 / R-28);
+`main` untouched (`e7ab101`). The fix-14 build run 42067864288 = SUCCESS.
+
+### 16.2 Run #145 (42067858465 @ `b69a5e6`) — arbitrated from full lane logs
+
+Lane 2 (job 127386946544): R-28's pkill matched the script's own sh -c command
+line → the recovery killed its own process tree (exit code null) → lane dead
+at ~43 min (SCRIPT_DEFECT). Lane 1 (job 127386947318): the FIRST fully-alive
+116-min fleet sample — gate A OK (7th consecutive), E OK, F OK, regression
+2 OK + 3 dispositioned-typed; gate B = instrument stream broke silently at
+~813 s (ColorBuffer in-window); gate C = 753 s walk SUCCEEDED then
+`Espresso.pressBack` threw `RootViewWithoutFocusException` (has-window-focus
+=false on the CameraX scanner screen); gate D = MODEL SANCTUM anchor timeout
+with the drawer visible (mechanism unproven on a ~2.5×-degraded guest — no
+blind repair). Verdict FAILED honestly.
+
+### 16.3 Repair executed (fix 15 / R-29+R-30) + Next Exact Action
+
+R-29: variable-split pkill pattern at all 6 R-28 sites (the joined string
+never appears in the script's own cmdline). R-30: gateLeaveScannerBack uses
+the device-level SYSTEM back (UiAutomator, uiautomator 2.3.0 Apache-2.0) —
+no window focus required; the return anchor unchanged. B and D untouched —
+their next healthy-guest sample decides. Both placeholders remain INTACT;
+CP-G4-024 STAGED. THIS commit's dual-sample push runs are the deciding
+evidence: ANY lane showing gate 6/6 green + regression green-or-typed +
+residual typed → fill the two placeholders ONLY from that lane's artifacts →
+§10 terminality.

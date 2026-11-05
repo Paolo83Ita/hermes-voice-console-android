@@ -439,7 +439,18 @@ fun HermesComposeRule.gateCollectViolations(destination: String, pool: Set<Strin
 
 /** Leave the QR scanner through its OWN back path and PROVE the return route. */
 fun HermesComposeRule.gateLeaveScannerBack(expectedReturnAnchor: String) {
-    androidx.test.espresso.Espresso.pressBack()
+    // R-30 (run #145 lane 1 job 127386947318 @ b69a5e6 — the FIRST fully-alive
+    // 116-min fleet sample; the walk itself SUCCEEDED for 753 s and then died
+    // at the back press): Espresso.pressBack requires the root window to have
+    // focus ("RootViewWithoutFocusException ... has-window-focus=false"), and
+    // on the CameraX scanner screen the window can legitimately be unfocused
+    // on the software fleet (ColorBuffer degradation in the same window). The
+    // REAL user path is the SYSTEM back button — injected at the DEVICE level
+    // (UiAutomator), which needs no window focus. The return anchor still
+    // decides success — nothing weakened.
+    androidx.test.uiautomator.UiDevice.getInstance(
+        androidx.test.platform.app.InstrumentationRegistry.getInstrumentation(),
+    ).pressBack()
     gateAwaitAnchor(expectedReturnAnchor, timeoutMs = 60_000)
 }
 
