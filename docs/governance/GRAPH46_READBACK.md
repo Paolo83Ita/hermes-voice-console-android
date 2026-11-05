@@ -533,3 +533,28 @@ CP-G4-024 STAGED. THIS commit's dual-sample push runs are the deciding
 evidence: ANY lane showing gate 6/6 green + regression green-or-typed +
 residual typed → fill the two placeholders ONLY from that lane's artifacts →
 §10 terminality.
+
+## 18. §0 fresh read-back — session of 2026-11-05, part 11 (fix 17 / R-33)
+
+### 18.1 Authority verification
+
+Fresh fetch read-back: remote tip = local HEAD = `5bcad1a` (fix 16 /
+R-31+R-32); `main` untouched (`e7ab101`).
+
+### 18.2 Run #147 (42099734635 @ `5bcad1a`) — arbitrated from full lane logs
+
+Lane 1 (job 127499073230): R-17 OK 20:18:22; gate A `OK (2 tests)` 20:40:37
+(8th consecutive cloud sample); gate B died with the device ~20:49 → R-28
+relaunch → UNBOOTED at the 1800 s bound (typed honest abort). Lane 2 (job
+127499072938): a class died with the device → R-28 → UNBOOTED at 1800 s
+(20:33:22→21:03:42). Combined with #146 lane 1: 3/3 relaunch boots failed
+while every fresh-job boot succeeded → stale-AVD-lock mechanism.
+
+### 18.3 Repair executed (fix 17 / R-33) + Next Exact Action
+
+rm -f the stale AVD locks before every relaunch (6 sites) + the UNBOOTED
+typed aborts now carry the qemu relaunch-log tail. Both placeholders remain
+INTACT; CP-G4-024 STAGED. THIS commit's dual-sample push runs are the
+deciding evidence: ANY lane showing gate 6/6 green + regression green-or-typed
++ residual typed → fill the two placeholders ONLY from that lane's artifacts
+→ §10 terminality.

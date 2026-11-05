@@ -425,3 +425,14 @@ No test deleted, skipped or weakened; no assertion touched.
 | Narrow repair | **R-31**: guest health is now UNIFIED — `adb get-state` OK **AND** `timeout 60 adb shell pm list packages` OK (≈1-2 s on a healthy guest) — at every guard (3 outer + 5 inner + the regression mid-loop check); the in-class retry triggers additionally on the typed `INSTRUMENTATION_ABORTED: System has crashed` marker in the class file — a crashed system now fires the SAME single R-28 relaunch (one per lane) + ONE re-invocation instead of burning 12 classes with no evidence. **R-32**: the R-28 boot bound 1200→1800 s (observed cold boots up to ~20 min); cap 340→350 (worst ≈348 < hosted 360); the R-17 boot re-wait keeps its 1200 s (calibrated to observed 968-1110 s boots, untouched) |
 | Semantics | nothing deleted, skipped or weakened: the verdict logic untouched; the re-invocation still requires the full `OK (… tests)`; missing evidence is NOT success |
 | Complete gate rerun | THIS commit's push run (two samples) |
+
+## R-33 — the relaunch never boots: stale AVD locks (runs #146/#147, 3/3 relaunch-boot failures)
+
+| Field | Value |
+| --- | --- |
+| Evidence | THREE relaunch attempts across two runs, ZERO boots completed: #146 lane 1 (1200 s bound exhausted), #147 lane 2 (1800 s exhausted, 20:33:22→21:03:42), #147 lane 1 (1800 s exhausted, 20:49:41→21:20:01) — while EVERY fresh-job boot in the same window succeeded in 8.5–20 min (R-17 GUEST_HEALTH_OK each time); #147 lane 1 reached gate A `OK (2 tests)` (8th consecutive cloud sample) before gate B died with the device and the relaunch ran |
+| Mechanism (evidence-consistent) | the relaunched qemu refuses/fails to start on a locked AVD: a qemu killed mid-run leaves `hardware-qemu.ini.lock`/`multiinstance.lock` in the AVD directory; the android-emulator-runner's teardown never cleans them on a crashed lane; the fresh emulator process then never registers on adb → `adb wait-for-device` blocks until the bound → UNBOOTED (100% of relaunches, exactly the fresh-vs-relaunch asymmetry) |
+| Typed classification | **INFRASTRUCTURE_FAILURE (relaunch blocked by stale AVD locks — collapse mode #17)** |
+| Narrow repair | **R-33**: (1) `rm -f "$HOME/.android/avd/test.avd/"*.lock` before EVERY relaunch (6 sites — the AVD is provably not running at that point: the pkill just cleared any qemu and the device is gone); (2) on UNBOOTED the typed abort now carries `tail -30 emulator-relaunch.log` (evidence in the error path — the R-21 observability contract), all 6 sites |
+| Semantics | nothing deleted, skipped or weakened: workflow-only; the verdict logic untouched; a failed relaunch still honest-aborts — now WITH its qemu log |
+| Complete gate rerun | THIS commit's push run (two samples) |

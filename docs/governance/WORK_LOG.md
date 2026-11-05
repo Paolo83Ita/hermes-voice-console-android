@@ -1229,3 +1229,18 @@ docs/governance/{ITALIAN_GATE_NAVIGATION_FAILURE_LEDGER,WORK_LOG,GRAPH46_READBAC
 COMMIT: (this commit).
 CHECKPOINT: CP-G4-023 fix 16 (R-31+R-32); CP-G4-024 STAGED.
 NEXT: the dual-sample push runs arbitrate ITALIAN_UI_COMPLETE.
+
+## G4-N39 — CP-G4-023 fix 17 / R-33 (stale AVD locks + relaunch-log evidence)
+
+Runs #146/#147: THREE R-28 relaunch boots failed to reach boot_completed
+(#146-l1 1200 s; #147-l2 1800 s; #147-l1 1800 s — after gate A OK, 8th
+consecutive cloud sample) while every fresh-job boot succeeded in 8.5-20 min.
+Mechanism: the killed qemu leaves *.lock in test.avd; the relaunched qemu
+refuses to start and never registers on adb. R-33: rm -f the stale locks
+before every relaunch (6 sites); UNBOOTED typed aborts now carry the
+relaunch-log tail (6 sites). No test deleted, skipped or weakened.
+FILES: .github/workflows/android-e2e.yml;
+docs/governance/{ITALIAN_GATE_NAVIGATION_FAILURE_LEDGER,WORK_LOG,GRAPH46_READBACK,CHECKPOINT_INDEX}.md.
+COMMIT: (this commit).
+CHECKPOINT: CP-G4-023 fix 17 (R-33); CP-G4-024 STAGED.
+NEXT: the dual-sample push runs arbitrate ITALIAN_UI_COMPLETE.
