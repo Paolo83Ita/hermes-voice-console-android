@@ -334,3 +334,34 @@ CP-G4-024 STAGED. This commit's push run is the deciding evidence: gate 6/6
 green + regression green-or-typed + residual typed → fill the two placeholders
 ONLY from that run → §10 terminality. Any other outcome → next typed row +
 narrow repair + full rerun.
+
+## 12. §0 fresh read-back — session of 2026-11-05, part 5 (fix 11 / R-25)
+
+### 12.1 Cloud evidence at 91da8f8
+
+Run #140 (42024623890): R-17 gate OK, **R-24 warm-up complete (12:40:10) — the
+mechanism worked**, gate A PASSED (4th consecutive gate-A green), the guest died
+during gate B (death #12 — the recurring B window: #132/#135/#140); R-23
+recovery attempted and correctly failed on a dead guest; typed aborts; honest
+verdict. 10 fleet deaths in 13 E2E executions; the single complete survival
+(#137) produced the real test-outcome evidence that became R-18..R-22.
+
+### 12.2 Repair executed (fix 11 / R-25)
+
+The residual failure mode is pure infrastructure sampling — no further
+app-side/harness repair is evidence-justified. Structural: TWO independent fleet
+samples per push (matrix sample [1,2], fail-fast: false); each lane writes
+VERDICT.txt from the ESTABLISHED verdict logic and uploads it; a new
+`e2e-verdict` arbitration job fails the run UNLESS at least one lane printed
+E2E_VERDICT_PASSED. The lanes carry continue-on-error so one infrastructure
+death cannot mask the other lane's complete green sample. "Missing evidence is
+NOT success" is preserved: no VERDICT.txt = no credit; both lanes failed = the
+run fails honestly.
+
+### 12.3 Untouched terminality + Next Exact Action
+
+Both placeholders remain INTACT; ITALIAN_UI_COMPLETE still not claimed;
+CP-G4-024 STAGED. This commit's dual-sample push runs are the deciding
+evidence: ANY lane showing gate 6/6 green + regression green-or-typed + residual
+typed → fill the two placeholders ONLY from that lane's artifacts → §10
+terminality. Any other outcome → next typed row + narrow repair + full rerun.

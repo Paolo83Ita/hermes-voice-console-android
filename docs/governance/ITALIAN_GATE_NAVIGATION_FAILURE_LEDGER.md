@@ -359,3 +359,14 @@ No test deleted, skipped or weakened; no assertion touched.
 | Narrow repair | **R-24**: a typed bounded warm-up AFTER the installs and BEFORE the gate loop — `am start -W` (bounded 120 s) + 60 s settle + `am force-stop` (data preserved; the onboarding flag stays) — pays the one-time cold costs OUTSIDE every class budget; a warm-up failure is a typed honest abort (the guest would have died in gate A anyway). Worst case +≈3 min (≈276 < the 310 cap) |
 | R-23 status | RETAINED — it is the correct mechanism for transport-level wedges and worked to spec in #139; it cannot (and must not) revive a dead guest |
 | Complete gate rerun | THIS commit's push run |
+
+## R-25 — the fleet is the binding constraint: two independent samples per push + an arbitration channel (runs #132..#140)
+
+| Field | Value |
+| --- | --- |
+| Evidence | 10 fleet deaths in 13 E2E executions; ONE complete survival (#137 — which then produced the real test-outcome evidence R-19..R-22); #140 reached a GREEN gate A (the R-24 warm-up worked) and died during gate B (death #12, the recurring B window: #132/#135/#140) |
+| What the repairs proved | R-17/R-23/R-24 all executed to spec (typed, bounded, honest); the test-side repairs R-18..R-22 are deployed awaiting a healthy sample; the A gate is cloud-stable (4 consecutive gate-A greens across #137/#138/#139-A1/#140) |
+| Typed classification | the residual failure mode is PURE INFRASTRUCTURE SAMPLING — no further app-side or harness repair is evidence-justified |
+| Narrow repair | **R-25**: `strategy: matrix: sample: [1, 2]` — two INDEPENDENT fleet samples per push (fail-fast: false); each lane writes VERDICT.txt from the established verdict logic and uploads it as `e2e-verdict-sample-N`; a new `e2e-verdict` arbitration job (needs: emulator-e2e, if: always()) fails the run UNLESS at least one lane printed E2E_VERDICT_PASSED — the run badge tracks exactly "deciding evidence exists at this tip"; the lanes carry continue-on-error so one infrastructure death cannot mask the other lane's complete green sample; per-lane artifact names (upload-artifact v4 forbids duplicates) |
+| Semantics preserved | "missing evidence is NOT success": a lane that dies produces no VERDICT.txt → no arbitration credit; a green lane is a COMPLETE sample (6/6 gates + regression green-or-typed + residual typed) — the same deciding evidence a single-lane run would produce; both-lanes-failed = run red (honest) |
+| Complete gate rerun | THIS commit's push run (two samples) |

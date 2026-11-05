@@ -1102,3 +1102,23 @@ COMMIT: (this commit).
 CHECKPOINT: CP-G4-023 fix 10 (R-24); CP-G4-024 STAGED.
 NEXT: the push run at the fix-10 tip arbitrates ITALIAN_UI_COMPLETE (or the next
 typed row).
+
+## G4-N32 — CP-G4-023 fix 11 / R-25 (two-sample matrix + arbitration)
+
+Run #140 (42024623890 @ 91da8f8): the R-24 warm-up WORKED (12:40:10 complete),
+gate A PASSED (4th consecutive gate-A green), the guest died during gate B
+(death #12 — the recurring B window). 10 deaths in 13 executions; the only
+complete survival was #137. All deployed mechanisms (R-17/R-23/R-24) executed
+to spec; the test repairs (R-18..R-22) await a healthy sample. R-25: two
+independent fleet samples per push (matrix, fail-fast false); each lane writes
+VERDICT.txt from the ESTABLISHED verdict logic; a new e2e-verdict job fails the
+run unless at least one lane printed E2E_VERDICT_PASSED — the badge tracks
+"deciding evidence exists"; lanes carry continue-on-error so an infra death in
+one lane cannot mask the other lane's complete green sample. No test deleted,
+skipped or weakened; the arbitration STRICTLY requires a complete green sample.
+FILES: .github/workflows/android-e2e.yml; docs/governance/
+{ITALIAN_GATE_NAVIGATION_FAILURE_LEDGER,WORK_LOG,GRAPH46_READBACK,CHECKPOINT_INDEX}.md.
+COMMIT: (this commit).
+CHECKPOINT: CP-G4-023 fix 11 (R-25); CP-G4-024 STAGED.
+NEXT: the two-sample push runs arbitrate ITALIAN_UI_COMPLETE (or the next typed
+row).
