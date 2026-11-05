@@ -1244,3 +1244,18 @@ docs/governance/{ITALIAN_GATE_NAVIGATION_FAILURE_LEDGER,WORK_LOG,GRAPH46_READBAC
 COMMIT: (this commit).
 CHECKPOINT: CP-G4-023 fix 17 (R-33); CP-G4-024 STAGED.
 NEXT: the dual-sample push runs arbitrate ITALIAN_UI_COMPLETE.
+
+## G4-N40 — CP-G4-023 fix 18 / R-34 (KVM grant for the relaunched guest)
+
+The R-33 relaunch-log tail proved the mechanism immediately: "ProbeKVM: This
+user doesn't have permissions to use KVM (/dev/kvm)" — the relaunched qemu ran
+SOFTWARE acceleration and could never boot API 34 in bound (5/5 relaunch
+failures). #148 lane 1 reached gates A+B+E green (B passed — the B window is
+not inherently deadly) before C died with the device. R-34: kvm4all udev rule
++ udevadm reload/trigger + chmod 666 /dev/kvm before every relaunch (6 sites).
+No test deleted, skipped or weakened.
+FILES: .github/workflows/android-e2e.yml;
+docs/governance/{ITALIAN_GATE_NAVIGATION_FAILURE_LEDGER,WORK_LOG,GRAPH46_READBACK,CHECKPOINT_INDEX}.md.
+COMMIT: (this commit).
+CHECKPOINT: CP-G4-023 fix 18 (R-34); CP-G4-024 STAGED.
+NEXT: the dual-sample push runs arbitrate ITALIAN_UI_COMPLETE.

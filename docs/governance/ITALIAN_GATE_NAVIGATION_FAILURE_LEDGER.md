@@ -436,3 +436,14 @@ No test deleted, skipped or weakened; no assertion touched.
 | Narrow repair | **R-33**: (1) `rm -f "$HOME/.android/avd/test.avd/"*.lock` before EVERY relaunch (6 sites — the AVD is provably not running at that point: the pkill just cleared any qemu and the device is gone); (2) on UNBOOTED the typed abort now carries `tail -30 emulator-relaunch.log` (evidence in the error path — the R-21 observability contract), all 6 sites |
 | Semantics | nothing deleted, skipped or weakened: workflow-only; the verdict logic untouched; a failed relaunch still honest-aborts — now WITH its qemu log |
 | Complete gate rerun | THIS commit's push run (two samples) |
+
+## R-34 — the relaunch has NO KVM: the qemu log proves it (runs #147/#148; 5/5 relaunch-boot failures)
+
+| Field | Value |
+| --- | --- |
+| Evidence (the R-33 log tail paid off immediately) | #148 lane 2 (job 127546981241) UNBOOTED log tail: `ProbeKVM: This user doesn't have permissions to use KVM (/dev/kvm)` + `ERROR \| x86_64 emulation currently requires hardware acceleration!` + `CPU acceleration status: This user doesn't have permissions to use KVM (/dev/kvm)` — the RELAUNCHED qemu runs with software acceleration, which can never boot API 34 within any reasonable bound (the fresh-job boots are KVM-accelerated: 8.5–20 min) |
+| Corroboration | #148 lane 1 (job 127546980862): gates A, B, E `OK` (gate B GREEN on the R-30-era healthy sample — the B window is not inherently deadly), gate C died with the device at 22:31 → R-28 → UNBOOTED (same KVM cause) → D/F lost — a working relaunch would have continued C-D-F |
+| Typed classification | **INFRASTRUCTURE_FAILURE (relaunch without KVM acceleration — collapse mode #18; the stale-lock repair R-33 was necessary but not sufficient)** |
+| Narrow repair | **R-34**: grant KVM before EVERY relaunch (6 sites): the kvm4all udev rule (`KERNEL=="kvm", GROUP="kvm", MODE="0666", OPTIONS+="static_node=kvm"` → /etc/udev/rules.d/99-kvm4all.rules) + `udevadm control --reload-rules` + `udevadm trigger --name-match=kvm` + `sudo chmod 666 /dev/kvm` (passwordless sudo on hosted runners); every step `|| true`-guarded and the UNBOOTED abort still honest (the relaunch log tail stays in the evidence) |
+| Semantics | nothing deleted, skipped or weakened: workflow-only; verdict logic untouched |
+| Complete gate rerun | THIS commit's push run (two samples) |

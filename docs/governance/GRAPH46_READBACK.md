@@ -558,3 +558,30 @@ INTACT; CP-G4-024 STAGED. THIS commit's dual-sample push runs are the
 deciding evidence: ANY lane showing gate 6/6 green + regression green-or-typed
 + residual typed → fill the two placeholders ONLY from that lane's artifacts
 → §10 terminality.
+
+## 19. §0 fresh read-back — session of 2026-11-05, part 12 (fix 18 / R-34)
+
+### 19.1 Authority verification
+
+Fresh fetch read-back: remote tip = local HEAD = `9bbb8af` (fix 17 / R-33);
+`main` untouched (`e7ab101`).
+
+### 19.2 Run #148 (42113516002 @ `9bbb8af`) — arbitrated from full lane logs
+
+Lane 1 (job 127546980862): gates A, B, E `OK` — B GREEN on the R-30-era
+healthy sample (the B window is not inherently deadly) — gate C died with the
+device at 22:31 → R-28 → UNBOOTED at 1800 s; D/F lost. Lane 2 (job
+127546981241): R-28 → UNBOOTED, and the NEW R-33 log tail captured the
+mechanism: `ProbeKVM: This user doesn't have permissions to use KVM
+(/dev/kvm)` + `x86_64 emulation currently requires hardware acceleration!` —
+the relaunched qemu runs software acceleration (5/5 relaunch failures now
+explained).
+
+### 19.3 Repair executed (fix 18 / R-34) + Next Exact Action
+
+kvm4all udev rule + udevadm reload/trigger + chmod 666 /dev/kvm before every
+relaunch (6 sites, || true-guarded). Both placeholders remain INTACT;
+CP-G4-024 STAGED. THIS commit's dual-sample push runs are the deciding
+evidence: ANY lane showing gate 6/6 green + regression green-or-typed +
+residual typed → fill the two placeholders ONLY from that lane's artifacts →
+§10 terminality.
