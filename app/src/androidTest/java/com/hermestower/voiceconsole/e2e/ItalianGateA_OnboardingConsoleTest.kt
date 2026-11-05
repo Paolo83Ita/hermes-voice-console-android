@@ -46,8 +46,12 @@ class ItalianGateA_OnboardingConsoleTest {
         val violations = mutableListOf<String>()
         try {
             // Fresh wizard, English baseline, then the system-driven relaunch to Italian.
+            // R-14 (run 41938185541 @ a2d0b27): this recreate threw the un-retried
+            // AppNotIdleException at the starved fleet (AsyncTask idle policy) — the
+            // same typed flake class the baseline recreate already carries. The typed
+            // steady-recreate helper replaces the raw call; the REAL walk is unchanged.
             Onboarding.resetForTest(ctx)
-            compose.activityRule.scenario.recreate()
+            compose.gateRecreateSteadily()
             // Wait for the wizard to compose BEFORE the locale switch (the switch's
             // wizard-detection samples the tree once at entry — ledger R-1 discipline).
             compose.gateAwaitAnchor(

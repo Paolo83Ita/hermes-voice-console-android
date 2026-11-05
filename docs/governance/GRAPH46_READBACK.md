@@ -103,6 +103,11 @@ Nothing in the read-back justifies re-opening the dispositioned lifecycle residu
 
 ## 6. Forward-only plan from the true Next Exact Action
 
+> **SUPERSEDED 2026-11-05**: items 1–4 of this plan are DONE (CP-G4-021/022/023).
+> The current truth is §7 below — the fresh read-back at tip `a2d0b27` and the
+> fix-5 repairs. §10 terminality stays gated on the cloud gate verdict.
+
+
 1. CP-G4-021: repair the rescued §8 diff (duplicate YAML key), harden the E2E install
    statements, commit + push → fresh cloud build/E2E on the new tip.
 2. While cloud runs: §6 LLM implementation, §7 Archive completion, §4/§5 receipts,
@@ -113,3 +118,71 @@ Nothing in the read-back justifies re-opening the dispositioned lifecycle residu
 4. Download the dual APK artifacts, hash + size-breakdown → APK_SIZE_AND_ABI_REPORT.md.
 5. Governance convergence + terminal receipt
    `GRAPH_4_IMPLEMENTATION_COMPLETE_XIAOMI_QUALIFICATION_PENDING`.
+
+
+## 7. FRESH READ-BACK — 2026-11-05, NEW session (directive §0 re-executed)
+
+This section supersedes §§1–6 as the current authority map. Every dimension was
+re-verified live THIS session; no claim is carried over from the b3b78ed-era
+read-back.
+
+### 7.1 Repository authority
+
+| Dimension | Value (verified this session) |
+| --- | --- |
+| `git fetch origin` | exit 0 |
+| Remote tip `origin/graph-4/real-voice-pairing-archive-e2e` | **`a2d0b27`** (CP-G4-023 fix 4) |
+| Local HEAD | `a2d0b27` — equal to remote (rev-list 0/0) |
+| `main` | untouched, not checked out |
+| Working tree at read-back | clean (before this session's fix-5 edits) |
+| History guard | forward-only; no force-push; no checkpoint deleted |
+
+### 7.2 The staged terminality is NOT a verdict (critical intake)
+
+`docs/receipts/GRAPH_46_TERMINAL_RECEIPT.md` (committed at e084be8) contains an
+intact `<!-- TERMINAL_VERDICT_PLACEHOLDER -->` in its condition-1 section, and
+`docs/receipts/ITALIAN_UI_REPORT.md` §6 contains an intact
+`<!-- VERDICT_PLACEHOLDER -->`. Both documents were pre-staged BEFORE the gate
+decided. **ITALIAN_UI_COMPLETE is not claimed anywhere yet** — the placeholders
+may only be filled from a real cloud run that shows every gate class
+`OK (… tests)`.
+
+### 7.3 Cloud evidence at the verified tip
+
+| Run | Workflow | Commit | Outcome (parsed from the job log THIS session) |
+| --- | --- | --- | --- |
+| 41938185541 (#132) | android-e2e | a2d0b27 | **CANCELLED at the 180-min job cap** (duration 3 h 0 m 24 s). Gate A1 FAILED: `AppNotIdleException` 60 s ASYNC_TASKS around `ActivityScenario.recreate()` — R-13's settle+ONE-retry was consumed, the retry threw the SAME exception (stack: `Espresso.onIdle` → `loopMainThreadUntilIdle`). Gate A2 **PASSED** (STATUS_CODE 0) — the R-12 direct-dispatch physics holds at this tip. Gate B: the emulator DIED (~00:39 UTC, 4th fleet death) — the offline-guard typed `DEVICE_OFFLINE_ABORT` and stopped the loop without burning timeouts (C–F and regression never ran; tally honestly 0/6). The UNBOUNDED `adb logcat -d` capture line then consumed **2 h 22 min** against the dead fleet until the cap cancelled the job BEFORE the verdict printed. → ledger **R-14** |
+| 41938185538 (#114) | android-debug-build | a2d0b27 | **BUILD SUCCESSFUL**: assembleDebug + testDebugUnitTest + lintDebug; lint 0 errors (badges: android-e2e failing, android-debug-build passing) |
+
+### 7.4 Physical state dimensions (re-verified live)
+
+| Dimension | Value |
+| --- | --- |
+| Localization | **652 keys ×5 locales** counted live (en/it/es/fr/de `strings.xml` each 652) — parity holds at the tip |
+| APKs (run #114 at the tip) | arm64-v8a **105,247,044 B** `59c3c26e…`; universal **206,679,899 B** `ebb9d7b4…`; x86_64 **109,176,588 B** `761f1693…` — sizes byte-identical to the c97a02f receipt; the briefing's "~165 MB" figure was the pre-split APK at b1df58a and is obsolete |
+| Unit tests | task green at the tip (BUILD SUCCESSFUL); last counted total 260/260 @ bba1ebc artifact 13350398668 |
+| STT | vosk-android 0.3.75 pinned + frame engine; `LOCAL_STT_READY_FOR_XIAOMI_QUALIFICATION` (STT_RUNTIME_RECEIPT.md) |
+| TTS | system TTS ACTIVE with real playback/interruption/engine read-back (TTS_RUNTIME_RECEIPT.md); Piper candidates verified-downloadable, runtime row honestly pending |
+| LLM | LocalLlmEngine DEFAULT DISABLED, typed-blocked generation, 10 unit tests → `LOCAL_LLM_IMPLEMENTED` (never QUALIFIED before Xiaomi) |
+| Archive | deterministic mock complete (§7 rows: search/pagination/filters/open/preview/cache/pin/provenance/hash/re-download), every record SIMULATED |
+| Tower | MONUMENTAL_TOWER_FINAL_REPORT.md — 7 previews with measured evidence; painterly delta honestly dispositioned |
+| Xiaomi package | docs/XIAOMI_GRAPH4_BETA_PACKAGE.md — dual APK, install/upgrade, 13-item matrix, 4 h soak |
+| GitHub API access | unauthenticated api.github.com rate-limited from this sandbox IP; authenticated reads executed via the stored git credential (never printed) |
+
+### 7.5 The true Next Exact Action (executed this session → CP-G4-023 fix 5)
+
+1. R-14 typed repair: `gateRecreateSteadily()` (AppNotIdle-only catch, backoff
+   3 s→10 s→30 s, three retries, fourth propagates honestly) wired at BOTH gate
+   recreate sites — `gateEnsureBaseline` (supersedes the R-13 single retry) and
+   ItalianGateA's raw `scenario.recreate()`. The REAL walk is unchanged; nothing
+   skipped or weakened.
+2. Workflow: `adb logcat -d`/`screencap` bounded `timeout 60`; residual
+   invocation offline-guard writing the typed `DEVICE_OFFLINE_ABORT` INTO
+   residual-output.txt (verdict channel stays honest); job timeout 180→300 min
+   (per-class arithmetic worst case ≈263 min; hosted ceiling 6 h).
+3. Governance: ledger R-14, WORK_LOG G4-N25, CHECKPOINT_INDEX fix-5 row, this §7.
+4. Push → the push-triggered run at the fix-5 tip is the deciding evidence:
+   gate 6/6 `OK (… tests)` + regression green-or-residual-typed + residual
+   typed → fill ITALIAN_UI_REPORT §6 and GRAPH_46_TERMINAL_RECEIPT §2 ONLY from
+   that run → then, and only then, §10 terminality. Any other outcome → next
+   typed ledger row + narrow repair + full rerun.

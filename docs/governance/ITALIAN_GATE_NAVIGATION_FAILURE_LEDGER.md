@@ -237,8 +237,24 @@ isolation), not the disposition.
 | Narrow repair | A2/B inject clicks + dialog cancel clicks now use the DIRECT semantics-action dispatch (gateClickByContentDescription / gateActivateRow — same proven physics); artifact glob corrected to `regression_*.txt`; the regression loop fast-fails on `adb get-state` failure (typed DEVICE_OFFLINE_ABORT); per-class timeout 900→600 s; gate invocation timeout 1500→3000 s (measured: A1 alone ≈ 12 min on the software fleet — six classes cannot fit 25 min); job timeout 120→180 min (boot+install+gate+6 classes+residual measured budget) |
 | Complete gate rerun | next workflow execution |
 
+## R-14 — baseline recreate idle-sync: the R-13 single retry was consumed and insufficient (run 41938185541 @ a2d0b27)
+
+| Field | Value |
+| --- | --- |
+| Run ID / commit | 41938185541 @ a2d0b27 (push, one-invocation-per-class gate model, fix-4 harness active) |
+| Run outcome | **CANCELLED at the 180-min job cap** — never reached a verdict |
+| Gate A1 | FAILED — `AppNotIdleException: Looped for 1 iterations over 60 SECONDS (ASYNC_TASKS_HAVE_IDLED)` around `ActivityScenario.recreate()`; the R-13 repair (fix-4 commit message designation; settle+ONE-retry) was consumed and the RETRY recreate threw the SAME exception seconds later (stack: `Espresso.onIdle` → `loopMainThreadUntilIdle` → `IdlingPolicy.handleTimeout`) |
+| Gate A2 | **PASSED** (STATUS_CODE 0) — the R-12 direct-dispatch physics holds at this tip; A1 passed bba1ebc, failed e084be8, failed a2d0b27 — the SAME code three different idle-sync outcomes: pure fleet physics |
+| Gate B | the emulator **DIED mid-invocation** (4th fleet death: `adb: device offline` at 00:39 UTC, ~38 min into the step) — the offline-guard aborted C–F with typed `DEVICE_OFFLINE_ABORT`, no timeout burned |
+| Regression / residual | offline-abort typed immediately (tally 0/0/[]); the residual's `adb logcat -d` capture line ran against the dead fleet UNBOUNDED and consumed 2 h 22 min until the 3 h cap cancelled the job BEFORE the verdict printed (the upload step only ran at 03:01:40 after the cancel signal) |
+| Typed classification | **INFRASTRUCTURE_FAILURE** (fleet death #4 + unbounded adb capture hang — E2E_BLOCKED_EMULATOR_ENVIRONMENT class) + **TEST_NAVIGATION_DEFECT-CLASS FLAKE** (AppNotIdleException at BOTH gate recreate sites — the TEST-E INCONCLUSIVE_EMULATOR_IDLE_SYNC lineage) |
+| Narrow repair (fix 5) | (1) `gateRecreateSteadily()` — ONE typed helper at EVERY gate recreate site: catches ONLY AppNotIdleException, backoff 3 s→10 s→30 s, three retries on top of the first attempt, fourth failure propagates honestly; replaces R-13's single retry in `gateEnsureBaseline` AND replaces A1's raw `scenario.recreate()`; nothing skipped, nothing weakened — the recreate must SUCCEED for the REAL walk to continue. (2) Workflow: `adb logcat -d` + `adb exec-out screencap` bounded `timeout 60`; residual invocation gets the same offline-guard (typed DEVICE_OFFLINE_ABORT written INTO residual-output.txt so the verdict channel stays honest); job timeout 180→300 min (arithmetic worst case of the per-class model ≈263 min) |
+| Complete gate rerun | next workflow execution (fix-5 tip) |
+
 ## Classification summary update
 
 | Run | Classification |
 | --- | --- |
 | R-12 | TEST_NAVIGATION_DEFECT + INFRASTRUCTURE_FAILURE (emulator death) |
+| R-13 | (fix-4 repair designation, commit a2d0b27 — baseline recreate settle+retry; no separate run row) |
+| R-14 | INFRASTRUCTURE_FAILURE (fleet death #4 + unbounded adb capture hang) + recreate idle-sync flake (AppNotIdleException at both gate recreate sites) |

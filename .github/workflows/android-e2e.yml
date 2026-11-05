@@ -27,7 +27,13 @@ permissions:
 jobs:
   emulator-e2e:
     runs-on: ubuntu-latest
-    timeout-minutes: 180
+    # CP-G4-023 fix 5 (run 41938185541 @ a2d0b27 — CANCELLED at the 180-min cap):
+    # the per-class model's arithmetic worst case is build ≈8 min + boot ≤40 min
+    # + settle/installs ≤35 min + gate 6×900 s (90) + regression 6×600 s (60) +
+    # residual 900 s (15) + evidence/uploads ≈15 min ≈ 263 min — the old 180-min
+    # cap can never carry a full worst-case run. 300 min keeps ~35 min of margin
+    # inside the hosted-runner 6-hour job ceiling.
+    timeout-minutes: 300
     steps:
       - name: Checkout
         uses: actions/checkout@v4
@@ -146,12 +152,18 @@ jobs:
             if [ -n "$E2E_CLASS_FILTER" ]; then IA=""; if [ "$E2E_PROFILE" = "LIFECYCLE" ]; then IA="$IA -e lifecycleProfile true"; fi; timeout 3600 adb shell am instrument -w -r $IA -e class "$E2E_CLASS_FILTER" com.hermestower.voiceconsole.test/androidx.test.runner.AndroidJUnitRunner > experiment-output.txt 2>&1; cat experiment-output.txt; fi
             if [ -z "$E2E_CLASS_FILTER" ]; then GOK=0; GBAD=""; for C in com.hermestower.voiceconsole.e2e.ItalianGateA_OnboardingConsoleTest com.hermestower.voiceconsole.e2e.ItalianGateB_ChatHistoryArchiveTest com.hermestower.voiceconsole.e2e.ItalianGateC_TowerGateQrScannerTest com.hermestower.voiceconsole.e2e.ItalianGateD_ModelsAndVoiceTest com.hermestower.voiceconsole.e2e.ItalianGateE_SettingsAppearanceLanguageTest com.hermestower.voiceconsole.e2e.ItalianGateF_DiagnosticsSelfTestAboutTest; do if ! adb get-state >/dev/null 2>&1; then echo "DEVICE_OFFLINE_ABORT — remaining gate classes have no runnable device (typed E2E_BLOCKED_EMULATOR_ENVIRONMENT)"; break; fi; F="gate_$(echo "$C" | sed 's/.*ItalianGate//;s/_.*//').txt"; timeout 900 adb shell am instrument -w -r -e class "$C" com.hermestower.voiceconsole.test/androidx.test.runner.AndroidJUnitRunner > "$F" 2>&1; cat "$F"; if grep -q 'OK ([0-9][0-9]* tests)' "$F"; then GOK=$((GOK+1)); else GBAD="$GBAD $C"; fi; done; echo "GATE_TALLY classes_ok=$GOK of 6 classes_failed:[$GBAD]"; fi
             if [ -z "$E2E_CLASS_FILTER" ]; then RC_OK=0; RC_RESIDUAL=0; RC_FAILED=""; for C in com.hermestower.voiceconsole.e2e.E2EFreshInstallTest com.hermestower.voiceconsole.e2e.E2ELifecycleProfileTest com.hermestower.voiceconsole.e2e.E2EModelManagerTest com.hermestower.voiceconsole.e2e.E2EOnboardingTest com.hermestower.voiceconsole.e2e.E2ESelfTestTest com.hermestower.voiceconsole.e2e.E2EVoiceFlowTest; do if ! adb get-state >/dev/null 2>&1; then echo "DEVICE_OFFLINE_ABORT — remaining regression classes have no runnable device (typed E2E_BLOCKED_EMULATOR_ENVIRONMENT)"; break; fi; F="regression_$(echo "$C" | sed 's/.*\.//').txt"; IA=""; if [ "$E2E_PROFILE" = "LIFECYCLE" ]; then IA="-e lifecycleProfile true"; fi; timeout 600 adb shell am instrument -w -r $IA -e class "$C" com.hermestower.voiceconsole.test/androidx.test.runner.AndroidJUnitRunner > "$F" 2>&1; cat "$F"; if grep -q 'OK ([0-9][0-9]* tests)' "$F"; then RC_OK=$((RC_OK+1)); elif grep -qE 'State must be at least CREATED to move to DESTROYED' "$F"; then RC_RESIDUAL=$((RC_RESIDUAL+1)); else RC_FAILED="$RC_FAILED $C"; fi; done; echo "REGRESSION_TALLY classes_ok=$RC_OK classes_residual_typed=$RC_RESIDUAL classes_failed:[$RC_FAILED]"; fi
-            if [ -z "$E2E_CLASS_FILTER" ]; then timeout 900 adb shell am instrument -w -r -e class com.hermestower.voiceconsole.e2e.E2EAppearancePersistenceTest com.hermestower.voiceconsole.test/androidx.test.runner.AndroidJUnitRunner > residual-output.txt 2>&1; cat residual-output.txt; fi
+            if [ -z "$E2E_CLASS_FILTER" ]; then if adb get-state >/dev/null 2>&1; then timeout 900 adb shell am instrument -w -r -e class com.hermestower.voiceconsole.e2e.E2EAppearancePersistenceTest com.hermestower.voiceconsole.test/androidx.test.runner.AndroidJUnitRunner > residual-output.txt 2>&1; else echo 'DEVICE_OFFLINE_ABORT — residual invocation has no runnable device (typed E2E_BLOCKED_EMULATOR_ENVIRONMENT)' > residual-output.txt; fi; cat residual-output.txt; fi
             # Evidence capture INSIDE the script step: the runner tears the emulator
             # down before the separate failure-evidence step can run, which produced
             # empty evidence on every failure so far (runs 41349811483 / 41356511688).
-            adb logcat -d -t 6000 > e2e-logcat-tail.txt 2>/dev/null || true
-            adb exec-out screencap -p > e2e-final-screen.png 2>/dev/null || true
+            # CP-G4-023 fix 5 (run 41938185541 @ a2d0b27): `adb logcat -d` against a
+            # DEAD fleet HANGS FOREVER — the device died during gate B, the residual
+            # invocation returned fast, and this UNBOUNDED logcat line then consumed
+            # 2 h 22 min until the 3 h job cap cancelled the run BEFORE the verdict
+            # could even print. Both capture lines are now bounded at 60 s; a dead
+            # device costs one minute, not the run.
+            timeout 60 adb logcat -d -t 6000 > e2e-logcat-tail.txt 2>/dev/null || true
+            timeout 60 adb exec-out screencap -p > e2e-final-screen.png 2>/dev/null || true
             # VERDICT — MUST be a single line. The emulator-runner executes this
             # script ONE LINE PER `sh -c` invocation (evidence: runs 41621063936 /
             # 41621713747 / 41621955951 each logged a standalone `if …; then` line

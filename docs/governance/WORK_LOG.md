@@ -923,3 +923,48 @@ CHECKPOINT: CP-G4-021/022/023 CLOSED; CP-G4-024 (terminality) = the E2E verdict 
 bba1ebc (run 41890040629) arbitrates ITALIAN_UI_COMPLETE and the terminal receipt.
 NEXT: read the bba1ebc E2E artifacts → ITALIAN_UI_REPORT verdict → terminal receipt
 GRAPH_4_IMPLEMENTATION_COMPLETE_XIAOMI_QUALIFICATION_PENDING (or the next typed fix).
+
+## G4-N25 (2026-11-05) — GRAPH 4.6: fresh read-back at a2d0b27 + R-14 gate/workflow repairs (directive §0/§11)
+
+NODE: GRAPH 4.6 §0 FIRST EXACT ACTION (fresh read-back, NEW session) + §11 Next Exact
+Action from the TRUE remote tip.
+FINDING: (1) FRESH READ-BACK: `git fetch origin` exit 0; remote tip VERIFIED
+**a2d0b27** (local HEAD == origin/graph-4/real-voice-pairing-archive-e2e, main
+untouched, tree clean) — the CP-G4-023 fix-4 commit is the true authority; every
+prior tip claim (b3b78ed et al.) superseded. (2) The staged terminality is NOT a
+verdict: GRAPH_46_TERMINAL_RECEIPT.md §2 and ITALIAN_UI_REPORT.md §6 both carry
+intact placeholders committed at e084be8 — ITALIAN_UI_COMPLETE remains UNCLAIMED
+until a real cloud run shows gate 6/6 OK. (3) Cloud evidence at the tip: E2E run
+41938185541 (#132) **CANCELLED at the 180-min cap** — gate A1 failed on the
+AppNotIdleException flake (R-13's single retry consumed; stack Espresso.onIdle →
+loopMainThreadUntilIdle), gate A2 **PASSED** (R-12 direct-dispatch physics holds),
+the emulator DIED a FOURTH time during gate B (typed DEVICE_OFFLINE_ABORT — the
+offline-guard worked), and the UNBOUNDED `adb logcat -d` capture line ran against
+the dead fleet for 2 h 22 min until the cap cancelled the job BEFORE the verdict.
+Build run 41938185538 (#114) at the same tip: BUILD SUCCESSFUL (assembleDebug +
+testDebugUnitTest + lintDebug), lint 0 errors, APKs byte-identical in size to the
+c97a02f receipt (arm64-v8a 105,247,044 B; universal 206,679,899 B; x86_64
+109,176,588 B — the "~165 MB" figure in the old briefing was the pre-split APK at
+b1df58a), strings counted live 652 ×5 locales (en/it/es/fr/de).
+ACTION: CP-G4-023 fix 5 — (a) R-14 typed repair: `gateRecreateSteadily()` in
+ItalianGateSupport (catch ONLY AppNotIdleException, backoff 3 s→10 s→30 s, three
+retries, fourth failure propagates honestly) wired at BOTH gate recreate sites
+(gateEnsureBaseline supersedes the R-13 single retry; ItalianGateA's raw
+`scenario.recreate()` replaced) — nothing skipped, nothing weakened, the REAL walk
+unchanged; (b) android-e2e.yml: logcat/screencap bounded `timeout 60`, residual
+invocation offline-guard writes the typed DEVICE_OFFLINE_ABORT into
+residual-output.txt (verdict channel stays honest), job timeout 180→300 min
+(per-class arithmetic worst case ≈263 min; hosted ceiling 6 h); (c) governance:
+ledger R-14 + this file + CHECKPOINT_INDEX + GRAPH46_READBACK §7 fresh read-back.
+FILES: app/src/androidTest/java/com/hermestower/voiceconsole/e2e/
+{ItalianGateSupport,ItalianGateA_OnboardingConsoleTest}.kt;
+.github/workflows/android-e2e.yml;
+docs/governance/{GRAPH46_READBACK,ITALIAN_GATE_NAVIGATION_FAILURE_LEDGER,WORK_LOG,
+CHECKPOINT_INDEX}.md.
+COMMIT: (this commit).
+CHECKPOINT: CP-G4-023 fix 5; CP-G4-024 (terminality) stays STAGED — both verdict
+placeholders intact until a cloud run at THIS tip shows gate 6/6 'OK (… tests)' +
+regression green-or-residual-typed + residual typed.
+NEXT: run #133 verdict → ITALIAN_UI_REPORT §6 + GRAPH_46_TERMINAL_RECEIPT §2 filled
+ONLY from that run → GRAPH_4_IMPLEMENTATION_COMPLETE_XIAOMI_QUALIFICATION_PENDING
+(or the next typed fix row).

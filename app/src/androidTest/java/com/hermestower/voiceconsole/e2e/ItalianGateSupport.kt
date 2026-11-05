@@ -6,6 +6,7 @@ import androidx.compose.ui.test.onAllNodesWithContentDescription
 import androidx.compose.ui.test.onAllNodesWithText
 import androidx.compose.ui.test.onNodeWithContentDescription
 import androidx.compose.ui.test.performClick
+import androidx.test.espresso.AppNotIdleException
 import androidx.test.platform.app.InstrumentationRegistry
 import com.hermestower.voiceconsole.R
 import com.hermestower.voiceconsole.locale.AppLanguage
@@ -153,12 +154,11 @@ fun HermesComposeRule.gateEnsureBaseline() {
         // main looper can stay busy >60 s (AsyncTask drain) → AppNotIdleException —
         // the SAME flake class TEST-E typed as INCONCLUSIVE_EMULATOR_IDLE_SYNC
         // (A1 passed in run bba1ebc and failed here on nothing but that flake).
-        // Repair: settle + ONE retry; the second failure propagates honestly.
-        runCatching { composeRuleScenarioRecreate() }
-            .onFailure {
-                Thread.sleep(3_000)
-                composeRuleScenarioRecreate()
-            }
+        // R-14 (run 41938185541 @ a2d0b27): the ONE-retry settlement was not enough
+        // — the retry recreate threw the SAME AppNotIdleException seconds later and
+        // honestly propagated. Superseded by gateRecreateSteadily() below (typed,
+        // bounded, three-retry); nothing is skipped, the recreate must SUCCEED.
+        gateRecreateSteadily()
         pumpUntil(30_000) {
             runCatching {
                 onAllNodesWithContentDescription(enDesc, substring = true).fetchSemanticsNodes().isNotEmpty() ||
@@ -170,7 +170,34 @@ fun HermesComposeRule.gateEnsureBaseline() {
     runCatching { gateSwitchLocaleAndAwait("en") }
 }
 
-private fun HermesComposeRule.composeRuleScenarioRecreate() {
+/**
+ * R-14 (run 41938185541 @ a2d0b27): the AppNotIdleException class around
+ * ActivityScenario.recreate() is NOT a one-shot flake. At that tip A1's own
+ * wizard recreate (then unprotected) threw it, and gateEnsureBaseline's
+ * R-13 single retry ALSO threw the same exception seconds later — the
+ * starved software fleet can keep AsyncTask drains alive past the 60 s
+ * idle policy repeatedly (the flake class TEST-E typed
+ * INCONCLUSIVE_EMULATOR_IDLE_SYNC; A1 passed bba1ebc, failed e084be8,
+ * failed a2d0b27 — nothing but fleet physics changed between them).
+ *
+ * Repair: ONE typed helper used at EVERY gate recreate site. It catches
+ * ONLY AppNotIdleException, settles with growing backoff (3 s → 10 s →
+ * 30 s) and re-issues the recreate (three retries on top of the first
+ * attempt). Any other failure — and a FOURTH consecutive AppNotIdle —
+ * propagates honestly. Nothing is skipped or weakened: the recreate must
+ * SUCCEED for the segment to continue its REAL product walk.
+ */
+fun HermesComposeRule.gateRecreateSteadily() {
+    val backoffsMs = longArrayOf(3_000, 10_000, 30_000)
+    for (attempt in backoffsMs.indices) {
+        try {
+            activityRule.scenario.recreate()
+            return
+        } catch (e: AppNotIdleException) {
+            Thread.sleep(backoffsMs[attempt])
+        }
+    }
+    // Fourth and last attempt: its failure is the honest typed outcome.
     activityRule.scenario.recreate()
 }
 
