@@ -2,6 +2,14 @@ package com.hermestower.voiceconsole.e2e
 
 import androidx.compose.ui.semantics.SemanticsActions
 import androidx.compose.ui.semantics.SemanticsProperties
+// R-27 (run #143 @ afefd3d, death #14): TouchInjectionScope.click is a
+// TOP-LEVEL EXTENSION (`public fun TouchInjectionScope.click(position: Offset
+// = center)`, TouchInjectionScope.kt line 392), not an interface member —
+// members resolve inside the performTouchInput lambda but full-gesture
+// extensions must be imported at the call site. Its absence was the single
+// compiler error (`412:38 Unresolved reference 'click'`) that killed BOTH
+// lanes before the emulator ever booted. No behavior change.
+import androidx.compose.ui.test.click
 import androidx.compose.ui.test.onAllNodesWithContentDescription
 import androidx.compose.ui.test.onAllNodesWithText
 import androidx.compose.ui.test.onNodeWithContentDescription

@@ -1153,3 +1153,23 @@ FILES: app/src/androidTest/java/com/hermestower/voiceconsole/e2e/
 COMMIT: (this commit).
 CHECKPOINT: CP-G4-023 fix 12 (R-26); CP-G4-024 STAGED.
 NEXT: the two-sample push runs arbitrate ITALIAN_UI_COMPLETE.
+
+## G4-N35 — CP-G4-023 fix 13 / R-27 (missing `click` import + androidTest compile gate)
+
+Run #143 (42050155253 @ afefd3d, two samples): BOTH lanes died at ~4 min —
+`compileDebugAndroidTestKotlin FAILED`, one compiler error each:
+`ItalianGateSupport.kt:412:38 Unresolved reference 'click'` (death #14, the
+first ZERO-fleet death: the emulator never booted). Artifact-proven root
+cause: `TouchInjectionScope.click` is a top-level extension (not a member) and
+must be imported at the call site; the R-26 fallback imported
+`performTouchInput` but not `click`. The build workflow never compiles
+androidTest, so the error reached the fleet twice. R-27: (1) the one-line
+import; (2) `:app:compileDebugAndroidTestKotlin` added to the
+android-debug-build step so BUILD_CODE_ERROR dies in the cheap build job. No
+test deleted, skipped or weakened.
+FILES: app/src/androidTest/java/com/hermestower/voiceconsole/e2e/
+ItalianGateSupport.kt; .github/workflows/android-debug-build.yml;
+docs/governance/{ITALIAN_GATE_NAVIGATION_FAILURE_LEDGER,WORK_LOG,GRAPH46_READBACK,CHECKPOINT_INDEX}.md.
+COMMIT: (this commit).
+CHECKPOINT: CP-G4-023 fix 13 (R-27); CP-G4-024 STAGED.
+NEXT: the dual-sample push runs arbitrate ITALIAN_UI_COMPLETE.

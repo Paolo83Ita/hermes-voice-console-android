@@ -396,3 +396,49 @@ Both placeholders remain INTACT; ITALIAN_UI_COMPLETE still not claimed;
 CP-G4-024 STAGED. This commit's dual-sample push runs are the deciding evidence:
 ANY lane showing gate 6/6 green + regression green-or-typed + residual typed →
 fill the two placeholders ONLY from that lane's artifacts → §10 terminality.
+
+## 14. §0 fresh read-back — session of 2026-11-05, part 7 (fix 13 / R-27)
+
+### 14.1 Authority verification
+
+Fresh fetch read-back (never trusting memory): remote tip
+origin/graph-4/real-voice-pairing-archive-e2e = local HEAD = `afefd3d`
+(fix 12 / R-26); `main` untouched (`e7ab101`). The decisive run #137
+(41990077345 @ `e89d014`) turned out to be the FIRST full-instrumentation
+evidence run and its honest verdict produced R-18..R-22; the chain then ran
+fix 9 (R-23, death #10), fix 10 (R-24, death #11), fix 11 (R-25, death #12),
+fix 11 deployment repair, fix 12 (R-26, death #13) — every step typed from
+parsed cloud logs, every tip push-triggered.
+
+### 14.2 Run #143 (42050155253 @ `afefd3d`) — arbitrated from full lane logs
+
+BOTH lanes (jobs 127323782870 / 127323782414) died at ~4 min — NOT in the
+fleet: `> Task :app:compileDebugAndroidTestKotlin FAILED` with exactly ONE
+compiler error on each lane:
+`e: ItalianGateSupport.kt:412:38 Unresolved reference 'click'`.
+The build run 42050155287 at the same tip was SUCCESS — the androidTest
+source set is only compiled inside the E2E workflow, so the R-26 harness
+change shipped without any androidTest compilation gate.
+
+### 14.3 Root cause (artifact-proven, zero speculation)
+
+`TouchInjectionScope.click` is a TOP-LEVEL EXTENSION
+(`public fun TouchInjectionScope.click(position: Offset = center)`,
+androidx.compose.ui.test.TouchInjectionScope.kt line 392), not an interface
+member: interface members (down/moveTo/up) resolve inside the
+`performTouchInput { }` lambda, full-gesture extensions must be imported at
+the call site. ItalianGateSupport.kt imported `performTouchInput` but not
+`click` — exactly one unresolved reference at the call site, identical on both
+lanes (BUILD_CODE_ERROR, deterministic; death #14).
+
+### 14.4 Repair executed (fix 13 / R-27) + Next Exact Action
+
+(1) `import androidx.compose.ui.test.click` added to ItalianGateSupport.kt —
+the single unresolved reference, no behavior change, the R-26 tap fallback
+semantics intact. (2) Structural leg: `:app:compileDebugAndroidTestKotlin`
+added to the android-debug-build build step so any future BUILD_CODE_ERROR in
+the harness fails the cheap build job and never reaches the fleet. No test
+deleted, skipped or weakened. Both placeholders remain INTACT; CP-G4-024
+STAGED. THIS commit's dual-sample push runs are the deciding evidence: ANY
+lane showing gate 6/6 green + regression green-or-typed + residual typed →
+fill the two placeholders ONLY from that lane's artifacts → §10 terminality.

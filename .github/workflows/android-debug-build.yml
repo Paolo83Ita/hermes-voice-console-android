@@ -37,7 +37,13 @@ jobs:
         uses: gradle/actions/setup-gradle@v4
 
       - name: Build debug APK and run unit tests
-        run: ./gradlew --no-daemon --console=plain :app:assembleDebug :app:testDebugUnitTest
+        # R-27 (run #143 @ afefd3d — BOTH lanes died in 4 min, death #14, on
+        # `ItalianGateSupport.kt:412:38 Unresolved reference 'click'`): the
+        # androidTest source set is only compiled inside the E2E workflow, so a
+        # non-compiling harness reached the fleet twice at full lane cost.
+        # Compile it HERE — a BUILD_CODE_ERROR must fail the cheap build job,
+        # never reach the emulator fleet. No test touched.
+        run: ./gradlew --no-daemon --console=plain :app:assembleDebug :app:testDebugUnitTest :app:compileDebugAndroidTestKotlin
 
       - name: Lint gate (blocking on errors — GRAPH 4 NODE 0 CP-G4-002)
         # abortOnError=true in app/build.gradle.kts: 0 lint errors is terminal truth;
