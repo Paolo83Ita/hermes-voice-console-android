@@ -1122,3 +1122,16 @@ COMMIT: (this commit).
 CHECKPOINT: CP-G4-023 fix 11 (R-25); CP-G4-024 STAGED.
 NEXT: the two-sample push runs arbitrate ITALIAN_UI_COMPLETE (or the next typed
 row).
+
+## G4-N33 — CP-G4-023 fix 11 deployment repair (duplicate YAML keys)
+
+The fix-11 push run 42033747789 failed AT TRIGGER TIME with ZERO jobs (run name
+degraded to the file path — the parse-rejection signature). Strict
+duplicate-key detection (pyyaml silently merges duplicates; GitHub Actions
+rejects them) found `if-no-files-found` + `retention-days` duplicated in the
+new per-lane verdict upload step; the duplicated pair was removed and strict
+no-duplicate-key validation is now part of the verification loop.
+FILES: .github/workflows/android-e2e.yml.
+COMMIT: (this commit).
+CHECKPOINT: CP-G4-023 fix 11 (R-25) deployment repair; CP-G4-024 STAGED.
+NEXT: the two-sample push runs arbitrate ITALIAN_UI_COMPLETE.
