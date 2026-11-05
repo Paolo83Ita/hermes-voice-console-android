@@ -1212,3 +1212,20 @@ docs/governance/{ITALIAN_GATE_NAVIGATION_FAILURE_LEDGER,WORK_LOG,GRAPH46_READBAC
 COMMIT: (this commit).
 CHECKPOINT: CP-G4-023 fix 15 (R-29+R-30); CP-G4-024 STAGED.
 NEXT: the dual-sample push runs arbitrate ITALIAN_UI_COMPLETE.
+
+## G4-N38 — CP-G4-023 fix 16 / R-31+R-32 (system-crash detection + boot bound)
+
+Run #146 (42088354468 @ bbf5cc1): lane 2 — INSTRUMENTATION_ABORTED: System has
+crashed during gate A (system_server dead, adb alive — collapse mode #16; 12
+classes burned in ~43 s, no evidence); lane 1 — R-28 fired correctly (R-29
+verified in production) but the relaunch missed the 1200 s boot bound. R-31:
+unified guest health (get-state AND pm-list probe) at 3 outer + 5 inner +
+1 mid-loop guard; in-class triggers + the residual retry also fire on the
+typed system-crash marker → the single R-28 relaunch + one re-invocation.
+R-32: relaunch boot bound 1800 s; cap 340→350 (worst ≈348). R-17's re-wait
+untouched. No test deleted, skipped or weakened.
+FILES: .github/workflows/android-e2e.yml;
+docs/governance/{ITALIAN_GATE_NAVIGATION_FAILURE_LEDGER,WORK_LOG,GRAPH46_READBACK,CHECKPOINT_INDEX}.md.
+COMMIT: (this commit).
+CHECKPOINT: CP-G4-023 fix 16 (R-31+R-32); CP-G4-024 STAGED.
+NEXT: the dual-sample push runs arbitrate ITALIAN_UI_COMPLETE.

@@ -503,3 +503,33 @@ CP-G4-024 STAGED. THIS commit's dual-sample push runs are the deciding
 evidence: ANY lane showing gate 6/6 green + regression green-or-typed +
 residual typed → fill the two placeholders ONLY from that lane's artifacts →
 §10 terminality.
+
+## 17. §0 fresh read-back — session of 2026-11-05, part 10 (fix 16 / R-31+R-32)
+
+### 17.1 Authority verification
+
+Fresh fetch read-back: remote tip = local HEAD = `bbf5cc1` (fix 15 /
+R-29+R-30); `main` untouched (`e7ab101`). The fix-15 build run (42088354391)
+= SUCCESS — uiautomator 2.3.0 resolved, the R-30 back path compiles.
+
+### 17.2 Run #146 (42088354468 @ `bbf5cc1`) — arbitrated from full lane logs
+
+Lane 2 (job 127459452797): `INSTRUMENTATION_ABORTED: System has crashed.`
+during gate A — system_server died with adb ALIVE (collapse mode #16); the
+device-loss guards correctly stayed silent; 12 classes burned in ~43 s with
+no evidence. Lane 1 (job 127386947318): R-28 fired EXACTLY as designed (the
+R-29 fix verified in production — the relaunch ran cleanly, no self-match)
+but the relaunched guest missed the 1200 s boot bound (R-28 UNBOOTED, typed
+honest abort). Verdict FAILED honestly on both lanes.
+
+### 17.3 Repair executed (fix 16 / R-31+R-32) + Next Exact Action
+
+R-31: unified guest health (get-state AND pm-list probe) at every guard; the
+in-class retries also fire on the typed `INSTRUMENTATION_ABORTED: System has
+crashed` marker — a crashed system now gets the same single R-28 relaunch +
+one re-invocation instead of 12 evidence-free classes. R-32: relaunch boot
+bound 1800 s; cap 350 (worst ≈348). Both placeholders remain INTACT;
+CP-G4-024 STAGED. THIS commit's dual-sample push runs are the deciding
+evidence: ANY lane showing gate 6/6 green + regression green-or-typed +
+residual typed → fill the two placeholders ONLY from that lane's artifacts →
+§10 terminality.
