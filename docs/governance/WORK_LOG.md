@@ -991,3 +991,26 @@ COMMIT: (this commit).
 CHECKPOINT: CP-G4-023 fix 5 (R-15 addendum); CP-G4-024 STAGED.
 NEXT: the rerun verdict at this tip arbitrates ITALIAN_UI_COMPLETE (or the next
 typed row).
+
+## G4-N27 (2026-11-05) — R-16: idling tolerance 60s→240s (the binding constraint), rerun re-entered
+
+NODE: GRAPH 4.6 §11 — monitor #135, classify, narrow repair.
+FINDING: run #135 @ 9508ac8 proved the R-14 helper mechanically correct and
+insufficient: A1's recreate hit AppNotIdleException through ALL FOUR attempts
+(class time 604 s = 4×60 s idle syncs + backoffs + setup), because the binding
+constraint is Espresso's 60 s MASTER idling policy against a drain that needs
+70–180 s under fleet starvation (it finishes — A1 passed at bba1ebc, A2 passed
+again here). Fleet death #7 hit mid-gate B; typed containment held everywhere.
+ACTION: R-16 — IdlingPolicies master+resource 240 s at gateEnsureBaseline (the
+R-7 precedent: evidence-backed tolerance raise; fresh process per gate class so
+exactly one class is affected; the recreate must still SUCCEED);
+gateRecreateSteadily resized to 2 retries (worst 3×240 s ≈ 760 s < 900 s
+per-class budget); ledger R-16 + this entry; governance commit re-enters the
+queue at the R-16 tip. No test deleted, skipped or weakened; no assertion touched.
+FILES: app/src/androidTest/java/com/hermestower/voiceconsole/e2e/
+ItalianGateSupport.kt; docs/governance/{ITALIAN_GATE_NAVIGATION_FAILURE_LEDGER,
+WORK_LOG,GRAPH46_READBACK,CHECKPOINT_INDEX}.md.
+COMMIT: (this commit).
+CHECKPOINT: CP-G4-023 fix 6 (R-16); CP-G4-024 STAGED.
+NEXT: run #136 verdict at this tip arbitrates ITALIAN_UI_COMPLETE (or the next
+typed row).

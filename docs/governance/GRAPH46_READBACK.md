@@ -155,6 +155,7 @@ may only be filled from a real cloud run that shows every gate class
 | 41938185538 (#114) | android-debug-build | a2d0b27 | **BUILD SUCCESSFUL**: assembleDebug + testDebugUnitTest + lintDebug; lint 0 errors (badges: android-e2e failing, android-debug-build passing) |
 | #115/#116 | android-debug-build | 8bffd60 / 7c57025 | **BOTH SUCCESS** — fix-5 code compiles; unit tests 260/260 COUNTED from the 7c57025 artifact (0 failures/errors/skipped); lint 0 errors; APK sizes byte-identical (arm64 105,247,044 / universal 206,679,899 / x86_64 109,176,588) |
 | #133 + #134 | android-e2e | 8bffd60 / 7c57025 | **BOTH INFRASTRUCTURE FAILURE (R-15)** — #134 boot-level (guest never online, zero instrumentation); #133 died at gate A start after compiling+installing the gate; all fix-5 mechanics verified under collapse (typed guards, bounded captures, honest verdict, ~1 h 05 m); NOT a code property |
+| #135 | android-e2e | 9508ac8 | **R-14 EXERCISED, POLICY BOUND PROVEN (R-16)** — A1 failed after 604 s: AppNotIdleException through ALL FOUR recreate attempts (the 60 s master idling policy is the constraint; the drain needs 70–180 s and finishes); A2 PASSED (3rd consecutive); fleet death #7 mid-gate B → typed aborts everywhere; repair: IdlingPolicies 240 s + retry resize |
 
 ### 7.4 Physical state dimensions (re-verified live)
 

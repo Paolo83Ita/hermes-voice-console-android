@@ -270,3 +270,16 @@ isolation), not the disposition.
 | Typed classification | **INFRASTRUCTURE_FAILURE ×2 (E2E_BLOCKED_EMULATOR_ENVIRONMENT)** — six deaths across the last six E2E executions (4 mid-gate, 1 boot-level, 1 gate-A-start); NOT a code property: the same gate harness PASSED A1 (bba1ebc) and A2 (e084be8 + a2d0b27) on healthier fleet samples |
 | Narrow repair | none required in code — the established "complete rerun on infrastructure failure" contract; this governance commit re-enters the queue at the current tip |
 | Complete gate rerun | THIS commit's push run |
+
+## R-16 — the 60 s master idling policy is the binding constraint, not the retry count (run #135 @ 9508ac8)
+
+| Field | Value |
+| --- | --- |
+| Run ID / commit | #135 (job 127078393485) @ 9508ac8 — R-14 helper ACTIVE and fully exercised |
+| Gate A1 | FAILED after `Time: 604.008` — `AppNotIdleException: Looped for 2 iterations over 60 SECONDS (ASYNC_TASKS_HAVE_IDLED)` propagated through ALL FOUR gateRecreateSteadily attempts (4 × 60 s idle sync + 3/10/30 s backoffs ≈ 283 s inside the 604 s class time). The helper worked as designed; the POLICY bound (60 s) failed four times — the drain needs MORE THAN 60 s, not more attempts |
+| Physics evidence | ActivityScenario.recreate() ends in Espresso.onIdle() (stack-proven in #132) bounded by IdlingPolicies' 60 s MASTER default; the drain FINISHES (A1 passed at bba1ebc with the same code; #135's own run continued past A1 and A2 PASSED again — the fleet was merely slow, not hung). The app-side relaunch physics (AppLanguage.apply + semantics polling) has NEVER hit this exception in any run — it never waits on the idle controller |
+| Gate A2 | PASSED again (3rd consecutive sample) |
+| Fleet death #7 | mid-gate B (06:47:44 UTC, ~7 min into B) → typed DEVICE_OFFLINE_ABORT for C–F + regression instant abort + residual guard typed — the containment worked as designed |
+| Typed classification | **FLEET-SPEED IDLE-SYNC TOLERANCE** (the TEST-E INCONCLUSIVE_EMULATOR_IDLE_SYNC lineage — the drain exceeds the 60 s policy under starvation) + **INFRASTRUCTURE_FAILURE** (death #7) |
+| Narrow repair | **R-16**: raise the espresso idling tolerance in the gate harness — `IdlingPolicies.setMasterPolicyTimeout(240, SECONDS)` + `setIdlingResourceTimeout(240, SECONDS)` at gateEnsureBaseline entry (fresh process per gate-class invocation, so exactly one class is affected); same precedent as R-7's evidence-backed destination floor (60 s), 4× the default, the recreate must STILL SUCCEED; gateRecreateSteadily resized to 2 retries (worst case 3×240 s + backoffs ≈ 760 s < the 900 s per-class budget) |
+| Complete gate rerun | next workflow execution (R-16 tip) |

@@ -7,11 +7,13 @@ import androidx.compose.ui.test.onAllNodesWithText
 import androidx.compose.ui.test.onNodeWithContentDescription
 import androidx.compose.ui.test.performClick
 import androidx.test.espresso.AppNotIdleException
+import androidx.test.espresso.IdlingPolicies
 import androidx.test.platform.app.InstrumentationRegistry
 import com.hermestower.voiceconsole.R
 import com.hermestower.voiceconsole.locale.AppLanguage
 import com.hermestower.voiceconsole.ui.screens.Onboarding
 import java.util.Locale
+import java.util.concurrent.TimeUnit
 
 /**
  * GRAPH 4 directive §4 — shared harness for the SEGMENTED Italian completeness
@@ -141,6 +143,18 @@ object ItalianGate {
  */
 fun HermesComposeRule.gateEnsureBaseline() {
     val ctx = InstrumentationRegistry.getInstrumentation().targetContext
+    // R-16 (runs 41938185541 #132 + #135 @ 9508ac8): ActivityScenario.recreate()
+    // ends in Espresso.onIdle() whose MASTER idling policy defaults to 60 s; under
+    // the starved software fleet the app's cold-start AsyncTask drain needs
+    // 70–180 s (it FINISHES — run #135's A1 class time of 604 s covers 4×60 s
+    // failed syncs + backoffs and still returned; A1 PASSED at bba1ebc when the
+    // fleet was healthier). The harness's own R-7 precedent: raise the tolerance
+    // with evidence — 240 s master + idling-resource policy, 4× the default.
+    // The recreate must still SUCCEED for the walk to continue; only the idle
+    // tolerance changes. Fresh process per `am instrument -e class` invocation,
+    // so this applies to exactly the one gate class running.
+    IdlingPolicies.setMasterPolicyTimeout(240, TimeUnit.SECONDS)
+    IdlingPolicies.setIdlingResourceTimeout(240, TimeUnit.SECONDS)
     Onboarding.markDone(ctx)
     val enDesc = ItalianGate.localizedString(R.string.nav_open_drawer, "en")
     val itDesc = ItalianGate.localizedString(R.string.nav_open_drawer, "it")
@@ -181,14 +195,15 @@ fun HermesComposeRule.gateEnsureBaseline() {
  * failed a2d0b27 — nothing but fleet physics changed between them).
  *
  * Repair: ONE typed helper used at EVERY gate recreate site. It catches
- * ONLY AppNotIdleException, settles with growing backoff (3 s → 10 s →
- * 30 s) and re-issues the recreate (three retries on top of the first
- * attempt). Any other failure — and a FOURTH consecutive AppNotIdle —
- * propagates honestly. Nothing is skipped or weakened: the recreate must
- * SUCCEED for the segment to continue its REAL product walk.
+ * ONLY AppNotIdleException, settles with backoff and re-issues the recreate
+ * (two retries on top of the first attempt — with the R-16 240 s idling
+ * policy the worst case 3×240 s + backoffs ≈ 760 s stays inside the 900 s
+ * per-class invocation budget). Any other failure — and a THIRD consecutive
+ * AppNotIdle — propagates honestly. Nothing is skipped or weakened: the
+ * recreate must SUCCEED for the segment to continue its REAL product walk.
  */
 fun HermesComposeRule.gateRecreateSteadily() {
-    val backoffsMs = longArrayOf(3_000, 10_000, 30_000)
+    val backoffsMs = longArrayOf(10_000, 30_000)
     for (attempt in backoffsMs.indices) {
         try {
             activityRule.scenario.recreate()
@@ -197,7 +212,7 @@ fun HermesComposeRule.gateRecreateSteadily() {
             Thread.sleep(backoffsMs[attempt])
         }
     }
-    // Fourth and last attempt: its failure is the honest typed outcome.
+    // Third and last attempt: its failure is the honest typed outcome.
     activityRule.scenario.recreate()
 }
 
