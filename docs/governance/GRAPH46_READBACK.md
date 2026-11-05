@@ -160,7 +160,7 @@ may only be filled from a real cloud run that shows every gate class
 | --- | --- |
 | Localization | **652 keys ×5 locales** counted live (en/it/es/fr/de `strings.xml` each 652) — parity holds at the tip |
 | APKs (run #114 at the tip) | arm64-v8a **105,247,044 B** `59c3c26e…`; universal **206,679,899 B** `ebb9d7b4…`; x86_64 **109,176,588 B** `761f1693…` — sizes byte-identical to the c97a02f receipt; the briefing's "~165 MB" figure was the pre-split APK at b1df58a and is obsolete |
-| Unit tests | task green at the tip (BUILD SUCCESSFUL); last counted total 260/260 @ bba1ebc artifact 13350398668 |
+| Unit tests | **260/260 COUNTED** from the a2d0b27 artifact 13375237125 (tests=260, failures=0, errors=0, skipped=0) — task green at the tip (BUILD SUCCESSFUL) |
 | STT | vosk-android 0.3.75 pinned + frame engine; `LOCAL_STT_READY_FOR_XIAOMI_QUALIFICATION` (STT_RUNTIME_RECEIPT.md) |
 | TTS | system TTS ACTIVE with real playback/interruption/engine read-back (TTS_RUNTIME_RECEIPT.md); Piper candidates verified-downloadable, runtime row honestly pending |
 | LLM | LocalLlmEngine DEFAULT DISABLED, typed-blocked generation, 10 unit tests → `LOCAL_LLM_IMPLEMENTED` (never QUALIFIED before Xiaomi) |
