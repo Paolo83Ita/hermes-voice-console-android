@@ -148,7 +148,17 @@ fun HermesComposeRule.gateEnsureBaseline() {
             onAllNodesWithContentDescription(itDesc, substring = true).fetchSemanticsNodes().isNotEmpty()
     }.getOrDefault(false)
     if (!drawerVisible) {
-        composeRuleScenarioRecreate()
+        // R-13 (run 41910303552 @ e084be8): ActivityScenario.recreate() synchronizes
+        // with the espresso idle controller; under the starved software fleet the
+        // main looper can stay busy >60 s (AsyncTask drain) → AppNotIdleException —
+        // the SAME flake class TEST-E typed as INCONCLUSIVE_EMULATOR_IDLE_SYNC
+        // (A1 passed in run bba1ebc and failed here on nothing but that flake).
+        // Repair: settle + ONE retry; the second failure propagates honestly.
+        runCatching { composeRuleScenarioRecreate() }
+            .onFailure {
+                Thread.sleep(3_000)
+                composeRuleScenarioRecreate()
+            }
         pumpUntil(30_000) {
             runCatching {
                 onAllNodesWithContentDescription(enDesc, substring = true).fetchSemanticsNodes().isNotEmpty() ||

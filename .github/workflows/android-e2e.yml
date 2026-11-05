@@ -118,7 +118,13 @@ jobs:
             # instrumentation PROCESS, destroying every later class's evidence.
             # Repair = crash-quarantine BY INVOCATION — nothing deleted, weakened
             # or bypassed:
-            #   1) GATE invocation: the six segmented Italian classes (§4) — MUST pass;
+            #   1) GATE: ONE INVOCATION PER CLASS (fix 4, run 41910303552: the
+            #      software fleet DIED twice mid-gate (adb: device offline at
+            #      ~100-110 min of the step) — a single 6-class instrument can
+            #      never complete; per-class invocations give every segment
+            #      independent evidence and the offline-guard stops the loop fast.
+            #      ITALIAN_UI_COMPLETE requires EVERY gate class file to show
+            #      'OK (… tests)' — missing evidence is NOT success;
             #   2) REGRESSION: ONE INVOCATION PER CLASS (Graph 4.6 R-11, run
             #      41868118783: the residual crashed E2EFreshInstallTest at
             #      e2e_03_04 — it is CLASS-INDEPENDENT and route-independent, so a
@@ -138,7 +144,7 @@ jobs:
             # Dispatch with e2e_class_filter keeps the EXACT old single-invocation
             # contract for the lifecycle experiments (TEST-A..E channel, §2).
             if [ -n "$E2E_CLASS_FILTER" ]; then IA=""; if [ "$E2E_PROFILE" = "LIFECYCLE" ]; then IA="$IA -e lifecycleProfile true"; fi; timeout 3600 adb shell am instrument -w -r $IA -e class "$E2E_CLASS_FILTER" com.hermestower.voiceconsole.test/androidx.test.runner.AndroidJUnitRunner > experiment-output.txt 2>&1; cat experiment-output.txt; fi
-            if [ -z "$E2E_CLASS_FILTER" ]; then GC="com.hermestower.voiceconsole.e2e.ItalianGateA_OnboardingConsoleTest,com.hermestower.voiceconsole.e2e.ItalianGateB_ChatHistoryArchiveTest,com.hermestower.voiceconsole.e2e.ItalianGateC_TowerGateQrScannerTest,com.hermestower.voiceconsole.e2e.ItalianGateD_ModelsAndVoiceTest,com.hermestower.voiceconsole.e2e.ItalianGateE_SettingsAppearanceLanguageTest,com.hermestower.voiceconsole.e2e.ItalianGateF_DiagnosticsSelfTestAboutTest"; IA=""; if [ "$E2E_PROFILE" = "LIFECYCLE" ]; then IA="$IA -e lifecycleProfile true"; fi; timeout 3000 adb shell am instrument -w -r $IA -e class "$GC" com.hermestower.voiceconsole.test/androidx.test.runner.AndroidJUnitRunner > gate-output.txt 2>&1; cat gate-output.txt; fi
+            if [ -z "$E2E_CLASS_FILTER" ]; then GOK=0; GBAD=""; for C in com.hermestower.voiceconsole.e2e.ItalianGateA_OnboardingConsoleTest com.hermestower.voiceconsole.e2e.ItalianGateB_ChatHistoryArchiveTest com.hermestower.voiceconsole.e2e.ItalianGateC_TowerGateQrScannerTest com.hermestower.voiceconsole.e2e.ItalianGateD_ModelsAndVoiceTest com.hermestower.voiceconsole.e2e.ItalianGateE_SettingsAppearanceLanguageTest com.hermestower.voiceconsole.e2e.ItalianGateF_DiagnosticsSelfTestAboutTest; do if ! adb get-state >/dev/null 2>&1; then echo "DEVICE_OFFLINE_ABORT — remaining gate classes have no runnable device (typed E2E_BLOCKED_EMULATOR_ENVIRONMENT)"; break; fi; F="gate_$(echo "$C" | sed 's/.*ItalianGate//;s/_.*//').txt"; timeout 900 adb shell am instrument -w -r -e class "$C" com.hermestower.voiceconsole.test/androidx.test.runner.AndroidJUnitRunner > "$F" 2>&1; cat "$F"; if grep -q 'OK ([0-9][0-9]* tests)' "$F"; then GOK=$((GOK+1)); else GBAD="$GBAD $C"; fi; done; echo "GATE_TALLY classes_ok=$GOK of 6 classes_failed:[$GBAD]"; fi
             if [ -z "$E2E_CLASS_FILTER" ]; then RC_OK=0; RC_RESIDUAL=0; RC_FAILED=""; for C in com.hermestower.voiceconsole.e2e.E2EFreshInstallTest com.hermestower.voiceconsole.e2e.E2ELifecycleProfileTest com.hermestower.voiceconsole.e2e.E2EModelManagerTest com.hermestower.voiceconsole.e2e.E2EOnboardingTest com.hermestower.voiceconsole.e2e.E2ESelfTestTest com.hermestower.voiceconsole.e2e.E2EVoiceFlowTest; do if ! adb get-state >/dev/null 2>&1; then echo "DEVICE_OFFLINE_ABORT — remaining regression classes have no runnable device (typed E2E_BLOCKED_EMULATOR_ENVIRONMENT)"; break; fi; F="regression_$(echo "$C" | sed 's/.*\.//').txt"; IA=""; if [ "$E2E_PROFILE" = "LIFECYCLE" ]; then IA="-e lifecycleProfile true"; fi; timeout 600 adb shell am instrument -w -r $IA -e class "$C" com.hermestower.voiceconsole.test/androidx.test.runner.AndroidJUnitRunner > "$F" 2>&1; cat "$F"; if grep -q 'OK ([0-9][0-9]* tests)' "$F"; then RC_OK=$((RC_OK+1)); elif grep -qE 'State must be at least CREATED to move to DESTROYED' "$F"; then RC_RESIDUAL=$((RC_RESIDUAL+1)); else RC_FAILED="$RC_FAILED $C"; fi; done; echo "REGRESSION_TALLY classes_ok=$RC_OK classes_residual_typed=$RC_RESIDUAL classes_failed:[$RC_FAILED]"; fi
             if [ -z "$E2E_CLASS_FILTER" ]; then timeout 900 adb shell am instrument -w -r -e class com.hermestower.voiceconsole.e2e.E2EAppearancePersistenceTest com.hermestower.voiceconsole.test/androidx.test.runner.AndroidJUnitRunner > residual-output.txt 2>&1; cat residual-output.txt; fi
             # Evidence capture INSIDE the script step: the runner tears the emulator
@@ -154,7 +160,7 @@ jobs:
             # so even a fully green suite would have failed the job before any
             # truthful classification). One line, POSIX-safe, same semantics.
             if [ -n "$E2E_CLASS_FILTER" ]; then grep -q 'OK ([0-9][0-9]* tests)' experiment-output.txt && echo 'E2E_VERDICT_PASSED' || { echo 'E2E_VERDICT_FAILED'; exit 1; }; fi
-            if [ -z "$E2E_CLASS_FILTER" ]; then VERDICT=OK; grep -q 'OK ([0-9][0-9]* tests)' gate-output.txt || VERDICT=FAIL; for RF in regression_*.txt; do grep -q 'OK ([0-9][0-9]* tests)' "$RF" || grep -qE 'State must be at least CREATED to move to DESTROYED' "$RF" || VERDICT=FAIL; done; { grep -qE 'State must be at least CREATED to move to DESTROYED|OK \([0-9][0-9]* tests\)' residual-output.txt; } || VERDICT=FAIL; if [ "$VERDICT" = "OK" ]; then echo 'E2E_VERDICT_PASSED (gate green, per-class regression green-or-residual-typed, residual typed)'; else echo 'E2E_VERDICT_FAILED'; exit 1; fi; fi
+            if [ -z "$E2E_CLASS_FILTER" ]; then VERDICT=OK; GOK=0; for GF in gate_*.txt; do grep -q 'OK ([0-9][0-9]* tests)' "$GF" && GOK=$((GOK+1)) || VERDICT=FAIL; done; [ "$GOK" -eq 6 ] || VERDICT=FAIL; for RF in regression_*.txt; do grep -q 'OK ([0-9][0-9]* tests)' "$RF" || grep -qE 'State must be at least CREATED to move to DESTROYED' "$RF" || VERDICT=FAIL; done; { grep -qE 'State must be at least CREATED to move to DESTROYED|OK \([0-9][0-9]* tests\)' residual-output.txt; } || VERDICT=FAIL; if [ "$VERDICT" = "OK" ]; then echo "E2E_VERDICT_PASSED (gate $GOK/6 green, per-class regression green-or-residual-typed, residual typed)"; else echo 'E2E_VERDICT_FAILED'; exit 1; fi; fi
 
       - name: Upload connected-test results
         if: always()
@@ -164,8 +170,7 @@ jobs:
           path: |
             app/build/outputs/androidTest-results/
             app/build/reports/androidTests/
-            instrumentation-output.txt
-            gate-output.txt
+            gate_*.txt
             regression_*.txt
             residual-output.txt
             experiment-output.txt
@@ -196,10 +201,9 @@ jobs:
               r"PAIRING_CODE\s*=\s*\S", r"Bearer [A-Za-z0-9._-]{16,}",
           )]
           roots = [pathlib.Path("app/build/outputs/androidTest-results"),
-                   pathlib.Path("instrumentation-output.txt"),
-                   pathlib.Path("gate-output.txt"),
                    pathlib.Path("residual-output.txt"),
                    pathlib.Path("experiment-output.txt")]
+          roots += sorted(pathlib.Path('.').glob("gate_*.txt"))
           roots += sorted(pathlib.Path('.').glob("regression_*.txt"))
           hits = []
           for root in roots:
