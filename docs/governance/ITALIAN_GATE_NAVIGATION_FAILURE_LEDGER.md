@@ -392,3 +392,14 @@ No test deleted, skipped or weakened; no assertion touched.
 | Narrow repair | **R-27**: (1) the missing `import androidx.compose.ui.test.click` — the single unresolved reference; the R-26 physical-tap fallback semantics are UNCHANGED (OnClick direct dispatch first, prefix-matched tap as the last mile, the destination anchor still decides); (2) structural leg: `:app:compileDebugAndroidTestKotlin` added to the android-debug-build build step — any future BUILD_CODE_ERROR fails the ~3-min build job and never reaches the emulator fleet |
 | Semantics | nothing deleted, skipped or weakened — a one-line import + a build-stage compilation task; no assertion, walk or budget touched |
 | Complete gate rerun | THIS commit's push run (two samples) |
+
+## R-28 — the emulator PROCESS dies: guest relaunch recovery (run #144 42059335798 @ 7c17745, BOTH lanes)
+
+| Field | Value |
+| --- | --- |
+| Evidence | BOTH lanes died ~40 min in, in the SAME window: gate A `OK (2 tests)` on both (6th consecutive cloud sample), ColorBuffer errors precede the death (lane 1 16:27:24, lane 2 16:20-16:28), and the guest becomes FULLY unreachable — `could not connect to TCP port 5554: Connection refused`: the EMULATOR PROCESS dies, not just the adb transport. The B-window is now the dominant kill zone (#132/#135/#140/#144) |
+| Why the deployed mechanisms did not cover it | R-23's transport recovery is correct for wedges and CANNOT revive a dead process (it correctly refused in #144); R-17 covers only the boot→install window; R-24 pays cold-start costs; R-25's two independent samples reduce but do not eliminate the correlated fleet-event risk (both lanes died in the same event class in the same run) |
+| Typed classification | **INFRASTRUCTURE_FAILURE (emulator process death in the gate-B window) — death #15, dual-lane correlated** |
+| Narrow repair | **R-28** (the R-14/R-17/R-23 lineage — ONE typed bounded recovery for ONE evidenced collapse class): when the device is still gone after the R-23 attempt, relaunch the SAME AVD ONCE per lane (file-flag `r28_used.flag` — the runner executes the script ONE LINE PER sh -c so variables die across lines; a file survives), warm boot bounded 1200 s + settle 60 s + the R-17-style `pm list packages` health probe; the class whose invocation died WITH the device is re-invoked ONCE after the relaunch and its evidence file REWRITTEN — a test that fails on the relaunched guest still fails honestly; unrecovered after R-28 → the same typed honest abort. Cap 310→340 (worst case ≈337 < hosted 360) |
+| Semantics | nothing deleted, skipped or weakened: verdict logic untouched (6/6 gates + regression green-or-typed + residual typed; missing evidence is NOT success); the re-invocation fires ONLY for the class whose invocation coincided with the device death, and its rewritten file must still print the full `OK (… tests)` |
+| Complete gate rerun | THIS commit's push run (two samples) |

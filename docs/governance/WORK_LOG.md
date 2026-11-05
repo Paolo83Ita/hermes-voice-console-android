@@ -1173,3 +1173,21 @@ docs/governance/{ITALIAN_GATE_NAVIGATION_FAILURE_LEDGER,WORK_LOG,GRAPH46_READBAC
 COMMIT: (this commit).
 CHECKPOINT: CP-G4-023 fix 13 (R-27); CP-G4-024 STAGED.
 NEXT: the dual-sample push runs arbitrate ITALIAN_UI_COMPLETE.
+
+## G4-N36 — CP-G4-023 fix 14 / R-28 (guest relaunch recovery)
+
+Run #144 (42059335798 @ 7c17745, two samples): BOTH lanes died ~40 min in —
+gate A green on both (6th consecutive), ColorBuffer errors, then the guest
+FULLY unreachable (`could not connect to TCP port 5554: Connection refused`) —
+the emulator PROCESS dies mid-gate-B (death #15, dual-lane correlated; the
+B-window kill zone #132/#135/#140/#144). R-23 correctly refused. R-28: one
+typed bounded relaunch of the SAME AVD per lane (file-flag r28_used.flag,
+bounded 1200 s warm boot + settle + pm-list probe), the class that died WITH
+the device re-invoked ONCE with its file rewritten; verdict logic untouched;
+cap 310→340 (worst ≈337). No test deleted, skipped or weakened.
+FILES: .github/workflows/android-e2e.yml;
+docs/governance/{ITALIAN_GATE_NAVIGATION_FAILURE_LEDGER,WORK_LOG,GRAPH46_READBACK,CHECKPOINT_INDEX}.md
+(verification loop: strict no-duplicate-key YAML parse + per-line sh -n + structural assertions — all passed).
+COMMIT: (this commit).
+CHECKPOINT: CP-G4-023 fix 14 (R-28); CP-G4-024 STAGED.
+NEXT: the dual-sample push runs arbitrate ITALIAN_UI_COMPLETE.

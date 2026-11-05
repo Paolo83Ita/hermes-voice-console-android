@@ -442,3 +442,32 @@ deleted, skipped or weakened. Both placeholders remain INTACT; CP-G4-024
 STAGED. THIS commit's dual-sample push runs are the deciding evidence: ANY
 lane showing gate 6/6 green + regression green-or-typed + residual typed →
 fill the two placeholders ONLY from that lane's artifacts → §10 terminality.
+
+## 15. §0 fresh read-back — session of 2026-11-05, part 8 (fix 14 / R-28)
+
+### 15.1 Authority verification
+
+Fresh fetch read-back: remote tip = local HEAD = `7c17745` (fix 13 / R-27);
+`main` untouched (`e7ab101`). The fix-13 build run 42059335648 = SUCCESS —
+`:app:compileDebugAndroidTestKotlin` passed with the R-27 import (root-cause
+repair compile-verified) and the build-stage androidTest gate is LIVE.
+
+### 15.2 Run #144 (42059335798 @ `7c17745`) — arbitrated from full lane logs
+
+BOTH lanes died ~40 min in, gate A `OK (2 tests)` on both (6th consecutive
+cloud sample), ColorBuffer errors precede the death, and the guest becomes
+FULLY unreachable (`could not connect to TCP port 5554: Connection refused`) —
+the EMULATOR PROCESS dies. The B-window is the dominant kill zone
+(#132/#135/#140/#144). R-23 correctly refused (a dead process is not a
+transport wedge). Death #15, dual-lane correlated.
+
+### 15.3 Repair executed (fix 14 / R-28) + Next Exact Action
+
+ONE typed bounded recovery for the evidenced collapse class: relaunch the SAME
+AVD once per lane (file-flag survives the one-line-per-sh -c execution),
+bounded warm boot + settle + R-17-style health probe; the class that died WITH
+the device is re-invoked ONCE, its file rewritten; verdict logic untouched.
+Cap 310→340 (worst ≈337). Both placeholders remain INTACT; CP-G4-024 STAGED.
+THIS commit's dual-sample push runs are the deciding evidence: ANY lane showing
+gate 6/6 green + regression green-or-typed + residual typed → fill the two
+placeholders ONLY from that lane's artifacts → §10 terminality.
