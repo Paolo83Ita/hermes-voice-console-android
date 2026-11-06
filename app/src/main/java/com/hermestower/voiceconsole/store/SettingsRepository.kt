@@ -30,6 +30,8 @@ class SettingsRepository(context: Context) {
             captionsEnabled = prefs.tolerantBool(K_CAPTIONS, d.captionsEnabled),
             brightnessScrim = prefs.tolerantFloat(K_SCRIM, d.brightnessScrim),
             speakingRate = prefs.tolerantFloat(K_RATE, d.speakingRate),
+            // OWNER PHYSICAL RETEST §5: pitch persists and reads back after restart.
+            speechPitch = prefs.tolerantFloat(K_PITCH, d.speechPitch),
             visualQuality = prefs.tolerantString(K_VISUAL_QUALITY, d.visualQuality),
             localLlmEnabled = prefs.tolerantBool(K_LLM_ENABLED, d.localLlmEnabled),
         )
@@ -46,6 +48,7 @@ class SettingsRepository(context: Context) {
             .putBoolean(K_CAPTIONS, settings.captionsEnabled)
             .putFloat(K_SCRIM, settings.brightnessScrim)
             .putFloat(K_RATE, settings.speakingRate)
+            .putFloat(K_PITCH, settings.speechPitch)
             .putString(K_VISUAL_QUALITY, settings.visualQuality)
             .putBoolean(K_LLM_ENABLED, settings.localLlmEnabled)
             .apply()
@@ -83,6 +86,7 @@ class SettingsRepository(context: Context) {
         const val K_CAPTIONS = "captions_enabled"
         const val K_SCRIM = "brightness_scrim"
         const val K_RATE = "speaking_rate"
+        const val K_PITCH = "speech_pitch"
         const val K_VISUAL_QUALITY = "visual_quality"
         const val K_LLM_ENABLED = "local_llm_enabled"
     }

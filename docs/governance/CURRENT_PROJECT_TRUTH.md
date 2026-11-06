@@ -165,3 +165,32 @@ Secret/device scan: 0 findings in working tree and full git history (scripts/sec
   (`ITALIAN_VOICE_ACTIVE` / `ITALIAN_VOICE_READY_AND_BLOCKED_BY_KNOWN_RUNTIME_LIMITATION`
   still gated on the next physical cycle's runtime read-back); owner screenshots for
   the layout ledger; second-cycle installation evidence.
+
+---
+
+# OWNER PHYSICAL RETEST FAILURE TRUTH (appended 2026-11-06; second physical cycle)
+
+- The Owner re-tested on the physical POCO X6 Pro and REJECTED the checkpoint:
+  state **OWNER_RETEST_FAILED_REPAIR_REQUIRED** /
+  `CHECKPOINT_REJECTED_PENDING_REPAIR` (receipt:
+  `docs/receipts/OWNER_PHYSICAL_RETEST_FAILURE_RECEIPT.md`).
+- Physical failures recorded: PHYSICAL-FAIL-01 English spoken response;
+  PHYSICAL-FAIL-02 `HIGH_PITCH_ENGLISH_TTS_OUTPUT` (no speaker identity/gender
+  inferred anywhere); PHYSICAL-FAIL-03 Verify-button text layout in Models and
+  Voice; PHYSICAL-FAIL-04 microphone-activation icon indistinguishable from the
+  mute icon; PHYSICAL-FAIL-05 no material improvement perceived.
+- Explicitly NOT true (prohibited tokens): `ITALIAN_TTS_OWNER_VERIFIED`,
+  `RESPONSIVE_UI_QUALIFIED`, `POCO_RETEST_PASSED`. The CP-G4-026/027/028
+  implementation checkpoint is NOT Owner-accepted.
+- Installed-build provenance of the retested APK: UNPROVEN — the supplied
+  build exposed no in-app build identity. The retest observations cannot be
+  bound to an exact binary; the repair build closes this forward (build
+  identity panel, build-injected values, on-device measured APK SHA-256).
+- Pre-repair code truth (read-back at `53841a5`): the spoken path is
+  FAIL-OPEN — `AndroidSystemTtsEngine.speak()` never blocks on the Italian
+  negotiation verdict, and no `setSpeechRate`/`setPitch` exists in the entire
+  pipeline; the in-app `APP_VERSION` constant was stale (`0.2.0-debug`)
+  against BuildConfig `0.3.0-alpha-graph4` (drift removed this cycle).
+- Repair cycle in flight (Owner priority override unchanged): Italian
+  fail-closed TTS → speech profile → Verify button → control semantics →
+  build identity → `POCO_RETEST_PACKAGE_2_READY`.

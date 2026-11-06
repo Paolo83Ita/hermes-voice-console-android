@@ -187,5 +187,70 @@ class ItalianTtsVoiceNegotiatorTest {
         assertNull(out.voiceReadback)
         assertNull(out.spokenText)
         assertNull(out.error)
+        // OWNER PHYSICAL RETEST §4: the fail-closed block surface is typed and
+        // null in the normal path.
+        assertNull(out.speakBlocked)
+    }
+
+    // ---- OWNER PHYSICAL RETEST: quality-aware selection + inventory ----
+
+    @Test
+    fun `selection prefers the highest quality within a tier`() {
+        val lowQuality = ItalianTtsVoiceNegotiator.TtsVoiceCandidate(
+            name = "it-a-low", localeTag = "it-IT", requiresNetwork = false, quality = 300,
+        )
+        val highQuality = ItalianTtsVoiceNegotiator.TtsVoiceCandidate(
+            name = "it-b-high", localeTag = "it-IT", requiresNetwork = false, quality = 500,
+        )
+        assertEquals("it-b-high", ItalianTtsVoiceNegotiator.selectVoice(listOf(lowQuality, highQuality))?.name)
+    }
+
+    @Test
+    fun `quality never overrides the offline preference`() {
+        val networkedHigh = ItalianTtsVoiceNegotiator.TtsVoiceCandidate(
+            name = "it-net-high", localeTag = "it-IT", requiresNetwork = true, quality = 500,
+        )
+        val offlineLow = ItalianTtsVoiceNegotiator.TtsVoiceCandidate(
+            name = "it-off-low", localeTag = "it-IT", requiresNetwork = false, quality = 300,
+        )
+        assertEquals("it-off-low", ItalianTtsVoiceNegotiator.selectVoice(listOf(networkedHigh, offlineLow))?.name)
+    }
+
+    @Test
+    fun `inventory counts the italian offline and networked voices`() {
+        val inv = ItalianTtsVoiceNegotiator.inventory(
+            engineName = "com.google.android.tts",
+            candidates = listOf(
+                ItalianTtsVoiceNegotiator.TtsVoiceCandidate("en-a", "en-US", false),
+                offlineItaly,
+                networkedItaly,
+            ),
+            selectedVoiceName = offlineItaly.name,
+            selectedVoiceLocaleTag = "it-IT",
+        )
+        assertEquals("com.google.android.tts", inv.engineName)
+        assertEquals(3, inv.totalVoices)
+        assertEquals(2, inv.italianVoices)
+        assertEquals(1, inv.offlineItalianVoices)
+        assertEquals(1, inv.networkRequiredItalianVoices)
+        assertEquals("it-it-x-ita-local", inv.selectedVoiceName)
+    }
+
+    @Test
+    fun `the owner-observed english-fallback classification stays typed`() {
+        // setLanguage accepted, active voice English → FALLBACK_VOICE_TRIGGERED.
+        val rb = ItalianTtsVoiceNegotiator.classify(
+            requestedLocaleTag = "it-IT",
+            setLanguageResult = TtsLanguageResultCode.LANG_COUNTRY_AVAILABLE,
+            selectedVoiceName = null,
+            activeVoiceName = "en-us-x-ene-local",
+            activeVoiceLocaleTag = "en-US",
+            activeLanguageTag = "en-US",
+            engineName = "com.google.android.tts",
+            availableItalianVoiceNames = emptyList(),
+        )
+        assertEquals(ItalianTtsVoiceStatus.FALLBACK_VOICE_TRIGGERED, rb.status)
+        assertTrue(!rb.isItalianAudible)
+        assertTrue(rb.status.requiresUserAction)
     }
 }

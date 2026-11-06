@@ -88,6 +88,29 @@ enum class TtsState(val displayLabel: String) {
     INTERRUPTED("Interrupted"),
     FAILED("Failed"),
     UNLOADED("Unloaded"),
+    // OWNER PHYSICAL RETEST §4: the honest fail-closed resting state — Italian
+    // was requested, the read-back is not an Italian voice, spoken output is
+    // REFUSED and the response stays visible as text. Never a silent English voice.
+    TEXT_ONLY_SAFE_DEGRADED("Text-only (safe degraded)"),
+}
+
+/**
+ * OWNER PHYSICAL RETEST §4: the typed reason speech was REFUSED by the
+ * fail-closed gate (TtsSpeakGate). Surfaced verbatim in the TTS diagnostic
+ * card, Voice & Audio and the exported receipt.
+ */
+data class TtsSpeakBlock(
+    val reason: TtsSpeakGate.BlockReason,
+    val readbackStatus: String,
+) {
+    /** The typed token the Owner brief mandates for the missing-data class. */
+    val token: String
+        get() = when (reason) {
+            TtsSpeakGate.BlockReason.ITALIAN_SYSTEM_TTS_DATA_MISSING -> "ITALIAN_SYSTEM_TTS_DATA_MISSING"
+            TtsSpeakGate.BlockReason.ITALIAN_SYSTEM_TTS_READBACK_MISMATCH -> "ITALIAN_SYSTEM_TTS_READBACK_MISMATCH"
+            TtsSpeakGate.BlockReason.ITALIAN_SYSTEM_TTS_NOT_SUPPORTED -> "ITALIAN_SYSTEM_TTS_NOT_SUPPORTED"
+            TtsSpeakGate.BlockReason.ITALIAN_SYSTEM_TTS_ENGINE_UNAVAILABLE -> "ITALIAN_SYSTEM_TTS_ENGINE_UNAVAILABLE"
+        }
 }
 
 data class TtsOutput(
@@ -101,6 +124,12 @@ data class TtsOutput(
      * Voice & Audio card and Self-Test ST-51 surface verbatim.
      */
     val voiceReadback: ItalianTtsVoiceNegotiator.TtsVoiceReadback? = null,
+    /**
+     * OWNER PHYSICAL RETEST §4: non-null when the fail-closed gate REFUSED
+     * the last speak request (text-only safe degraded). The response text
+     * remains visible in the console; no non-Italian audio is ever produced.
+     */
+    val speakBlocked: TtsSpeakBlock? = null,
 )
 
 /**
@@ -113,7 +142,13 @@ interface TtsEngine {
     val state: StateFlow<TtsOutput>
     fun load()
     fun unload()
-    /** Starts speaking; returns immediately (state moves SYNTHESIZING → SPEAKING). */
+    /**
+     * Starts speaking; returns immediately (state moves SYNTHESIZING → SPEAKING).
+     * OWNER PHYSICAL RETEST §4: the implementation MUST fail closed — when the
+     * negotiated voice does not match the requested language the utterance is
+     * refused (TEXT_ONLY_SAFE_DEGRADED + TtsSpeakBlock), never spoken with a
+     * fallback voice.
+     */
     fun speak(text: String)
     /** Interrupts speech (barge-in / cancel). */
     fun interrupt()

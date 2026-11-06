@@ -52,3 +52,16 @@ Test totals (physical, 2026-11-01): 33 `@Test` in 6 classes; 33 executed, 0 fail
 | PHYS-02 | Secondary screens layout/spacing | OWNER_UI_LAYOUT_DEFECT_LEDGER.md + UI_POLISH_PASS commit (BadgeFlowRow, SectionCard weight, SettingsHub rows) | REPAIRED_IN_CODE — verification pending second Owner cycle |
 | PHYS-03 | Italian TTS answers in Italian | Code-proven root cause (silent setLanguage failure, no voice read-back) + typed negotiation repair + runtime read-back (Diagnostics rows, ST-51) | REPAIRED_IN_CODE — ITALIAN_VOICE_ACTIVE / ITALIAN_VOICE_READY_AND_BLOCKED_BY_KNOWN_RUNTIME_LIMITATION gated on device read-back |
 | PHYS-04 | Current APK + arm64 APK + install/upgrade guide | 0.3.0-alpha-graph4-owner-feedback universal + arm64-v8a APKs; docs/INSTALL_POCO_X6_PRO.md | PACKAGE_PRODUCED — second Owner validation cycle pending |
+
+---
+
+# OWNER PHYSICAL RETEST FAILURE (2026-11-06) — evidence appended
+
+| Req | Requirement (short) | Evidence | Status |
+| --- | --- | --- | --- |
+| RETEST-01 | Spoken response in Italian on device | Call-path trace: speak() fail-open (negotiation verdict never gates audio); repair = fail-closed gate + ITALIAN_SYSTEM_TTS_DATA_MISSING / ITALIAN_SYSTEM_TTS_READBACK_MISMATCH tokens + TEXT_ONLY_SAFE_DEGRADED | REPAIRED_IN_CODE — unit-tested; physical re-check = next Owner cycle |
+| RETEST-02 | Comfortable voice (no HIGH_PITCH_ENGLISH_TTS_OUTPUT) | No setSpeechRate/setPitch anywhere pre-repair; speech-profile authority added (rate 0.96f, pitch 0.95f defaults, safe ranges, persisted) | REPAIRED_IN_CODE — unit-tested; physical re-check = next Owner cycle |
+| RETEST-03 | Verify button readable in Models and Voice | Fixed horizontal TextButton rows overflow ≈372 dp; adaptive action layout + More actions overflow + 48 dp touch height | REPAIRED_IN_CODE — unit-tested; physical re-check = next Owner cycle |
+| RETEST-04 | Microphone/mute/TTS-stop controls semantically distinct | Idle+unmuted privacy-mute and push-to-talk BOTH render Icons.Filled.Mic pre-repair; distinct visual vocabulary + unique contentDescriptions + tests | REPAIRED_IN_CODE — unit-tested; physical re-check = next Owner cycle |
+| RETEST-05 | In-app proof of the installed build | Build identity panel (About & Safety → Build information; Diagnostics → Runtime truth; Diagnostics footer) with build-injected version/Git SHA/timestamp/run ID/label + on-device measured APK SHA-256 + variant + install timestamps; Copy + Export secret-clean receipt actions | REPAIRED_IN_CODE — build identity panel live; on-device verification next cycle |
+| RETEST-06 | New repair package for the Owner | versionName 0.3.1-alpha-graph4-owner-repair / versionCode 4 / label POCO OWNER REPAIR 1; universal + arm64-v8a APKs + hashes + install guide + retest package | POCO_RETEST_PACKAGE_2_READY (unit tests green, lint 0 errors, universal + arm64 APKs hashed) |

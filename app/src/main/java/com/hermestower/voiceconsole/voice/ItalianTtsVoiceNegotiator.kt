@@ -67,11 +67,28 @@ object ItalianTtsVoiceNegotiator {
         val name: String,
         val localeTag: String,
         val requiresNetwork: Boolean,
+        /** Android Voice quality (0 = unknown; higher = better). Tiebreak only. */
+        val quality: Int = 0,
     ) {
         val language: String get() = localeTag.substringBefore('-').lowercase(Locale.ROOT)
         val isItalian: Boolean get() = language == "it"
         val isItalianItaly: Boolean get() = localeTag.lowercase(Locale.ROOT).startsWith("it-it")
     }
+
+    /**
+     * OWNER PHYSICAL RETEST §6: the full voice-enumeration snapshot the TTS
+     * diagnostic card reports (counts are facts from the active engine; no
+     * inference).
+     */
+    data class TtsVoiceInventory(
+        val engineName: String?,
+        val totalVoices: Int,
+        val italianVoices: Int,
+        val offlineItalianVoices: Int,
+        val networkRequiredItalianVoices: Int,
+        val selectedVoiceName: String?,
+        val selectedVoiceLocaleTag: String?,
+    )
 
     /** The full read-back record surfaced in Diagnostics / Voice & Audio / ST-51. */
     data class TtsVoiceReadback(
@@ -85,6 +102,8 @@ object ItalianTtsVoiceNegotiator {
         val status: ItalianTtsVoiceStatus,
         val availableItalianVoiceNames: List<String>,
         val detail: String? = null,
+        /** OWNER PHYSICAL RETEST §6: the enumeration snapshot behind the read-back. */
+        val inventory: TtsVoiceInventory? = null,
     ) {
         val isItalianAudible: Boolean get() = status.isItalianAudible
     }
@@ -107,15 +126,38 @@ object ItalianTtsVoiceNegotiator {
     }
 
     /**
-     * Voice selection preference: exact it-IT offline → any it offline →
-     * it-IT networked → any it networked → null (no Italian voice exists).
+     * Voice selection preference (Owner brief §4): exact it-IT offline → any
+     * it offline → it-IT networked → any it networked → null (no Italian
+     * voice exists). Within a tier: highest available quality, then the
+     * deterministic name order (no random voice selection).
      */
     fun selectVoice(candidates: List<TtsVoiceCandidate>): TtsVoiceCandidate? {
         val italian = candidates.filter { it.isItalian }
-        return italian.firstOrNull { it.isItalianItaly && !it.requiresNetwork }
-            ?: italian.firstOrNull { !it.requiresNetwork }
-            ?: italian.firstOrNull { it.isItalianItaly }
-            ?: italian.firstOrNull()
+        fun best(pool: List<TtsVoiceCandidate>): TtsVoiceCandidate? =
+            pool.maxWithOrNull(compareBy({ it.quality }, { it.name }))
+        return best(italian.filter { it.isItalianItaly && !it.requiresNetwork })
+            ?: best(italian.filter { !it.requiresNetwork })
+            ?: best(italian.filter { it.isItalianItaly })
+            ?: best(italian)
+    }
+
+    /** Builds the enumeration snapshot for the diagnostic card (pure). */
+    fun inventory(
+        engineName: String?,
+        candidates: List<TtsVoiceCandidate>,
+        selectedVoiceName: String?,
+        selectedVoiceLocaleTag: String?,
+    ): TtsVoiceInventory {
+        val italian = candidates.filter { it.isItalian }
+        return TtsVoiceInventory(
+            engineName = engineName,
+            totalVoices = candidates.size,
+            italianVoices = italian.size,
+            offlineItalianVoices = italian.count { !it.requiresNetwork },
+            networkRequiredItalianVoices = italian.count { it.requiresNetwork },
+            selectedVoiceName = selectedVoiceName,
+            selectedVoiceLocaleTag = selectedVoiceLocaleTag,
+        )
     }
 
     /**

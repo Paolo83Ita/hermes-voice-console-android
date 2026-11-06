@@ -84,9 +84,11 @@ object SelfTestRegistry {
         return listOf(
             // ---------- identity, configuration, security ----------
             def("ST-01", "Application identity and version", SelfTestCategory.IDENTITY, setOf(SelfTestMode.QUICK, SelfTestMode.STANDARD, SelfTestMode.FULL)) { s ->
-                val ok = s.appVersion.isNotBlank() && s.appVersion.startsWith("0.3.0")
+                // CP-G4-029 (Owner retest repair): the repair build advances the
+                // version — 0.3.x-alpha-graph4* is the accepted Owner-package schema.
+                val ok = s.appVersion.isNotBlank() && s.appVersion.startsWith("0.3.")
                 if (ok) SelfTestState.PASS to "app version ${s.appVersion} reported truthfully."
-                else SelfTestState.FAIL to "app version '${s.appVersion}' does not match 0.3.0-alpha schema (Owner package)."
+                else SelfTestState.FAIL to "app version '${s.appVersion}' does not match 0.3.x-alpha-graph4 schema (Owner package)."
             },
             def("ST-02", "Configuration schema", SelfTestCategory.CONFIGURATION, setOf(SelfTestMode.QUICK, SelfTestMode.STANDARD, SelfTestMode.FULL)) { s ->
                 val profile = TowerConnectionProfile.emptyMock()
@@ -660,22 +662,36 @@ object SelfTestRegistry {
             def("ST-51", "Italian TTS voice negotiation probe (Owner Finding 3)", SelfTestCategory.DIAGNOSTICS, setOf(SelfTestMode.QUICK, SelfTestMode.STANDARD, SelfTestMode.FULL, SelfTestMode.VOICE_FOUNDATION_ONLY)) { s ->
                 val probe = s.italianTtsVoiceProbe
                 when {
+                    // OWNER PHYSICAL RETEST §7: a JVM/emulator runtime cannot
+                    // initialize a real engine or produce audio — the typed
+                    // result is QUALIFICATION_PENDING_DEVICE (never a pass).
                     probe == null ->
-                        SelfTestState.SKIPPED_NOT_APPLICABLE to "voice read-back not wired on this runtime (JVM)."
+                        SelfTestState.QUALIFICATION_PENDING_DEVICE to
+                            "JVM/emulator runtime: no real TTS engine can produce audio here. The real-engine path (initialize → enumerate → select Italian → read back → synthesize → utterance start/done) is qualified on the physical device."
                     probe() == null ->
                         SelfTestState.SKIPPED_NOT_APPLICABLE to "the TTS engine has not negotiated yet (not initialized on this run)."
                     else -> {
                         val rb = probe()!!
-                        if (rb.status == com.hermestower.voiceconsole.voice.ItalianTtsVoiceNegotiator.ItalianTtsVoiceStatus.ITALIAN_VOICE_ACTIVE) {
-                            SelfTestState.PASS to com.hermestower.voiceconsole.voice.ItalianTtsVoiceNegotiator.describe(rb)
-                        } else {
-                            // Every non-active class is a DEVICE-side state (missing
-                            // data, unsupported engine, fallback voice) — the app is
-                            // truthful about it; typed blocked with the full read-back.
-                            val detail = rb.detail?.let { " — $it" } ?: ""
-                            SelfTestState.BLOCKED_DEPENDENCY to
-                                (com.hermestower.voiceconsole.voice.ItalianTtsVoiceNegotiator.describe(rb) + detail +
-                                    " Repair: install the Italian voice data from the system Text-to-speech settings, then re-run.")
+                        when (rb.status) {
+                            com.hermestower.voiceconsole.voice.ItalianTtsVoiceNegotiator.ItalianTtsVoiceStatus.ITALIAN_VOICE_ACTIVE ->
+                                SelfTestState.PASS to com.hermestower.voiceconsole.voice.ItalianTtsVoiceNegotiator.describe(rb)
+                            // Device-side dependency states: the Italian voice
+                            // data is missing or the engine cannot do Italian.
+                            com.hermestower.voiceconsole.voice.ItalianTtsVoiceNegotiator.ItalianTtsVoiceStatus.ITALIAN_VOICE_MISSING_DATA,
+                            com.hermestower.voiceconsole.voice.ItalianTtsVoiceNegotiator.ItalianTtsVoiceStatus.ITALIAN_VOICE_NOT_SUPPORTED,
+                            com.hermestower.voiceconsole.voice.ItalianTtsVoiceNegotiator.ItalianTtsVoiceStatus.ENGINE_UNAVAILABLE,
+                            ->
+                                SelfTestState.BLOCKED_DEPENDENCY to
+                                    (com.hermestower.voiceconsole.voice.ItalianTtsVoiceNegotiator.describe(rb) +
+                                        (rb.detail?.let { " — $it" } ?: "") +
+                                        " Repair: install the Italian voice data from the system Text-to-speech settings, then re-run.")
+                            // A non-Italian voice is ACTIVE while Italian was
+                            // requested — the engine fell back to English: FAIL
+                            // (the app's fail-closed gate refuses the audio).
+                            else ->
+                                SelfTestState.FAIL to
+                                    ("English or non-Italian voice active while Italian was requested (ITALIAN_SYSTEM_TTS_READBACK_MISMATCH). " +
+                                        com.hermestower.voiceconsole.voice.ItalianTtsVoiceNegotiator.describe(rb))
                         }
                     }
                 }

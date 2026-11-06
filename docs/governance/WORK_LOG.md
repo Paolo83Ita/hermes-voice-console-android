@@ -1493,3 +1493,91 @@ COMMIT: (this commit).
 CHECKPOINT: CP-G4-028 verified (owner-package + evidence).
 NEXT: second Owner validation cycle on the POCO X6 PRO; then the remaining Graph 4
 nodes (the E2E gate loop continues autonomously).
+
+---
+
+NODE N53 — CP-G4-029 OWNER PHYSICAL RETEST FAILURE intake (repair cycle opens)
+FINDING: the Owner re-tested on the physical POCO X6 Pro and REJECTED the checkpoint —
+5 physical failures remain (English spoken response; HIGH_PITCH_ENGLISH_TTS_OUTPUT;
+Verify-button text layout in Models and Voice; microphone activation icon indistinguishable
+from the mute icon; no material improvement perceived). State: OWNER_RETEST_FAILED_-
+REPAIR_REQUIRED / CHECKPOINT_REJECTED_PENDING_REPAIR. Prohibited tokens NOT used:
+ITALIAN_TTS_OWNER_VERIFIED, RESPONSIVE_UI_QUALIFIED, POCO_RETEST_PASSED.
+ACTION: FIRST EXACT ACTION executed — fresh fetch + ls-remote read-back of
+graph-4/real-voice-pairing-archive-e2e → 53841a5 (local HEAD identical, tree clean);
+receipt docs/receipts/OWNER_PHYSICAL_RETEST_FAILURE_RECEIPT.md created; truth,
+checkpoint index, evidence register, defect ledger, TTS root-cause report updated.
+Pre-repair call-path facts recorded: SystemTtsDomainAdapter discards the rate
+parameter; AndroidSystemTtsEngine.speak() re-negotiates then speaks REGARDLESS of
+the negotiation verdict (fail-open — the English default voice is audible when the
+device lacks a usable Italian voice); no setSpeechRate/setPitch exists anywhere in
+the pipeline; the app exposes no in-app build identity (Git SHA / build timestamp /
+workflow run ID / APK variant / APK SHA-256), so the retested APK's provenance is
+UNPROVABLE — a provenance defect in its own right, closed forward by the repair
+build's identity panel.
+TEST: this node is the intake record; the repair commits below carry the tests.
+FILES: docs/receipts/OWNER_PHYSICAL_RETEST_FAILURE_RECEIPT.md;
+docs/governance/{CURRENT_PROJECT_TRUTH,CHECKPOINT_INDEX,REQUIREMENT_TO_EVIDENCE_REGISTER,
+OWNER_UI_LAYOUT_DEFECT_LEDGER,ITALIAN_TTS_ROOT_CAUSE_REPORT}.md
+COMMIT: (this commit)
+CHECKPOINT: CP-G4-029 intake.
+NEXT: provenance panel → TTS fail-closed + speech profile → Verify button → mic
+semantics → tests → APKs → POCO_X6_PRO_OWNER_RETEST_PACKAGE_2 → push + read-back.
+
+
+NODE N54 — CP-G4-029 REPAIR executed (the physical retest blockers)
+FINDING: all five physical failures were code-reproducible at 53841a5:
+(1) speak() was FAIL-OPEN — the typed negotiation verdict never gated audio;
+(2) no setSpeechRate/setPitch existed anywhere (HIGH_PITCH_ENGLISH_TTS_OUTPUT
+= the engine's default voice character, never an app-chosen profile);
+(3) the Verify button sat in FIXED horizontal Rows of up to 6 TextButtons
+(BADGE-flow repair of CP-G4-027 never covered ACTION rows);
+(4) privacy-mute-unmuted and push-to-talk-idle BOTH rendered Icons.Filled.Mic
+(and stop-speaking shared Stop with the listening push-to-talk);
+(5) no in-app build identity existed (provenance UNPROVABLE) and the in-app
+APP_VERSION constant was stale (0.2.0-debug vs BuildConfig 0.3.0-alpha-graph4).
+ACTION: TtsSpeakGate (fail-closed; Italian audible ONLY after an Italian
+read-back; ITALIAN_SYSTEM_TTS_DATA_MISSING / ITALIAN_SYSTEM_TTS_READBACK_MISMATCH
+/ TEXT_ONLY_SAFE_DEGRADED typed) + SpeechProfile authority (0.96/0.95 defaults,
+safe ranges 0.75-1.30 / 0.75-1.25, persisted speech_pitch, Voice & Audio
+presets Slower/Recommended/Faster + Lower/Recommended/Higher + collapsed
+advanced sliders + preview phrase + reset) + secret-clean TtsTelemetry
+(length-only, no spoken content; surfaced in the diagnostic card and the
+exported receipt) + Android TTS diagnostic card (engine package/label,
+Italian availability, voice inventory, selected voice/locale, rate/pitch,
+last negotiation result; actions Test/Open settings/Install data/Refresh/
+Reset) + ST-51 real-engine result classes (PASS/BLOCKED_DEPENDENCY/FAIL/
+QUALIFICATION_PENDING_DEVICE — JVM is never a pass) + AdaptiveActionsRow
+(primary Download/Verify/Activate/Details direct; 12 secondary actions behind
+"Altre azioni"; 48 dp touch height; maxLines 2; centered; wrap at <=480 dp)
++ ConsoleControlSemanticsResolver (Mic/Parla, Stop/Interrompi ascolto,
+MicOff+red-bronze seal+persistent "Microfono disattivato",
+VolumeUp/Interrompi voce; unique icon+label+contentDescription per state)
++ BuildIdentity (build-injected version/SHA/timestamp/run-id/label +
+on-device MEASURED APK SHA-256/variant/ABIs/install-update timestamps/process
+start; Copy build identity + Export secret-clean diagnostic receipt;
+About&Safety Build information card + Diagnostics footer; APP_VERSION drift
+removed — BuildConfig authority) + version 0.3.1-alpha-graph4-owner-repair /
+versionCode 4 / label POCO OWNER REPAIR 1.
+TEST: unit suite 310/310 GREEN (new: SpeechProfileTest 5, TtsSpeakGateTest 7,
+TtsTelemetryTest 5, BuildIdentityTest 7, ConsoleControlSemanticsTest 6,
+AdaptiveActionPolicyTest 2, negotiator +4; SelfTestCenterTest realigned for
+ST-51 QUALIFICATION_PENDING_DEVICE + ST-01 0.3.x schema); lintDebug 0 errors
+(abortOnError gate green); universal + arm64-v8a + x86_64 debug APKs assembled
+and hashed (POCO_X6_PRO_OWNER_RETEST_PACKAGE_2).
+FILES: voice/{TtsSpeakGate,SpeechProfile,TtsTelemetry}.kt (NEW);
+voice/{AndroidSystemTtsEngine,VoiceSeams,ItalianTtsVoiceNegotiator}.kt;
+tts/SystemTtsDomainAdapter.kt; ui/components/AdaptiveActionsRow.kt (NEW);
+ui/screens/{ConsoleControlSemantics}.kt (NEW);
+ui/screens/{ModelManagerScreen,ConsoleScreen,VoiceAudioScreen,AboutSafetyScreen,
+DiagnosticsScreen}.kt; app/{BuildIdentity}.kt (NEW); app/AppGraph.kt;
+core/state/ConsoleStateStore.kt; store/SettingsRepository.kt;
+selftest/{SelfTestRegistry}.kt; res/values*/strings.xml (+74 keys x5 locales,
+parity held); build.gradle.kts (version + buildConfigField injection);
+docs/{POCO_OWNER_REPAIR_INSTALL_GUIDE}.md;
+docs/receipts/{PHYSICAL_TTS_CALL_PATH_REPORT,PHYSICAL_APK_PROVENANCE_REPAIR_REPORT,
+VERIFY_BUTTON_PHYSICAL_DEFECT_REPORT,MICROPHONE_CONTROL_SEMANTICS_REPORT}.md.
+COMMIT: (this commit).
+CHECKPOINT: CP-G4-029 repair complete — POCO_RETEST_PACKAGE_2_READY.
+NEXT: push + fresh remote read-back; second Owner physical validation cycle
+(POCO_ITALIAN_TTS_UI_AND_CONTROLS_RETEST_PASSED is Owner-confirmed only).

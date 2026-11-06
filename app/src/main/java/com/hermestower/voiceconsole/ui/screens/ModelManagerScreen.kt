@@ -38,6 +38,8 @@ import android.content.Intent
 import android.net.Uri
 import com.hermestower.voiceconsole.towersim.LocalTowerMockServer
 import com.hermestower.voiceconsole.ui.components.SectionCard
+import com.hermestower.voiceconsole.ui.components.AdaptiveAction
+import com.hermestower.voiceconsole.ui.components.AdaptiveActionsRow
 import com.hermestower.voiceconsole.ui.components.MeanderBand
 import com.hermestower.voiceconsole.ui.theme.HermesType
 import com.hermestower.voiceconsole.ui.theme.hermesColors
@@ -376,80 +378,95 @@ fun ModelManagerScreen(graph: AppGraph) {
                     // The open action validates first (directive pre-conditions);
                     // a blocked or un-openable link NEVER substitutes a source —
                     // it shows the localized explanation and offers the retry.
-                    Row(horizontalArrangement = Arrangement.spacedBy(4.dp)) {
-                        TextButton(onClick = {
-                            val check = ModelLinks.validateForOpen(entry.sourceUri)
-                            if (!check.ok) {
-                                statusNote = context.getString(
-                                    R.string.mm_link_blocked_fmt,
-                                    context.getString(R.string.mm_open_source),
-                                    check.reason ?: "?",
-                                )
-                            } else {
-                                runCatching {
-                                    context.startActivity(
-                                        Intent(Intent.ACTION_VIEW, Uri.parse(entry.sourceUri)),
-                                    )
-                                    statusNote = context.getString(R.string.mm_link_opened, entry.sourceUri)
-                                }.onFailure {
+                    // OWNER PHYSICAL RETEST §8: the link row is ALSO adaptive —
+                    // the four secondary actions live behind More actions.
+                    AdaptiveActionsRow(
+                        primary = emptyList(),
+                        secondary = listOf(
+                            AdaptiveAction(key = "open_source", label = context.getString(R.string.mm_open_source)) {
+                                val check = ModelLinks.validateForOpen(entry.sourceUri)
+                                if (!check.ok) {
                                     statusNote = context.getString(
                                         R.string.mm_link_blocked_fmt,
                                         context.getString(R.string.mm_open_source),
-                                        context.getString(R.string.mm_link_no_browser),
+                                        check.reason ?: "?",
                                     )
+                                } else {
+                                    runCatching {
+                                        context.startActivity(
+                                            Intent(Intent.ACTION_VIEW, Uri.parse(entry.sourceUri)),
+                                        )
+                                        statusNote = context.getString(R.string.mm_link_opened, entry.sourceUri)
+                                    }.onFailure {
+                                        statusNote = context.getString(
+                                            R.string.mm_link_blocked_fmt,
+                                            context.getString(R.string.mm_open_source),
+                                            context.getString(R.string.mm_link_no_browser),
+                                        )
+                                    }
                                 }
-                            }
-                        }) { Text(stringResource(R.string.mm_open_source)) }
-                        TextButton(onClick = {
-                            val check = ModelLinks.licenseCheck(entry)
-                            if (!check.ok) {
-                                statusNote = context.getString(
-                                    R.string.mm_link_blocked_fmt,
-                                    context.getString(R.string.mm_open_license),
-                                    check.reason ?: "?",
-                                )
-                            } else {
-                                val url = entry.licenseUrl!!
-                                runCatching {
-                                    context.startActivity(Intent(Intent.ACTION_VIEW, Uri.parse(url)))
-                                    statusNote = context.getString(R.string.mm_link_opened, url)
-                                }.onFailure {
+                            },
+                            AdaptiveAction(key = "open_license", label = context.getString(R.string.mm_open_license)) {
+                                val check = ModelLinks.licenseCheck(entry)
+                                if (!check.ok) {
                                     statusNote = context.getString(
                                         R.string.mm_link_blocked_fmt,
                                         context.getString(R.string.mm_open_license),
-                                        context.getString(R.string.mm_link_no_browser),
+                                        check.reason ?: "?",
+                                    )
+                                } else {
+                                    val url = entry.licenseUrl!!
+                                    runCatching {
+                                        context.startActivity(Intent(Intent.ACTION_VIEW, Uri.parse(url)))
+                                        statusNote = context.getString(R.string.mm_link_opened, url)
+                                    }.onFailure {
+                                        statusNote = context.getString(
+                                            R.string.mm_link_blocked_fmt,
+                                            context.getString(R.string.mm_open_license),
+                                            context.getString(R.string.mm_link_no_browser),
+                                        )
+                                    }
+                                }
+                            },
+                            AdaptiveAction(key = "copy_identity", label = context.getString(R.string.mm_copy_identity)) {
+                                clipboard.setText(AnnotatedString(entry.identity))
+                                statusNote = context.getString(R.string.mm_copied_identity, entry.identity)
+                            },
+                            AdaptiveAction(key = "retry_source", label = context.getString(R.string.mm_retry_source_check)) {
+                                // Retry source check — re-runs the directive §12
+                                // pre-conditions and reports the result honestly.
+                                val check = ModelLinks.validateForOpen(entry.sourceUri)
+                                statusNote = if (check.ok) {
+                                    context.getString(R.string.mm_link_opened, entry.sourceUri)
+                                } else {
+                                    context.getString(
+                                        R.string.mm_link_blocked_fmt,
+                                        context.getString(R.string.mm_retry_source_check),
+                                        check.reason ?: "?",
                                     )
                                 }
-                            }
-                        }) { Text(stringResource(R.string.mm_open_license)) }
-                        TextButton(onClick = {
-                            clipboard.setText(AnnotatedString(entry.identity))
-                            statusNote = context.getString(R.string.mm_copied_identity, entry.identity)
-                        }) { Text(stringResource(R.string.mm_copy_identity)) }
-                        TextButton(onClick = {
-                            // Retry source check — re-runs the directive §12
-                            // pre-conditions and reports the result honestly.
-                            val check = ModelLinks.validateForOpen(entry.sourceUri)
-                            statusNote = if (check.ok) {
-                                context.getString(R.string.mm_link_opened, entry.sourceUri)
-                            } else {
-                                context.getString(
-                                    R.string.mm_link_blocked_fmt,
-                                    context.getString(R.string.mm_retry_source_check),
-                                    check.reason ?: "?",
-                                )
-                            }
-                        }) { Text(stringResource(R.string.mm_retry_source_check)) }
-                    }
+                            },
+                        ),
+                        moreActionsLabel = context.getString(R.string.mm_more_actions),
+                    )
                 }
 
-                // ---------- D. Lifecycle actions (all wired to the real engine) ----------
-                Row(horizontalArrangement = Arrangement.spacedBy(4.dp)) {
-                    TextButton(
-                        enabled = resolved?.downloadAllowed != false &&
-                            entry.entryClassification == "VERIFIED_DOWNLOADABLE" &&
-                            progress?.state != ModelInstallState.DOWNLOADING && !packRunning,
-                        onClick = {
+                // ---------- D. Lifecycle actions (OWNER PHYSICAL RETEST §8: adaptive action layout) ----------
+                // The physical defect (PHYSICAL-FAIL-03): three FIXED horizontal Rows of up to 6
+                // TextButtons overflowed the POCO's ≈372 dp and clipped the Verify label. The
+                // adaptive layout: direct primary actions (Download/Install, Verify, Activate,
+                // Details — Details stays direct: the E2E Italian Gate D walk expands the sheet
+                // through it), everything else behind “More actions” (never clipped), ≥48 dp
+                // touch height, maxLines 2, centered text, wrap at constrained width.
+                AdaptiveActionsRow(
+                    primary = listOf(
+                        AdaptiveAction(
+                            key = "download",
+                            label = context.getString(R.string.mm_download),
+                            enabled = resolved?.downloadAllowed != false &&
+                                entry.entryClassification == "VERIFIED_DOWNLOADABLE" &&
+                                progress?.state != ModelInstallState.DOWNLOADING && !packRunning,
+                        ) {
                             if (entry.identity == PROBE_IDENTITY) {
                                 // The only mock-served artifact: the deterministic test probe.
                                 val server = LocalTowerMockServer()
@@ -467,10 +484,35 @@ fun ModelManagerScreen(graph: AppGraph) {
                             }
                             registryTick++
                         },
-                    ) { Text(stringResource(R.string.mm_download)) }
-                    TextButton(onClick = { graph.modelDownloads.pause(entry.identity); statusNote = context.getString(R.string.mm_download_paused, entry.identity) }) { Text(stringResource(R.string.mm_pause)) }
-                    TextButton(
-                        onClick = {
+                        AdaptiveAction(
+                            key = "verify",
+                            label = context.getString(R.string.mm_verify),
+                            emphasized = true,
+                        ) {
+                            statusNote = if (graph.modelDownloads.verifiedExisting(entry)) context.getString(R.string.mm_hash_verified)
+                            else context.getString(R.string.mm_no_verified_file, entry.identity)
+                        },
+                        AdaptiveAction(
+                            key = "activate",
+                            label = context.getString(R.string.mm_activate),
+                            enabled = !packRunning,
+                        ) {
+                            val result = graph.modelActivation.activate(entry)
+                            statusNote = context.getString(R.string.mm_activate_result, entry.identity, if (result.success) "ACTIVE" else "REFUSED", result.reason)
+                            registryTick++
+                        },
+                        AdaptiveAction(
+                            key = "details",
+                            label = context.getString(if (isExpanded) R.string.mm_hide_details else R.string.mm_details),
+                        ) {
+                            expanded[entry.identity] = !isExpanded
+                        },
+                    ),
+                    secondary = listOf(
+                        AdaptiveAction(key = "pause", label = context.getString(R.string.mm_pause)) {
+                            graph.modelDownloads.pause(entry.identity); statusNote = context.getString(R.string.mm_download_paused, entry.identity)
+                        },
+                        AdaptiveAction(key = "resume", label = context.getString(R.string.mm_resume)) {
                             if (entry.identity == PROBE_IDENTITY) {
                                 val port = graph.keyValueStore.getString("probe_server_port")?.toIntOrNull()
                                 if (port != null) {
@@ -485,18 +527,14 @@ fun ModelManagerScreen(graph: AppGraph) {
                                 statusNote = context.getString(R.string.mm_download_resumed_source, entry.identity)
                             }
                         },
-                    ) { Text(stringResource(R.string.mm_resume)) }
-                    TextButton(onClick = { graph.modelDownloads.cancel(entry.identity); statusNote = context.getString(R.string.mm_download_cancelled, entry.identity) }) { Text(stringResource(R.string.mm_cancel)) }
-                    TextButton(onClick = {
-                        statusNote = if (graph.modelDownloads.verifiedExisting(entry)) context.getString(R.string.mm_hash_verified)
-                        else context.getString(R.string.mm_no_verified_file, entry.identity)
-                    }) { Text(stringResource(R.string.mm_verify)) }
-                    TextButton(onClick = { expanded[entry.identity] = !isExpanded }) { Text(if (isExpanded) stringResource(R.string.mm_hide_details) else stringResource(R.string.mm_details)) }
-                }
-                Row(horizontalArrangement = Arrangement.spacedBy(4.dp)) {
-                    TextButton(
-                        enabled = !packRunning,
-                        onClick = {
+                        AdaptiveAction(key = "cancel", label = context.getString(R.string.mm_cancel)) {
+                            graph.modelDownloads.cancel(entry.identity); statusNote = context.getString(R.string.mm_download_cancelled, entry.identity)
+                        },
+                        AdaptiveAction(
+                            key = "install",
+                            label = context.getString(R.string.mm_install),
+                            enabled = !packRunning,
+                        ) {
                             val resources = graph.deviceResourceReader.read()
                             scope.launch {
                                 if (graph.modelDownloads.verifiedExisting(entry)) {
@@ -512,46 +550,41 @@ fun ModelManagerScreen(graph: AppGraph) {
                                 }
                             }
                         },
-                    ) { Text(stringResource(R.string.mm_install)) }
-                    TextButton(onClick = {
-                        val result = graph.modelQualification.qualify(entry)
-                        statusNote = context.getString(R.string.mm_qualify_result, entry.identity, if (result.qualified) "PASSED" else "FAILED", result.checks.joinToString { "${it.name}=${it.passed}" })
-                    }) { Text(stringResource(R.string.mm_qualify)) }
-                    TextButton(onClick = {
-                        val result = graph.modelActivation.activate(entry)
-                        statusNote = context.getString(R.string.mm_activate_result, entry.identity, if (result.success) "ACTIVE" else "REFUSED", result.reason)
-                        registryTick++
-                    }) { Text(stringResource(R.string.mm_activate)) }
-                    TextButton(onClick = {
-                        val result = graph.modelActivation.deactivate(entry)
-                        statusNote = context.getString(R.string.mm_deactivate_result, entry.identity, result.reason)
-                        registryTick++
-                    }) { Text(stringResource(R.string.mm_deactivate)) }
-                    TextButton(onClick = {
-                        val result = graph.modelRollback.rollback(entry)
-                        statusNote = context.getString(R.string.mm_rollback_result, entry.identity, if (result.success) context.getString(R.string.mm_rollback_restored, result.restoredVersion) else result.reason)
-                        registryTick++
-                    }) { Text(stringResource(R.string.mm_rollback)) }
-                    TextButton(onClick = {
-                        val removed = graph.modelRollback.removalCleanup(entry)
-                        statusNote = if (removed) context.getString(R.string.mm_removed, entry.identity) else context.getString(R.string.mm_nothing_to_remove, entry.identity)
-                        registryTick++
-                    }) { Text(stringResource(R.string.mm_remove)) }
-                }
-                Row(horizontalArrangement = Arrangement.spacedBy(4.dp)) {
-                    TextButton(
-                        enabled = entry.entryClassification == "VERIFIED_DOWNLOADABLE" && entry.identity != PROBE_IDENTITY && !packRunning,
-                        onClick = {
+                        AdaptiveAction(key = "qualify", label = context.getString(R.string.mm_qualify)) {
+                            val result = graph.modelQualification.qualify(entry)
+                            statusNote = context.getString(R.string.mm_qualify_result, entry.identity, if (result.qualified) "PASSED" else "FAILED", result.checks.joinToString { "${it.name}=${it.passed}" })
+                        },
+                        AdaptiveAction(key = "deactivate", label = context.getString(R.string.mm_deactivate)) {
+                            val result = graph.modelActivation.deactivate(entry)
+                            statusNote = context.getString(R.string.mm_deactivate_result, entry.identity, result.reason)
+                            registryTick++
+                        },
+                        AdaptiveAction(key = "rollback", label = context.getString(R.string.mm_rollback)) {
+                            val result = graph.modelRollback.rollback(entry)
+                            statusNote = context.getString(R.string.mm_rollback_result, entry.identity, if (result.success) context.getString(R.string.mm_rollback_restored, result.restoredVersion) else result.reason)
+                            registryTick++
+                        },
+                        AdaptiveAction(key = "remove", label = context.getString(R.string.mm_remove)) {
+                            val removed = graph.modelRollback.removalCleanup(entry)
+                            statusNote = if (removed) context.getString(R.string.mm_removed, entry.identity) else context.getString(R.string.mm_nothing_to_remove, entry.identity)
+                            registryTick++
+                        },
+                        AdaptiveAction(
+                            key = "redownload",
+                            label = context.getString(R.string.mm_redownload),
+                            enabled = entry.entryClassification == "VERIFIED_DOWNLOADABLE" && entry.identity != PROBE_IDENTITY && !packRunning,
+                        ) {
                             graph.modelDownloads.cancel(entry.identity)
                             val removed = graph.modelRollback.removalCleanup(entry)
                             graph.modelDownloads.start(entry, entry.sourceUri)
                             statusNote = context.getString(R.string.mm_redownload_note, entry.displayName, if (removed) context.getString(R.string.mm_removed_word) else context.getString(R.string.mm_absent_word))
                             registryTick++
                         },
-                    ) { Text(stringResource(R.string.mm_redownload)) }
-                    TextButton(
-                        enabled = entry.identity != PROBE_IDENTITY && !packRunning,
-                        onClick = {
+                        AdaptiveAction(
+                            key = "repair",
+                            label = context.getString(R.string.mm_repair),
+                            enabled = entry.identity != PROBE_IDENTITY && !packRunning,
+                        ) {
                             if (graph.modelDownloads.verifiedExisting(entry)) {
                                 statusNote = context.getString(R.string.mm_repair_ok, entry.displayName)
                             } else {
@@ -561,17 +594,21 @@ fun ModelManagerScreen(graph: AppGraph) {
                             }
                             registryTick++
                         },
-                    ) { Text(stringResource(R.string.mm_repair)) }
-                    TextButton(
-                        enabled = updateAvailable && !packRunning,
-                        onClick = {
+                        AdaptiveAction(
+                            key = "update",
+                            label = context.getString(R.string.mm_update),
+                            enabled = updateAvailable && !packRunning,
+                        ) {
                             graph.modelDownloads.start(entry, entry.sourceUri)
                             statusNote = context.getString(R.string.mm_update_note, entry.displayName, record?.version ?: "", entry.version)
                             registryTick++
                         },
-                    ) { Text(stringResource(R.string.mm_update)) }
-                    TextButton(onClick = { diagnosticsOpen.value = !diagnosticsOpen.value }) { Text(stringResource(R.string.mm_open_diagnostics)) }
-                }
+                        AdaptiveAction(key = "diagnostics", label = context.getString(R.string.mm_open_diagnostics)) {
+                            diagnosticsOpen.value = !diagnosticsOpen.value
+                        },
+                    ),
+                    moreActionsLabel = context.getString(R.string.mm_more_actions),
+                )
             }
 
             if (diagnosticsOpen.value) {

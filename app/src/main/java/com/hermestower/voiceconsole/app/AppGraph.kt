@@ -45,6 +45,8 @@ import com.hermestower.voiceconsole.voice.InactiveSpeechToTextEngine
 import com.hermestower.voiceconsole.voice.InactiveVoiceActivityDetector
 import com.hermestower.voiceconsole.voice.InactiveWakeWordEngine
 import com.hermestower.voiceconsole.voice.NoAudioCaptureEngine
+import com.hermestower.voiceconsole.voice.SpeechProfile
+import com.hermestower.voiceconsole.voice.TtsTelemetry
 import com.hermestower.voiceconsole.voice.VoicePipelineController
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Dispatchers
@@ -60,7 +62,7 @@ import java.time.Clock
  * adapter, Keystore vault, V0.2 migration, Self-Test Center. The console pipeline
  * remains mock-first until a real Tower endpoint is configured by the Owner.
  */
-class AppGraph(context: Context) {
+class AppGraph(private val context: Context) {
 
     val scope = CoroutineScope(SupervisorJob() + Dispatchers.Default)
     val clock: Clock = Clock.systemDefaultZone()
@@ -250,11 +252,26 @@ class AppGraph(context: Context) {
     // the §10 fallback chain; the natural Piper voice is G4-C07 after
     // qualification). No TTS engine on device → honest text-only degradation.
     // OWNER PHYSICAL FEEDBACK 3: the spoken locale follows the app language
-    // (AppLanguage), the negotiation is read-back-verified and typed — the
-    // English-voice silent fallback class is dead (ItalianTtsVoiceNegotiator).
-    val voiceTts = AndroidSystemTtsEngine(context) {
-        com.hermestower.voiceconsole.locale.AppLanguage.effectiveTag(context)
-    }
+    // (AppLanguage), the negotiation is read-back-verified and typed.
+    // OWNER PHYSICAL RETEST §4/§5: the engine now FAILS CLOSED (a non-Italian
+    // active voice while Italian is requested refuses the utterance —
+    // TEXT_ONLY_SAFE_DEGRADED + typed TtsSpeakBlock) and applies the persisted
+    // SpeechProfile (rate 0.96 / pitch 0.95 defaults) before every utterance;
+    // every negotiation/utterance event lands in the secret-clean telemetry.
+    val ttsTelemetry = TtsTelemetry()
+    val voiceTts = AndroidSystemTtsEngine(
+        context,
+        spokenLocaleTagProvider = {
+            com.hermestower.voiceconsole.locale.AppLanguage.effectiveTag(context)
+        },
+        speechProfileProvider = {
+            SpeechProfile.safe(
+                store.settings.value.speakingRate,
+                store.settings.value.speechPitch,
+            )
+        },
+        telemetry = ttsTelemetry,
+    )
     val consoleTts: com.hermestower.voiceconsole.domain.TextToSpeechEngine =
         SystemTtsDomainAdapter(voiceTts)
 
@@ -304,6 +321,7 @@ class AppGraph(context: Context) {
     val activeRuntimeReadback: ActiveRuntimeReadback
         get() {
             val readback = voiceTts.voiceReadback
+            val profile = SpeechProfile.safe(store.settings.value.speakingRate, store.settings.value.speechPitch)
             return ActiveRuntimeReadback(
                 sttActiveEngine = if (voskFrameStt.loadedModelDir != null) voskFrameStt.engineId
                 else "Android system recognizer (offline vosk model not installed)",
@@ -316,6 +334,19 @@ class AppGraph(context: Context) {
                 },
                 ttsVoiceLocale = readback?.activeVoiceLocaleTag
                     ?: readback?.activeLanguageTag,
+                // OWNER PHYSICAL RETEST §6: the TTS diagnostic card rows.
+                ttsEngineLabel = voiceTts.activeEngineLabel,
+                ttsItalianAvailability = readback?.setLanguageResult?.name,
+                ttsVoiceInventory = readback?.inventory?.let {
+                    "total=${it.totalVoices} italian=${it.italianVoices} " +
+                        "offlineItalian=${it.offlineItalianVoices} " +
+                        "networkItalian=${it.networkRequiredItalianVoices}"
+                },
+                ttsSelectedVoice = readback?.selectedVoiceName,
+                ttsSelectedVoiceLocale = readback?.inventory?.selectedVoiceLocaleTag,
+                ttsSpeechRate = profile.speechRate,
+                ttsSpeechPitch = profile.pitch,
+                ttsLastNegotiationStatus = readback?.status?.name,
                 llmState = "No local model (default) — Qwen2.5-0.5B candidate present, llama.cpp runtime pending",
                 onnxRuntime = "onnxruntime-android 1.20.0 (Gradle)",
             )
@@ -326,6 +357,36 @@ class AppGraph(context: Context) {
         health = health,
         appVersion = APP_VERSION,
     )
+
+    /**
+     * OWNER PHYSICAL RETEST §1: the secret-clean diagnostic receipt — build
+     * identity (build-injected + on-device measured) + the live TTS call-path
+     * telemetry + the runtime read-back. No spoken content, no transcript
+     * content, no credential (SEC §4/SEC-06): technical identity only. The
+     * Owner copies this out of the app to prove the exact installed build and
+     * what the TTS path actually did.
+     */
+    fun exportDiagnosticReceipt(): String {
+        val injected = BuildIdentity.injected()
+        val measured = BuildIdentity.measure(context)
+        val identityBlock = BuildIdentity.format(injected, measured) { ms ->
+            ms?.let { java.time.Instant.ofEpochMilli(it).toString() }
+        }
+        return buildString {
+            appendLine(identityBlock)
+            appendLine()
+            appendLine("TTS CALL-PATH TELEMETRY (last ${ttsTelemetry.snapshot().size} events, secret-clean)")
+            ttsTelemetry.snapshot().forEach { appendLine("  $it") }
+            if (ttsTelemetry.snapshot().isEmpty()) appendLine("  (no TTS activity recorded yet)")
+            appendLine()
+            appendLine("RUNTIME READ-BACK")
+            appendLine("  tts engine: ${activeRuntimeReadback.ttsActiveEngine}")
+            activeRuntimeReadback.ttsEngineLabel?.let { appendLine("  engine label: $it") }
+            appendLine("  tts voice: ${activeRuntimeReadback.ttsVoiceReadback ?: "(not negotiated yet)"}")
+            appendLine("  tts locale: ${activeRuntimeReadback.ttsVoiceLocale ?: "(unavailable)"}")
+            appendLine("  speech rate: ${activeRuntimeReadback.ttsSpeechRate} / pitch: ${activeRuntimeReadback.ttsSpeechPitch}")
+        }.trimEnd()
+    }
 
     val driver = ScriptedConsoleDriver(
         scope = scope,
@@ -390,19 +451,36 @@ class AppGraph(context: Context) {
     private fun Int.format2(): String = toString().padStart(2, '0')
 
     companion object {
-        const val APP_VERSION = "0.2.0-debug"
+        /**
+         * OWNER PHYSICAL RETEST §2 (provenance drift removed): the app version
+         * is the BUILD-INJECTED BuildConfig authority — the pre-repair hardcoded
+         * constant reported a stale identity (0.2.0-debug) against the real APK.
+         */
+        val APP_VERSION: String = com.hermestower.voiceconsole.BuildConfig.VERSION_NAME
     }
 }
 
 /** GRAPH 4 FINAL §13 — active-runtime snapshot consumed by safe Diagnostics.
  *  OWNER PHYSICAL FEEDBACK 3 adds the TTS voice read-back rows (active voice,
- *  locale, typed status) so the device itself answers the root-cause questions. */
+ *  locale, typed status) so the device itself answers the root-cause questions.
+ *  OWNER PHYSICAL RETEST §6 adds the diagnostic-card rows (engine label,
+ *  Italian availability, voice inventory, selected voice, rate/pitch, last
+ *  negotiation result). All fields may be null when the engine has not
+ *  negotiated yet — the UI renders the honest localized "unavailable". */
 data class ActiveRuntimeReadback(
     val sttActiveEngine: String,
     val sttFrameState: String,
     val ttsActiveEngine: String,
     val ttsVoiceReadback: String? = null,
     val ttsVoiceLocale: String? = null,
+    val ttsEngineLabel: String? = null,
+    val ttsItalianAvailability: String? = null,
+    val ttsVoiceInventory: String? = null,
+    val ttsSelectedVoice: String? = null,
+    val ttsSelectedVoiceLocale: String? = null,
+    val ttsSpeechRate: Float = 0.96f,
+    val ttsSpeechPitch: Float = 0.95f,
+    val ttsLastNegotiationStatus: String? = null,
     val llmState: String,
     val onnxRuntime: String,
 )

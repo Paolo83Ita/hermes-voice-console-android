@@ -169,3 +169,31 @@ Device: POCO X6 PRO — 6.67", 2712×1220 px, ~446 dpi → canonical width ≈ 3
 - "Visual polish issues" beyond layout mechanics (colors, motion) are NOT claimed
   repaired — only the code-proven layout/spacing defects are.
 - No emulator screenshot is offered as substitute evidence.
+
+## 4. SECOND PHYSICAL CYCLE ADDITIONS (2026-11-06 retest — Owner-observed)
+
+### S11 — Models and Voice: Verify button text layout (PHYSICAL-FAIL-03)
+
+| Field | Value |
+| --- | --- |
+| Route | `model_manager` (ModelManagerScreen) — lifecycle action rows |
+| Screenshot reference | PENDING_OWNER_CAPTURE (second cycle) |
+| Screen size | POCO X6 Pro ≈372 dp width class |
+| Language | it |
+| Orientation | portrait (Owner report) |
+| Root-cause hypothesis | `FIXED_ROW_ACTION_OVERFLOW`: the lifecycle actions sit in fixed horizontal `Row`s of up to 6 `TextButton`s; at ≈372 dp with Italian labels the row overflows and the Verify label clips/wraps badly. CP-G4-027's BadgeFlowRow touched BADGE rows only — the ACTION rows were never converted (the Owner's "still incorrectly laid out" verdict is consistent: the defect class was left in place, not repaired) |
+| Fix | dedicated adaptive action layout: primary actions (Download/Install, Verify, Activate) direct; all secondary actions behind a **More actions** overflow; Verify ≥48 dp touch height, min horizontal padding, maxLines 2, centered text, no fixed narrow width; wrap/stack at constrained width, shared row at wide width |
+| Verification status | REPAIRED_IN_CODE (AdaptiveActionsRow; unit-tested; physical re-check next cycle) — VERIFY_BUTTON_PHYSICAL_DEFECT_REPORT.md |
+
+### S12 — Console: microphone / privacy-mute / stop-speaking icon collision (PHYSICAL-FAIL-04)
+
+| Field | Value |
+| --- | --- |
+| Route | `console` (ConsoleScreen) — control medallions row |
+| Screenshot reference | PENDING_OWNER_CAPTURE (second cycle) |
+| Screen size | POCO X6 Pro ≈372 dp width class |
+| Language | it |
+| Orientation | portrait (Owner report) |
+| Root-cause hypothesis | `ICON_SEMANTIC_COLLISION`: pre-repair, the privacy-mute medallion renders `Icons.Filled.Mic` when NOT muted and the push-to-talk medallion renders `Icons.Filled.Mic` when idle — two adjacent controls with the SAME symbol; the stop-speaking medallion ALSO renders `Icons.Filled.Stop`, the same symbol as the listening push-to-talk. Three controls share two symbols |
+| Fix | distinct visual vocabulary: push-to-talk = Mic (idle) / waveform (listening) labeled "Parla"/"Interrompi ascolto"; privacy mute = MicOff in a red-bronze seal with persistent "Microfono disattivato" text when engaged; stop-speaking = VolumeUp/waveform labeled "Interrompi voce" (never a microphone icon for TTS playback); unique contentDescriptions + stateDescription per control |
+| Verification status | REPAIRED_IN_CODE (ConsoleControlSemantics; unit-tested uniqueness in every state; physical re-check next cycle) — MICROPHONE_CONTROL_SEMANTICS_REPORT.md |

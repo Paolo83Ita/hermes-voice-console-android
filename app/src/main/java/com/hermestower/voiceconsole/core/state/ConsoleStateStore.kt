@@ -45,7 +45,11 @@ data class ConsoleSettings(
     val keepScreenOn: Boolean = true,
     val captionsEnabled: Boolean = true,
     val brightnessScrim: Float = 0f,
-    val speakingRate: Float = 1.0f,
+    // OWNER PHYSICAL RETEST §5: the speech-profile authority. Defaults are the
+    // recommended starting values (0.96 / 0.95 — comfortable, no forced high
+    // pitch); safe ranges are enforced at the SpeechProfile boundary.
+    val speakingRate: Float = 0.96f,
+    val speechPitch: Float = 0.95f,
     /** GRAPH 3: LOW / BALANCED / HIGH visual quality profile (mission §14). */
     val visualQuality: String = "BALANCED",
     /** GRAPH 4.6 §6: optional local LLM — DEFAULT DISABLED (never self-enables). */

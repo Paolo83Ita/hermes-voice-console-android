@@ -4,6 +4,7 @@ import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.fillMaxSize
+import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.rememberScrollState
 import androidx.compose.foundation.verticalScroll
@@ -31,6 +32,7 @@ import com.hermestower.voiceconsole.ui.components.TruthBadge
 import com.hermestower.voiceconsole.ui.components.BadgeFlowRow
 import com.hermestower.voiceconsole.ui.theme.HermesType
 import com.hermestower.voiceconsole.ui.theme.hermesColors
+import com.hermestower.voiceconsole.app.BuildIdentity
 import kotlinx.coroutines.launch
 
 /**
@@ -225,6 +227,23 @@ fun DiagnosticsScreen(graph: AppGraph, onOpenStudio: () -> Unit = {}, onOpenSelf
                 style = HermesType.bodySecondary,
                 color = c.inkSecondary,
             )
+            // OWNER PHYSICAL RETEST §1: the secret-clean diagnostic receipt —
+            // build identity + TTS call-path telemetry, copy-ready for the Owner.
+            TextButton(onClick = {
+                clipboard.setText(AnnotatedString(graph.exportDiagnosticReceipt()))
+            }) { Text(stringResource(Res.string.diag_export_receipt)) }
         }
+
+        // ---- OWNER PHYSICAL RETEST §1: compact build identity footer. ----
+        val injected = remember { BuildIdentity.injected() }
+        val appContext = androidx.compose.ui.platform.LocalContext.current.applicationContext
+        val measured = remember { BuildIdentity.measure(appContext) }
+        Text(
+            BuildIdentity.footerLine(injected, measured),
+            style = HermesType.bodySecondary,
+            color = c.inkSecondary,
+            textAlign = androidx.compose.ui.text.style.TextAlign.Center,
+            modifier = Modifier.fillMaxWidth(),
+        )
     }
 }

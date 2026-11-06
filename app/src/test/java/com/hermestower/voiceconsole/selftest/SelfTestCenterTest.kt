@@ -83,7 +83,7 @@ class SelfTestCenterTest {
                 reopenKeyValueStore = { keyValue },
                 reopenRegistry = { FileInstallationRegistry(registryFile) },
                 serverFactory = { LocalTowerMockServer() },
-                appVersion = "0.3.0-alpha-graph4",
+                appVersion = "0.3.1-alpha-graph4-owner-repair",
                 commitReference = "self-test",
                 isAndroidRuntime = false,
             ),
@@ -116,10 +116,18 @@ class SelfTestCenterTest {
         val quick = results.values.filter { it.state != SelfTestState.NOT_RUN }
         assertTrue("quick subset empty", quick.isNotEmpty())
         // JVM runtime: bundled manifest is not readable → ST-46 is honestly skipped;
-        // the TTS voice probe is not wired on the JVM → ST-51 is honestly skipped.
+        // the TTS voice probe is not wired on the JVM → ST-51 is now typed
+        // QUALIFICATION_PENDING_DEVICE (Owner retest §7 — never a JVM pass).
         val skipped = quick.filter { it.state == SelfTestState.SKIPPED_NOT_APPLICABLE }.map { it.testId }
-        assertEquals(listOf("ST-46", "ST-51"), skipped)
-        val failures = quick.filter { it.state != SelfTestState.PASS && it.state != SelfTestState.SKIPPED_NOT_APPLICABLE }
+        assertEquals(listOf("ST-46"), skipped)
+        assertEquals(
+            SelfTestState.QUALIFICATION_PENDING_DEVICE,
+            results.values.first { it.testId == "ST-51" }.state,
+        )
+        val failures = quick.filter {
+            it.state != SelfTestState.PASS && it.state != SelfTestState.SKIPPED_NOT_APPLICABLE &&
+                it.state != SelfTestState.QUALIFICATION_PENDING_DEVICE
+        }
         assertTrue("non-pass quick results: ${failures.map { it.testId to it.evidence }}", failures.isEmpty())
         assertTrue(center.summary().contains("22 pass"))
     }
@@ -132,10 +140,18 @@ class SelfTestCenterTest {
         assertEquals(51, results.size)
         assertTrue(results.keys.containsAll((1..51).map { "ST-%02d".format(it) }))
         // JVM runtime: the Android-asset subjects degrade to typed skips;
-        // the TTS voice probe is not wired on the JVM (ST-51).
+        // the TTS voice probe is not wired on the JVM (ST-51 →
+        // QUALIFICATION_PENDING_DEVICE, Owner retest §7).
         val skipped = results.values.filter { it.state == SelfTestState.SKIPPED_NOT_APPLICABLE }.map { it.testId }.sorted()
-        assertEquals(listOf("ST-46", "ST-47", "ST-49", "ST-51"), skipped)
-        val failures = results.values.filter { it.state != SelfTestState.PASS && it.state != SelfTestState.SKIPPED_NOT_APPLICABLE }
+        assertEquals(listOf("ST-46", "ST-47", "ST-49"), skipped)
+        assertEquals(
+            SelfTestState.QUALIFICATION_PENDING_DEVICE,
+            results.values.first { it.testId == "ST-51" }.state,
+        )
+        val failures = results.values.filter {
+            it.state != SelfTestState.PASS && it.state != SelfTestState.SKIPPED_NOT_APPLICABLE &&
+                it.state != SelfTestState.QUALIFICATION_PENDING_DEVICE
+        }
         assertTrue("non-pass results: ${failures.map { it.testId to it.evidence }}", failures.isEmpty())
     }
 
@@ -148,7 +164,7 @@ class SelfTestCenterTest {
         assertTrue(st01.startTime != null && st01.finishTime != null)
         assertTrue(st01.durationMs >= 0)
         assertTrue(st01.evidence.isNotBlank())
-        assertEquals("0.3.0-alpha-graph4", st01.appVersion)
+        assertEquals("0.3.1-alpha-graph4-owner-repair", st01.appVersion)
         assertEquals("self-test", st01.commitReference)
     }
 

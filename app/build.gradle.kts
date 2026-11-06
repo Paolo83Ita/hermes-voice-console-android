@@ -1,3 +1,7 @@
+import java.time.Instant
+import java.time.ZoneOffset
+import java.time.format.DateTimeFormatter
+
 plugins {
     alias(libs.plugins.android.application)
     alias(libs.plugins.kotlin.android)
@@ -13,9 +17,32 @@ android {
         applicationId = "com.hermestower.voiceconsole"
         minSdk = 30
         targetSdk = 35
-        versionCode = 3
-        versionName = "0.3.0-alpha-graph4"
+        // OWNER PHYSICAL RETEST FAILURE (CP-G4-029): the repair build version
+        // MUST exceed the shipped 0.3.0-alpha-graph4 / versionCode 3. Never lower.
+        versionCode = 4
+        versionName = "0.3.1-alpha-graph4-owner-repair"
         testInstrumentationRunner = "androidx.test.runner.AndroidJUnitRunner"
+
+        // OWNER PHYSICAL RETEST §1 (build provenance): authoritative build
+        // identity is INJECTED AT BUILD TIME — no value identifying the build
+        // may be generated at runtime. CI (android-debug-build.yml) supplies
+        // GITHUB_SHA / GITHUB_RUN_ID; local builds stamp honestly as local.
+        // The installed-APK SHA-256 and the APK variant are NOT buildConfig
+        // values (a file cannot hash itself at build time) — they are MEASURED
+        // on device from the real installed file (BuildIdentity.kt).
+        val ciSha: String = System.getenv("GITHUB_SHA") ?: ""
+        val ciRun: String = System.getenv("GITHUB_RUN_ID") ?: ""
+        val ciRef: String = System.getenv("GITHUB_REF_NAME") ?: ""
+        val buildStamp: String = DateTimeFormatter
+            .ofPattern("yyyy-MM-dd'T'HH:mm:ss'Z'")
+            .withZone(ZoneOffset.UTC)
+            .format(Instant.now())
+        buildConfigField("String", "GIT_SHA_FULL", "\"$ciSha\"")
+        buildConfigField("String", "GIT_SHA_SHORT", "\"${ciSha.take(7)}\"")
+        buildConfigField("String", "BUILD_TIMESTAMP_ISO8601", "\"$buildStamp\"")
+        buildConfigField("String", "BUILD_WORKFLOW_RUN_ID", "\"$ciRun\"")
+        buildConfigField("String", "BUILD_WORKFLOW_REF", "\"$ciRef\"")
+        buildConfigField("String", "BUILD_LABEL", "\"${project.findProperty("hermes.buildLabel") ?: "POCO OWNER REPAIR 1"}\"")
     }
 
     // GRAPH 4 FINAL §20: DUAL APK OUTPUT — the UNIVERSAL debug APK keeps every

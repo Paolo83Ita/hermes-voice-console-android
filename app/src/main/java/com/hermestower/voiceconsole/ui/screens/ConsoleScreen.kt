@@ -30,6 +30,7 @@ import androidx.compose.material.icons.filled.Mic
 import androidx.compose.material.icons.filled.MicOff
 import androidx.compose.material.icons.filled.Replay
 import androidx.compose.material.icons.filled.Stop
+import androidx.compose.material.icons.filled.VolumeUp
 import androidx.compose.material.icons.outlined.History
 import androidx.compose.material.icons.outlined.Send
 import androidx.compose.material3.AlertDialog
@@ -463,7 +464,14 @@ fun ConsoleScreen(
                 )
             }
 
-            // ---- control medallions ----
+            // ---- control medallions (OWNER PHYSICAL RETEST §9: distinct semantics) ----
+            // Four semantically distinct controls: privacy mute = MicOff (+ red-bronze
+            // seal + persistent “Microfono disattivato” text when engaged); push-to-talk
+            // = Mic (Parla) / Stop (Interrompi ascolto); TTS stop = VolumeUp (Interrompi
+            // voce — never a microphone icon). Every cd is unique per state (§10).
+            val muteSemantics = ConsoleControlSemanticsResolver.privacyMute(muted)
+            val pttSemantics = ConsoleControlSemanticsResolver.pushToTalk(micState)
+            val stopVoiceSemantics = ConsoleControlSemanticsResolver.stopSpeaking()
             Row(
                 Modifier
                     .fillMaxWidth()
@@ -474,10 +482,12 @@ fun ConsoleScreen(
             ) {
                 IconButton(onClick = { graph.driver.setPrivacyMuted(!muted) }) {
                     MedallionDisc(
-                        cd = if (muted) stringResource(com.hermestower.voiceconsole.R.string.mute_cd_on) else stringResource(com.hermestower.voiceconsole.R.string.mute_cd_off),
-                        icon = if (muted) Icons.Filled.MicOff else Icons.Filled.Mic,
+                        cd = stringResource(muteSemantics.contentDescriptionRes),
+                        icon = medallionIcon(muteSemantics.icon),
                         tint = if (muted) m.redBronze else m.bronzeLight,
                         m = m,
+                        sealed = muted,
+                        sealColor = m.redBronze,
                     )
                 }
                 Spacer(Modifier.size(8.dp))
@@ -494,8 +504,8 @@ fun ConsoleScreen(
                     }
                 }) {
                     MedallionDisc(
-                        cd = stringResource(com.hermestower.voiceconsole.R.string.ptt_cd),
-                        icon = if (micState == MicUiState.LISTENING) Icons.Filled.Stop else Icons.Filled.Mic,
+                        cd = stringResource(pttSemantics.contentDescriptionRes),
+                        icon = medallionIcon(pttSemantics.icon),
                         tint = if (micState == MicUiState.LISTENING) m.cyanCore else m.gold,
                         m = m,
                         big = true,
@@ -516,9 +526,9 @@ fun ConsoleScreen(
                     graph.driver.stopSpeaking()
                 }) {
                     MedallionDisc(
-                        cd = stringResource(com.hermestower.voiceconsole.R.string.stop_cd),
-                        icon = Icons.Filled.Stop,
-                        tint = m.bronzeLight,
+                        cd = stringResource(stopVoiceSemantics.contentDescriptionRes),
+                        icon = medallionIcon(stopVoiceSemantics.icon),
+                        tint = m.cyanCore,
                         m = m,
                     )
                 }
@@ -540,6 +550,30 @@ fun ConsoleScreen(
                         m = m,
                     )
                 }
+            }
+            // ---- OWNER PHYSICAL RETEST §9: the persistent privacy-mute text + the
+            // live control label row (Parla / Interrompi ascolto / Interrompi voce). ----
+            if (muted) {
+                Text(
+                    stringResource(com.hermestower.voiceconsole.R.string.mic_label_muted),
+                    style = MonumentalType.sealSub,
+                    color = m.redBronze,
+                    textAlign = TextAlign.Center,
+                    modifier = Modifier
+                        .fillMaxWidth()
+                        .padding(horizontal = 12.dp, vertical = 2.dp)
+                        .semantics { liveRegion = LiveRegionMode.Polite },
+                )
+            } else {
+                Text(
+                    stringResource(pttSemantics.labelRes),
+                    style = MonumentalType.sealSub,
+                    color = if (micState == MicUiState.LISTENING) m.cyanCore else m.inkDim,
+                    textAlign = TextAlign.Center,
+                    modifier = Modifier
+                        .fillMaxWidth()
+                        .padding(horizontal = 12.dp, vertical = 2.dp),
+                )
             }
             // ---- engine truth row (§5: engines are named, simulation labeled) ----
             Text(
@@ -597,6 +631,9 @@ private fun MedallionDisc(
     tint: Color,
     m: MonumentalColors,
     big: Boolean = false,
+    /** OWNER PHYSICAL RETEST §9: the red-bronze PRIVACY SEAL (muted state). */
+    sealed: Boolean = false,
+    sealColor: Color = Color.Red,
 ) {
     val size = if (big) 62.dp else 50.dp
     Box(
@@ -607,8 +644,8 @@ private fun MedallionDisc(
                 CircleShape,
             )
             .border(
-                width = if (big) 2.5.dp else 1.5.dp,
-                color = tint,
+                width = if (sealed) 3.dp else if (big) 2.5.dp else 1.5.dp,
+                color = if (sealed) sealColor else tint,
                 shape = CircleShape,
             )
             .semantics { contentDescription = cd },
@@ -616,6 +653,21 @@ private fun MedallionDisc(
     ) {
         Icon(icon, contentDescription = null, tint = tint)
     }
+}
+
+/**
+ * OWNER PHYSICAL RETEST §9: the typed icon vocabulary → the material vector.
+ * The privacy-mute control is ALWAYS MicOff (its identity), push-to-talk is
+ * Mic/Stop, the TTS stop is VolumeUp — the collision class is dead.
+ */
+private fun medallionIcon(icon: ConsoleControlIcon): ImageVector = when (icon) {
+    ConsoleControlIcon.MIC -> Icons.Filled.Mic
+    ConsoleControlIcon.STOP -> Icons.Filled.Stop
+    ConsoleControlIcon.MIC_OFF -> Icons.Filled.MicOff
+    ConsoleControlIcon.VOLUME_UP -> Icons.Filled.VolumeUp
+    ConsoleControlIcon.REPLAY -> Icons.Filled.Replay
+    ConsoleControlIcon.SEND -> Icons.Outlined.Send
+    ConsoleControlIcon.HISTORY -> Icons.Outlined.History
 }
 
 

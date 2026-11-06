@@ -124,3 +124,52 @@ provable instead of anecdotal.
   language accepted, active voice English → `FALLBACK_VOICE_TRIGGERED`).
 - Piper voices stay `INSTALLED-BUT-INACTIVE` (sherpa-onnx runtime gap, `TTS_RUNTIME_RECEIPT.md`) —
   unchanged by this report; the system TTS route is the route that spoke.
+
+## 9. Second physical cycle verdict (2026-11-06 retest — this cycle)
+
+- The Owner re-tested on the POCO X6 Pro: the spoken response is STILL English
+  (PHYSICAL-FAIL-01) and the voice is still the uncomfortable high-pitched
+  English synthetic voice (PHYSICAL-FAIL-02, technical token
+  `HIGH_PITCH_ENGLISH_TTS_OUTPUT`). The CP-G4-026 repair did NOT reach
+  terminality on device.
+- Installed-build provenance is UNPROVEN (no in-app build identity existed) —
+  the retest cannot be bound to `bf34014`. What IS provable from the code of
+  the supplied build (`53841a5`): even ON `bf34014` the spoken path was
+  fail-open, so the Owner's observation is consistent with the new build
+  having run:
+  1. `AndroidSystemTtsEngine.speak()` re-negotiates and then speaks
+     REGARDLESS of the typed verdict — `FALLBACK_VOICE_TRIGGERED` /
+     `ITALIAN_VOICE_MISSING_DATA` states were published but never BLOCKED
+     audio. The negotiation was observability-only. This is the
+     `LANGUAGE_TO_VOICE_ROUTING_DEFECT` residual: the verdict existed, the
+     gate did not.
+  2. No `setSpeechRate`/`setPitch` call exists in the pre-repair pipeline;
+     `SystemTtsDomainAdapter.speak(text, rate)` discards `rate`. The audible
+     voice = the engine's default voice character → the high-pitched
+     discomfort is an UNCONFIGURED engine, not an app-chosen profile.
+  3. The in-app `APP_VERSION` constant was stale (`0.2.0-debug` vs BuildConfig
+     `0.3.0-alpha-graph4`) — configuration drift in the app's own identity.
+- Classification update: `WRONG_VOICE_SELECTION` remains NOT CONFIRMED
+  (selection preference order is correct); the operative classes are the
+  fail-open gate (routing), the never-applied speech profile (pitch/rate) and
+  the unprovable provenance (identity).
+- Repair bound to this report (this cycle): FAIL-CLOSED speak gate (§4 of the
+  Owner brief) — when the effective language is Italian and the read-back is
+  not an Italian voice, speak() is REFUSED, the state becomes
+  `TEXT_ONLY_SAFE_DEGRADED` with typed tokens
+  `ITALIAN_SYSTEM_TTS_DATA_MISSING` / `ITALIAN_SYSTEM_TTS_READBACK_MISMATCH`,
+  the response stays visible as text, an Italian message is shown and the
+  Owner gets direct actions (open Android TTS settings / install voice data /
+  test Italian voice). Plus the speech-profile authority (rate 0.96f, pitch
+  0.95f defaults; safe ranges; persisted) applied through the real engine,
+  structured secret-clean TTS telemetry (engine init, locale requested,
+  availability, voices enumerated, selected voice, setVoice result,
+  utterance start/done/error, fallback reason — no spoken content), the TTS
+  diagnostic card, and ST-51 real-engine result classes
+  (PASS / BLOCKED_DEPENDENCY / FAIL / QUALIFICATION_PENDING_DEVICE).
+- Terminality: unchanged — `ITALIAN_VOICE_ACTIVE` or
+  `ITALIAN_VOICE_READY_AND_BLOCKED_BY_KNOWN_RUNTIME_LIMITATION` decided ON
+  DEVICE by the read-back in the NEXT cycle, now additionally guarded by the
+  fail-closed gate (an English voice can no longer be audible while Italian
+  is requested — the failure mode the Owner heard is made impossible in
+  code, and its suppression is itself a typed, visible state).
