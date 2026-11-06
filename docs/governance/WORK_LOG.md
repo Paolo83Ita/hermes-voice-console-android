@@ -1279,3 +1279,21 @@ docs/governance/{ITALIAN_GATE_NAVIGATION_FAILURE_LEDGER,WORK_LOG,GRAPH46_READBAC
 COMMIT: (this commit).
 CHECKPOINT: CP-G4-023 fix 19 (R-35+R-36); CP-G4-024 STAGED.
 NEXT: the dual-sample push runs arbitrate ITALIAN_UI_COMPLETE.
+
+## G4-N42 — CP-G4-023 fix 20 / R-37 (cloud-proven activation ported to the gates)
+
+Run #150 (42148884891 @ 0cdad8d): lane 1 — R-28 relaunch RECOVERY_OK in ~86 s
+(2nd consecutive KVM recovery) and the re-invocation SUCCEEDED FULLY: gate A
+OK ON THE RELAUNCHED GUEST + B OK + C OK — the recovery chain carried a lane
+past its own death for the first time; D = MODEL SANCTUM timeout n=3
+(identical dump on a fresh guest). Lane 2 — R-17 typed abort (dead package
+service). Decisive cross-check: the regression suite navigates to MODEL
+MANAGER on this fleet every sample via hasText+hasClickAction + direct OnClick
+invocation. R-37: gateActivateRowAccessible ports that mechanism into
+gateNavigateTo (drawer + hub steps, direct invocation first). No test deleted,
+skipped or weakened.
+FILES: app/src/androidTest/java/com/hermestower/voiceconsole/e2e/ItalianGateSupport.kt;
+docs/governance/{ITALIAN_GATE_NAVIGATION_FAILURE_LEDGER,WORK_LOG,GRAPH46_READBACK,CHECKPOINT_INDEX}.md.
+COMMIT: (this commit).
+CHECKPOINT: CP-G4-023 fix 20 (R-37); CP-G4-024 STAGED.
+NEXT: the dual-sample push runs arbitrate ITALIAN_UI_COMPLETE.

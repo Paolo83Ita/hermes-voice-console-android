@@ -614,3 +614,32 @@ the bounded settle. Both placeholders remain INTACT; CP-G4-024 STAGED. THIS
 commit's dual-sample push runs are the deciding evidence: ANY lane showing
 gate 6/6 green + regression green-or-typed + residual typed → fill the two
 placeholders ONLY from that lane's artifacts → §10 terminality.
+
+## 21. §0 fresh read-back — session of 2026-11-06, part 14 (fix 20 / R-37)
+
+### 21.1 Authority verification
+
+Fresh fetch read-back: remote tip = local HEAD = `0cdad8d` (fix 19 /
+R-35+R-36); `main` untouched (`e7ab101`).
+
+### 21.2 Run #150 (42148884891 @ `0cdad8d`) — arbitrated from full lane logs
+
+Lane 1: gate A died with the device → R-28 → RECOVERY_OK in ~86 s (the R-34
+KVM grant, 2nd consecutive) → re-invocation gate A `OK (2 tests)` ON THE
+RELAUNCHED GUEST + B `OK` + C `OK` — the recovery chain carried a lane past
+its own death for the first time — then D = MODEL SANCTUM timeout (n=3,
+identical dump on a fresh guest — degradation excluded). Lane 2: guest booted
+with a dead package service → R-17 recovery → typed honest abort (as
+designed). THE DECISIVE CROSS-CHECK: E2EModelManagerTest navigates the SAME
+destination on the SAME fleet in every cloud sample via hasText+hasClickAction
++ DIRECT OnClick invocation (the regression mechanism).
+
+### 21.3 Repair executed (fix 20 / R-37) + Next Exact Action
+
+gateActivateRowAccessible (the cloud-proven regression activation) added to
+gateNavigateTo's drawer + hub steps; direct invocation first, runOnMainSync
+second arm, the physical tap stays the last mile. Both placeholders remain
+INTACT; CP-G4-024 STAGED. THIS commit's dual-sample push runs are the deciding
+evidence: ANY lane showing gate 6/6 green + regression green-or-typed +
+residual typed → fill the two placeholders ONLY from that lane's artifacts →
+§10 terminality.

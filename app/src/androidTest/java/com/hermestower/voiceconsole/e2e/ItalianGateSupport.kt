@@ -10,6 +10,9 @@ import androidx.compose.ui.semantics.SemanticsProperties
 // compiler error (`412:38 Unresolved reference 'click'`) that killed BOTH
 // lanes before the emulator ever booted. No behavior change.
 import androidx.compose.ui.test.click
+import androidx.compose.ui.test.hasClickAction
+import androidx.compose.ui.test.hasText
+import androidx.compose.ui.test.onAllNodes
 import androidx.compose.ui.test.onAllNodesWithContentDescription
 import androidx.compose.ui.test.onAllNodesWithText
 import androidx.compose.ui.test.onNodeWithContentDescription
@@ -308,6 +311,34 @@ fun HermesComposeRule.gateOpenDrawerAndActivateRow(label: String, attempts: Int 
 }
 
 /**
+ * R-37 (runs #145/#149/#150 — the MODEL SANCTUM anchor timeout n=3): port the
+ * CLOUD-PROVEN activation from the regression suite (E2ECommon
+ * openDrawerAndNavigate → activateRowFrozen → activateAccessible) — match
+ * `hasText + hasClickAction` and invoke the OnClick action DIRECTLY. The
+ * regression mechanism navigates to the SAME destination on the SAME fleet in
+ * every cloud sample (E2EModelManagerTest green in #149 lane 2), while the
+ * gate's runOnMainSync dispatch and the R-26/R-35 physical tap have failed n=3
+ * on exactly this row. The destination anchor after the call STILL decides
+ * success — nothing weakened.
+ */
+fun HermesComposeRule.gateActivateRowAccessible(label: String): Boolean {
+    var advanced = 0L
+    while (advanced < 5_000L) {
+        mainClock.advanceTimeBy(100)
+        advanced += 100
+        val rows = runCatching {
+            onAllNodes(hasText(label, substring = true, ignoreCase = true).and(hasClickAction()))
+                .fetchSemanticsNodes()
+        }.getOrDefault(emptyList())
+        val row = rows.firstOrNull() ?: continue
+        val click = row.config[SemanticsActions.OnClick]?.action ?: continue
+        click()
+        return true
+    }
+    return false
+}
+
+/**
  * Activates the first clickable node labeled [label] (drawer rows, hub rows,
  * screen buttons) — the accessible OnClick dispatched ON MAIN (ledger R-3).
  * Bounded virtual pump first (frozen-clock physics, CP-G4-007).
@@ -390,7 +421,11 @@ fun HermesComposeRule.gateNavigate(labelRes: Int, anchorRes: Int, timeoutMs: Lon
 fun HermesComposeRule.gateNavigateTo(labelRes: Int, anchor: String, timeoutMs: Long = 60_000) {
     val label = ItalianGate.localizedString(labelRes, "it")
     gateOpenDrawer()
-    if (!gateActivateRow(label)) {
+    // R-37: the gate's own activation first, then the CLOUD-PROVEN accessible
+    // dispatch from the regression suite (same matcher + direct OnClick call —
+    // E2EModelManagerTest green on this fleet in every sample). The hub
+    // fallback below is unchanged; the destination anchor still decides.
+    if (!gateActivateRow(label) && !gateActivateRowAccessible(label)) {
         val settingsLabel = ItalianGate.localizedString(R.string.dest_settings, "it")
         check(gateActivateRow(settingsLabel)) { "Settings row missing from drawer (it)" }
         // R-21 (run 41990077345 @ e89d014): the fallback used to await the ROW
@@ -413,7 +448,16 @@ fun HermesComposeRule.gateNavigateTo(labelRes: Int, anchor: String, timeoutMs: L
         if (hubRow != null) {
             val click = hubRow.config[SemanticsActions.OnClick]?.action
                 ?: error("settings-hub row '$label' has no OnClick (it)")
-            androidx.test.platform.app.InstrumentationRegistry.getInstrumentation().runOnMainSync { click() }
+            // R-37: the direct invocation FIRST (the cloud-proven regression
+            // mechanism); the runOnMainSync dispatch stays as the second arm.
+            val dispatched = runCatching { click() }.isSuccess || runCatching {
+                androidx.test.platform.app.InstrumentationRegistry.getInstrumentation().runOnMainSync { click() }
+            }.isSuccess
+            check(dispatched) { "settings-hub row '$label' OnClick dispatch failed (it)" }
+        } else if (gateActivateRowAccessible(label)) {
+            // R-37: the proven accessible dispatch found a clickable node the
+            // OnClick-filtered onAllNodesWithText lookup missed (the matcher
+            // difference: hasText matches ContentDescription-carrying rows too).
         } else {
             // R-26 (runs #137 + #142 lane 1 — the SAME failure signature twice,
             // now with full dumps): the row text is dump-proven present ("Modelli
