@@ -204,6 +204,9 @@ class AppGraph(context: Context) {
                 )
             },
             towerArchive = towerArchive,
+            // OWNER PHYSICAL FEEDBACK 3 (ST-51): the live voice read-back, read
+            // lazily when the probe runs (after the engine negotiated).
+            italianTtsVoiceProbe = { voiceTts.voiceReadback },
         ),
         dispatcher = Dispatchers.Default,
     )
@@ -246,7 +249,12 @@ class AppGraph(context: Context) {
     // Real Android system TTS: the console SPEAKS with real audio (tier 2 of
     // the §10 fallback chain; the natural Piper voice is G4-C07 after
     // qualification). No TTS engine on device → honest text-only degradation.
-    val voiceTts = AndroidSystemTtsEngine(context)
+    // OWNER PHYSICAL FEEDBACK 3: the spoken locale follows the app language
+    // (AppLanguage), the negotiation is read-back-verified and typed — the
+    // English-voice silent fallback class is dead (ItalianTtsVoiceNegotiator).
+    val voiceTts = AndroidSystemTtsEngine(context) {
+        com.hermestower.voiceconsole.locale.AppLanguage.effectiveTag(context)
+    }
     val consoleTts: com.hermestower.voiceconsole.domain.TextToSpeechEngine =
         SystemTtsDomainAdapter(voiceTts)
 
@@ -294,16 +302,24 @@ class AppGraph(context: Context) {
     // consumes this snapshot; every value is read from the LIVE engine objects
     // (no invented identities, no aspiration shown as fact).
     val activeRuntimeReadback: ActiveRuntimeReadback
-        get() = ActiveRuntimeReadback(
-            sttActiveEngine = if (voskFrameStt.loadedModelDir != null) voskFrameStt.engineId
-            else "Android system recognizer (offline vosk model not installed)",
-            sttFrameState = voskFrameStt.state.value.state.name +
-                (voskFrameStt.loadedModelDir?.let { " (${it.name})" } ?: ""),
-            ttsActiveEngine = voiceTts.activeEngineName?.let { "Android system TTS ($it)" }
-                ?: "Android system TTS",
-            llmState = "No local model (default) — Qwen2.5-0.5B candidate present, llama.cpp runtime pending",
-            onnxRuntime = "onnxruntime-android 1.20.0 (Gradle)",
-        )
+        get() {
+            val readback = voiceTts.voiceReadback
+            return ActiveRuntimeReadback(
+                sttActiveEngine = if (voskFrameStt.loadedModelDir != null) voskFrameStt.engineId
+                else "Android system recognizer (offline vosk model not installed)",
+                sttFrameState = voskFrameStt.state.value.state.name +
+                    (voskFrameStt.loadedModelDir?.let { " (${it.name})" } ?: ""),
+                ttsActiveEngine = voiceTts.activeEngineName?.let { "Android system TTS ($it)" }
+                    ?: "Android system TTS",
+                ttsVoiceReadback = readback?.let {
+                    com.hermestower.voiceconsole.voice.ItalianTtsVoiceNegotiator.describe(it)
+                },
+                ttsVoiceLocale = readback?.activeVoiceLocaleTag
+                    ?: readback?.activeLanguageTag,
+                llmState = "No local model (default) — Qwen2.5-0.5B candidate present, llama.cpp runtime pending",
+                onnxRuntime = "onnxruntime-android 1.20.0 (Gradle)",
+            )
+        }
 
     val diagnostics = RedactedDiagnosticsExporter(
         events = events,
@@ -378,11 +394,15 @@ class AppGraph(context: Context) {
     }
 }
 
-/** GRAPH 4 FINAL §13 — active-runtime snapshot consumed by safe Diagnostics. */
+/** GRAPH 4 FINAL §13 — active-runtime snapshot consumed by safe Diagnostics.
+ *  OWNER PHYSICAL FEEDBACK 3 adds the TTS voice read-back rows (active voice,
+ *  locale, typed status) so the device itself answers the root-cause questions. */
 data class ActiveRuntimeReadback(
     val sttActiveEngine: String,
     val sttFrameState: String,
     val ttsActiveEngine: String,
+    val ttsVoiceReadback: String? = null,
+    val ttsVoiceLocale: String? = null,
     val llmState: String,
     val onnxRuntime: String,
 )

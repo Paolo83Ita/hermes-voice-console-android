@@ -84,9 +84,9 @@ object SelfTestRegistry {
         return listOf(
             // ---------- identity, configuration, security ----------
             def("ST-01", "Application identity and version", SelfTestCategory.IDENTITY, setOf(SelfTestMode.QUICK, SelfTestMode.STANDARD, SelfTestMode.FULL)) { s ->
-                val ok = s.appVersion.isNotBlank() && s.appVersion.startsWith("0.2.0")
+                val ok = s.appVersion.isNotBlank() && s.appVersion.startsWith("0.3.0")
                 if (ok) SelfTestState.PASS to "app version ${s.appVersion} reported truthfully."
-                else SelfTestState.FAIL to "app version '${s.appVersion}' does not match 0.2.0-debug schema."
+                else SelfTestState.FAIL to "app version '${s.appVersion}' does not match 0.3.0-alpha schema (Owner package)."
             },
             def("ST-02", "Configuration schema", SelfTestCategory.CONFIGURATION, setOf(SelfTestMode.QUICK, SelfTestMode.STANDARD, SelfTestMode.FULL)) { s ->
                 val profile = TowerConnectionProfile.emptyMock()
@@ -655,6 +655,29 @@ object SelfTestRegistry {
                     SelfTestState.PASS to "Graph 4 surfaces registered: archive, qr_scanner, tower_studio, model_manager, self_test."
                 } else {
                     SelfTestState.FAIL to "missing routes: $missing."
+                }
+            },
+            def("ST-51", "Italian TTS voice negotiation probe (Owner Finding 3)", SelfTestCategory.DIAGNOSTICS, setOf(SelfTestMode.QUICK, SelfTestMode.STANDARD, SelfTestMode.FULL, SelfTestMode.VOICE_FOUNDATION_ONLY)) { s ->
+                val probe = s.italianTtsVoiceProbe
+                when {
+                    probe == null ->
+                        SelfTestState.SKIPPED_NOT_APPLICABLE to "voice read-back not wired on this runtime (JVM)."
+                    probe() == null ->
+                        SelfTestState.SKIPPED_NOT_APPLICABLE to "the TTS engine has not negotiated yet (not initialized on this run)."
+                    else -> {
+                        val rb = probe()!!
+                        if (rb.status == com.hermestower.voiceconsole.voice.ItalianTtsVoiceNegotiator.ItalianTtsVoiceStatus.ITALIAN_VOICE_ACTIVE) {
+                            SelfTestState.PASS to com.hermestower.voiceconsole.voice.ItalianTtsVoiceNegotiator.describe(rb)
+                        } else {
+                            // Every non-active class is a DEVICE-side state (missing
+                            // data, unsupported engine, fallback voice) — the app is
+                            // truthful about it; typed blocked with the full read-back.
+                            val detail = rb.detail?.let { " — $it" } ?: ""
+                            SelfTestState.BLOCKED_DEPENDENCY to
+                                (com.hermestower.voiceconsole.voice.ItalianTtsVoiceNegotiator.describe(rb) + detail +
+                                    " Repair: install the Italian voice data from the system Text-to-speech settings, then re-run.")
+                        }
+                    }
                 }
             },
         )

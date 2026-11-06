@@ -29,6 +29,7 @@ import com.hermestower.voiceconsole.core.state.ConversationTurn
 import com.hermestower.voiceconsole.ui.components.SectionCard
 import com.hermestower.voiceconsole.ui.components.MeanderBand
 import com.hermestower.voiceconsole.ui.components.TruthBadge
+import com.hermestower.voiceconsole.ui.components.BadgeFlowRow
 import com.hermestower.voiceconsole.ui.theme.HermesType
 import com.hermestower.voiceconsole.ui.theme.hermesColors
 
@@ -52,7 +53,7 @@ fun HistoryScreen(graph: AppGraph) {
         Text(stringResource(com.hermestower.voiceconsole.R.string.history_title), style = HermesType.screenTitle, color = c.ink)
         MeanderBand(colors = hermesColors, modifier = Modifier.padding(top = 6.dp))
 
-        Row(horizontalArrangement = Arrangement.spacedBy(6.dp)) {
+        BadgeFlowRow(horizontalSpacing = 6.dp) {
             Filter.entries.forEach { f ->
                 com.hermestower.voiceconsole.ui.components.ModeChip(
                     label = f.label,
@@ -139,7 +140,7 @@ private fun TurnRow(turn: ConversationTurn, onRetry: () -> Unit) {
     }
     SectionCard(title = "#${turn.id} · $who") {
         Text(turn.text, style = HermesType.body, color = c.ink)
-        Row(horizontalArrangement = Arrangement.spacedBy(6.dp)) {
+        BadgeFlowRow(horizontalSpacing = 6.dp) {
             TruthBadge(
                 text = turn.source.name,
                 color = if (turn.source == ConversationTurn.Source.TOWER) c.energy else c.ok,

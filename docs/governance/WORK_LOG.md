@@ -1372,3 +1372,97 @@ docs/governance/{ITALIAN_GATE_NAVIGATION_FAILURE_LEDGER,WORK_LOG,GRAPH46_READBAC
 COMMIT: (this commit).
 CHECKPOINT: CP-G4-023 fix 24 (R-41); CP-G4-024 STAGED.
 NEXT: the dual-sample push runs arbitrate ITALIAN_UI_COMPLETE.
+
+## G4-N48 — OWNER PHYSICAL FEEDBACK intake (POCO X6 PRO) + priority override
+
+FIRST PHYSICAL DEVICE evidence of the project. Device: POCO X6 PRO (256 GB / 8 GB),
+real installation. Typed at intake: DEVICE_INSTALLATION_PASSED,
+APPLICATION_LAUNCH_PASSED, package bound (binary inspection) to commit ca8980b =
+Graph 3 terminal (versionName 0.2.0-debug, NO real voice pipeline inside —
+MockTextToSpeechEngine + Inactive* only) → the Owner's own qualifier ("produced
+before the latest Graph 4 commits") is CONFIRMED; physical qualification stays
+PARTIAL_OWNER_EVIDENCE. Four findings recorded verbatim-typed in
+docs/receipts/OWNER_PHYSICAL_FEEDBACK_RECEIPT.md; the Finding-3 provenance
+contradiction is recorded honestly (the tested package could not speak at all; the
+code-proven Graph 4 TTS defect applies to any newer build; the next cycle's runtime
+read-back discriminates on device). Owner priority override recorded as binding:
+Italian TTS → submenu layout → current APKs → install/upgrade package → second
+Owner validation cycle, THEN remaining Graph 4 nodes.
+FILES: docs/receipts/OWNER_PHYSICAL_FEEDBACK_RECEIPT.md;
+docs/governance/{CURRENT_PROJECT_TRUTH,WORK_LOG,CHECKPOINT_INDEX,
+REQUIREMENT_TO_EVIDENCE_REGISTER}.md.
+COMMIT: (this commit).
+CHECKPOINT: CP-G4-025 (owner-feedback intake).
+NEXT: Italian TTS repair + UI polish pass + fresh APKs + POCO upgrade package.
+
+## G4-N49 — ITALIAN TTS ROOT CAUSE (code-proven) + typed voice negotiation repair
+
+Finding 3 root cause (code-level, no guessing): AndroidSystemTtsEngine discarded
+setLanguage's typed result (runCatching swallows the return code, not exceptions),
+never selected an explicit Voice, never read back the active voice/locale — a
+silent language-negotiation failure whose audible result is exactly the Owner's
+observation when the device's Italian voice data is absent (the engine falls back
+to its default voice, commonly en-US). Classification set (evidence-bound):
+ITALIAN_VOICE_NOT_ACTIVE (runtime state, consistent with the English audio),
+LANGUAGE_TO_VOICE_ROUTING_DEFECT (contract class — the language→voice mapping is
+never verified), TTS_CONFIGURATION_DRIFT (app claims Italian; engine uses the
+default), FALLBACK_VOICE_TRIGGERED (the audible consequence). The discriminating
+question on device (missing data vs not-supported vs engine capability) is now
+ANSWERED BY THE APP ITSELF: ItalianTtsVoiceNegotiator (pure, unit-tested) +
+AndroidSystemTtsEngine rewritten to negotiate an explicit Italian voice (offline
+voices preferred), read back the ACTIVE voice + locale + engine, and emit a typed
+ItalianTtsVoiceStatus (ITALIAN_VOICE_ACTIVE / ITALIAN_VOICE_MISSING_DATA /
+ITALIAN_VOICE_NOT_SUPPORTED / FALLBACK_VOICE_TRIGGERED / ENGINE_UNAVAILABLE);
+spoken locale follows the app language (AppLanguage) instead of a hardcoded
+Locale.ITALY; read-back surfaced in Diagnostics (Active runtime rows),
+Settings→Voice & Audio (Italian voice status card + honest action to open the
+system TTS settings when data is missing) and Self-Test ST-51.
+FILES: app/src/main/java/com/hermestower/voiceconsole/voice/{ItalianTtsVoiceNegotiator,AndroidSystemTtsEngine}.kt;
+app/src/main/java/com/hermestower/voiceconsole/app/AppGraph.kt;
+app/src/main/java/com/hermestower/voiceconsole/ui/screens/{DiagnosticsScreen,VoiceAudioScreen}.kt;
+app/src/main/java/com/hermestower/voiceconsole/selftest/{SelfTestCenter,SelfTestRegistry}.kt;
+app/src/main/res/values{,-it,-es,-fr,-de}/strings.xml; unit tests
+ItalianTtsVoiceNegotiatorTest; docs/governance/ITALIAN_TTS_ROOT_CAUSE_REPORT.md.
+COMMIT: (this commit).
+CHECKPOINT: CP-G4-026 (italian-tts-readback).
+NEXT: device read-back in the second Owner validation cycle arbitrates
+ITALIAN_VOICE_ACTIVE vs ITALIAN_VOICE_READY_AND_BLOCKED_BY_KNOWN_RUNTIME_LIMITATION.
+
+## G4-N50 — UI_POLISH_PASS (Owner Finding 2) + layout defect ledger
+
+Root cause class (code-proven across secondary screens): status/badge rows are
+horizontal Rows with fixed spacing that CANNOT wrap — long Italian/German labels
+(e.g. li_load_badge "CARICA — BLOCCATO FINCHÉ MANCA UN RUNTIME VERIFICATO") overflow
+narrow screens; SettingsHub rows have no text-column weight, no end padding and no
+minimum touch height. Repairs (strictly additive, E2E-pinned strings untouched):
+BadgeFlowRow (google.common.layout.FlowRow) added to Chrome.kt and adopted on the
+non-wrapping badge rows of VoiceAudio/LocalIntelligence/Archive/History/Connection/
+Diagnostics/AboutSafety; SectionCard header title column weighted (trailing cannot
+collide); SettingsHubScreen.SettingsRow gets weight(1f) + end padding + 48dp min
+height. Per-screen ledger with typed fields (route; screenshot reference
+PENDING_OWNER_CAPTURE; screen size; language; orientation; root-cause hypothesis;
+fix; verification status): docs/governance/OWNER_UI_LAYOUT_DEFECT_LEDGER.md.
+FILES: app/src/main/java/com/hermestower/voiceconsole/ui/components/Chrome.kt;
+app/src/main/java/com/hermestower/voiceconsole/ui/screens/{VoiceAudioScreen,
+LocalIntelligenceScreen,ArchiveScreen,HistoryScreen,ConnectionScreen,
+DiagnosticsScreen,AboutSafetyScreen,SettingsHubScreen}.kt;
+docs/governance/OWNER_UI_LAYOUT_DEFECT_LEDGER.md.
+COMMIT: (this commit).
+CHECKPOINT: CP-G4-027 (ui-polish-pass).
+NEXT: owner screenshots on the POCO X6 PRO complete the ledger rows in the second cycle.
+
+## G4-N51 — FRESH OWNER PACKAGE (current + arm64 APKs) + POCO X6 PRO upgrade guide
+
+Finding 4 disposition: versionName 0.3.0-alpha-graph4 (versionCode 3)
+so the Owner can verify the installed build AT A GLANCE (the tested package was
+0.2.0-debug). Universal + arm64-v8a APKs built and hashed; upgrade guide
+docs/INSTALL_POCO_X6_PRO.md (HyperOS/POCO steps, debug-keystore signature identity,
+both install paths with and without adb, TTS voice-data install step, the second
+validation cycle runbook with the exact read-back items). Version bump is
+debug-line only; the E2E harness version probes were checked (none pin
+versionName).
+FILES: app/build.gradle.kts; docs/INSTALL_POCO_X6_PRO.md;
+docs/governance/{WORK_LOG,CHECKPOINT_INDEX}.md.
+COMMIT: (this commit).
+CHECKPOINT: CP-G4-028 (owner-package).
+NEXT: second Owner validation cycle on the POCO X6 PRO.

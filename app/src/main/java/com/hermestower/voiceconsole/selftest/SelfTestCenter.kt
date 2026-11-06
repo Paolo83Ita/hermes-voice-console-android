@@ -85,6 +85,9 @@ data class SelfTestSubjects(
     val bundledInstaller: BundledModelInstaller? = null,
     val pairingParserFactory: () -> PairingPayloadParser = { PairingPayloadParser() },
     val towerArchive: MockTowerArchive? = null,
+    // OWNER PHYSICAL FEEDBACK 3 (ST-51): the live TTS voice read-back — null
+    // provider or null read-back degrades to the honest typed skip/blocked.
+    val italianTtsVoiceProbe: (() -> com.hermestower.voiceconsole.voice.ItalianTtsVoiceNegotiator.TtsVoiceReadback?)? = null,
 )
 
 /**

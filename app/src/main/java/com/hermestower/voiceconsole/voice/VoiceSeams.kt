@@ -94,6 +94,13 @@ data class TtsOutput(
     val state: TtsState,
     val spokenText: String? = null,
     val error: String? = null,
+    /**
+     * OWNER PHYSICAL FEEDBACK 3: the post-apply voice truth (null when the
+     * engine has not negotiated yet or the implementation has no read-back).
+     * Carries the typed ItalianTtsVoiceStatus the Diagnostics screen, the
+     * Voice & Audio card and Self-Test ST-51 surface verbatim.
+     */
+    val voiceReadback: ItalianTtsVoiceNegotiator.TtsVoiceReadback? = null,
 )
 
 /**

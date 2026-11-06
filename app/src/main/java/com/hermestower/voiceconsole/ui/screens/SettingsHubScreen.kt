@@ -6,6 +6,7 @@ import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
+import androidx.compose.foundation.layout.heightIn
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.rememberScrollState
 import androidx.compose.foundation.verticalScroll
@@ -180,14 +181,24 @@ private fun SettingsRow(
     icon: androidx.compose.ui.graphics.vector.ImageVector,
     onClick: () -> Unit,
 ) {
+    // UI_POLISH_PASS (OWNER PHYSICAL FEEDBACK 2): the text column is WEIGHTED so
+    // long localized labels/subtitles wrap inside the row instead of pushing the
+    // row to overflow; end padding keeps a right margin; the row keeps a 56dp
+    // minimum height (48dp touch-target floor + breathing room).
     Row(
         Modifier
             .fillMaxWidth()
-            .clickable(onClickLabel = sub) { onClick() },
+            .heightIn(min = 56.dp)
+            .clickable(onClickLabel = sub) { onClick() }
+            .padding(vertical = 8.dp),
         verticalAlignment = Alignment.CenterVertically,
     ) {
         Icon(icon, contentDescription = null, tint = MaterialTheme.colorScheme.primary)
-        Column(Modifier.padding(start = 12.dp)) {
+        Column(
+            Modifier
+                .weight(1f)
+                .padding(start = 12.dp, end = 8.dp),
+        ) {
             Text(label, style = HermesType.body)
             Text(sub, style = HermesType.bodySecondary, color = hermesColors.inkSecondary)
         }

@@ -20,6 +20,7 @@ import com.hermestower.voiceconsole.app.AppGraph
 import com.hermestower.voiceconsole.ui.components.SectionCard
 import com.hermestower.voiceconsole.ui.components.MeanderBand
 import com.hermestower.voiceconsole.ui.components.TruthBadge
+import com.hermestower.voiceconsole.ui.components.BadgeFlowRow
 import com.hermestower.voiceconsole.ui.theme.HermesType
 import com.hermestower.voiceconsole.ui.theme.hermesColors
 
@@ -47,7 +48,7 @@ fun LocalIntelligenceScreen(graph: AppGraph) {
         MeanderBand(colors = hermesColors, modifier = Modifier.padding(top = 6.dp))
 
         SectionCard(title = stringResource(com.hermestower.voiceconsole.R.string.li_engine_card)) {
-            Row(horizontalArrangement = Arrangement.spacedBy(8.dp)) {
+            BadgeFlowRow(horizontalSpacing = 8.dp) {
                 TruthBadge(stringResource(com.hermestower.voiceconsole.R.string.li_state_fmt, modelState.value.name), c.warn)
                 TruthBadge(stringResource(com.hermestower.voiceconsole.R.string.li_runtime_none), c.inkSecondary)
             }
@@ -101,7 +102,7 @@ fun LocalIntelligenceScreen(graph: AppGraph) {
         val llmEnabled = graph.store.settings.collectAsStateWithLifecycle().value.localLlmEnabled
         val llmDiag = graph.localLlmEngine.diagnostics()
         SectionCard(title = stringResource(com.hermestower.voiceconsole.R.string.li_llm_card)) {
-            Row(horizontalArrangement = Arrangement.spacedBy(8.dp)) {
+            BadgeFlowRow(horizontalSpacing = 8.dp) {
                 TruthBadge(stringResource(com.hermestower.voiceconsole.R.string.li_state_fmt, llmState.name), c.warn)
                 TruthBadge(stringResource(com.hermestower.voiceconsole.R.string.li_llm_runtime_fmt, llmDiag.runtimeName), c.inkSecondary)
             }
@@ -130,7 +131,7 @@ fun LocalIntelligenceScreen(graph: AppGraph) {
                     },
                 )
             }
-            Row(horizontalArrangement = Arrangement.spacedBy(8.dp)) {
+            BadgeFlowRow(horizontalSpacing = 8.dp) {
                 TextButton(onClick = { graph.localLlmEngine.load() }) {
                     Text(stringResource(com.hermestower.voiceconsole.R.string.li_llm_load), color = c.ink)
                 }
@@ -146,7 +147,7 @@ fun LocalIntelligenceScreen(graph: AppGraph) {
         }
 
         SectionCard(title = stringResource(com.hermestower.voiceconsole.R.string.li_controls_card)) {
-            Row(horizontalArrangement = Arrangement.spacedBy(8.dp)) {
+            BadgeFlowRow(horizontalSpacing = 8.dp) {
                 TruthBadge(stringResource(com.hermestower.voiceconsole.R.string.li_load_badge), c.inkSecondary)
                 TruthBadge(stringResource(com.hermestower.voiceconsole.R.string.li_unload_badge), c.inkSecondary)
             }

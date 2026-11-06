@@ -31,6 +31,7 @@ import com.hermestower.voiceconsole.archive.MockTowerArchive
 import com.hermestower.voiceconsole.ui.components.SectionCard
 import com.hermestower.voiceconsole.ui.components.MeanderBand
 import com.hermestower.voiceconsole.ui.components.TruthBadge
+import com.hermestower.voiceconsole.ui.components.BadgeFlowRow
 import com.hermestower.voiceconsole.ui.monumental.MonumentalType
 import com.hermestower.voiceconsole.ui.monumental.monumentalColors
 import com.hermestower.voiceconsole.ui.theme.HermesType
@@ -85,7 +86,7 @@ fun ArchiveScreen(archive: MockTowerArchive) {
         )
 
         if (tab == 0) {
-            Row(horizontalArrangement = Arrangement.spacedBy(6.dp)) {
+            BadgeFlowRow(horizontalSpacing = 6.dp) {
                 listOf(null to stringResource(Res.string.archive_filter_all), ArchiveSource.LOCAL to "LOCAL", ArchiveSource.TOWER to "TOWER").forEach { (src, label) ->
                     com.hermestower.voiceconsole.ui.components.ModeChip(
                         label = label,
@@ -188,7 +189,7 @@ private fun ConversationRow(
                 (conv.missionId?.let { " · " + stringResource(Res.string.archive_meta_mission, it) } ?: ""),
             style = HermesType.bodySecondary,
         )
-        Row(horizontalArrangement = Arrangement.spacedBy(6.dp)) {
+        BadgeFlowRow(horizontalSpacing = 6.dp) {
             androidx.compose.material3.TextButton(onClick = onOpen) { Text(stringResource(Res.string.archive_open_transcript)) }
             // GRAPH 4.6 §7: offline pin — LOCAL cache/bookkeeping only; the remote
             // authority is never mutated from this console.
@@ -258,7 +259,7 @@ private fun ArtifactRow(artifact: com.hermestower.voiceconsole.archive.ArchiveAr
                 style = HermesType.bodySecondary,
             )
         }
-        Row(horizontalArrangement = Arrangement.spacedBy(6.dp)) {
+        BadgeFlowRow(horizontalSpacing = 6.dp) {
             androidx.compose.material3.TextButton(onClick = { archive.download(artifact.id) }) { Text(stringResource(Res.string.common_download)) }
             androidx.compose.material3.TextButton(onClick = { archive.removeLocalCopy(artifact.id) }) { Text(stringResource(Res.string.archive_remove_local)) }
             androidx.compose.material3.TextButton(onClick = { archive.verifyHash(artifact.id) }) { Text(stringResource(Res.string.archive_verify_hash)) }

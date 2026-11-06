@@ -36,6 +36,7 @@ import com.hermestower.voiceconsole.selftest.SelfTestMode
 import com.hermestower.voiceconsole.selftest.SelfTestState
 import com.hermestower.voiceconsole.ui.components.SectionCard
 import com.hermestower.voiceconsole.ui.components.MeanderBand
+import com.hermestower.voiceconsole.ui.components.BadgeFlowRow
 import com.hermestower.voiceconsole.ui.theme.HermesType
 import com.hermestower.voiceconsole.ui.theme.hermesColors
 import kotlinx.coroutines.launch
@@ -116,7 +117,9 @@ fun OnboardingScreen(graph: AppGraph, onFinish: (pendingRoute: String?) -> Unit)
                             label = { Text(stringResource(R.string.ob_s1_follow_system)) },
                         )
                     }
-                    Row(horizontalArrangement = Arrangement.spacedBy(8.dp)) {
+                    // UI_POLISH_PASS: five language chips WRAP instead of
+                    // overflowing narrow screens (Owner Finding 2).
+                    BadgeFlowRow(horizontalSpacing = 8.dp) {
                         listOf("it" to "Italiano", "en" to "English", "es" to "Español", "fr" to "Français", "de" to "Deutsch")
                             .forEach { (code, label) ->
                                 FilterChip(

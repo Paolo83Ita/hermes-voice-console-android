@@ -57,6 +57,18 @@ object AppLanguage {
         return stored
     }
 
+    /**
+     * OWNER PHYSICAL FEEDBACK 3: the language the app is ACTUALLY displaying
+     * right now — override when set, the resolved system language otherwise.
+     * The TTS voice negotiation re-reads this before every utterance so the
+     * spoken language follows the app language (the Owner's "selected language
+     * route"), never a hardcoded constant.
+     */
+    fun effectiveTag(context: Context): String {
+        overrideTag(context)?.let { return it }
+        return resolveSystemLanguage()
+    }
+
     /** Context wrapper for the API 30–32 fallback path (MainActivity.attachBaseContext). */
     fun wrapContext(base: Context): Context {
         val tag = overrideTag(base) ?: return base

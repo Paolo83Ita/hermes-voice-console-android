@@ -28,6 +28,7 @@ import com.hermestower.voiceconsole.core.state.ConnectionStatus
 import com.hermestower.voiceconsole.ui.components.SectionCard
 import com.hermestower.voiceconsole.ui.components.MeanderBand
 import com.hermestower.voiceconsole.ui.components.TruthBadge
+import com.hermestower.voiceconsole.ui.components.BadgeFlowRow
 import com.hermestower.voiceconsole.ui.theme.HermesType
 import com.hermestower.voiceconsole.ui.theme.hermesColors
 import kotlinx.coroutines.launch
@@ -78,11 +79,11 @@ fun ConnectionScreen(graph: AppGraph, onOpenStudio: () -> Unit = {}) {
         }
 
         SectionCard(title = stringResource(Res.string.connection_transport_card)) {
-            Row(horizontalArrangement = Arrangement.spacedBy(8.dp)) {
+            BadgeFlowRow(horizontalSpacing = 8.dp) {
                 TruthBadge(stringResource(Res.string.connection_badge_mock), c.ok)
                 TruthBadge(stringResource(Res.string.connection_badge_adapter), c.inkSecondary)
             }
-            Row(horizontalArrangement = Arrangement.spacedBy(8.dp)) {
+            BadgeFlowRow(horizontalSpacing = 8.dp) {
                 TruthBadge(
                     stringResource(Res.string.connection_tls_fmt) + " " + when (connection.tls) {
                         ConnectionStatus.TlsStatus.MOCK_NOT_APPLICABLE -> "N/A (MOCK)"
@@ -110,7 +111,7 @@ fun ConnectionScreen(graph: AppGraph, onOpenStudio: () -> Unit = {}) {
         }
 
         SectionCard(title = stringResource(Res.string.connection_tests_card)) {
-            Row(horizontalArrangement = Arrangement.spacedBy(8.dp)) {
+            BadgeFlowRow(horizontalSpacing = 8.dp) {
                 Button(
                     onClick = {
                         testing = true

@@ -196,6 +196,9 @@ fun AppearanceScreen(graph: AppGraph) {
                     onSelect = {
                         AppLanguage.apply(context, AppLanguage.FOLLOW_SYSTEM)
                         currentLang = AppLanguage.FOLLOW_SYSTEM
+                        // OWNER PHYSICAL FEEDBACK 3: the spoken voice follows the
+                        // app language immediately (no recreate dependency).
+                        runCatching { graph.voiceTts.applySpokenLocale() }
                         (context as? Activity)?.recreate()
                     },
                 )
@@ -208,6 +211,9 @@ fun AppearanceScreen(graph: AppGraph) {
                             onSelect = {
                                 AppLanguage.apply(context, code)
                                 currentLang = code
+                                // OWNER PHYSICAL FEEDBACK 3: the spoken voice
+                                // follows the app language immediately.
+                                runCatching { graph.voiceTts.applySpokenLocale() }
                                 (context as? Activity)?.recreate()
                             },
                         )

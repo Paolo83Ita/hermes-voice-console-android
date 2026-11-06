@@ -53,3 +53,10 @@ This document is the package manifest and index. The step-by-step instructions l
 3. The commit hash of the installed APK + both SHA-256 values.
 4. Soak table (time, battery %, temperature, anomalies).
 5. Verdict per runbook §16 vocabulary.
+
+---
+
+## OWNER FEEDBACK PACKAGE (2026-11-06)
+
+The current Owner package supersedes this beta description: versionName `0.3.0-alpha-graph4` (versionCode 3) — universal + arm64-v8a APKs, the Italian-TTS read-back repair, the UI polish pass and the second-validation-cycle runbook live in
+**`docs/INSTALL_POCO_X6_PRO.md`** (POCO X6 PRO / HyperOS install + upgrade guide).

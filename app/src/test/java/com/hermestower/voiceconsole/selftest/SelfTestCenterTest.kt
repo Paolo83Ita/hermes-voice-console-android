@@ -83,7 +83,7 @@ class SelfTestCenterTest {
                 reopenKeyValueStore = { keyValue },
                 reopenRegistry = { FileInstallationRegistry(registryFile) },
                 serverFactory = { LocalTowerMockServer() },
-                appVersion = "0.2.0-debug",
+                appVersion = "0.3.0-alpha-graph4",
                 commitReference = "self-test",
                 isAndroidRuntime = false,
             ),
@@ -145,7 +145,7 @@ class SelfTestCenterTest {
         assertTrue(st01.startTime != null && st01.finishTime != null)
         assertTrue(st01.durationMs >= 0)
         assertTrue(st01.evidence.isNotBlank())
-        assertEquals("0.2.0-debug", st01.appVersion)
+        assertEquals("0.3.0-alpha-graph4", st01.appVersion)
         assertEquals("self-test", st01.commitReference)
     }
 

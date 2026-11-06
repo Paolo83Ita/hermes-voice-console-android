@@ -28,6 +28,7 @@ import com.hermestower.voiceconsole.bridge.BridgeFault
 import com.hermestower.voiceconsole.ui.components.SectionCard
 import com.hermestower.voiceconsole.ui.components.MeanderBand
 import com.hermestower.voiceconsole.ui.components.TruthBadge
+import com.hermestower.voiceconsole.ui.components.BadgeFlowRow
 import com.hermestower.voiceconsole.ui.theme.HermesType
 import com.hermestower.voiceconsole.ui.theme.hermesColors
 import kotlinx.coroutines.launch
@@ -56,7 +57,7 @@ fun DiagnosticsScreen(graph: AppGraph, onOpenStudio: () -> Unit = {}, onOpenSelf
     ) {
         Text(stringResource(Res.string.diag_title), style = HermesType.screenTitle, color = c.ink)
         MeanderBand(colors = hermesColors, modifier = Modifier.padding(top = 6.dp))
-        Row(horizontalArrangement = Arrangement.spacedBy(8.dp)) {
+        BadgeFlowRow(horizontalSpacing = 8.dp) {
             TextButton(onClick = onOpenStudio) { Text(stringResource(Res.string.diag_studio_link)) }
             TextButton(onClick = onOpenSelfTest) { Text(stringResource(Res.string.diag_selftest_link)) }
         }
@@ -120,6 +121,25 @@ fun DiagnosticsScreen(graph: AppGraph, onOpenStudio: () -> Unit = {}, onOpenSelf
                 stringResource(Res.string.diag_tts_engine_fmt, graph.activeRuntimeReadback.ttsActiveEngine),
                 style = HermesType.body, color = c.ink,
             )
+            // OWNER PHYSICAL FEEDBACK 3: the ACTIVE voice read-back — the device
+            // itself answers the root-cause questions (active voice, its locale,
+            // the typed negotiation status). Unavailable until the engine negotiated.
+            Text(
+                stringResource(
+                    Res.string.diag_tts_voice_fmt,
+                    graph.activeRuntimeReadback.ttsVoiceReadback
+                        ?: stringResource(Res.string.diag_unavailable),
+                ),
+                style = HermesType.body, color = c.ink,
+            )
+            Text(
+                stringResource(
+                    Res.string.diag_tts_locale_fmt,
+                    graph.activeRuntimeReadback.ttsVoiceLocale
+                        ?: stringResource(Res.string.diag_unavailable),
+                ),
+                style = HermesType.body, color = c.ink,
+            )
             Text(
                 stringResource(Res.string.diag_llm_state_fmt, graph.activeRuntimeReadback.llmState),
                 style = HermesType.body, color = c.ink,
@@ -136,7 +156,7 @@ fun DiagnosticsScreen(graph: AppGraph, onOpenStudio: () -> Unit = {}, onOpenSelf
         }
 
         SectionCard(title = stringResource(Res.string.diag_service_card)) {
-            Row(horizontalArrangement = Arrangement.spacedBy(8.dp)) {
+            BadgeFlowRow(horizontalSpacing = 8.dp) {
                 TruthBadge(stringResource(Res.string.diag_service_badge), c.warn)
             }
             Text(
@@ -147,7 +167,7 @@ fun DiagnosticsScreen(graph: AppGraph, onOpenStudio: () -> Unit = {}, onOpenSelf
         }
 
         SectionCard(title = stringResource(Res.string.diag_tests_card)) {
-            Row(horizontalArrangement = Arrangement.spacedBy(8.dp)) {
+            BadgeFlowRow(horizontalSpacing = 8.dp) {
                 Button(onClick = {
                     scope.launch {
                         testResult = when (val r = graph.bridge.handshake()) {

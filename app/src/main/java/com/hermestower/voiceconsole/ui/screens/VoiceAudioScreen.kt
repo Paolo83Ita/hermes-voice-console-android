@@ -12,6 +12,7 @@ import androidx.compose.foundation.verticalScroll
 import androidx.compose.material3.Slider
 import androidx.compose.material3.Switch
 import androidx.compose.material3.Text
+import androidx.compose.material3.TextButton
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.getValue
 import androidx.compose.ui.Modifier
@@ -22,6 +23,7 @@ import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import com.hermestower.voiceconsole.app.AppGraph
 import com.hermestower.voiceconsole.ui.components.SectionCard
 import com.hermestower.voiceconsole.ui.components.MeanderBand
+import com.hermestower.voiceconsole.ui.components.BadgeFlowRow
 import com.hermestower.voiceconsole.ui.components.TruthBadge
 import com.hermestower.voiceconsole.ui.theme.HermesType
 import com.hermestower.voiceconsole.ui.theme.hermesColors
@@ -50,7 +52,7 @@ fun VoiceAudioScreen(graph: AppGraph) {
         MeanderBand(colors = hermesColors, modifier = Modifier.padding(top = 6.dp))
 
         SectionCard(title = stringResource(com.hermestower.voiceconsole.R.string.voice_wake_card)) {
-            Row(horizontalArrangement = Arrangement.spacedBy(8.dp)) {
+            BadgeFlowRow(horizontalSpacing = 8.dp) {
                 TruthBadge(stringResource(com.hermestower.voiceconsole.R.string.voice_provider_fmt, graph.wakeWordEngine.phrase.uppercase()), c.gold)
                 TruthBadge(stringResource(com.hermestower.voiceconsole.R.string.voice_engine_fmt, wakeState.value.name), c.inkSecondary)
             }
@@ -81,7 +83,7 @@ fun VoiceAudioScreen(graph: AppGraph) {
         }
 
         SectionCard(title = stringResource(com.hermestower.voiceconsole.R.string.voice_tts_card)) {
-            Row(horizontalArrangement = Arrangement.spacedBy(8.dp)) {
+            BadgeFlowRow(horizontalSpacing = 8.dp) {
                 when (ttsState.value.state) {
                     com.hermestower.voiceconsole.voice.TtsState.READY,
                     com.hermestower.voiceconsole.voice.TtsState.SPEAKING,
@@ -103,6 +105,61 @@ fun VoiceAudioScreen(graph: AppGraph) {
             )
             Text(
                 stringResource(com.hermestower.voiceconsole.R.string.voice_tts_note),
+                style = HermesType.bodySecondary,
+                color = c.inkSecondary,
+            )
+        }
+
+        // OWNER PHYSICAL FEEDBACK 3: the Italian voice card — the post-apply
+        // read-back surfaced verbatim, with the honest device-side action when
+        // the Italian voice data is missing on the POCO/Xiaomi.
+        SectionCard(title = stringResource(com.hermestower.voiceconsole.R.string.voice_italian_card)) {
+            val rb = ttsState.value.voiceReadback
+            if (rb == null) {
+                Text(
+                    stringResource(com.hermestower.voiceconsole.R.string.diag_unavailable),
+                    style = HermesType.bodySecondary,
+                    color = c.inkSecondary,
+                )
+            } else {
+                BadgeFlowRow(horizontalSpacing = 8.dp) {
+                    TruthBadge(rb.status.name, if (rb.isItalianAudible) c.ok else c.warn)
+                    rb.activeVoiceName?.let {
+                        TruthBadge(
+                            stringResource(com.hermestower.voiceconsole.R.string.voice_italian_voice_fmt, it),
+                            c.inkSecondary,
+                        )
+                    }
+                }
+                Text(
+                    stringResource(
+                        com.hermestower.voiceconsole.R.string.voice_italian_lang_fmt,
+                        rb.activeVoiceLocaleTag ?: rb.activeLanguageTag ?: "?",
+                    ),
+                    style = HermesType.body,
+                    color = c.ink,
+                )
+                rb.detail?.let {
+                    Text(
+                        it,
+                        style = HermesType.bodySecondary,
+                        color = c.inkSecondary,
+                    )
+                }
+                if (rb.status.requiresUserAction) {
+                    val ctx = androidx.compose.ui.platform.LocalContext.current
+                    TextButton(onClick = {
+                        runCatching {
+                            ctx.startActivity(android.content.Intent(android.provider.Settings.ACTION_TTS_SETTINGS)
+                                .addFlags(android.content.Intent.FLAG_ACTIVITY_NEW_TASK))
+                        }
+                    }) {
+                        Text(stringResource(com.hermestower.voiceconsole.R.string.voice_italian_open_settings))
+                    }
+                }
+            }
+            Text(
+                stringResource(com.hermestower.voiceconsole.R.string.voice_italian_note),
                 style = HermesType.bodySecondary,
                 color = c.inkSecondary,
             )

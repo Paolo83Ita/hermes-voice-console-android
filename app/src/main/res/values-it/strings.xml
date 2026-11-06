@@ -291,6 +291,11 @@
     <string name="voice_tts_unavailable">TTS DI SISTEMA — NON DISPONIBILE (solo testo)</string>
     <string name="voice_speed_fmt">Velocità di parlato: %1$s×</string>
     <string name="voice_tts_note">La selezione della voce e le voci locali di qualità superiore (candidato Piper, Kokoro rimandato) seguono le sessioni di qualifica fisica; la voce obiettivo è calma, autorevole, italiana prima di tutto.</string>
+    <string name="voice_italian_card">Voce italiana</string>
+    <string name="voice_italian_voice_fmt">Voce attiva: %1$s</string>
+    <string name="voice_italian_lang_fmt">Lingua della voce: %1$s</string>
+    <string name="voice_italian_note">La voce viene negoziata dalla lingua dell\'app a ogni risposta. Se lo stato non è ITALIAN_VOICE_ACTIVE, installa i dati della voce italiana nelle impostazioni di sintesi vocale di sistema.</string>
+    <string name="voice_italian_open_settings">Apri le impostazioni di sintesi vocale di sistema</string>
     <string name="voice_interruption_card">Interruzione e didascalie</string>
     <string name="voice_barge_in">Barge-in: il nuovo input interrompe la riproduzione</string>
     <string name="voice_captions">Didascalie</string>
@@ -651,6 +656,8 @@ MANUAL_ADVANCED — selezione indipendente per componente, visibilità totale, n
     <string name="diag_stt_engine_fmt">Riconoscimento vocale in uso: %1$s</string>
     <string name="diag_stt_frame_fmt">Stato del modello offline: %1$s</string>
     <string name="diag_tts_engine_fmt">Uscita vocale in uso: %1$s</string>
+    <string name="diag_tts_voice_fmt">Voce attiva: %1$s</string>
+    <string name="diag_tts_locale_fmt">Lingua della voce: %1$s</string>
     <string name="diag_llm_state_fmt">Intelligenza locale: %1$s</string>
     <string name="diag_onnx_fmt">Runtime di inferenza: %1$s</string>
     <string name="diag_runtime_note">Le identità sono lette dai motori attivi; gli stati non sono mai inventati.</string>

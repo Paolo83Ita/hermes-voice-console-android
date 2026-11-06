@@ -8,6 +8,8 @@ import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.ColumnScope
+import androidx.compose.foundation.layout.ExperimentalLayoutApi
+import androidx.compose.foundation.layout.FlowRow
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.padding
@@ -122,7 +124,10 @@ fun SectionCard(
                 verticalAlignment = Alignment.CenterVertically,
                 horizontalArrangement = Arrangement.SpaceBetween,
             ) {
-                Column {
+                // UI_POLISH_PASS: the title column takes the REMAINING width so a
+                // long localized title can never collide with (or push) the trailing
+                // element on narrow screens.
+                Column(Modifier.weight(1f)) {
                     Text(title.uppercase(), style = MonumentalType.sealLabel, color = m.gold)
                     Box(
                         Modifier
@@ -139,6 +144,30 @@ fun SectionCard(
                 content = content,
             )
         }
+    }
+}
+
+/**
+ * UI_POLISH_PASS (OWNER PHYSICAL FEEDBACK 2): the wrapping badge row. Status/
+ * truth badges were placed in fixed horizontal Rows that CANNOT wrap — long
+ * Italian/German labels overflowed narrow screens (the Owner's "incorrect text
+ * layout" finding). BadgeFlowRow wraps to the next line instead. Signature:
+ * content is one badge per call site slot, identical semantics, purely additive.
+ */
+@OptIn(ExperimentalLayoutApi::class)
+@Composable
+fun BadgeFlowRow(
+    modifier: Modifier = Modifier,
+    horizontalSpacing: androidx.compose.ui.unit.Dp = 8.dp,
+    verticalSpacing: androidx.compose.ui.unit.Dp = 6.dp,
+    content: @Composable () -> Unit,
+) {
+    FlowRow(
+        modifier = modifier.fillMaxWidth(),
+        horizontalArrangement = Arrangement.spacedBy(horizontalSpacing),
+        verticalArrangement = Arrangement.spacedBy(verticalSpacing),
+    ) {
+        content()
     }
 }
 

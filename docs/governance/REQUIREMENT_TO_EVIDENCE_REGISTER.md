@@ -41,3 +41,14 @@ Test totals (physical, 2026-11-01): 33 `@Test` in 6 classes; 33 executed, 0 fail
 | E2E-01..45 | Android emulator end-to-end flow, terminal state ANDROID_EMULATOR_E2E_PASSED | — | PENDING |
 | APK-G2 | 0.2.0-debug APK created, hashed, bound to commit | — | PENDING |
 | GATE-01..15 | Graph 2 mandatory gates | — | PENDING |
+
+---
+
+# OWNER PHYSICAL FEEDBACK (2026-11-06) — evidence appended
+
+| Req | Requirement (short) | Evidence | Status |
+| --- | --- | --- | --- |
+| PHYS-01 | Physical install + launch on the Owner device | POCO X6 PRO real installation; package ca8980b (Graph 3 terminal, 0.2.0-debug) binary-inspected | DEVICE_INSTALLATION_PASSED + APPLICATION_LAUNCH_PASSED (PARTIAL_OWNER_EVIDENCE — package predates Graph 4) |
+| PHYS-02 | Secondary screens layout/spacing | OWNER_UI_LAYOUT_DEFECT_LEDGER.md + UI_POLISH_PASS commit (BadgeFlowRow, SectionCard weight, SettingsHub rows) | REPAIRED_IN_CODE — verification pending second Owner cycle |
+| PHYS-03 | Italian TTS answers in Italian | Code-proven root cause (silent setLanguage failure, no voice read-back) + typed negotiation repair + runtime read-back (Diagnostics rows, ST-51) | REPAIRED_IN_CODE — ITALIAN_VOICE_ACTIVE / ITALIAN_VOICE_READY_AND_BLOCKED_BY_KNOWN_RUNTIME_LIMITATION gated on device read-back |
+| PHYS-04 | Current APK + arm64 APK + install/upgrade guide | 0.3.0-alpha-graph4-owner-feedback universal + arm64-v8a APKs; docs/INSTALL_POCO_X6_PRO.md | PACKAGE_PRODUCED — second Owner validation cycle pending |

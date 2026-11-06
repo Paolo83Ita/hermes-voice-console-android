@@ -143,3 +143,25 @@ Secret/device scan: 0 findings in working tree and full git history (scripts/sec
   NOT claimed green.
 - Real Tower: STILL mock/simulator only (TOWER_REAL_INTEGRATION never claimed).
 - Physical Xiaomi: QUALIFICATION_PENDING_DEVICE. Merge to main: OWNER_APPROVAL_PENDING.
+
+---
+
+# OWNER PHYSICAL FEEDBACK TRUTH (appended 2026-11-06; first PHYSICAL DEVICE evidence)
+
+- FIRST physical-device evidence of the project: POCO X6 PRO (256 GB / 8 GB) real
+  installation — `DEVICE_INSTALLATION_PASSED` + `APPLICATION_LAUNCH_PASSED` typed
+  (receipt: `docs/receipts/OWNER_PHYSICAL_FEEDBACK_RECEIPT.md`).
+- Tested package provenance (binary-inspected): commit `ca8980b` = Graph 3 terminal,
+  versionName `0.2.0-debug` versionCode 2 — contains NO real TTS/voice pipeline
+  (`MockTextToSpeechEngine` + `Inactive*` only). The tested APK predates ALL of
+  Graph 4's real voice work → the Owner's Finding 3 (voice answers in English)
+  CANNOT be attributed to the app's voice pipeline ON THAT PACKAGE; on any Graph 4
+  build the code-proven TTS defect applies (see the root-cause report).
+- Latest physical qualification state: **PARTIAL_OWNER_EVIDENCE** (Owner-typed).
+- Findings 2 (submenu layout) and 3 (Italian TTS) drive the Owner priority override:
+  Italian TTS → submenu layout → current APKs → install/upgrade package → SECOND
+  Owner validation cycle (remaining Graph 4 nodes resume after that).
+- Explicitly NOT true yet: Italian voice terminality on device
+  (`ITALIAN_VOICE_ACTIVE` / `ITALIAN_VOICE_READY_AND_BLOCKED_BY_KNOWN_RUNTIME_LIMITATION`
+  still gated on the next physical cycle's runtime read-back); owner screenshots for
+  the layout ledger; second-cycle installation evidence.

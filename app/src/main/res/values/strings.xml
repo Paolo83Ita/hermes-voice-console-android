@@ -291,6 +291,11 @@
     <string name="voice_tts_unavailable">SYSTEM TTS — UNAVAILABLE (text-only)</string>
     <string name="voice_speed_fmt">Speaking speed: %1$s×</string>
     <string name="voice_tts_note">Voice selection and higher-quality local voices (Piper candidate, Kokoro deferred) follow the physical qualification sessions; the target voice is calm, authoritative, Italian-first.</string>
+    <string name="voice_italian_card">Italian voice</string>
+    <string name="voice_italian_voice_fmt">Active voice: %1$s</string>
+    <string name="voice_italian_lang_fmt">Voice language: %1$s</string>
+    <string name="voice_italian_note">The voice is negotiated from the app language at every answer. If the status is not ITALIAN_VOICE_ACTIVE, install the Italian voice data in the system Text-to-speech settings.</string>
+    <string name="voice_italian_open_settings">Open system Text-to-speech settings</string>
     <string name="voice_interruption_card">Interruption &amp; captions</string>
     <string name="voice_barge_in">Barge-in: new input interrupts playback</string>
     <string name="voice_captions">Captions</string>
@@ -651,6 +656,8 @@ MANUAL_ADVANCED — independent per-component selection, full visibility, no sil
     <string name="diag_stt_engine_fmt">Speech recognition in use: %1$s</string>
     <string name="diag_stt_frame_fmt">Offline model state: %1$s</string>
     <string name="diag_tts_engine_fmt">Voice output in use: %1$s</string>
+    <string name="diag_tts_voice_fmt">Active voice: %1$s</string>
+    <string name="diag_tts_locale_fmt">Voice language: %1$s</string>
     <string name="diag_llm_state_fmt">Local intelligence: %1$s</string>
     <string name="diag_onnx_fmt">Inference runtime: %1$s</string>
     <string name="diag_runtime_note">Identities are read from the live engines; states are never invented.</string>
