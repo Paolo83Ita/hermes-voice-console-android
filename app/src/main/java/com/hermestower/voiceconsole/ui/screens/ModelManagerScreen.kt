@@ -498,8 +498,28 @@ fun ModelManagerScreen(graph: AppGraph) {
                             enabled = !packRunning,
                         ) {
                             val result = graph.modelActivation.activate(entry)
-                            statusNote = context.getString(R.string.mm_activate_result, entry.identity, if (result.success) "ACTIVE" else "REFUSED", result.reason)
-                            registryTick++
+                            if (result.success && entry.componentType == com.hermestower.voiceconsole.models.ModelComponentType.VOICE.name) {
+                                // GRAPH 4.10 §7/§8: registry activation alone is NOT
+                                // active — the six-condition runtime truth runs now.
+                                statusNote = context.getString(R.string.mm_voice_qualifying, entry.displayName)
+                                scope.launch {
+                                    val outcome = graph.qualifyVoiceRuntime(entry)
+                                    statusNote = when (outcome) {
+                                        is com.hermestower.voiceconsole.voice.VoiceRuntimeFactory.ActivationOutcome.Active ->
+                                            context.getString(R.string.mm_voice_active, entry.displayName)
+                                        is com.hermestower.voiceconsole.voice.VoiceRuntimeFactory.ActivationOutcome.Failed ->
+                                            context.getString(
+                                                R.string.mm_voice_runtime_failed,
+                                                entry.displayName,
+                                                outcome.typedReason.name,
+                                            )
+                                    }
+                                    registryTick++
+                                }
+                            } else {
+                                statusNote = context.getString(R.string.mm_activate_result, entry.identity, if (result.success) "ACTIVE" else "REFUSED", result.reason)
+                                registryTick++
+                            }
                         },
                         AdaptiveAction(
                             key = "details",

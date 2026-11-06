@@ -572,6 +572,9 @@
     <string name="mm_install_result">Instalación %1$s: %2$s — %3$s</string>
     <string name="mm_qualify_result">Calificación %1$s: %2$s — %3$s</string>
     <string name="mm_activate_result">Activación %1$s: %2$s — %3$s</string>
+    <string name="mm_voice_qualifying">Calificando la voz %1$s (síntesis y reproducción de prueba)…</string>
+    <string name="mm_voice_active">Voz %1$s ACTIVA — el runtime ahora habla con ella.</string>
+    <string name="mm_voice_runtime_failed">La activación del runtime de la voz %1$s falló (%2$s): archivos instalados conservados; se aplica la voz del sistema en italiano.</string>
     <string name="mm_deactivate_result">Desactivación %1$s: %2$s</string>
     <string name="mm_rollback_result">Reversión %1$s: %2$s</string>
     <string name="mm_removed">Eliminado %1$s (archivos + registro).</string>

@@ -52,6 +52,10 @@ import com.hermestower.voiceconsole.voice.NoAudioCaptureEngine
 import com.hermestower.voiceconsole.voice.SpeechProfile
 import com.hermestower.voiceconsole.voice.TtsTelemetry
 import com.hermestower.voiceconsole.voice.VoicePipelineController
+import com.hermestower.voiceconsole.voice.VoiceQualificationState
+import com.hermestower.voiceconsole.voice.VoiceRuntimeFactory
+import com.hermestower.voiceconsole.voice.VoiceSelectionAuthority
+import com.hermestower.voiceconsole.voice.VoiceSelectionState
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.SupervisorJob
@@ -361,13 +365,127 @@ class AppGraph(private val context: Context) {
 
     private val naturalVoiceActive: () -> String? = { activeNaturalVoice() }
 
+    // GRAPH 4.10 CP-G4.10-003 (§7/§8): the ONE voice-selection authority + the
+    // ONE runtime factory. A downloaded voice is not ACTIVE merely because it
+    // is selected in UI — activation requires files verified, runtime loaded,
+    // test synthesis, playback and a matching read-back (six conditions).
+    val voiceSelectionAuthority = VoiceSelectionAuthority(
+        voiceFilesPresent = { voiceId ->
+            when (voiceId) {
+                "org.piper.voice.it-riccardo-x-low" -> naturalTts.resolveVoiceDir() != null
+                "org.piper.voice.it-paola-medium" -> naturalTtsPaola.resolveVoiceDir() != null
+                else -> false
+            }
+        },
+        systemItalianAvailable = { true },
+        // NOTE: the REAL Italian availability gate is per-utterance and fail-closed
+        // (TtsSpeakGate + ItalianTtsVoiceNegotiator); this flag only labels the
+        // resting route in the status line and never bypasses that gate.
+    )
+    val voiceRuntimeFactory = VoiceRuntimeFactory()
+
+    private fun voiceSeamFor(voiceId: String): VoiceRuntimeFactory.VoiceRuntimeSeam? {
+        val engine = when (voiceId) {
+            "org.piper.voice.it-riccardo-x-low" -> naturalTts
+            "org.piper.voice.it-paola-medium" -> naturalTtsPaola
+            else -> return null
+        }
+        return object : VoiceRuntimeFactory.VoiceRuntimeSeam {
+            override fun resolveFiles(): VoiceRuntimeFactory.VoiceFiles? {
+                val dir = engine.resolveVoiceDir() ?: return null
+                val model = dir.listFiles()?.firstOrNull { it.name.endsWith(".onnx") } ?: return null
+                return VoiceRuntimeFactory.VoiceFiles(model.absolutePath, dir.resolve("tokens.txt").absolutePath)
+            }
+
+            override fun load(): String? {
+                engine.load()
+                return when (engine.state.value.state) {
+                    com.hermestower.voiceconsole.voice.TtsState.READY -> null
+                    com.hermestower.voiceconsole.voice.TtsState.NOT_INSTALLED -> "voice bundle files not resolvable on disk"
+                    else -> engine.state.value.error ?: "runtime init failed"
+                }
+            }
+
+            override fun speakTest(phrase: String) {
+                engine.interrupt()
+                engine.speak(phrase)
+            }
+
+            override fun awaitUtteranceCompletion(timeoutMs: Long): VoiceRuntimeFactory.UtteranceResult {
+                val deadline = System.currentTimeMillis() + timeoutMs
+                var sawSpeech = false
+                while (System.currentTimeMillis() < deadline) {
+                    when (engine.state.value.state) {
+                        com.hermestower.voiceconsole.voice.TtsState.SYNTHESIZING,
+                        com.hermestower.voiceconsole.voice.TtsState.SPEAKING,
+                        -> sawSpeech = true
+                        com.hermestower.voiceconsole.voice.TtsState.READY ->
+                            return if (sawSpeech) VoiceRuntimeFactory.UtteranceResult.COMPLETED
+                            else VoiceRuntimeFactory.UtteranceResult.SYNTHESIS_FAILED
+                        com.hermestower.voiceconsole.voice.TtsState.FAILED ->
+                            return if (sawSpeech) VoiceRuntimeFactory.UtteranceResult.PLAYBACK_FAILED
+                            else VoiceRuntimeFactory.UtteranceResult.SYNTHESIS_FAILED
+                        com.hermestower.voiceconsole.voice.TtsState.TEXT_ONLY_SAFE_DEGRADED ->
+                            return VoiceRuntimeFactory.UtteranceResult.SYNTHESIS_FAILED
+                        else -> Unit
+                    }
+                    Thread.sleep(120)
+                }
+                return if (sawSpeech) VoiceRuntimeFactory.UtteranceResult.PLAYBACK_FAILED
+                else VoiceRuntimeFactory.UtteranceResult.SYNTHESIS_FAILED
+            }
+
+            override fun readBackVoiceId(): String? = engine.state.value.voiceReadback?.activeVoiceName
+
+            override fun interrupt() {
+                engine.interrupt()
+            }
+        }
+    }
+
+    /** §8 pipeline: registry activation + the six-condition runtime truth. */
+    suspend fun qualifyVoiceRuntime(entry: com.hermestower.voiceconsole.models.ModelCatalogEntry): VoiceRuntimeFactory.ActivationOutcome {
+        val seam = voiceSeamFor(entry.identity)
+            ?: return VoiceRuntimeFactory.ActivationOutcome.Failed(
+                entry.identity, VoiceRuntimeFactory.TypedReason.FILES_MISSING,
+                "no runtime seam for this identity", com.hermestower.voiceconsole.voice.VoiceRuntimeType.ANDROID_SYSTEM_TTS,
+            )
+        voiceSelectionAuthority.selectDownloaded(
+            voiceId = entry.identity,
+            modelFile = seam.resolveFiles()?.modelFile,
+            configFile = seam.resolveFiles()?.configFile,
+            version = entry.version,
+            sha256 = entry.sha256,
+        )
+        voiceSelectionAuthority.beginQualification()
+        val outcome = kotlinx.coroutines.withContext(kotlinx.coroutines.Dispatchers.Default) {
+            voiceRuntimeFactory.activate(seam, entry.identity)
+        }
+        when (outcome) {
+            is VoiceRuntimeFactory.ActivationOutcome.Active ->
+                voiceSelectionAuthority.recordRuntimeReadBack(outcome.readBack)
+            is VoiceRuntimeFactory.ActivationOutcome.Failed -> {
+                seam.interrupt()
+                voiceSelectionAuthority.markRuntimeFailed(outcome.typedReason.name)
+            }
+        }
+        return outcome
+    }
+
+    /** Route truth: qualification state decides; a fresh process falls back to the registry read-back. */
+    private fun routedNaturalVoiceId(): String? = when (voiceSelectionAuthority.state.value.qualificationState) {
+        VoiceQualificationState.ACTIVE -> voiceSelectionAuthority.activeNaturalVoiceId()
+        VoiceQualificationState.INSTALLED_RUNTIME_FAILED, VoiceQualificationState.QUALIFYING -> null
+        VoiceQualificationState.NONE, VoiceQualificationState.SELECTION_PENDING_RUNTIME -> activeNaturalVoice()
+    }
+
     val ttsRouteSwitch = TtsRouteSwitch(
         systemRoute = consoleTts,
         naturalRoutes = mapOf(
             "org.piper.voice.it-riccardo-x-low" to SystemTtsDomainAdapter(naturalTts),
             "org.piper.voice.it-paola-medium" to SystemTtsDomainAdapter(naturalTtsPaola),
         ),
-        routeProvider = naturalVoiceActive,
+        routeProvider = { routedNaturalVoiceId() },
     )
     val consoleTtsRouted: com.hermestower.voiceconsole.domain.TextToSpeechEngine =
         ttsRouteSwitch
