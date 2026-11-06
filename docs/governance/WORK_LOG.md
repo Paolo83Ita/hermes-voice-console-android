@@ -1297,3 +1297,18 @@ docs/governance/{ITALIAN_GATE_NAVIGATION_FAILURE_LEDGER,WORK_LOG,GRAPH46_READBAC
 COMMIT: (this commit).
 CHECKPOINT: CP-G4-023 fix 20 (R-37); CP-G4-024 STAGED.
 NEXT: the dual-sample push runs arbitrate ITALIAN_UI_COMPLETE.
+
+## G4-N43 — CP-G4-023 fix 20 deployment repair (invalid onAllNodes import)
+
+The fix-20 push run 42154814808 failed at the BUILD gate in 3m15s — the R-27
+structural leg did EXACTLY its job (a BUILD_CODE_ERROR died in the cheap build
+job instead of reaching the emulator fleet). Root cause:
+`import androidx.compose.ui.test.onAllNodes` is INVALID — onAllNodes is a
+MEMBER of the compose test rule (reached through the HermesComposeRule
+receiver, exactly as E2ECommon uses it unimported). The import line was
+removed (the call resolves via the receiver); the gateActivateRowAccessible
+mechanism is unchanged.
+FILES: app/src/androidTest/java/com/hermestower/voiceconsole/e2e/ItalianGateSupport.kt.
+COMMIT: (this commit).
+CHECKPOINT: CP-G4-023 fix 20 (R-37) deployment repair; CP-G4-024 STAGED.
+NEXT: the dual-sample push runs arbitrate ITALIAN_UI_COMPLETE.
