@@ -35,6 +35,7 @@ import com.hermestower.voiceconsole.ui.components.TruthBadge
 import com.hermestower.voiceconsole.ui.theme.HermesType
 import com.hermestower.voiceconsole.ui.theme.hermesColors
 import com.hermestower.voiceconsole.voice.ItalianTtsVoiceNegotiator
+import com.hermestower.voiceconsole.voice.ListeningModePolicy
 import com.hermestower.voiceconsole.voice.SpeechProfile
 import com.hermestower.voiceconsole.voice.TtsSpeakGate
 import com.hermestower.voiceconsole.voice.TtsState
@@ -67,6 +68,80 @@ fun VoiceAudioScreen(graph: AppGraph) {
     ) {
         Text(stringResource(Res.string.voice_title), style = HermesType.screenTitle, color = c.ink)
         MeanderBand(colors = hermesColors, modifier = Modifier.padding(top = 6.dp))
+
+        // ---- GRAPH 4.10 §17: Listening mode (the §14 authority is the only writer) ----
+        SectionCard(title = stringResource(Res.string.listening_mode_title)) {
+            val listening by graph.listeningModePolicy.state.collectAsStateWithLifecycle()
+            val modeOptions = listOf(
+                ListeningModePolicy.Mode.PUSH_TO_TALK to Res.string.listening_mode_push_to_talk,
+                ListeningModePolicy.Mode.CONTINUOUS_WHILE_SCREEN_ACTIVE to Res.string.listening_mode_continuous,
+                ListeningModePolicy.Mode.WAKE_WORD to Res.string.listening_mode_wake_word,
+                ListeningModePolicy.Mode.OFF to Res.string.listening_mode_off,
+            )
+            modeOptions.forEach { (mode, labelRes) ->
+                Row(
+                    Modifier
+                        .fillMaxWidth()
+                        .heightIn(min = 48.dp)
+                        .toggleable(
+                            value = listening.mode == mode,
+                            role = Role.RadioButton,
+                            onValueChange = {
+                                if (it) {
+                                    if (mode == ListeningModePolicy.Mode.WAKE_WORD) {
+                                        // §14: honest refusal until physically qualified.
+                                        graph.listeningModePolicy.setMode(mode, "voice-audio settings")
+                                    } else {
+                                        graph.listeningModePolicy.setMode(mode, "voice-audio settings")
+                                    }
+                                }
+                            },
+                        ),
+                    verticalAlignment = androidx.compose.ui.Alignment.CenterVertically,
+                ) {
+                    androidx.compose.material3.RadioButton(
+                        selected = listening.mode == mode,
+                        onClick = null,
+                    )
+                    Text(
+                        stringResource(labelRes),
+                        style = HermesType.body,
+                        color = c.ink,
+                        modifier = Modifier.padding(start = 8.dp),
+                    )
+                }
+            }
+            if (listening.mode == ListeningModePolicy.Mode.WAKE_WORD) {
+                Text(
+                    stringResource(Res.string.wake_word_unavailable),
+                    style = HermesType.bodySecondary,
+                    color = c.energy,
+                )
+            }
+            if (listening.mode == ListeningModePolicy.Mode.CONTINUOUS_WHILE_SCREEN_ACTIVE) {
+                Text(
+                    stringResource(Res.string.listening_mode_title) + ": " + stringResource(Res.string.session_limit_15),
+                    style = HermesType.bodySecondary,
+                    color = c.inkSecondary,
+                    modifier = Modifier.padding(top = 4.dp),
+                )
+                Row(horizontalArrangement = Arrangement.spacedBy(6.dp)) {
+                    ListeningModePolicy.SESSION_LIMIT_OPTIONS.forEach { minutes ->
+                        val label = when (minutes) {
+                            5 -> Res.string.session_limit_5
+                            15 -> Res.string.session_limit_15
+                            30 -> Res.string.session_limit_30
+                            else -> Res.string.session_limit_open
+                        }
+                        androidx.compose.material3.FilterChip(
+                            selected = listening.sessionLimitMinutes == minutes,
+                            onClick = { graph.listeningModePolicy.setSessionLimit(minutes, "voice-audio settings") },
+                            label = { Text(stringResource(label), style = HermesType.bodySecondary) },
+                        )
+                    }
+                }
+            }
+        }
 
         SectionCard(title = stringResource(Res.string.voice_wake_card)) {
             BadgeFlowRow(horizontalSpacing = 8.dp) {

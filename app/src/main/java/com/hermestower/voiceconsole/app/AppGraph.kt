@@ -53,6 +53,9 @@ import com.hermestower.voiceconsole.voice.SpeechProfile
 import com.hermestower.voiceconsole.voice.TtsTelemetry
 import com.hermestower.voiceconsole.voice.VoicePipelineController
 import com.hermestower.voiceconsole.voice.ChatSpeechOutputPolicy
+import com.hermestower.voiceconsole.voice.ContinuousListeningController
+import com.hermestower.voiceconsole.voice.EchoFingerprintGuard
+import com.hermestower.voiceconsole.voice.ListeningModePolicy
 import com.hermestower.voiceconsole.voice.VoiceQualificationState
 import com.hermestower.voiceconsole.voice.VoiceRuntimeFactory
 import com.hermestower.voiceconsole.voice.VoiceSelectionAuthority
@@ -624,6 +627,12 @@ class AppGraph(private val context: Context) {
     // independent of the microphone privacy mute; never touches media volume.
     val chatSpeechPolicy = ChatSpeechOutputPolicy(keyValueStore)
 
+    // GRAPH 4.10 CP-G4.10-005 (§14): the ONE listening-mode authority.
+    val listeningModePolicy = ListeningModePolicy(keyValueStore)
+
+    // GRAPH 4.10 CP-G4.10-006 (§16): the echo fingerprint guard (no audio stored).
+    val echoGuard = EchoFingerprintGuard()
+
     val driver = ScriptedConsoleDriver(
         scope = scope,
         store = store,
@@ -642,6 +651,8 @@ class AppGraph(private val context: Context) {
         },
         localeResolver = responseLocaleResolver,
         chatSpeechPolicy = chatSpeechPolicy,
+        echoGuard = echoGuard,
+        onPrivacyMuteEngaged = { continuousListening.onPrivacyMuteEngaged() },
     )
 
     // G4-C03: real microphone path coordinator (single state authority, single
@@ -655,6 +666,20 @@ class AppGraph(private val context: Context) {
         keyValueStore = keyValueStore,
         events = events,
         statusLocale = { responseLocaleResolver.resolve().tag },
+        echoGuard = echoGuard,
+    )
+
+    // GRAPH 4.10 CP-G4.10-006 (§15): the continuous-listening loop controller.
+    val continuousListening: ContinuousListeningController = ContinuousListeningController(
+        scope = scope,
+        storeProvider = { store.currentState() },
+        policy = listeningModePolicy,
+        events = events,
+        startCapture = { voiceCoordinator.onPushToTalkPress() }, // Boolean return
+        stopCapture = { reason -> voiceCoordinator.stopCapture(reason) },
+        hasMicPermission = micPermissionGranted,
+        isPrivacyMuted = { store.privacyMuted.value },
+        isThermalConstrained = { health.statusSummary().contains("thermal", ignoreCase = true) && health.statusSummary().contains("critical", ignoreCase = true) },
     )
 
     fun start() {

@@ -26,6 +26,7 @@ import com.hermestower.voiceconsole.locale.ResponseCatalog
 import com.hermestower.voiceconsole.locale.ResponseLocaleResolver
 import com.hermestower.voiceconsole.migration.InMemoryKeyValueStore
 import com.hermestower.voiceconsole.voice.ChatSpeechOutputPolicy
+import com.hermestower.voiceconsole.voice.EchoFingerprintGuard
 import kotlinx.coroutines.CancellationException
 import kotlinx.coroutines.Job
 import kotlinx.coroutines.delay
@@ -61,6 +62,10 @@ class ScriptedConsoleDriver(
     private val statusProvider: () -> String,
     private val localeResolver: ResponseLocaleResolver = ResponseLocaleResolver.englishDefaults(),
     private val chatSpeechPolicy: ChatSpeechOutputPolicy = ChatSpeechOutputPolicy(InMemoryKeyValueStore()),
+    /** §16: when the console actually speaks, the echo guard remembers the text. */
+    private val echoGuard: EchoFingerprintGuard? = null,
+    /** §15: invoked when the Owner engages the privacy mute (continuous listening stops). */
+    private val onPrivacyMuteEngaged: () -> Unit = {},
     private val deviceId: String = "console-hermes-01",
     private val userIdRef: String = "owner-paolo",
 ) {
@@ -234,6 +239,7 @@ class ScriptedConsoleDriver(
         if (muted) {
             pipelineJob?.cancel()
             tts.interrupt()
+            onPrivacyMuteEngaged() // §15: continuous listening stops on privacy mute
             val reached = store.transition(ConsoleState.PRIVACY_MUTED)
             events.log("MUTE", "engaged (transition to ${reached ?: "REJECTED"})")
         } else {
@@ -542,6 +548,7 @@ class ScriptedConsoleDriver(
             return
         }
         if (captions) store.setCaption(text)
+        echoGuard?.rememberSpoken(text) // §16: the console remembers what it speaks
         tts.speak(text, store.settings.value.speakingRate).collect { amplitude ->
             store.setSpeakingAmplitude(amplitude)
         }

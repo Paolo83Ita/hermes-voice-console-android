@@ -33,6 +33,7 @@ import androidx.compose.material.icons.filled.Replay
 import androidx.compose.material.icons.filled.StopCircle
 import androidx.compose.material.icons.filled.VolumeDown
 import androidx.compose.material.icons.filled.VolumeOff
+import androidx.compose.material.icons.filled.Hearing
 import androidx.compose.material.icons.filled.Stop
 import androidx.compose.material.icons.filled.VolumeUp
 import androidx.compose.material.icons.outlined.History
@@ -122,11 +123,16 @@ fun ConsoleScreen(
     // ---- GRAPH 4 G4-C03: real microphone path (Owner delta §5) ----
     val micState by graph.voiceCoordinator.micState.collectAsStateWithLifecycle()
     val speechMode by graph.driver.speechPolicy.mode.collectAsStateWithLifecycle()
+    val continuousActive by graph.continuousListening.active.collectAsStateWithLifecycle()
+    val listeningState by graph.listeningModePolicy.state.collectAsStateWithLifecycle()
     val lastRefusal by graph.voiceCoordinator.lastRefusal.collectAsStateWithLifecycle()
 
     // Foreground-only capture (§4): leaving the screen physically stops the mic.
     DisposableEffect(Unit) {
-        onDispose { graph.voiceCoordinator.onConsolePaused() }
+        onDispose {
+            graph.voiceCoordinator.onConsolePaused()
+            graph.continuousListening.onConsolePaused() // §15: background stops continuous
+        }
     }
 
     val context = LocalContext.current
@@ -573,6 +579,29 @@ fun ConsoleScreen(
                     )
                 }
                 Spacer(Modifier.size(8.dp))
+                // ---- continuous listening (§17): Ascolto continuo / Ferma ascolto continuo ----
+                IconButton(onClick = {
+                    if (continuousActive) {
+                        graph.continuousListening.stop(
+                            com.hermestower.voiceconsole.voice.ListeningModePolicy.StopReason.USER_STOP,
+                            "console control",
+                        )
+                    } else {
+                        if (micState == MicUiState.PERMISSION_REQUIRED || micState == MicUiState.DENIED) {
+                            micPermissionLauncher.launch(android.Manifest.permission.RECORD_AUDIO)
+                        } else {
+                            graph.continuousListening.start("console control")
+                        }
+                    }
+                }) {
+                    MedallionDisc(
+                        cd = stringResource(com.hermestower.voiceconsole.R.string.continuous_cd),
+                        icon = Icons.Filled.Hearing,
+                        tint = if (continuousActive) m.cyanCore else m.bronzeLight,
+                        m = m,
+                    )
+                }
+                Spacer(Modifier.size(8.dp))
                 IconButton(onClick = { graph.driver.injectWake() }) {
                     MedallionDisc(
                         cd = stringResource(com.hermestower.voiceconsole.R.string.sim_wake_cd),
@@ -591,7 +620,20 @@ fun ConsoleScreen(
                     )
                 }
             }
-            // ---- OWNER PHYSICAL RETEST §9: the persistent privacy-mute text + the
+            // ---- OWNER PHYSICAL RETEST §9: the persistent privacy-mute text ----
+            // §17: the persistent CONTINUOUS indicator (never decorative).
+            if (continuousActive) {
+                Text(
+                    stringResource(com.hermestower.voiceconsole.R.string.continuous_active_indicator),
+                    style = MonumentalType.sealSub,
+                    color = m.cyanCore,
+                    textAlign = TextAlign.Center,
+                    modifier = Modifier
+                        .fillMaxWidth()
+                        .padding(horizontal = 12.dp, vertical = 2.dp)
+                        .semantics { liveRegion = LiveRegionMode.Polite },
+                )
+            }
             // live control label row (Parla / Interrompi ascolto / Interrompi voce). ----
             if (muted) {
                 Text(

@@ -8,6 +8,7 @@ import com.hermestower.voiceconsole.locale.ResponseCatalog
 import com.hermestower.voiceconsole.migration.KeyValueStore
 import com.hermestower.voiceconsole.privacy.LogRedactor
 import com.hermestower.voiceconsole.simulator.ScriptedConsoleDriver
+import com.hermestower.voiceconsole.voice.EchoFingerprintGuard
 import com.hermestower.voiceconsole.voice.MicPermissionFlow
 import com.hermestower.voiceconsole.voice.SystemSttEngine
 import com.hermestower.voiceconsole.voice.SystemSttError
@@ -53,6 +54,8 @@ class ConsoleVoiceCoordinator(
     private val languageTag: String = "it-IT",
     /** GRAPH 4.10 §4: application-language tag for user-visible status notes. */
     private val statusLocale: () -> String = { "en" },
+    /** §16: likely-echo transcripts (the console's own spoken text) are rejected. */
+    private val echoGuard: EchoFingerprintGuard? = null,
 ) {
 
     private val _micState = MutableStateFlow(MicUiState.IDLE)
@@ -88,31 +91,34 @@ class ConsoleVoiceCoordinator(
         onPushToTalkPress()
     }
 
-    /** Push-to-talk: one real capture turn. */
-    fun onPushToTalkPress() {
+    /**
+     * Push-to-talk: one real capture turn. Returns TRUE only when the
+     * recognizer physically started (§15 continuous loop consumes this).
+     */
+    fun onPushToTalkPress(): Boolean {
         _lastRefusal.value = null
         if (store.privacyMuted.value) {
             _lastRefusal.value = ResponseCatalog.text(ResponseCategory.MIC_PRIVACY_REFUSAL, statusLocale())
             events.log("MIC", "push-to-talk refused: privacy mute")
-            return
+            return false
         }
-        if (store.currentState() == ConsoleState.DORMANT || store.currentState().isPipelineActive) return
+        if (store.currentState() == ConsoleState.DORMANT || store.currentState().isPipelineActive) return false
         if (!hasMicPermission()) {
             _micState.value = MicUiState.PERMISSION_REQUIRED
             events.log("MIC", "push-to-talk refused: permission missing")
-            return
+            return false
         }
         if (!systemStt.isAvailable) {
             _micState.value = MicUiState.UNAVAILABLE
             _lastRefusal.value = ResponseCatalog.text(ResponseCategory.MIC_UNAVAILABLE, statusLocale())
             events.log("MIC", "push-to-talk refused: recognizer unavailable")
-            return
+            return false
         }
         // Owner override to rest, then enter LISTENING legally (IDLE→LISTENING).
         store.transition(ConsoleState.IDLE)
         if (store.transition(ConsoleState.LISTENING) == null) {
             events.log("MIC", "LISTENING transition rejected from ${store.currentState()}")
-            return
+            return false
         }
         val started = systemStt.start(languageTag, listener)
         if (!started) {
@@ -120,10 +126,11 @@ class ConsoleVoiceCoordinator(
             store.transition(ConsoleState.IDLE)
             _lastRefusal.value = ResponseCatalog.text(ResponseCategory.MIC_REFUSED, statusLocale())
             events.log("MIC", "recognizer start refused")
-            return
+            return false
         }
         _micState.value = MicUiState.LISTENING
         events.log("MIC", "capture started (system recognizer, len-guard on)")
+        return true
     }
 
     /** Owner stop / lifecycle / mute: capture physically stops, no capture after. */
@@ -177,6 +184,15 @@ class ConsoleVoiceCoordinator(
             }
             // Privacy: length only (SEC §4). The transcript flows through the
             // SAME pipeline as typed text — same routing, attribution, history.
+            // §16 ECHO PREVENTION: a transcript that (near-)verbatim matches the
+            // assistant's recent spoken response inside the time window is
+            // REJECTED — the console never turns its own voice into a user turn.
+            if (echoGuard?.isLikelyEcho(final) == true) {
+                events.log("MIC", "echo rejected len=${final.length}")
+                store.setStatusNote("echo rejected")
+                if (store.currentState() == ConsoleState.LISTENING) store.transition(ConsoleState.IDLE)
+                return
+            }
             events.log("MIC", "final transcript len=${final.length} conf=${confidence ?: -1f}")
             store.setTranscriptDraft(final)
             driver.submitUtterance(final, confidence ?: 0.9f, languageHint = languageTag)
