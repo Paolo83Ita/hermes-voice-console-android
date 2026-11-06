@@ -63,6 +63,17 @@ android {
             proguardFiles(getDefaultProguardFile("proguard-android-optimize.txt"), "proguard-rules.pro")
         }
     }
+    // CP-G4.9-003: onnxruntime-android (the app's ORT Java API, 1.20.0) and the
+    // sherpa-onnx AAR both bundle lib/<abi>/libonnxruntime.so. The ORT C API the
+    // sherpa JNI consumes is stable across these versions; the packaged copy is
+    // resolved by pickFirst (the project's 1.20.0 stays the Java-API authority).
+    // PHYSICAL-VALIDATION-NOTE: the natural-voice route must be exercised on the
+    // POCO (ST-52 + Hear sample) to confirm the merged runtime on device.
+    packaging {
+        jniLibs {
+            pickFirsts.add("lib/**/libonnxruntime.so")
+        }
+    }
     buildFeatures {
         compose = true
         buildConfig = true
