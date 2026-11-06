@@ -31,10 +31,42 @@ class ConsoleControlSemanticsTest {
     }
 
     @Test
-    fun `tts stop is VOLUME_UP — never a microphone icon`() {
+    fun `tts stop is STOP_CIRCLE - never a microphone icon (§11 realignment)`() {
         val s = ConsoleControlSemanticsResolver.stopSpeaking()
-        assertEquals(ConsoleControlIcon.VOLUME_UP, s.icon)
+        // GRAPH 4.10 §11: TTS_SPEAKING icon = StopCircle (was VolumeUp; the
+        // VolumeUp identity now belongs to the chat-speech MUTE state).
+        assertEquals(ConsoleControlIcon.STOP_CIRCLE, s.icon)
         assertTrue(s.icon != ConsoleControlIcon.MIC && s.icon != ConsoleControlIcon.MIC_OFF)
+    }
+
+    @Test
+    fun `speaker control states match the §11 vocabulary`() {
+        val mute = ConsoleControlSemanticsResolver.chatSpeech(
+            com.hermestower.voiceconsole.voice.ChatSpeechOutputPolicy.Mode.AUTO_SPEAK, false,
+        )
+        assertEquals("chat_speech_mute", mute.semanticId)
+        assertEquals(ConsoleControlIcon.VOLUME_UP, mute.icon)
+        assertEquals(R.string.chat_speech_mute_label, mute.labelRes)
+
+        val unmute = ConsoleControlSemanticsResolver.chatSpeech(
+            com.hermestower.voiceconsole.voice.ChatSpeechOutputPolicy.Mode.MUTED, false,
+        )
+        assertEquals("chat_speech_unmute", unmute.semanticId)
+        assertEquals(ConsoleControlIcon.VOLUME_OFF, unmute.icon)
+        assertEquals(R.string.chat_speech_unmute_label, unmute.labelRes)
+
+        val manual = ConsoleControlSemanticsResolver.chatSpeech(
+            com.hermestower.voiceconsole.voice.ChatSpeechOutputPolicy.Mode.MANUAL, false,
+        )
+        assertEquals("chat_speech_manual_play", manual.semanticId)
+        assertEquals(ConsoleControlIcon.VOLUME_DOWN, manual.icon)
+        assertEquals(R.string.chat_speech_manual_label, manual.labelRes)
+
+        val stop = ConsoleControlSemanticsResolver.chatSpeech(
+            com.hermestower.voiceconsole.voice.ChatSpeechOutputPolicy.Mode.AUTO_SPEAK, true,
+        )
+        assertEquals("tts_stop_speaking", stop.semanticId)
+        assertEquals(ConsoleControlIcon.STOP_CIRCLE, stop.icon)
     }
 
     @Test
@@ -45,6 +77,13 @@ class ConsoleControlSemanticsTest {
                 ConsoleControlSemanticsResolver.activeControls(mic, muted).forEach { ids.add(it.semanticId) }
             }
         }
+        // GRAPH 4.10 §11/§18: the speaker-control states + manual playback identity.
+        com.hermestower.voiceconsole.voice.ChatSpeechOutputPolicy.Mode.entries.forEach { mode ->
+            ConsoleControlSemanticsResolver.chatSpeech(mode, false).let { ids.add(it.semanticId) }
+        }
+        ConsoleControlSemanticsResolver.chatSpeech(
+            com.hermestower.voiceconsole.voice.ChatSpeechOutputPolicy.Mode.AUTO_SPEAK, true,
+        ).let { ids.add(it.semanticId) }
         ids.add(ConsoleControlSemanticsResolver.textSend().semanticId)
         assertTrue(
             "missing identities: $ids",
@@ -53,6 +92,7 @@ class ConsoleControlSemanticsTest {
                     "voice_start_listening", "voice_stop_listening",
                     "privacy_mute_enable", "privacy_mute_disable",
                     "tts_stop_speaking", "text_send",
+                    "chat_speech_mute", "chat_speech_unmute", "chat_speech_manual_play",
                 ),
             ),
         )

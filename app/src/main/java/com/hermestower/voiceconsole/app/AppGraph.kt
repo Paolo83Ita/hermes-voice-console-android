@@ -52,6 +52,7 @@ import com.hermestower.voiceconsole.voice.NoAudioCaptureEngine
 import com.hermestower.voiceconsole.voice.SpeechProfile
 import com.hermestower.voiceconsole.voice.TtsTelemetry
 import com.hermestower.voiceconsole.voice.VoicePipelineController
+import com.hermestower.voiceconsole.voice.ChatSpeechOutputPolicy
 import com.hermestower.voiceconsole.voice.VoiceQualificationState
 import com.hermestower.voiceconsole.voice.VoiceRuntimeFactory
 import com.hermestower.voiceconsole.voice.VoiceSelectionAuthority
@@ -617,6 +618,12 @@ class AppGraph(private val context: Context) {
         }.trimEnd()
     }
 
+    // GRAPH 4.10 CP-G4.10-004 (§10): the ONE persistent chat-speech policy —
+    // AUTO_SPEAK default; MUTED keeps text visible and stops the utterance in
+    // flight; MANUAL speaks only through per-message playback; restart-persistent;
+    // independent of the microphone privacy mute; never touches media volume.
+    val chatSpeechPolicy = ChatSpeechOutputPolicy(keyValueStore)
+
     val driver = ScriptedConsoleDriver(
         scope = scope,
         store = store,
@@ -634,6 +641,7 @@ class AppGraph(private val context: Context) {
             }
         },
         localeResolver = responseLocaleResolver,
+        chatSpeechPolicy = chatSpeechPolicy,
     )
 
     // G4-C03: real microphone path coordinator (single state authority, single

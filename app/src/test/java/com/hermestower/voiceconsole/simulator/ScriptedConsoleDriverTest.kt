@@ -217,4 +217,97 @@ class ScriptedConsoleDriverTest {
         assertTrue(hermesTurn.text.contains("predisporre un piano di missione"))
         assertTrue(hermesTurn.text.contains("simulazione"))
     }
+
+    // ---- GRAPH 4.10 CP-G4.10-004: chat speech output policy (P0-04/P0-05) ----
+
+    @Test
+    fun `MUTED keeps the assistant text visible and speaks nothing`() = runTest {
+        scope = CoroutineScope(SupervisorJob() + UnconfinedTestDispatcher(testScheduler))
+        val mockTts = MockTextToSpeechEngine(UnconfinedTestDispatcher(testScheduler))
+        val policy = com.hermestower.voiceconsole.voice.ChatSpeechOutputPolicy(
+            com.hermestower.voiceconsole.migration.InMemoryKeyValueStore(),
+        )
+        policy.setMode(com.hermestower.voiceconsole.voice.ChatSpeechOutputPolicy.Mode.MUTED, "test")
+        val localBridge = MockTowerBridge(DeterministicTowerSimulator(), UnconfinedTestDispatcher(testScheduler))
+        val d = ScriptedConsoleDriver(
+            scope = scope, store = store, router = RuleBasedIntentRouter(),
+            localEngine = MockLocalConversationEngine(), bridge = localBridge, tts = mockTts,
+            events = events, session = DefaultSessionController(), statusProvider = { fixedStatus },
+            chatSpeechPolicy = policy,
+        )
+        store.transition(ConsoleState.IDLE)
+        localBridge.handshake()
+        d.start()
+
+        d.submitText("good day hermes")
+        advanceUntilIdle()
+
+        // The Italian/English text is VISIBLE (the turn was appended)...
+        val turns = store.turns.value
+        assertEquals(2, turns.size)
+        assertEquals(ConsoleState.IDLE, store.currentState())
+        // ...but NO audio was produced and SPEAKING was never claimed.
+        assertEquals(null, mockTts.lastSpokenText)
+        assertTrue(events.recent(50).none { it.detail.contains("SPEAKING claimed") })
+    }
+
+    @Test
+    fun `stopping speech never mutes future responses`() = runTest {
+        scope = CoroutineScope(SupervisorJob() + UnconfinedTestDispatcher(testScheduler))
+        val mockTts = MockTextToSpeechEngine(UnconfinedTestDispatcher(testScheduler))
+        val d = buildDriver(UnconfinedTestDispatcher(testScheduler)).let {
+            ScriptedConsoleDriver(
+                scope = scope, store = store, router = RuleBasedIntentRouter(),
+                localEngine = MockLocalConversationEngine(), bridge = bridge, tts = mockTts,
+                events = events, session = DefaultSessionController(), statusProvider = { fixedStatus },
+            )
+        }
+        store.transition(ConsoleState.IDLE)
+        bridge.handshake()
+        d.start()
+
+        d.submitText("good day hermes")
+        advanceUntilIdle()
+        val firstSpoken = mockTts.lastSpokenText
+        d.stopSpeaking() // user pressed the stop control
+        assertEquals(ConsoleState.IDLE, store.currentState())
+
+        d.submitText("status report")
+        advanceUntilIdle()
+        // The next response IS spoken again (stop != mute, §10) and it is the
+        // SECOND response (not the stale first one).
+        val secondText = store.turns.value.last { it.role == ConversationTurn.Role.HERMES }.text
+        org.junit.Assert.assertNotEquals(firstSpoken, mockTts.lastSpokenText)
+        assertEquals(secondText, mockTts.lastSpokenText)
+    }
+
+    @Test
+    fun `per-message playback speaks the exact visible text`() = runTest {
+        scope = CoroutineScope(SupervisorJob() + UnconfinedTestDispatcher(testScheduler))
+        val mockTts = MockTextToSpeechEngine(UnconfinedTestDispatcher(testScheduler))
+        val policy = com.hermestower.voiceconsole.voice.ChatSpeechOutputPolicy(
+            com.hermestower.voiceconsole.migration.InMemoryKeyValueStore(),
+        )
+        policy.setMode(com.hermestower.voiceconsole.voice.ChatSpeechOutputPolicy.Mode.MANUAL, "test")
+        val manualBridge = MockTowerBridge(DeterministicTowerSimulator(), UnconfinedTestDispatcher(testScheduler))
+        val d = ScriptedConsoleDriver(
+            scope = scope, store = store, router = RuleBasedIntentRouter(),
+            localEngine = MockLocalConversationEngine(), bridge = manualBridge, tts = mockTts,
+            events = events, session = DefaultSessionController(), statusProvider = { fixedStatus },
+            chatSpeechPolicy = policy,
+        )
+        store.transition(ConsoleState.IDLE)
+        manualBridge.handshake()
+        d.start()
+
+        d.submitText("good day hermes")
+        advanceUntilIdle()
+        assertEquals(null, mockTts.lastSpokenText) // MANUAL: no auto speech
+
+        val assistantText = store.turns.value.last { it.role == ConversationTurn.Role.HERMES }.text
+        d.repeatMessage(assistantText)
+        advanceUntilIdle()
+        // Explicit playback: TTS input == visible text (§6), even in MANUAL.
+        assertEquals(assistantText, mockTts.lastSpokenText)
+    }
 }

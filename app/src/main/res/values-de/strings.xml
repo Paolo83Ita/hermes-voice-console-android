@@ -572,6 +572,16 @@
     <string name="mm_install_result">Installation %1$s: %2$s — %3$s</string>
     <string name="mm_qualify_result">Qualifikation %1$s: %2$s — %3$s</string>
     <string name="mm_activate_result">Aktivierung %1$s: %2$s — %3$s</string>
+    <string name="chat_speech_mute_label">Sprachantworten stummschalten</string>
+    <string name="chat_speech_unmute_label">Sprachantworten aktivieren</string>
+    <string name="chat_speech_manual_label">Antwort anhören</string>
+    <string name="chat_speech_mute_cd">Sprachantworten des Chats stummschalten</string>
+    <string name="chat_speech_unmute_cd">Sprachantworten des Chats aktivieren</string>
+    <string name="chat_speech_manual_cd">Diese Antwort anhören</string>
+    <string name="chat_speech_state_muted">Sprachantworten stummgeschaltet</string>
+    <string name="chat_speech_state_manual">Sprachantworten manuell</string>
+    <string name="msg_repeat_label">Wiederholen</string>
+    <string name="msg_listen_label">Anhören</string>
     <string name="mm_voice_qualifying">Stimme %1$s wird qualifiziert (Test-Synthese und -Wiedergabe)…</string>
     <string name="mm_voice_active">Stimme %1$s AKTIV — das Runtime spricht jetzt damit.</string>
     <string name="mm_voice_runtime_failed">Runtime-Aktivierung der Stimme %1$s fehlgeschlagen (%2$s) — installierte Dateien bleiben erhalten; die italienische Systemstimme gilt.</string>

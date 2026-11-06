@@ -24,6 +24,8 @@ import com.hermestower.voiceconsole.domain.TowerBridge
 import com.hermestower.voiceconsole.locale.ResponseCategory
 import com.hermestower.voiceconsole.locale.ResponseCatalog
 import com.hermestower.voiceconsole.locale.ResponseLocaleResolver
+import com.hermestower.voiceconsole.migration.InMemoryKeyValueStore
+import com.hermestower.voiceconsole.voice.ChatSpeechOutputPolicy
 import kotlinx.coroutines.CancellationException
 import kotlinx.coroutines.Job
 import kotlinx.coroutines.delay
@@ -58,6 +60,7 @@ class ScriptedConsoleDriver(
     private val session: SessionController,
     private val statusProvider: () -> String,
     private val localeResolver: ResponseLocaleResolver = ResponseLocaleResolver.englishDefaults(),
+    private val chatSpeechPolicy: ChatSpeechOutputPolicy = ChatSpeechOutputPolicy(InMemoryKeyValueStore()),
     private val deviceId: String = "console-hermes-01",
     private val userIdRef: String = "owner-paolo",
 ) {
@@ -186,23 +189,31 @@ class ScriptedConsoleDriver(
         if (store.currentState() == ConsoleState.DORMANT) return
         val last = store.turns.value.lastOrNull {
             it.role == ConversationTurn.Role.HERMES && it.delivery == ConversationTurn.Delivery.DELIVERED
-        }
-        if (last == null) {
+        } ?: run {
             store.setStatusNote(ResponseCatalog.text(ResponseCategory.REPEAT_NOTHING_YET, currentLocale()))
             return
         }
+        repeatMessage(last.text)
+    }
+
+    /**
+     * GRAPH 4.10 §11: per-message playback (Ascolta/Ripeti) — the explicit
+     * user request speaks THIS message (force), unless the chat speech policy
+     * is MUTED (strict mute; the user can unmute first).
+     */
+    fun repeatMessage(text: String) {
+        if (store.currentState() == ConsoleState.DORMANT) return
+        if (store.currentState().isPipelineActive) return
         pipelineJob?.cancel()
         tts.interrupt()
         store.transition(ConsoleState.IDLE)
         pipelineJob = scope.launch {
-            // Legal path to SPEAKING: IDLE→TRANSCRIBING→UNDERSTANDING_LOCAL→SPEAKING
-            // (the state machine has no IDLE→SPEAKING shortcut by design).
             if (store.transition(ConsoleState.TRANSCRIBING) == null) return@launch
             if (store.transition(ConsoleState.UNDERSTANDING_LOCAL) == null) {
                 store.transition(ConsoleState.IDLE)
                 return@launch
             }
-            speakAndFinish(last.text, store.settings.value.captionsEnabled)
+            speakAndFinish(text, store.settings.value.captionsEnabled, force = true)
         }
     }
 
@@ -268,6 +279,9 @@ class ScriptedConsoleDriver(
         val reached = store.transition(ConsoleState.UPDATE_AVAILABLE)
         events.log("SIM", "update available shown: $reached")
     }
+
+    /** §10: the chat-speech output policy is exposed read-only to the UI (speaker control). */
+    val speechPolicy: ChatSpeechOutputPolicy get() = chatSpeechPolicy
 
     private fun currentLocale(): String = localeResolver.resolve().tag
 
@@ -506,7 +520,23 @@ class ScriptedConsoleDriver(
         store.transition(ConsoleState.IDLE)
     }
 
-    private suspend fun speakAndFinish(text: String, captions: Boolean) {
+    /**
+     * §6/§10: speak + return to idle. The visible text is ALWAYS the canonical
+     * response (appended before this runs); TTS input equals the visible text.
+     * The ChatSpeechOutputPolicy decides whether speech happens: AUTO_SPEAK
+     * speaks once; MUTED never speaks (strict mute — text stays visible);
+     * MANUAL speaks only through the explicit per-message playback ([force]).
+     * Skipping speech is HONEST: no SPEAKING state is claimed.
+     */
+    private suspend fun speakAndFinish(text: String, captions: Boolean, force: Boolean = false) {
+        val maySpeak = (chatSpeechPolicy.shouldAutoSpeak() && !chatSpeechPolicy.isMuted()) ||
+            (force && !chatSpeechPolicy.isMuted())
+        if (!maySpeak) {
+            events.log("TTS", "skipped by chat speech policy mode=${chatSpeechPolicy.mode.value.name} len=${text.length}")
+            if (store.currentState() != ConsoleState.IDLE) store.transition(ConsoleState.IDLE)
+            store.setTranscriptDraft(null)
+            return
+        }
         if (store.transition(ConsoleState.SPEAKING) == null) {
             // Console was overridden mid-flight (mute/stop); do not speak over the Owner.
             return

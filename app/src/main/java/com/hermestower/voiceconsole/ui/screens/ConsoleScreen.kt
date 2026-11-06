@@ -10,6 +10,7 @@ import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.BoxWithConstraints
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Row
+import androidx.compose.foundation.layout.heightIn
 import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.Canvas
 import androidx.compose.foundation.layout.WindowInsets
@@ -29,6 +30,9 @@ import androidx.compose.material.icons.filled.Menu
 import androidx.compose.material.icons.filled.Mic
 import androidx.compose.material.icons.filled.MicOff
 import androidx.compose.material.icons.filled.Replay
+import androidx.compose.material.icons.filled.StopCircle
+import androidx.compose.material.icons.filled.VolumeDown
+import androidx.compose.material.icons.filled.VolumeOff
 import androidx.compose.material.icons.filled.Stop
 import androidx.compose.material.icons.filled.VolumeUp
 import androidx.compose.material.icons.outlined.History
@@ -117,6 +121,7 @@ fun ConsoleScreen(
 
     // ---- GRAPH 4 G4-C03: real microphone path (Owner delta §5) ----
     val micState by graph.voiceCoordinator.micState.collectAsStateWithLifecycle()
+    val speechMode by graph.driver.speechPolicy.mode.collectAsStateWithLifecycle()
     val lastRefusal by graph.voiceCoordinator.lastRefusal.collectAsStateWithLifecycle()
 
     // Foreground-only capture (§4): leaving the screen physically stops the mic.
@@ -357,6 +362,19 @@ fun ConsoleScreen(
                     }
                     Text(who, style = MonumentalType.sealLabel, color = whoColor)
                     Text(turn.text, style = MonumentalType.body, color = m.ink)
+                    // §11: every assistant message offers per-message playback.
+                    if (turn.role == com.hermestower.voiceconsole.core.state.ConversationTurn.Role.HERMES) {
+                        TextButton(
+                            onClick = { graph.driver.repeatMessage(turn.text) },
+                            modifier = Modifier.heightIn(min = 48.dp),
+                        ) {
+                            Text(
+                                stringResource(com.hermestower.voiceconsole.R.string.msg_repeat_label),
+                                style = MonumentalType.sealSub,
+                                color = m.inkSecondary,
+                            )
+                        }
+                    }
                     Spacer(Modifier.height(6.dp))
                 }
                 // capture the delegated value once: smart cast is impossible on a
@@ -471,7 +489,12 @@ fun ConsoleScreen(
             // voce — never a microphone icon). Every cd is unique per state (§10).
             val muteSemantics = ConsoleControlSemanticsResolver.privacyMute(muted)
             val pttSemantics = ConsoleControlSemanticsResolver.pushToTalk(micState)
-            val stopVoiceSemantics = ConsoleControlSemanticsResolver.stopSpeaking()
+            // GRAPH 4.10 §11: the ONE functional speaker control (P0-04/P0-05).
+            val isSpeaking = state == ConsoleState.SPEAKING
+            val speechSemantics = ConsoleControlSemanticsResolver.chatSpeech(
+                speechMode,
+                isSpeaking,
+            )
             Row(
                 Modifier
                     .fillMaxWidth()
@@ -521,14 +544,31 @@ fun ConsoleScreen(
                     )
                 }
                 Spacer(Modifier.size(8.dp))
+                // ---- speaker control (§11): mute / unmute / stop / manual playback ----
                 IconButton(onClick = {
-                    graph.voiceCoordinator.stopCapture("stop pressed")
-                    graph.driver.stopSpeaking()
+                    when {
+                        isSpeaking -> graph.driver.stopSpeaking() // stops CURRENT only, policy unchanged
+                        speechMode == com.hermestower.voiceconsole.voice.ChatSpeechOutputPolicy.Mode.MUTED ->
+                            graph.driver.speechPolicy.setMode(
+                                com.hermestower.voiceconsole.voice.ChatSpeechOutputPolicy.Mode.AUTO_SPEAK,
+                                "unmute control",
+                            )
+                        speechMode == com.hermestower.voiceconsole.voice.ChatSpeechOutputPolicy.Mode.MANUAL ->
+                            graph.driver.repeatLastSpoken()
+                        else -> {
+                            // §10: engaging MUTED also stops the utterance in flight.
+                            graph.driver.stopSpeaking()
+                            graph.driver.speechPolicy.setMode(
+                                com.hermestower.voiceconsole.voice.ChatSpeechOutputPolicy.Mode.MUTED,
+                                "mute control",
+                            )
+                        }
+                    }
                 }) {
                     MedallionDisc(
-                        cd = stringResource(stopVoiceSemantics.contentDescriptionRes),
-                        icon = medallionIcon(stopVoiceSemantics.icon),
-                        tint = m.cyanCore,
+                        cd = stringResource(speechSemantics.contentDescriptionRes),
+                        icon = medallionIcon(speechSemantics.icon),
+                        tint = if (isSpeaking) m.cyanCore else m.bronzeLight,
                         m = m,
                     )
                 }
@@ -665,6 +705,9 @@ private fun medallionIcon(icon: ConsoleControlIcon): ImageVector = when (icon) {
     ConsoleControlIcon.STOP -> Icons.Filled.Stop
     ConsoleControlIcon.MIC_OFF -> Icons.Filled.MicOff
     ConsoleControlIcon.VOLUME_UP -> Icons.Filled.VolumeUp
+    ConsoleControlIcon.VOLUME_OFF -> Icons.Filled.VolumeOff
+    ConsoleControlIcon.VOLUME_DOWN -> Icons.Filled.VolumeDown
+    ConsoleControlIcon.STOP_CIRCLE -> Icons.Filled.StopCircle
     ConsoleControlIcon.REPLAY -> Icons.Filled.Replay
     ConsoleControlIcon.SEND -> Icons.Outlined.Send
     ConsoleControlIcon.HISTORY -> Icons.Outlined.History

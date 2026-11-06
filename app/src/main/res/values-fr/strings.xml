@@ -572,6 +572,16 @@
     <string name="mm_install_result">Installation %1$s : %2$s — %3$s</string>
     <string name="mm_qualify_result">Qualification %1$s : %2$s — %3$s</string>
     <string name="mm_activate_result">Activation %1$s : %2$s — %3$s</string>
+    <string name="chat_speech_mute_label">Couper les réponses vocales</string>
+    <string name="chat_speech_unmute_label">Activer les réponses vocales</string>
+    <string name="chat_speech_manual_label">Écouter la réponse</string>
+    <string name="chat_speech_mute_cd">Couper les réponses vocales du chat</string>
+    <string name="chat_speech_unmute_cd">Activer les réponses vocales du chat</string>
+    <string name="chat_speech_manual_cd">Écouter cette réponse</string>
+    <string name="chat_speech_state_muted">Réponses vocales coupées</string>
+    <string name="chat_speech_state_manual">Réponses vocales manuelles</string>
+    <string name="msg_repeat_label">Répéter</string>
+    <string name="msg_listen_label">Écouter</string>
     <string name="mm_voice_qualifying">Qualification de la voix %1$s (synthèse et lecture de test)…</string>
     <string name="mm_voice_active">Voix %1$s ACTIVE — le runtime parle désormais avec elle.</string>
     <string name="mm_voice_runtime_failed">Échec de l’activation runtime de la voix %1$s (%2$s) — fichiers installés conservés ; la voix système italienne s’applique.</string>
