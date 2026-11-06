@@ -102,7 +102,7 @@ After that, continue with the remaining Graph 4 nodes.
 
 ## 6. Second Owner validation cycle — required evidence (planned)
 
-With the NEW package (versionName `0.3.0-alpha-graph4-owner-feedback`, see the build
+With the NEW package (versionName `0.3.0-alpha-graph4`, see the build
 receipt) the Owner runbook collects, ON DEVICE:
 
 1. `DEVICE_INSTALLATION_PASSED` + `APPLICATION_LAUNCH_PASSED` re-typed for the new package;

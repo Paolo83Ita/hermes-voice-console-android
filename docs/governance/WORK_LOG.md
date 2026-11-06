@@ -1466,3 +1466,30 @@ docs/governance/{WORK_LOG,CHECKPOINT_INDEX}.md.
 COMMIT: (this commit).
 CHECKPOINT: CP-G4-028 (owner-package).
 NEXT: second Owner validation cycle on the POCO X6 PRO.
+
+## G4-N52 — Owner package VERIFIED (cloud) + APK receipt + second-cycle runbook
+
+Deployment history (the R-27 build-gate loop doing exactly its job): 1cd5738 → run
+42224431930 BUILD_FAILED (5 compile errors, 2 sites: the ACTION_TTS_SETTINGS
+constant reference + getLanguage() returning a Locale not a String) → 7cac4fe → run
+42225216683 BUILD_FAILED (274 tests / 3 failed: the negotiator's OWN test caught
+classify() ignoring the engine language read-back when getVoice() returns null;
+SelfTestCenterTest honest realignment for ST-51 — 51 definitions, JVM skips;
+subtitle 50→51 ×5 locales) → bf34014 → run 42226155144 BUILD_SUCCESSFUL: unit
+274/274 (JUnit XML artifact), lint executed, APKs universal 206,701,159 B sha256
+56ac87ab…071d / arm64-v8a 105,268,304 B sha256 df4c0db0…f9f5 / x86_64
+109,197,848 B sha256 f5850591…3aaa (previous-tip comparison: universal at 4116819
+was already 206,679,899 B — this cycle added ~21 KB, code-only; the 165 MB figure
+in the Graph 4.6-era receipt is not the comparison point). E2E segmented-gate run
+42226155140 @ bf34014 IN FLIGHT at write time (its verdict belongs to the remaining
+Graph 4 node loop, not to the Owner package gates). Receipt:
+docs/receipts/OWNER_FEEDBACK_APK_RECEIPT.md. The Owner package = install/upgrade
+per docs/INSTALL_POCO_X6_PRO.md; the second validation cycle's 7-item runbook is in
+the same guide; the intake receipt's planned-evidence section lists the typed
+read-back items (Diagnostics voice rows, ST-51, Italian voice card).
+FILES: docs/receipts/{OWNER_FEEDBACK_APK_RECEIPT,OWNER_PHYSICAL_FEEDBACK_RECEIPT}.md;
+docs/governance/WORK_LOG.md; docs/governance/CHECKPOINT_INDEX.md.
+COMMIT: (this commit).
+CHECKPOINT: CP-G4-028 verified (owner-package + evidence).
+NEXT: second Owner validation cycle on the POCO X6 PRO; then the remaining Graph 4
+nodes (the E2E gate loop continues autonomously).
