@@ -170,4 +170,44 @@ class MockTowerArchiveTest {
             throw AssertionError("oversized page must be rejected")
         } catch (expected: IllegalArgumentException) { /* typed */ }
     }
+    // ---- CP-G4.9-007: product-completion of the artifact transfer lifecycle ----
+
+    @Test
+    fun `artifacts carry mime type provenance and deterministic text previews`() {
+        val archive = MockTowerArchive()
+        val page = archive.listArtifacts(page = 0, pageSize = 20)
+        assertTrue(page.items.all { it.mimeType.isNotBlank() })
+        assertTrue(page.items.all { it.provenance.startsWith("SIMULATED provenance") })
+        val json = page.items.first { it.kind == ArtifactKind.JSON }
+        assertEquals("application/json", json.mimeType)
+        assertTrue("text-bearing kinds expose a preview", json.previewText!!.startsWith("SIMULATED preview"))
+        val pdf = page.items.first { it.kind == ArtifactKind.PDF }
+        assertEquals("application/pdf", pdf.mimeType)
+        assertEquals("binary kinds expose no fabricated text preview", null, pdf.previewText)
+    }
+
+    @Test
+    fun `transfer lifecycle pauses resumes re-downloads with typed states`() {
+        val archive = MockTowerArchive()
+        val id = archive.listArtifacts(page = 0, pageSize = 20).items.first().id
+        assertEquals(ArtifactTransferState.IDLE, archive.transferState(id))
+        // pause without a transfer in flight is refused (typed honesty)
+        assertEquals(false, archive.pause(id))
+        val result = archive.download(id)
+        assertTrue(result is ArtifactDownloadResult.Simulated)
+        assertEquals(ArtifactTransferState.DOWNLOADED, archive.transferState(id))
+        // re-download removes the local copy first, then downloads again
+        val again = archive.reDownload(id)
+        assertTrue(again is ArtifactDownloadResult.Simulated)
+        assertEquals(ArtifactLocalState.SIMULATED_DOWNLOAD, archive.getArtifact(id)!!.localState)
+        // cancel resets to IDLE; resume of an IDLE transfer is refused
+        archive.cancel(id)
+        assertEquals(ArtifactTransferState.IDLE, archive.transferState(id))
+        assertEquals(false, archive.resume(id))
+        // removeLocalCopy returns the row to METADATA_ONLY (remote untouched)
+        archive.download(id)
+        archive.removeLocalCopy(id)
+        assertEquals(ArtifactLocalState.METADATA_ONLY, archive.getArtifact(id)!!.localState)
+        assertEquals(ArtifactTransferState.IDLE, archive.transferState(id))
+}
 }

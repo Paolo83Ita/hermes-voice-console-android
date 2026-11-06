@@ -677,7 +677,16 @@ MANUAL_ADVANCED — sélection indépendante par composant, visibilité totale, 
     <string name="archive_hash_fmt">SHA-256 : %1$s</string>
 
     <!-- OWNER PHYSICAL RETEST (2026-11-06) — new keys -->
-        <string name="mm_more_actions">Plus d\'actions</string>
+        <string name="mm_test">Test</string>
+    <string name="mm_hear_sample">Écouter l\'échantillon</string>
+    <string name="mm_fixture_transcript_fmt">Transcription du fixture : %1$s</string>
+    <string name="mm_fixture_expected_fmt">Attendu : %1$s</string>
+    <string name="mm_fixture_error_fmt">Échec du test du fixture STT hors ligne : %1$s</string>
+    <string name="mm_sample_requested">Échantillon demandé — la voix naturelle prononce la phrase d\'aperçu.</string>
+    <string name="common_pause">Pause</string>
+    <string name="common_resume">Reprendre</string>
+    <string name="archive_redownload">Retélécharger</string>
+    <string name="mm_more_actions">Plus d\'actions</string>
         <string name="about_build_card">Informations de build</string>
         <string name="about_build_label">Label de build</string>
         <string name="about_build_version">Version (versionName · versionCode)</string>

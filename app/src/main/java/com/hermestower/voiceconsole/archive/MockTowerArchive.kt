@@ -90,15 +90,23 @@ class MockTowerArchive(
         )
         for (a in 0 until 10) {
             val id = "art-%03d".format(a + 1)
+            val kind = kinds[a]
+            val convId = conversations[a % conversations.size].id
+            val misId = if (a % 3 == 0) "mis-%03d".format(a / 3 % 5 + 1) else null
             artifacts += ArchiveArtifact(
                 id = id,
-                conversationId = conversations[a % conversations.size].id,
-                missionId = if (a % 3 == 0) "mis-%03d".format(a / 3 % 5 + 1) else null,
-                name = "artifact-${a + 1}.${kinds[a].name.lowercase()}",
-                kind = kinds[a],
+                conversationId = convId,
+                missionId = misId,
+                name = "artifact-${a + 1}.${kind.name.lowercase()}",
+                kind = kind,
                 sizeBytes = 1024L * (37 + a * 11),
                 sha256 = "seed%064d".format(a),
                 localState = ArtifactLocalState.METADATA_ONLY,
+                // CP-G4.9-007: MIME + provenance + deterministic text preview.
+                mimeType = mimeFor(kind),
+                provenance = "SIMULATED provenance: deterministic seed row ${a + 1} (conversation $convId" +
+                    (misId?.let { ", mission $it" } ?: "") + "); real recovery waits for Tower Graph 1.7.",
+                previewText = previewFor(kind, a + 1),
             )
         }
     }
@@ -200,16 +208,55 @@ class MockTowerArchive(
         // §17: never silently regenerate an absent artifact — the mock performs NO
         // byte transfer and labels the row SIMULATED_DOWNLOAD.
         downloaded += artifactId
+        transfers[artifactId] = ArtifactTransferState.DOWNLOADED
         artifacts.replaceAll { if (it.id == artifactId) it.copy(localState = ArtifactLocalState.SIMULATED_DOWNLOAD) else it }
         return ArtifactDownloadResult.Simulated(
             "SIMULATED download of ${artifact.name} (${artifact.sizeBytes} B); real transfer waits for Tower Graph 1.7",
         )
     }
 
-    override fun cancel(artifactId: String) { /* deterministic mock: no in-flight transfer */ }
+    // CP-G4.9-007: typed transfer lifecycle (SIMULATED — no bytes move until
+    // Tower Graph 1.7 provides the real routes).
+    private val transfers = HashMap<String, ArtifactTransferState>()
+
+    override fun cancel(artifactId: String) {
+        // Deterministic mock: an in-flight transfer exists only between
+        // download() and its simulated completion; cancel resets it.
+        transfers[artifactId] = ArtifactTransferState.IDLE
+    }
+
+    override fun pause(artifactId: String): Boolean {
+        val current = transfers[artifactId] ?: ArtifactTransferState.IDLE
+        if (current != ArtifactTransferState.DOWNLOADING) return false
+        transfers[artifactId] = ArtifactTransferState.PAUSED
+        return true
+    }
+
+    override fun resume(artifactId: String): Boolean {
+        val current = transfers[artifactId] ?: ArtifactTransferState.IDLE
+        if (current != ArtifactTransferState.PAUSED) return false
+        // Resuming lands back at the simulated completion (the mock never keeps
+        // bytes in flight); the row stays honestly SIMULATED_DOWNLOAD.
+        transfers[artifactId] = ArtifactTransferState.DOWNLOADED
+        downloaded += artifactId
+        artifacts.replaceAll { if (it.id == artifactId) it.copy(localState = ArtifactLocalState.SIMULATED_DOWNLOAD) else it }
+        return true
+    }
+
+    override fun reDownload(artifactId: String): ArtifactDownloadResult {
+        removeLocalCopy(artifactId)
+        return download(artifactId)
+    }
+
+    override fun transferState(artifactId: String): ArtifactTransferState =
+        transfers[artifactId]
+            ?: if (downloaded.contains(artifactId)) ArtifactTransferState.DOWNLOADED
+            else ArtifactTransferState.IDLE
 
     override fun removeLocalCopy(artifactId: String) {
         downloaded -= artifactId
+        // No local copy ⇒ no transfer state (the row returns to metadata-only).
+        transfers[artifactId] = ArtifactTransferState.IDLE
         artifacts.replaceAll { if (it.id == artifactId) it.copy(localState = ArtifactLocalState.METADATA_ONLY) else it }
     }
 
@@ -243,4 +290,35 @@ class MockTowerArchive(
             duplicatesPrevented = duplicates + (if (before > 0) before else 0),
         )
     }
+}
+
+/** Honest MIME mapping of the artifact kinds (CP-G4.9-007). */
+private fun mimeFor(kind: ArtifactKind): String = when (kind) {
+    ArtifactKind.PDF -> "application/pdf"
+    ArtifactKind.DOCX -> "application/vnd.openxmlformats-officedocument.wordprocessingml.document"
+    ArtifactKind.XLSX -> "application/vnd.openxmlformats-officedocument.spreadsheetml.sheet"
+    ArtifactKind.PPTX -> "application/vnd.openxmlformats-officedocument.presentationml.presentation"
+    ArtifactKind.HTML -> "text/html"
+    ArtifactKind.TXT -> "text/plain"
+    ArtifactKind.MARKDOWN -> "text/markdown"
+    ArtifactKind.JSON -> "application/json"
+    ArtifactKind.CSV -> "text/csv"
+    ArtifactKind.IMAGE -> "image/png"
+    ArtifactKind.AUDIO -> "audio/wav"
+    ArtifactKind.ZIP -> "application/zip"
+    ArtifactKind.EVIDENCE_REGISTER -> "application/json"
+    ArtifactKind.MISSION_RECEIPT -> "application/json"
+}
+
+/** Deterministic text preview for text-bearing kinds (CP-G4.9-007). */
+private fun previewFor(kind: ArtifactKind, index: Int): String? = when (kind) {
+    ArtifactKind.TXT, ArtifactKind.MARKDOWN, ArtifactKind.JSON, ArtifactKind.CSV,
+    ArtifactKind.HTML, ArtifactKind.EVIDENCE_REGISTER, ArtifactKind.MISSION_RECEIPT,
+    ->
+        buildString {
+            append("SIMULATED preview — deterministic seed row ").append(index).append(". ")
+            append("The real content is recovered from Hermes Tower when Tower Graph 1.7 provides the artifact routes; ")
+            append("no historical data is claimed here.")
+        }
+    else -> null
 }

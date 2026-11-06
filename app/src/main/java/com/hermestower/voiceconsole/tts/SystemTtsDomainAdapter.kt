@@ -6,6 +6,7 @@ import com.hermestower.voiceconsole.voice.TtsState
 import kotlinx.coroutines.delay
 import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.channelFlow
+import java.util.concurrent.atomic.AtomicLong
 
 /**
  * GRAPH 4 G4-C03 (§5/§10): bridges the voice-seam [TtsEngine] (real Android
@@ -30,6 +31,18 @@ import kotlinx.coroutines.flow.channelFlow
  * persisted [com.hermestower.voiceconsole.voice.SpeechProfile] is (the engine
  * applies it before every utterance); the parameter only drives the mock's
  * timing and is kept for the domain-seam contract.
+ *
+ * GRAPH 4.9 REGRESSION REPAIR (e2e_14 / e2e_19_20): interruption is a TOKEN,
+ * not a best-effort state write. The CP-G4-029 repair introduced the honest
+ * ready-wait window, but an [interrupt] arriving INSIDE the window was
+ * swallowed: the engine flipped LOADING→READY, the wait loop exited on READY
+ * and [TtsEngine.speak] was called unconditionally — the Owner cancel was
+ * lost and the utterance was spoken anyway (the console then showed SPEAKING
+ * past the cancel; E2EVoiceFlowTest e2e_14 failed at the repaired tip and
+ * e2e_19_20 failed as its cascade). The adapter now samples the token when
+ * the utterance flow starts and re-checks it in EVERY wait loop and before
+ * the SPEAKING state is claimed; a token change closes the flow without
+ * speaking and without overriding the NOT_READY state that interrupt() set.
  */
 class SystemTtsDomainAdapter(
     private val engine: TtsEngine,
@@ -43,24 +56,35 @@ class SystemTtsDomainAdapter(
         get() = _state
     private val _state = kotlinx.coroutines.flow.MutableStateFlow(TextToSpeechEngine.State.NOT_READY)
 
+    /** Bumped on every interrupt: any in-flight speak() with an older token must stop. */
+    private val interruptToken = AtomicLong(0L)
+
     override fun interrupt() {
+        interruptToken.incrementAndGet()
         engine.interrupt()
         _state.value = TextToSpeechEngine.State.NOT_READY
     }
 
     override fun speak(text: String, rate: Float): Flow<Float> = channelFlow {
+        val myToken = interruptToken.get()
+        fun interrupted() = interruptToken.get() != myToken
+
         engine.load()
         // Short honest wait for READY (system TTS init is async). Never fake SPEAKING.
         val deadline = System.currentTimeMillis() + readyWaitMs
         while (engine.state.value.state != TtsState.READY && System.currentTimeMillis() < deadline) {
+            if (interrupted()) { // cancel wins: the utterance must never start
+                close()
+                return@channelFlow
+            }
             ticker(pollMs)
         }
-        if (engine.state.value.state != TtsState.READY) {
-            engine.interrupt()
+        if (interrupted() || engine.state.value.state != TtsState.READY) {
+            if (!interrupted()) engine.interrupt() // engine never became ready
+            _state.value = TextToSpeechEngine.State.NOT_READY
             close()
             return@channelFlow
         }
-        _state.value = TextToSpeechEngine.State.READY
         engine.speak(text)
         // The gate may have REFUSED the utterance (fail-closed, Italian missing):
         // complete honestly — text stays visible, no SPEAKING lie.
@@ -75,10 +99,22 @@ class SystemTtsDomainAdapter(
         // this was a single immediate check that always saw SYNTHESIZING).
         val startDeadline = System.currentTimeMillis() + speakStartWaitMs
         while (engine.state.value.state == TtsState.SYNTHESIZING && System.currentTimeMillis() < startDeadline) {
+            if (interrupted()) {
+                _state.value = TextToSpeechEngine.State.NOT_READY
+                close()
+                return@channelFlow
+            }
             ticker(pollMs)
         }
         when (engine.state.value.state) {
-            TtsState.SPEAKING -> _state.value = TextToSpeechEngine.State.SPEAKING
+            TtsState.SPEAKING -> {
+                if (interrupted()) {
+                    _state.value = TextToSpeechEngine.State.NOT_READY
+                    close()
+                    return@channelFlow
+                }
+                _state.value = TextToSpeechEngine.State.SPEAKING
+            }
             else -> {
                 // speak refused or never started (engine error): text-only, no lie.
                 _state.value = TextToSpeechEngine.State.NOT_READY
@@ -88,13 +124,14 @@ class SystemTtsDomainAdapter(
         }
         var t = 0.0
         while (engine.state.value.state == TtsState.SPEAKING) {
+            if (interrupted()) break // interrupt() owns the state now (NOT_READY)
             // Decorative amplitude shaped like a calm syllable train.
             t += 0.35
             val amp = (0.55 + 0.45 * kotlin.math.sin(t)).toFloat().coerceIn(0f, 1f)
             trySend(amp)
             ticker(pollMs)
         }
-        _state.value = TextToSpeechEngine.State.READY
+        if (!interrupted()) _state.value = TextToSpeechEngine.State.READY
         close()
     }
 }

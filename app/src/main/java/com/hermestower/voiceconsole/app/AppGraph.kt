@@ -30,6 +30,9 @@ import com.hermestower.voiceconsole.store.SettingsRepository
 import com.hermestower.voiceconsole.tower.FileTowerProfileStore
 import com.hermestower.voiceconsole.tower.KeystoreVault
 import com.hermestower.voiceconsole.tower.PrivateFileVaultStore
+import com.hermestower.voiceconsole.tts.TtsRouteSwitch
+import com.hermestower.voiceconsole.voice.SherpaOnnxTtsEngine
+import com.hermestower.voiceconsole.voice.SherpaRealNativeBridge
 import com.hermestower.voiceconsole.tower.RealTowerBridge
 import com.hermestower.voiceconsole.towersim.LocalTowerMockServer
 import com.hermestower.voiceconsole.tts.MockTextToSpeechEngine
@@ -209,6 +212,29 @@ class AppGraph(private val context: Context) {
             // OWNER PHYSICAL FEEDBACK 3 (ST-51): the live voice read-back, read
             // lazily when the probe runs (after the engine negotiated).
             italianTtsVoiceProbe = { voiceTts.voiceReadback },
+            // CP-G4.9-003 (ST-52): the REAL spoken route (registry + bundle).
+            naturalTtsRouteProbe = {
+                com.hermestower.voiceconsole.selftest.NaturalTtsRouteReadback(
+                    activeRoute = ttsRouteSwitch.lastRouteUsed,
+                    naturalEngineId = activeNaturalVoice()?.let { id ->
+                        when (id) {
+                            "org.piper.voice.it-riccardo-x-low" -> naturalTts.engineId
+                            "org.piper.voice.it-paola-medium" -> naturalTtsPaola.engineId
+                            else -> null
+                        }
+                    },
+                    voiceBundlePresent = naturalTts.resolveVoiceDir() != null || naturalTtsPaola.resolveVoiceDir() != null,
+                )
+            },
+            // CP-G4.9-004 (ST-53): the REAL speech-input route.
+            localSttRouteProbe = {
+                com.hermestower.voiceconsole.selftest.LocalSttRouteReadback(
+                    activeEngine = if (voskFrameStt.loadedModelDir != null) voskFrameStt.engineId
+                    else "Android system recognizer (offline vosk model not installed)",
+                    offlineModelLoaded = voskFrameStt.loadedModelDir != null,
+                    loadedModelDir = voskFrameStt.loadedModelDir?.name,
+                )
+            },
         ),
         dispatcher = Dispatchers.Default,
     )
@@ -274,6 +300,68 @@ class AppGraph(private val context: Context) {
     )
     val consoleTts: com.hermestower.voiceconsole.domain.TextToSpeechEngine =
         SystemTtsDomainAdapter(voiceTts)
+
+    // CP-G4.9-003: REAL downloadable natural Italian voice route (sherpa-onnx
+    // v1.12.24 + the verified piper vits bundles). The route switch keeps the
+    // Android system engine as the MANDATORY fallback: the natural route is
+    // used ONLY while a piper voice is installed, verified AND active in the
+    // registry — removal/deactivation falls back honestly on the next
+    // utterance. The sherpa-onnx classes are touched only by the real bridge
+    // (constructed lazily on device; JVM tests never build AppGraph).
+    val naturalTts = SherpaOnnxTtsEngine(
+        voiceRoot = java.io.File(context.filesDir, "models/voices/riccardo-x-low"),
+        voiceIdentity = "vits-piper-it_IT-riccardo-x_low",
+        native = SherpaRealNativeBridge(),
+        player = SherpaOnnxTtsEngine.AudioTrackPlayer(),
+        speechProfileProvider = {
+            SpeechProfile.safe(
+                store.settings.value.speakingRate,
+                store.settings.value.speechPitch,
+            )
+        },
+        telemetry = ttsTelemetry,
+    )
+    val naturalTtsPaola = SherpaOnnxTtsEngine(
+        voiceRoot = java.io.File(context.filesDir, "models/voices/paola-medium"),
+        voiceIdentity = "vits-piper-it_IT-paola-medium",
+        native = SherpaRealNativeBridge(),
+        player = SherpaOnnxTtsEngine.AudioTrackPlayer(),
+        speechProfileProvider = {
+            SpeechProfile.safe(
+                store.settings.value.speakingRate,
+                store.settings.value.speechPitch,
+            )
+        },
+        telemetry = ttsTelemetry,
+    )
+
+    /** Registry read-back: which natural voice (if any) is installed+active. */
+    fun activeNaturalVoice(): String? {
+        val active = modelRegistry.snapshot().firstOrNull {
+            it.componentType == "VOICE" && it.active && it.state == "ACTIVE"
+        } ?: return null
+        // The bundle must still resolve on disk (an activated record whose
+        // files were removed falls back honestly to the system route).
+        val engine = when (active.identity) {
+            "org.piper.voice.it-riccardo-x-low" -> naturalTts
+            "org.piper.voice.it-paola-medium" -> naturalTtsPaola
+            else -> null
+        }
+        return engine?.takeIf { it.resolveVoiceDir() != null }?.let { active.identity }
+    }
+
+    private val naturalVoiceActive: () -> String? = { activeNaturalVoice() }
+
+    val ttsRouteSwitch = TtsRouteSwitch(
+        systemRoute = consoleTts,
+        naturalRoutes = mapOf(
+            "org.piper.voice.it-riccardo-x-low" to SystemTtsDomainAdapter(naturalTts),
+            "org.piper.voice.it-paola-medium" to SystemTtsDomainAdapter(naturalTtsPaola),
+        ),
+        routeProvider = naturalVoiceActive,
+    )
+    val consoleTtsRouted: com.hermestower.voiceconsole.domain.TextToSpeechEngine =
+        ttsRouteSwitch
 
     // Real system speech recognizer (STT while the offline frame path is
     // pending G4-C07 runtime delivery). One owner of the microphone at a time:
@@ -347,6 +435,17 @@ class AppGraph(private val context: Context) {
                 ttsSpeechRate = profile.speechRate,
                 ttsSpeechPitch = profile.pitch,
                 ttsLastNegotiationStatus = readback?.status?.name,
+                // CP-G4.9-003: the REAL spoken route (registry + on-disk read-back).
+                ttsActiveRoute = ttsRouteSwitch.lastRouteUsed.let { route: String ->
+                    if (route.startsWith("NATURAL:")) "NATURAL (${route.removePrefix("NATURAL:")})" else route
+                },
+                ttsNaturalEngineId = activeNaturalVoice()?.let { id ->
+                    when (id) {
+                        "org.piper.voice.it-riccardo-x-low" -> naturalTts.engineId
+                        "org.piper.voice.it-paola-medium" -> naturalTtsPaola.engineId
+                        else -> null
+                    }
+                },
                 llmState = "No local model (default) — Qwen2.5-0.5B candidate present, llama.cpp runtime pending",
                 onnxRuntime = "onnxruntime-android 1.20.0 (Gradle)",
             )
@@ -394,7 +493,7 @@ class AppGraph(private val context: Context) {
         router = router,
         localEngine = localEngine,
         bridge = bridge,
-        tts = consoleTts,
+        tts = consoleTtsRouted,
         events = events,
         session = session,
         statusProvider = {
@@ -481,6 +580,10 @@ data class ActiveRuntimeReadback(
     val ttsSpeechRate: Float = 0.96f,
     val ttsSpeechPitch: Float = 0.95f,
     val ttsLastNegotiationStatus: String? = null,
+    /** CP-G4.9-003: which REAL route the console speaks through (registry read-back). */
+    val ttsActiveRoute: String = "SYSTEM",
+    /** CP-G4.9-003: the natural-voice engine identity when that route is active. */
+    val ttsNaturalEngineId: String? = null,
     val llmState: String,
     val onnxRuntime: String,
 )

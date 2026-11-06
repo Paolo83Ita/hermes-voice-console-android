@@ -253,4 +253,113 @@ class ItalianTtsVoiceNegotiatorTest {
         assertTrue(!rb.isItalianAudible)
         assertTrue(rb.status.requiresUserAction)
     }
+    // ---- GRAPH 4.9 CP-G4.9-002 hardening: the remaining briefing scenarios ----
+
+    @Test
+    fun `selected voice disappearing after selection classifies fallback and blocks`() {
+        // The engine applied setVoice(offline it-IT) successfully, but by the
+        // post-apply read-back the voice is GONE (voice pack uninstalled,
+        // engine restarted) and the ACTIVE voice drifted back to English.
+        val rb = ItalianTtsVoiceNegotiator.classify(
+            requestedLocaleTag = "it-IT",
+            setLanguageResult = ItalianTtsVoiceNegotiator.TtsLanguageResultCode.LANG_COUNTRY_VAR_AVAILABLE,
+            selectedVoiceName = "it-it-x-ital-local", // was selected…
+            activeVoiceName = "en-us-x-ene-local",    // …but is no longer the active voice
+            activeVoiceLocaleTag = "en-US",
+            activeLanguageTag = "en-US",
+            engineName = "com.google.android.tts",
+            availableItalianVoiceNames = emptyList(), // the Italian voice disappeared entirely
+        )
+        assertEquals(ItalianTtsVoiceStatus.FALLBACK_VOICE_TRIGGERED, rb.status)
+        assertEquals(false, rb.isItalianAudible)
+        // TtsSpeakGate: the drifted read-back must be REFUSED (fail-closed).
+        val verdict = TtsSpeakGate.decide(
+            effectiveLanguageTag = "it",
+            readback = rb,
+        )
+        assertTrue(verdict is TtsSpeakGate.Verdict.Block)
+        assertEquals(
+            TtsSpeakGate.BlockReason.ITALIAN_SYSTEM_TTS_READBACK_MISMATCH,
+            (verdict as TtsSpeakGate.Verdict.Block).reason,
+        )
+    }
+
+    @Test
+    fun `engine package change between utterances is decided by voice language not engine identity`() {
+        // The user switched the system TTS engine (Settings → Google → another
+        // engine). The gate must decide on the ACTIVE VOICE's language; a new
+        // engine that genuinely activates an Italian voice stays allowed.
+        val rb = ItalianTtsVoiceNegotiator.classify(
+            requestedLocaleTag = "it-IT",
+            setLanguageResult = ItalianTtsVoiceNegotiator.TtsLanguageResultCode.LANG_COUNTRY_VAR_AVAILABLE,
+            selectedVoiceName = "pico-it-it",
+            activeVoiceName = "pico-it-it",
+            activeVoiceLocaleTag = "it-IT",
+            activeLanguageTag = "it-IT",
+            engineName = "com.svox.pico", // DIFFERENT engine package than before
+            availableItalianVoiceNames = listOf("pico-it-it"),
+        )
+        assertEquals(ItalianTtsVoiceStatus.ITALIAN_VOICE_ACTIVE, rb.status)
+        val verdict = TtsSpeakGate.decide(effectiveLanguageTag = "it", readback = rb)
+        assertTrue(verdict is TtsSpeakGate.Verdict.Allow)
+        // And the read-back record itself carries the new engine name verbatim.
+        assertEquals("com.svox.pico", rb.engineName)
+    }
+
+    @Test
+    fun `app language switches without process restart re-decide the gate per utterance`() {
+        // The engine re-negotiates before EVERY utterance (OWNER FEEDBACK 3),
+        // so a language switch (it → de → it) must flip the verdict WITHOUT a
+        // process restart: the effective-language tag drives the decision.
+        val italianReadback = ItalianTtsVoiceNegotiator.classify(
+            requestedLocaleTag = "it-IT",
+            setLanguageResult = ItalianTtsVoiceNegotiator.TtsLanguageResultCode.LANG_COUNTRY_VAR_AVAILABLE,
+            selectedVoiceName = "it-it-x-ital-local",
+            activeVoiceName = "it-it-x-ital-local",
+            activeVoiceLocaleTag = "it-IT",
+            activeLanguageTag = "it-IT",
+            engineName = "com.google.android.tts",
+            availableItalianVoiceNames = listOf("it-it-x-ital-local"),
+        )
+        val englishReadback = ItalianTtsVoiceNegotiator.classify(
+            requestedLocaleTag = "en-US",
+            setLanguageResult = ItalianTtsVoiceNegotiator.TtsLanguageResultCode.LANG_COUNTRY_VAR_AVAILABLE,
+            selectedVoiceName = "en-us-x-ene-local",
+            activeVoiceName = "en-us-x-ene-local",
+            activeVoiceLocaleTag = "en-US",
+            activeLanguageTag = "en-US",
+            engineName = "com.google.android.tts",
+            availableItalianVoiceNames = listOf("it-it-x-ital-local"),
+        )
+        // Italian app language + Italian active voice → audible.
+        assertTrue(TtsSpeakGate.decide("it", italianReadback) is TtsSpeakGate.Verdict.Allow)
+        // Switch to German WITHOUT restart: the German request follows the
+        // negotiated path (no Italian fail-closed constraint applies).
+        assertTrue(TtsSpeakGate.decide("de", englishReadback) is TtsSpeakGate.Verdict.Allow)
+        // Switch back to Italian while the voice drifted to English (the
+        // engine kept the en voice after the round-trip) → BLOCKED, fail-closed.
+        val verdict = TtsSpeakGate.decide("it", englishReadback)
+        assertTrue(verdict is TtsSpeakGate.Verdict.Block)
+    }
+
+    @Test
+    fun `inventory snapshot counts offline and networked italian voices verbatim`() {
+        val inventory = ItalianTtsVoiceNegotiator.inventory(
+            engineName = "com.google.android.tts",
+            candidates = listOf(
+                networkedItaly,
+                offlineItaly,
+                offlineItalianGeneric,
+                offlineOther,
+            ),
+            selectedVoiceName = "it-it-x-ital-local",
+            selectedVoiceLocaleTag = "it-IT",
+        )
+        assertEquals(4, inventory.totalVoices)
+        assertEquals(3, inventory.italianVoices)
+        assertEquals(2, inventory.offlineItalianVoices)
+        assertEquals(1, inventory.networkRequiredItalianVoices)
+        assertEquals("it-it-x-ital-local", inventory.selectedVoiceName)
+        assertEquals("it-IT", inventory.selectedVoiceLocaleTag)
+}
 }

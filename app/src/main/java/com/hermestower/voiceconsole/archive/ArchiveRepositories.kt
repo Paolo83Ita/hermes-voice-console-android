@@ -58,7 +58,16 @@ data class ArchiveArtifact(
     val sha256: String?,
     /** METADATA_ONLY = header known, bytes not on this device. */
     val localState: ArtifactLocalState,
+    /** CP-G4.9-007: RFC 4064-style MIME type (honest mapping of the kind). */
+    val mimeType: String,
+    /** CP-G4.9-007: deterministic provenance line (producer, mission context). */
+    val provenance: String,
+    /** CP-G4.9-007: deterministic text preview (text-bearing kinds only, else null). */
+    val previewText: String? = null,
 )
+
+/** CP-G4.9-007: the transfer lifecycle of one artifact (typed, observable). */
+enum class ArtifactTransferState { IDLE, DOWNLOADING, PAUSED, DOWNLOADED, FAILED }
 
 enum class ArtifactLocalState { METADATA_ONLY, SIMULATED_DOWNLOAD, DOWNLOADED }
 
@@ -107,6 +116,12 @@ interface ArtifactDownloadManager {
     fun cancel(artifactId: String)
     fun removeLocalCopy(artifactId: String)
     fun verifyHash(artifactId: String): Boolean
+
+    /** CP-G4.9-007: typed pause/resume/re-download of the transfer lifecycle. */
+    fun pause(artifactId: String): Boolean
+    fun resume(artifactId: String): Boolean
+    fun reDownload(artifactId: String): ArtifactDownloadResult
+    fun transferState(artifactId: String): ArtifactTransferState
 }
 
 sealed class ArtifactDownloadResult {

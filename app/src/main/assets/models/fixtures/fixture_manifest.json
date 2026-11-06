@@ -1,0 +1,17 @@
+{
+  "manifestVersion": "1.0.0",
+  "fixtures": [
+    {
+      "id": "org.hermestower.stt-fixture.benvenuto-torre-it",
+      "file": "fixture_benvenuto_torre_it.wav",
+      "sha256": "7b5483a2af2998bbec3f49fcb573de20123e23065d9883fd88c57978398f1a2f",
+      "sizeBytes": 100908,
+      "language": "it-IT",
+      "transcript": "Benvenuto alla torre di Hermes, il canale vocale è pronto.",
+      "durationSeconds": 3.15,
+      "format": "wav-pcm16-mono-16khz",
+      "provenance": "Synthesised this session with piper (vits-piper-it_IT-riccardo-x_low, the SAME verified voice the natural TTS route speaks) from the mission fixture phrase; bundled as a test fixture (TEST_FIXTURE_ONLY), never presented as a model.",
+      "usage": "Models and Voice → Speech-to-text → Test: the real Italian speech audio is fed through the offline vosk recognizer; the transcript shown is what the engine produced."
+    }
+  ]
+}

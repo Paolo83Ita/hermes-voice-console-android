@@ -554,6 +554,61 @@ fun ModelManagerScreen(graph: AppGraph) {
                             val result = graph.modelQualification.qualify(entry)
                             statusNote = context.getString(R.string.mm_qualify_result, entry.identity, if (result.qualified) "PASSED" else "FAILED", result.checks.joinToString { "${it.name}=${it.passed}" })
                         },
+                        // CP-G4.9-004: REAL deterministic Italian fixture test —
+                        // the bundled 16 kHz speech WAV (the verified mission
+                        // phrase, spoken by the same verified piper voice) is
+                        // fed through the offline vosk recognizer; the shown
+                        // transcript is what the ENGINE produced, next to the
+                        // expected phrase. No microphone, no network.
+                        AdaptiveAction(
+                            key = "test_stt_fixture",
+                            label = context.getString(R.string.mm_test),
+                            enabled = entry.componentType == "SPEECH_TO_TEXT",
+                        ) {
+                            val runner = com.hermestower.voiceconsole.voice.SttFixtureTestRunner
+                            val expected = "Benvenuto alla torre di Hermes, il canale vocale è pronto."
+                            scope.launch {
+                                val bytes = runCatching {
+                                    context.assets.open("models/fixtures/fixture_benvenuto_torre_it.wav").use { it.readBytes() }
+                                }.getOrNull()
+                                if (bytes == null) {
+                                    statusNote = context.getString(R.string.mm_fixture_error_fmt, "fixture asset missing")
+                                } else {
+                                    val r = runner.run(graph.voskFrameStt, bytes)
+                                    statusNote = when {
+                                        !r.success -> context.getString(R.string.mm_fixture_error_fmt, r.error ?: "no transcript")
+                                        else -> context.getString(R.string.mm_fixture_transcript_fmt, r.transcript ?: "") +
+                                            "  " + context.getString(R.string.mm_fixture_expected_fmt, expected)
+                                    }
+                                }
+                            }
+                        },
+                        // CP-G4.9-003: HEAR SAMPLE — the natural piper voice
+                        // speaks the real preview phrase through the activated
+                        // route (the system engine stays the fallback when the
+                        // voice is not active; both are REAL audio paths).
+                        AdaptiveAction(
+                            key = "hear_sample",
+                            label = context.getString(R.string.mm_hear_sample),
+                            enabled = entry.componentType == "VOICE",
+                        ) {
+                            val phrase = "Benvenuto nella console vocale di Hermes Tower."
+                            val engine = when (entry.identity) {
+                                "org.piper.voice.it-riccardo-x-low" -> graph.naturalTts
+                                "org.piper.voice.it-paola-medium" -> graph.naturalTtsPaola
+                                else -> null
+                            }
+                            scope.launch {
+                                if (engine != null && engine.resolveVoiceDir() != null) {
+                                    engine.load()
+                                    engine.interrupt()
+                                    engine.speak(phrase)
+                                    statusNote = context.getString(R.string.mm_sample_requested)
+                                } else {
+                                    statusNote = context.getString(R.string.mm_fixture_error_fmt, "voice bundle not installed")
+                                }
+                            }
+                        },
                         AdaptiveAction(key = "deactivate", label = context.getString(R.string.mm_deactivate)) {
                             val result = graph.modelActivation.deactivate(entry)
                             statusNote = context.getString(R.string.mm_deactivate_result, entry.identity, result.reason)

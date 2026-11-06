@@ -65,3 +65,20 @@ Test totals (physical, 2026-11-01): 33 `@Test` in 6 classes; 33 executed, 0 fail
 | RETEST-04 | Microphone/mute/TTS-stop controls semantically distinct | Idle+unmuted privacy-mute and push-to-talk BOTH render Icons.Filled.Mic pre-repair; distinct visual vocabulary + unique contentDescriptions + tests | REPAIRED_IN_CODE — unit-tested; physical re-check = next Owner cycle |
 | RETEST-05 | In-app proof of the installed build | Build identity panel (About & Safety → Build information; Diagnostics → Runtime truth; Diagnostics footer) with build-injected version/Git SHA/timestamp/run ID/label + on-device measured APK SHA-256 + variant + install timestamps; Copy + Export secret-clean receipt actions | REPAIRED_IN_CODE — build identity panel live; on-device verification next cycle |
 | RETEST-06 | New repair package for the Owner | versionName 0.3.1-alpha-graph4-owner-repair / versionCode 4 / label POCO OWNER REPAIR 1; universal + arm64-v8a APKs + hashes + install guide + retest package | POCO_RETEST_PACKAGE_2_READY (unit tests green, lint 0 errors, universal + arm64 APKs hashed) |
+
+## GRAPH 4.9 register (2026-11-07)
+
+| Requirement | Evidence | Class |
+| --- | --- | --- |
+| Fresh read-back before any work | docs/governance/GRAPH49_FRESH_READBACK.md; fetch + API (tip eb660d5, runs 42247787324/42247787274, JUnit 310/310) | VERIFIED |
+| e2e_14 regression repaired | SystemTtsDomainAdapter interrupt token + SystemTtsDomainAdapterTest (5); pre-repair lane artifacts bf34014 (VoiceFlow OK(6) both lanes) | JVM-VERIFIED |
+| Natural local TTS (verified runtime + voice) | JitPack v1.12.24 AAR sha256 ad052d51…6c7e; piper 8ad07915…7021 + 7541f757…16b4; SherpaOnnxTtsEngineTest/TtsRouteSwitchTest; ST-52 | JVM-VERIFIED / PHYSICAL-QUALIFICATION-PENDING |
+| Local STT user-operable test | fixture sha256 7b5483a2…f1a2f + manifest; SttFixtureTestRunnerTest; ST-53; Sanctum Test action | JVM-VERIFIED / PHYSICAL-QUALIFICATION-PENDING |
+| Optional local LLM verified-or-blocked | qwen2.5-0.5b q5_k_m @ 9217f5db sha256 04147455…9fd55 (downloaded in full, exact match); NoVerifiedLlmRuntime typed block | ARTIFACT-VERIFIED / RUNTIME-TYPED-BLOCKED |
+| Model Sanctum responsive qualification | MODEL_SANCTUM_RESPONSIVE_REPORT.md; AdaptiveActionPolicyTest; Gate D walk at tip | JVM+EMULATOR-VERIFIED / PHYSICAL-PENDING |
+| Distinct microphone controls | VOICE_CONTROL_SEMANTICS_QUALIFICATION.md; ConsoleControlSemanticsTest | JVM-VERIFIED / TALKBACK-DEVICE-PENDING |
+| Tower Archive product completion | TOWER_ARCHIVE_PRODUCT_COMPLETION_REPORT.md; MockTowerArchiveTest +2 | JVM-VERIFIED |
+| Tower Gate / Graph 1.7 matrix | ANDROID_GRAPH4_TOWER_GRAPH1_7_COMPATIBILITY_MATRIX.md | DOCUMENTED (no invented routes) |
+| Self-Test expansion | ST-52/ST-53; SelfTestCenterTest (53 definitions) | JVM-VERIFIED |
+| Regression + APKs | 335/335 unit, lint 0 errors; POCO_X6_PRO_OWNER_RETEST_PACKAGE_3 hashes | BUILD-VERIFIED |
+| Owner physical verdict | OWNER_POCO_RETEST_PENDING — no claim | PENDING (only the Owner may set POCO_RETEST_PASSED) |

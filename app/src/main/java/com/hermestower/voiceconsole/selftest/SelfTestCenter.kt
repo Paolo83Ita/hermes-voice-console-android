@@ -88,6 +88,34 @@ data class SelfTestSubjects(
     // OWNER PHYSICAL FEEDBACK 3 (ST-51): the live TTS voice read-back — null
     // provider or null read-back degrades to the honest typed skip/blocked.
     val italianTtsVoiceProbe: (() -> com.hermestower.voiceconsole.voice.ItalianTtsVoiceNegotiator.TtsVoiceReadback?)? = null,
+    // CP-G4.9-003 (ST-52): the natural local TTS route read-back — which REAL
+    // engine the console speaks through, from the registry + on-disk truth.
+    val naturalTtsRouteProbe: (() -> NaturalTtsRouteReadback?)? = null,
+    // CP-G4.9-004 (ST-53): the local offline STT route read-back (Vosk frame
+    // path vs the Android system recognizer).
+    val localSttRouteProbe: (() -> LocalSttRouteReadback?)? = null,
+)
+
+/** CP-G4.9-003 (ST-52): the honest snapshot of the spoken-output route. */
+data class NaturalTtsRouteReadback(
+    /** "SYSTEM" or "NATURAL:<voice identity>" (registry + bundle read-back). */
+    val activeRoute: String,
+    /** The natural engine identity when that route is bound, else null. */
+    val naturalEngineId: String?,
+    /** The verified piper bundle resolves on disk. */
+    val voiceBundlePresent: Boolean,
+    /** Last utterance telemetry line (route=natural), or null. */
+    val lastUtteranceEvent: String? = null,
+)
+
+/** CP-G4.9-004 (ST-53): the honest snapshot of the speech-input route. */
+data class LocalSttRouteReadback(
+    /** The ACTIVE STT engine identity (never an aspiration). */
+    val activeEngine: String,
+    /** Whether the offline vosk model is installed and loaded. */
+    val offlineModelLoaded: Boolean,
+    /** The loaded model directory name, when loaded. */
+    val loadedModelDir: String? = null,
 )
 
 /**

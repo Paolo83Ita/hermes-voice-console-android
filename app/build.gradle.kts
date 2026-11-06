@@ -18,9 +18,9 @@ android {
         minSdk = 30
         targetSdk = 35
         // OWNER PHYSICAL RETEST FAILURE (CP-G4-029): the repair build version
-        // MUST exceed the shipped 0.3.0-alpha-graph4 / versionCode 3. Never lower.
-        versionCode = 4
-        versionName = "0.3.1-alpha-graph4-owner-repair"
+        // MUST exceed the shipped 0.3.1-alpha-graph4-owner-repair / versionCode 4.
+        versionCode = 5
+        versionName = "0.3.2-alpha-graph4.9-local-models"
         testInstrumentationRunner = "androidx.test.runner.AndroidJUnitRunner"
 
         // OWNER PHYSICAL RETEST §1 (build provenance): authoritative build
@@ -42,7 +42,7 @@ android {
         buildConfigField("String", "BUILD_TIMESTAMP_ISO8601", "\"$buildStamp\"")
         buildConfigField("String", "BUILD_WORKFLOW_RUN_ID", "\"$ciRun\"")
         buildConfigField("String", "BUILD_WORKFLOW_REF", "\"$ciRef\"")
-        buildConfigField("String", "BUILD_LABEL", "\"${project.findProperty("hermes.buildLabel") ?: "POCO OWNER REPAIR 1"}\"")
+        buildConfigField("String", "BUILD_LABEL", "\"${project.findProperty("hermes.buildLabel") ?: "GRAPH 4.9 LOCAL MODELS 1"}\"")
     }
 
     // GRAPH 4 FINAL §20: DUAL APK OUTPUT — the UNIVERSAL debug APK keeps every
@@ -112,6 +112,11 @@ dependencies {
     // GRAPH 4 FINAL §14: REAL offline Italian STT runtime for the verified
     // vosk-model-small-it-0.22 delivery (§12 catalog, Maven Central, Apache-2.0).
     implementation(libs.vosk.android)
+    // CP-G4.9-003: REAL downloadable natural Italian TTS runtime (sherpa-onnx
+    // v1.12.24 AAR, JitPack tag build, verified + hashed this session). The
+    // piper vits Italian voices (riccardo-x-low / paola-medium) are delivered
+    // through the Model Sanctum and spoken through voice/SherpaOnnxTtsEngine.
+    implementation(libs.sherpa.onnx)
     // CP-G4-010 wave 2: in-app QR pairing scanner — CameraX capture pipeline +
     // ML Kit bundled on-device barcode scanning (no Play Services dependency).
     // Versions pinned in DEPENDENCY_PINNING.md with license verification.

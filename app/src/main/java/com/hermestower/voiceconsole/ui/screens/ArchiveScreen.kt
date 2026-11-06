@@ -242,6 +242,11 @@ private fun ArtifactRow(artifact: com.hermestower.voiceconsole.archive.ArchiveAr
             "${artifact.id} · ${artifact.kind.name} · ${artifact.sizeBytes} B · ${artifact.localState.name}",
             style = HermesType.bodySecondary,
         )
+        // CP-G4.9-007: MIME type + transfer state (typed, observable).
+        Text(
+            "${artifact.mimeType} · ${archive.transferState(artifact.id).name}",
+            style = HermesType.bodySecondary,
+        )
         // GRAPH 4.6 §7: provenance (source conversation/mission) + integrity hash.
         val provenanceConv = archive.locateConversation(artifact.id)
         val provenanceMission = archive.locateMission(artifact.id)
@@ -253,14 +258,25 @@ private fun ArtifactRow(artifact: com.hermestower.voiceconsole.archive.ArchiveAr
             ),
             style = HermesType.bodySecondary,
         )
+        artifact.provenance.takeIf { it.isNotBlank() }?.let {
+            Text(it, style = HermesType.bodySecondary)
+        }
         if (artifact.sha256 != null) {
             Text(
                 stringResource(Res.string.archive_hash_fmt, artifact.sha256.take(16) + "…"),
                 style = HermesType.bodySecondary,
             )
         }
+        // CP-G4.9-007: deterministic text preview for text-bearing kinds —
+        // always visibly SIMULATED in the mock (no recovered historical data).
+        artifact.previewText?.let {
+            Text(it, style = HermesType.bodySecondary)
+        }
         BadgeFlowRow(horizontalSpacing = 6.dp) {
             androidx.compose.material3.TextButton(onClick = { archive.download(artifact.id) }) { Text(stringResource(Res.string.common_download)) }
+            androidx.compose.material3.TextButton(onClick = { archive.pause(artifact.id) }) { Text(stringResource(Res.string.common_pause)) }
+            androidx.compose.material3.TextButton(onClick = { archive.resume(artifact.id) }) { Text(stringResource(Res.string.common_resume)) }
+            androidx.compose.material3.TextButton(onClick = { archive.reDownload(artifact.id) }) { Text(stringResource(Res.string.archive_redownload)) }
             androidx.compose.material3.TextButton(onClick = { archive.removeLocalCopy(artifact.id) }) { Text(stringResource(Res.string.archive_remove_local)) }
             androidx.compose.material3.TextButton(onClick = { archive.verifyHash(artifact.id) }) { Text(stringResource(Res.string.archive_verify_hash)) }
         }

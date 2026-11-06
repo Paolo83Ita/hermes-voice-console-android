@@ -677,7 +677,16 @@ MANUAL_ADVANCED — unabhängige Auswahl pro Komponente, volle Sichtbarkeit, kei
     <string name="archive_hash_fmt">SHA-256: %1$s</string>
 
     <!-- OWNER PHYSICAL RETEST (2026-11-06) — new keys -->
-        <string name="mm_more_actions">Weitere Aktionen</string>
+        <string name="mm_test">Test</string>
+    <string name="mm_hear_sample">Beispiel anhören</string>
+    <string name="mm_fixture_transcript_fmt">Fixture-Transkript: %1$s</string>
+    <string name="mm_fixture_expected_fmt">Erwartet: %1$s</string>
+    <string name="mm_fixture_error_fmt">Offline-STT-Fixturbest fehlgeschlagen: %1$s</string>
+    <string name="mm_sample_requested">Beispiel angefordert — die natürliche Stimme spricht den Vorschau-Satz.</string>
+    <string name="common_pause">Anhalten</string>
+    <string name="common_resume">Fortsetzen</string>
+    <string name="archive_redownload">Erneut laden</string>
+    <string name="mm_more_actions">Weitere Aktionen</string>
         <string name="about_build_card">Build-Informationen</string>
         <string name="about_build_label">Build-Label</string>
         <string name="about_build_version">Version (versionName · versionCode)</string>

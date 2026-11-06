@@ -696,6 +696,50 @@ object SelfTestRegistry {
                     }
                 }
             },
+            def("ST-52", "Natural local TTS route (CP-G4.9-003)", SelfTestCategory.DIAGNOSTICS, setOf(SelfTestMode.QUICK, SelfTestMode.STANDARD, SelfTestMode.FULL, SelfTestMode.VOICE_FOUNDATION_ONLY)) { s ->
+                val probe = s.naturalTtsRouteProbe
+                when {
+                    // JVM/emulator: no native runtime, no audible audio — a
+                    // typed pending, never a simulated pass.
+                    probe == null ->
+                        SelfTestState.QUALIFICATION_PENDING_DEVICE to
+                            "JVM/emulator runtime: the sherpa-onnx native runtime cannot synthesise or play audio here. The physical path (bundle load → synthesis → PCM playback → interruption → unload) is qualified on the physical device."
+                    else -> {
+                        val rb = probe()
+                        when {
+                            rb == null ->
+                                SelfTestState.SKIPPED_NOT_APPLICABLE to "route read-back not produced this run."
+                            rb.activeRoute.startsWith("NATURAL") && rb.voiceBundlePresent ->
+                                SelfTestState.PASS to "NATURAL route active: ${rb.naturalEngineId ?: rb.activeRoute} (bundle verified on disk)."
+                            rb.activeRoute.startsWith("NATURAL") && !rb.voiceBundlePresent ->
+                                SelfTestState.FAIL to "route reports NATURAL but the voice bundle does not resolve on disk — route-truth violation."
+                            else ->
+                                SelfTestState.BLOCKED_DEPENDENCY to
+                                    "SYSTEM route active (mandatory fallback). The natural piper voice is not installed/activated in the Model Sanctum — download it under Models and Voice, then re-run."
+                        }
+                    }
+                }
+            },
+            def("ST-53", "Local offline STT route (CP-G4.9-004)", SelfTestCategory.DIAGNOSTICS, setOf(SelfTestMode.QUICK, SelfTestMode.STANDARD, SelfTestMode.FULL, SelfTestMode.VOICE_FOUNDATION_ONLY)) { s ->
+                val probe = s.localSttRouteProbe
+                when {
+                    probe == null ->
+                        SelfTestState.QUALIFICATION_PENDING_DEVICE to
+                            "JVM/emulator runtime: no microphone capture and no vosk native decoder here. The physical path (model load → capture/fixture WAV → transcript → unload) is qualified on the physical device."
+                    else -> {
+                        val rb = probe()
+                        when {
+                            rb == null ->
+                                SelfTestState.SKIPPED_NOT_APPLICABLE to "route read-back not produced this run."
+                            rb.offlineModelLoaded ->
+                                SelfTestState.PASS to "offline route active: ${rb.activeEngine} (model ${rb.loadedModelDir ?: "?"})."
+                            else ->
+                                SelfTestState.BLOCKED_DEPENDENCY to
+                                    "active: ${rb.activeEngine}. The offline vosk Italian model is not installed — download it under Models and Voice, then re-run."
+                        }
+                    }
+                }
+            },
         )
     }
 

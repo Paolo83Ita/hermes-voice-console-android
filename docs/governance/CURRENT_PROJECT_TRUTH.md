@@ -194,3 +194,63 @@ Secret/device scan: 0 findings in working tree and full git history (scripts/sec
 - Repair cycle in flight (Owner priority override unchanged): Italian
   fail-closed TTS → speech profile → Verify button → control semantics →
   build identity → `POCO_RETEST_PACKAGE_2_READY`.
+
+---
+
+# GRAPH 4.9 TRUTH (appended 2026-11-07; CP-G4.9-001…010 session)
+
+- Fresh read-back (docs/governance/GRAPH49_FRESH_READBACK.md): remote tip
+  advanced 53841a5 → eb660d5 (20 commits: R-27…R-41 E2E chain, CP-G4-026…029);
+  local fast-forwarded forward-only; tree clean; the CP-G4-029 repair and
+  POCO_X6_PRO_OWNER_RETEST_PACKAGE_2 are AT THE TIP (CI run 42247787324 BUILD
+  SUCCESS, 310/310 unit from the CI JUnit artifact, lint 0 errors).
+- E2E regression FOUND at the tip and REPAIRED this cycle:
+  `e2e_14_cancelActiveResponse_returnsToIdle` (expected IDLE, was SPEAKING)
+  was a repair-introduced interrupt-swallow in `SystemTtsDomainAdapter` —
+  interrupt() inside the honest ready-wait/speak-start windows was lost and
+  the utterance was spoken anyway. Fix: interruption TOKEN checked in every
+  wait loop and before the SPEAKING claim + 5 deterministic unit tests
+  (e2e_19_20 was the cascade). The 3 crash classes (FreshInstall/ModelManager/
+  SelfTest NavBackStackEntry INITIALIZED→DESTROYED) remain the LEDGERED
+  pre-existing emulator class — NOT a repair regression (proven by the
+  bf34014 lane artifacts).
+- CP-G4.9-003 natural local TTS: DELIVERED — sherpa-onnx v1.12.24 AAR
+  verified on JitPack (AAR sha256 ad052d51…6c7e, arm64-v8a + 3 more ABIs,
+  minSdk 21 ≤ 30, Apache-2.0) and linked via Gradle; piper voices
+  it-riccardo-x_low (sha256 8ad07915…7021) and it-paola-medium (7541f757…16b4)
+  download-verified; `SherpaOnnxTtsEngine` (native+player seams, JVM-testable)
+  + `TtsRouteSwitch` (system engine stays the MANDATORY fallback; route =
+  registry ACTIVE + on-disk bundle) + Hear-sample action + ST-52 probe +
+  catalog runtime entry resolved (unresolved:// → RUNTIME_BUNDLED with the
+  AAR hash). Pre-device state:
+  LOCAL_NATURAL_TTS_IMPLEMENTED_PHYSICAL_QUALIFICATION_PENDING.
+- CP-G4.9-004 local STT: DELIVERED — vosk-android 0.3.75 was already linked;
+  the user-operable TEST path added: real Italian fixture WAV (the verified
+  mission phrase, synthesised with the SAME verified piper voice, sha256
+  7b5483a2…f1a2f bundled with a provenance manifest) driven through
+  `SttFixtureTestRunner` (SttEngine interface; load→accept→finalize→unload);
+  Test action in the Sanctum; ST-53 route probe; Diagnostics active-route
+  read-back already present. Pre-device state:
+  LOCAL_STT_IMPLEMENTED_PHYSICAL_QUALIFICATION_PENDING.
+- CP-G4.9-005 optional local LLM: ARTIFACT VERIFIED — Qwen2.5-0.5B-Instruct
+  q5_k_m GGUF downloaded IN FULL at the pinned revision 9217f5db: SHA-256
+  041474553fcabfc2a2d67903f9d2c2e50bd92528e670da4f33b5d0ce6e59fd55 (exact
+  catalog match, 522,186,592 B). Runtime remains TYPED-BLOCKED
+  (`NoVerifiedLlmRuntime`, LLM_RUNTIME_PENDING_VERIFIED_SOURCE): no verified
+  llama.cpp Android AAR exists to link; the engine never invents completions.
+  LOCAL_LLM_CANDIDATE_VERIFIED_RUNTIME_TYPED_BLOCKED.
+- CP-G4.9-007 Tower Archive: product-complete (mock) — artifacts gained MIME
+  type, provenance, deterministic SIMULATED text previews, and a typed
+  transfer lifecycle (download/pause/resume/re-download/remove/verify/
+  cancel/transferState) + UI actions + tests; report
+  docs/receipts/TOWER_ARCHIVE_PRODUCT_COMPLETION_REPORT.md.
+- CP-G4.9-008 Tower Gate matrix: docs/tower/
+  ANDROID_GRAPH4_TOWER_GRAPH1_7_COMPATIBILITY_MATRIX.md (15 CLIENT_IMPLEMENTED,
+  11 MOCK_PASSED, 5 GRAPH_1_7_SERVER_REQUIRED, 2 REAL_TEST_PENDING,
+  2 BLOCKED — no invented routes).
+- Version: 0.3.2-alpha-graph4.9-local-models / versionCode 5 (strictly greater
+  than the Owner's in-flight 0.3.1/versionCode 4). Build label
+  "GRAPH 4.9 LOCAL MODELS 1". Unit suite 335/335 GREEN, lint 0 errors.
+- Owner gate UNCHANGED: `OWNER_POCO_RETEST_PENDING` on package 2
+  (arm64, dbbdc429…b60cc). No physical claim. Prohibited tokens remain
+  unclaimed.

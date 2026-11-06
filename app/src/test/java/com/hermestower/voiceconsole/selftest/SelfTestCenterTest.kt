@@ -111,15 +111,24 @@ class SelfTestCenterTest {
         center.run(SelfTestMode.QUICK)
         awaitCompletion()
         val results = center.results.value
-        // ST-51 (Italian TTS voice negotiation probe, Owner Finding 3) joins the battery.
-        assertEquals(51, results.size)
+        // ST-51 (Italian TTS negotiation) + ST-52 (natural TTS route,
+        // CP-G4.9-003) + ST-53 (offline STT route, CP-G4.9-004) join the battery.
+        assertEquals(53, results.size)
         val quick = results.values.filter { it.state != SelfTestState.NOT_RUN }
         assertTrue("quick subset empty", quick.isNotEmpty())
         // JVM runtime: bundled manifest is not readable → ST-46 is honestly skipped;
         // the TTS voice probe is not wired on the JVM → ST-51 is now typed
         // QUALIFICATION_PENDING_DEVICE (Owner retest §7 — never a JVM pass).
-        val skipped = quick.filter { it.state == SelfTestState.SKIPPED_NOT_APPLICABLE }.map { it.testId }
+        val skipped = quick.filter { it.state == SelfTestState.SKIPPED_NOT_APPLICABLE }.map { it.testId }.sorted()
         assertEquals(listOf("ST-46"), skipped)
+        assertEquals(
+            SelfTestState.QUALIFICATION_PENDING_DEVICE,
+            results.values.first { it.testId == "ST-52" }.state,
+        )
+        assertEquals(
+            SelfTestState.QUALIFICATION_PENDING_DEVICE,
+            results.values.first { it.testId == "ST-53" }.state,
+        )
         assertEquals(
             SelfTestState.QUALIFICATION_PENDING_DEVICE,
             results.values.first { it.testId == "ST-51" }.state,
@@ -129,16 +138,16 @@ class SelfTestCenterTest {
                 it.state != SelfTestState.QUALIFICATION_PENDING_DEVICE
         }
         assertTrue("non-pass quick results: ${failures.map { it.testId to it.evidence }}", failures.isEmpty())
-        assertTrue(center.summary().contains("22 pass"))
+        assertTrue(center.summary().contains("22 pass")) // quick subset pass count unchanged by the two new pending probes
     }
 
     @Test
-    fun `full mode runs all 51 definitions and passes or skips honestly on the JVM`() {
+    fun `full mode runs all 53 definitions and passes or skips honestly on the JVM`() {
         center.run(SelfTestMode.FULL)
         awaitCompletion()
         val results = center.results.value
-        assertEquals(51, results.size)
-        assertTrue(results.keys.containsAll((1..51).map { "ST-%02d".format(it) }))
+        assertEquals(53, results.size)
+        assertTrue(results.keys.containsAll((1..53).map { "ST-%02d".format(it) }))
         // JVM runtime: the Android-asset subjects degrade to typed skips;
         // the TTS voice probe is not wired on the JVM (ST-51 →
         // QUALIFICATION_PENDING_DEVICE, Owner retest §7).
@@ -147,6 +156,14 @@ class SelfTestCenterTest {
         assertEquals(
             SelfTestState.QUALIFICATION_PENDING_DEVICE,
             results.values.first { it.testId == "ST-51" }.state,
+        )
+        assertEquals(
+            SelfTestState.QUALIFICATION_PENDING_DEVICE,
+            results.values.first { it.testId == "ST-52" }.state,
+        )
+        assertEquals(
+            SelfTestState.QUALIFICATION_PENDING_DEVICE,
+            results.values.first { it.testId == "ST-53" }.state,
         )
         val failures = results.values.filter {
             it.state != SelfTestState.PASS && it.state != SelfTestState.SKIPPED_NOT_APPLICABLE &&

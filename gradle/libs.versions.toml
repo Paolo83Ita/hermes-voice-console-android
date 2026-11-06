@@ -16,6 +16,10 @@ mlkitBarcode = "17.3.0"
 # GRAPH 4 FINAL §14: REAL offline Italian STT runtime (Maven Central, Apache-2.0,
 # arm64-v8a/armv7/x86/x86_64 AAR; verified on central.sonatype.com 2026-11-04).
 voskAndroid = "0.3.75"
+# CP-G4.9-003: sherpa-onnx Android runtime (JitPack tag build, AAR verified this
+# session: arm64-v8a/armv7/x86/x86_64 JNI + OfflineTts API, minSdk 21, Apache-2.0;
+# AAR sha256 ad052d51309f2d4caa688fe2394192e844223d7a861eae974429563df9416c7e).
+sherpaOnnx = "v1.12.24"
 junit = "4.13.2"
 androidxTestExtJunit = "1.2.1"
 androidxTestRunner = "1.6.2"
@@ -45,6 +49,7 @@ camera-lifecycle = { group = "androidx.camera", name = "camera-lifecycle", versi
 camera-view = { group = "androidx.camera", name = "camera-view", version.ref = "camerax" }
 mlkit-barcode-scanning = { group = "com.google.mlkit", name = "barcode-scanning", version.ref = "mlkitBarcode" }
 vosk-android = { group = "com.alphacephei", name = "vosk-android", version.ref = "voskAndroid" }
+sherpa-onnx = { group = "com.github.k2-fsa", name = "sherpa-onnx", version.ref = "sherpaOnnx" }
 junit = { group = "junit", name = "junit", version.ref = "junit" }
 androidx-test-ext-junit = { group = "androidx.test.ext", name = "junit", version.ref = "androidxTestExtJunit" }
 androidx-test-runner = { group = "androidx.test", name = "runner", version.ref = "androidxTestRunner" }

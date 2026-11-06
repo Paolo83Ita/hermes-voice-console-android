@@ -1581,3 +1581,102 @@ COMMIT: (this commit).
 CHECKPOINT: CP-G4-029 repair complete — POCO_RETEST_PACKAGE_2_READY.
 NEXT: push + fresh remote read-back; second Owner physical validation cycle
 (POCO_ITALIAN_TTS_UI_AND_CONTROLS_RETEST_PASSED is Owner-confirmed only).
+
+NODE CP-G4.9-001 — fresh read-back
+FINDING: reported tip 53841a5 STALE — fresh remote tip eb660d5 (repair cycle
+1e2701e + package 35fd9d1 + deployment record); local 0/20 behind; fast-forward
+only; CI 42247787324 BUILD SUCCESS (310/310 unit from the JUnit artifact, lint 0).
+ACTION: advance local; verify cloud artifacts; write docs/governance/GRAPH49_FRESH_READBACK.md.
+TEST: git read-back + GitHub API (runs, artifacts, JUnit XML parse).
+FILES: docs/governance/GRAPH49_FRESH_READBACK.md.
+CHECKPOINT: CP-G4.9-001. NEXT: regression repair.
+
+NODE CP-G4.9-001b — E2E regression root-caused and REPAIRED (interrupt token)
+FINDING: e2e_14 (expected IDLE, was SPEAKING) is a repair-introduced regression:
+the CP-G4-029 honest ready-wait window swallowed interrupt() (engine LOADING→READY
+made the wait loop exit and speak() fire anyway); e2e_19_20 failed as the cascade.
+Pre-repair lane artifacts (bf34014 run 42226155140) prove VoiceFlow was OK(6) both
+lanes → regression, not infra. The NavBackStackEntry crash class is LEDGERED
+pre-existing (both lanes before AND after the repair).
+ACTION: SystemTtsDomainAdapter interruption TOKEN (sampled at flow start,
+re-checked in every wait loop + before the SPEAKING claim; interrupt() wins and
+owns the NOT_READY state); no fail-closed semantics touched.
+TEST: 5 new deterministic unit tests (SystemTtsDomainAdapterTest) — cancel in the
+ready window prevents speak; cancel in the start window never claims SPEAKING;
+happy path; fail-closed refusal; interrupt-while-speaking.
+FILES: app/.../tts/SystemTtsDomainAdapter.kt (+test).
+CHECKPOINT: merged into CP-G4.9-010 regression. NEXT: natural TTS.
+
+NODE CP-G4.9-003 — natural local TTS delivery
+FINDING: the catalog runtime entry was unresolved:// (the sherpa-onnx catalog
+incident). This session VERIFIED: JitPack v1.12.24 AAR downloaded+inspected
+(OfflineTts API, jni/{arm64-v8a,armeabi-v7a,x86,x86_64}, minSdk 21,
+sha256 ad052d51…6c7e); piper it-riccardo-x_low (8ad07915…7021, EXACT catalog
+match) + it-paola-medium (7541f757…16b4, EXACT match) download-verified.
+ACTION: JitPack repo (scoped to com.github.k2-fsa) + version catalog pin +
+SherpaOnnxTtsEngine (native + player seams) + SherpaRealNativeBridge +
+TtsRouteSwitch (registry+disk route truth, system engine = mandatory fallback,
+mid-utterance route change interrupts all other engines) + AppGraph wiring +
+Hear-sample Sanctum action + ST-52 self-test probe + ActiveRuntimeReadback
+route fields + catalog entry resolved to RUNTIME_BUNDLED with the AAR hash.
+TEST: SherpaOnnxTtsEngineTest (7), TtsRouteSwitchTest (3); full suite green.
+FILES: gradle files, voice/SherpaOnnxTtsEngine.kt, voice/SherpaRealNativeBridge.kt,
+tts/TtsRouteSwitch.kt, app/AppGraph.kt, selftest/*, catalog, ModelManagerScreen,
+5×strings.xml.
+CHECKPOINT: CP-G4.9-003 → LOCAL_NATURAL_TTS_IMPLEMENTED_PHYSICAL_QUALIFICATION_PENDING.
+
+NODE CP-G4.9-004 — local STT delivery (user-operable test path)
+FINDING: vosk-android 0.3.75 linked + VoskFrameSttEngine existed; the missing
+piece was the OPERABLE proof loop. Fixture: REAL Italian speech (the verified
+mission phrase) synthesised with the SAME verified piper voice; WAV
+(16 kHz mono PCM16, 3.15 s, sha256 7b5483a2…f1a2f) bundled with a provenance
+manifest (TEST_FIXTURE_ONLY).
+ACTION: SttFixtureTestRunner (PCM16 WAV parser + frame feed over the SttEngine
+interface) + Sanctum Test action (transcript shown is what the ENGINE produced,
+next to the expected phrase) + ST-53 route probe + 5-locale strings.
+TEST: SttFixtureTestRunnerTest (4 — real fixture parse, malformed typed error,
+full protocol via fakes, not-installed honesty).
+FILES: voice/SttFixtureTestRunner.kt, assets/models/fixtures/*, ModelManagerScreen,
+selftest/*, strings.
+CHECKPOINT: CP-G4.9-004 → LOCAL_STT_IMPLEMENTED_PHYSICAL_QUALIFICATION_PENDING.
+
+NODE CP-G4.9-005 — optional local LLM
+FINDING: Qwen2.5-0.5B-Instruct q5_k_m GGUF verified IN FULL this session
+(downloaded at the pinned revision 9217f5db: sha256 041474553fcabfc2a2d67903f9
+d2c2e50bd92528e670da4f33b5d0ce6e59fd55, exact catalog match, 522,186,592 B).
+No verified llama.cpp-derived Android AAR exists to link → runtime stays
+TYPED-BLOCKED (NoVerifiedLlmRuntime; the engine never invents completions).
+ACTION: none in code (typed state already shipped); verified-record update.
+CHECKPOINT: CP-G4.9-005 → LOCAL_LLM_CANDIDATE_VERIFIED_RUNTIME_TYPED_BLOCKED.
+
+NODE CP-G4.9-006 — Model Sanctum responsive + control semantics qualification
+FINDING: the adaptive Verify policy is preserved; the two new Sanctum actions
+ride the same policy. TalkBack walk and the 1.50-font physical corner remain
+device-lane items.
+ACTION: docs/receipts/MODEL_SANCTUM_RESPONSIVE_REPORT.md +
+docs/receipts/VOICE_CONTROL_SEMANTICS_QUALIFICATION.md (evidence classes split
+JVM/emulator/physical; no physical claim).
+CHECKPOINT: CP-G4.9-006 (RESPONSIVE_UI_QUALIFIED remains UNCLAIMED).
+
+NODE CP-G4.9-007 — Tower Archive product completion (mock)
+FINDING: gaps were artifact MIME/provenance/preview + pause/resume/re-download.
+ACTION: ArchiveArtifact +3 fields (honest MIME map, SIMULATED provenance,
+deterministic text preview for text kinds only); ArtifactDownloadManager
++pause/resume/reDownload/transferState (typed lifecycle; removeLocalCopy resets
+it); ArtifactRow UI shows all of it + 6 actions; archive_* + common_* strings ×5.
+TEST: MockTowerArchiveTest +2 (mime/preview matrix; full transfer lifecycle).
+FILES: archive/*, ui/screens/ArchiveScreen.kt, test, strings ×5.
+CHECKPOINT: CP-G4.9-007. Report: docs/receipts/TOWER_ARCHIVE_PRODUCT_COMPLETION_REPORT.md.
+
+NODE CP-G4.9-008 — Tower Gate / Graph 1.7 matrix
+ACTION: docs/tower/ANDROID_GRAPH4_TOWER_GRAPH1_7_COMPATIBILITY_MATRIX.md
+(15 CLIENT_IMPLEMENTED / 11 MOCK_PASSED / 5 GRAPH_1_7_SERVER_REQUIRED /
+2 REAL_TEST_PENDING / 2 BLOCKED; no invented routes).
+CHECKPOINT: CP-G4.9-008.
+
+NODE CP-G4.9-009/010 — self-test expansion + regression + package
+FINDING: ST-52/ST-53 joined the battery (53 definitions; SelfTestCenterTest
+updated honestly). Version 0.3.2-alpha-graph4.9-local-models / versionCode 5.
+ACTION: full unit suite 335/335 GREEN; lintDebug 0 errors; APKs rebuilt and
+hashed (see the package receipt); commit + push + fresh remote read-back.
+CHECKPOINT: CP-G4.9-009/010 → GRAPH_4_9_IMPLEMENTATION_COMPLETE_OWNER_PHYSICAL_RETEST_PENDING.

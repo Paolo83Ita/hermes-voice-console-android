@@ -25,6 +25,12 @@ dependencyResolutionManagement {
         // serves what they could not. Same remedy as the sandbox init script
         // (scripts/gradle-mirrors.init.gradle). Artifacts are byte-identical and
         // still integrity-checked by Gradle checksum verification.
+        // CP-G4.9-003: authoritative host of the sherpa-onnx Android AAR
+        // (com.github.k2-fsa only; scoped so nothing else can be served from here).
+        maven {
+            url = uri("https://jitpack.io")
+            content { includeGroup("com.github.k2-fsa") }
+        }
         maven { url = uri("https://maven.aliyun.com/repository/central") }
         maven { url = uri("https://maven.aliyun.com/repository/google") }
     }
