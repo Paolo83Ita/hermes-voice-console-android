@@ -6,9 +6,9 @@
     <string name="attribution_note">l’attribuzione è reale — le risposte locali non si attribuiscono mai alla Tower</string>
     <string name="composer_cd">Scrivi un messaggio</string>
     <string name="composer_hint">Scrivi un messaggio…</string>
-    <string name="composer_send">invia</string>
-    <string name="composer_speak_instead">parla invece</string>
-    <string name="composer_stop">stop</string>
+    <string name="composer_send">Invia</string>
+    <string name="composer_speak_instead">Parla</string>
+    <string name="composer_stop">Interrompi</string>
     <string name="desc_bridge_fmt">Bridge Tower: %1$s, endpoint %2$s</string>
     <string name="desc_mic_live">Il riconoscitore di sistema sta acquisendo — push-to-talk attivo</string>
     <string name="desc_mic_ready">Microfono pronto per push-to-talk; l’acquisizione avviene solo durante un turno</string>

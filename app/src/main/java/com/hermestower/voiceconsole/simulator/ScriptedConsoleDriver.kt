@@ -21,6 +21,9 @@ import com.hermestower.voiceconsole.domain.LocalEventStore
 import com.hermestower.voiceconsole.domain.SessionController
 import com.hermestower.voiceconsole.domain.TextToSpeechEngine
 import com.hermestower.voiceconsole.domain.TowerBridge
+import com.hermestower.voiceconsole.locale.ResponseCategory
+import com.hermestower.voiceconsole.locale.ResponseCatalog
+import com.hermestower.voiceconsole.locale.ResponseLocaleResolver
 import kotlinx.coroutines.CancellationException
 import kotlinx.coroutines.Job
 import kotlinx.coroutines.delay
@@ -37,6 +40,12 @@ import java.util.concurrent.atomic.AtomicLong
  *
  * PRIVACY RULE: transcripts are never written to the event log; only lengths,
  * decisions and reasons are (SEC section 4, "no secret speech in logs").
+ *
+ * GRAPH 4.10 CP-G4.10-002: the response language for every turn is resolved ONCE
+ * through the ONE ResponseLocaleResolver authority (§4 precedence chain) and
+ * threaded to the local engine, the bridge frame and every status/error string
+ * from the localized ResponseCatalog — visible text and TTS input stay the SAME
+ * string (§6 visibleAssistantText == ttsInputText).
  */
 class ScriptedConsoleDriver(
     private val scope: kotlinx.coroutines.CoroutineScope,
@@ -48,6 +57,7 @@ class ScriptedConsoleDriver(
     private val events: LocalEventStore,
     private val session: SessionController,
     private val statusProvider: () -> String,
+    private val localeResolver: ResponseLocaleResolver = ResponseLocaleResolver.englishDefaults(),
     private val deviceId: String = "console-hermes-01",
     private val userIdRef: String = "owner-paolo",
 ) {
@@ -119,7 +129,7 @@ class ScriptedConsoleDriver(
     /** Simulated wake word. Ignored honestly while privacy muted (FR-03). */
     fun injectWake() {
         if (store.privacyMuted.value) {
-            store.setStatusNote("Wake ignored: privacy mute is engaged.")
+            store.setStatusNote(ResponseCatalog.text(ResponseCategory.PRIVACY_IGNORED_REQUEST, currentLocale()))
             events.log("WAKE", "ignored while privacy muted")
             return
         }
@@ -137,10 +147,10 @@ class ScriptedConsoleDriver(
     }
 
     /** Text injection test harness standing in for STT (V0.1 only). */
-    fun submitText(text: String) {
+    fun submitText(text: String, languageHint: String? = null) {
         if (text.isBlank()) return
         if (store.privacyMuted.value) {
-            store.setStatusNote("Request ignored: privacy mute is engaged.")
+            store.setStatusNote(ResponseCatalog.text(ResponseCategory.PRIVACY_IGNORED_REQUEST, currentLocale()))
             events.log("TURN", "ignored while privacy muted")
             return
         }
@@ -149,7 +159,7 @@ class ScriptedConsoleDriver(
         tts.interrupt()
         // Owner override: return to rest first (universal rule 3), then enter the pipeline.
         store.transition(ConsoleState.IDLE)
-        pipelineJob = scope.launch { runPipeline(text.trim(), sttConfidence = 0.9f) }
+        pipelineJob = scope.launch { runPipeline(text.trim(), sttConfidence = 0.9f, languageHint = languageHint) }
     }
 
     /**
@@ -157,10 +167,10 @@ class ScriptedConsoleDriver(
      * enters the pipeline here — one single routing/attribution/history path
      * for voice and text (Owner binding delta §1/§13).
      */
-    fun submitUtterance(text: String, sttConfidence: Float) {
+    fun submitUtterance(text: String, sttConfidence: Float, languageHint: String? = null) {
         if (text.isBlank()) return
         if (store.privacyMuted.value) {
-            store.setStatusNote("Request ignored: privacy mute is engaged.")
+            store.setStatusNote(ResponseCatalog.text(ResponseCategory.PRIVACY_IGNORED_REQUEST, currentLocale()))
             events.log("TURN", "ignored while privacy muted")
             return
         }
@@ -168,7 +178,7 @@ class ScriptedConsoleDriver(
         pipelineJob?.cancel()
         tts.interrupt()
         store.transition(ConsoleState.IDLE)
-        pipelineJob = scope.launch { runPipeline(text.trim(), sttConfidence = sttConfidence) }
+        pipelineJob = scope.launch { runPipeline(text.trim(), sttConfidence = sttConfidence, languageHint = languageHint) }
     }
 
     /** GRAPH 4 G4-C03 (§5): repeat the last spoken response on demand. */
@@ -178,7 +188,7 @@ class ScriptedConsoleDriver(
             it.role == ConversationTurn.Role.HERMES && it.delivery == ConversationTurn.Delivery.DELIVERED
         }
         if (last == null) {
-            store.setStatusNote("Nothing has been spoken yet.")
+            store.setStatusNote(ResponseCatalog.text(ResponseCategory.REPEAT_NOTHING_YET, currentLocale()))
             return
         }
         pipelineJob?.cancel()
@@ -259,7 +269,14 @@ class ScriptedConsoleDriver(
         events.log("SIM", "update available shown: $reached")
     }
 
-    private suspend fun runPipeline(text: String, sttConfidence: Float) {
+    private fun currentLocale(): String = localeResolver.resolve().tag
+
+    private suspend fun runPipeline(text: String, sttConfidence: Float, languageHint: String? = null) {
+        // §4: ONE locale resolution per turn through the canonical authority.
+        val locale = localeResolver.resolve(
+            explicitConversationLanguage = null,
+            inputLanguageHint = languageHint,
+        ).tag
         val ownerTurn = store.appendTurn(
             role = ConversationTurn.Role.OWNER,
             text = text,
@@ -298,13 +315,13 @@ class ScriptedConsoleDriver(
                 store.updateTurn(ownerTurn.id) { it.copy(source = ConversationTurn.Source.LOCAL) }
                 store.transition(ConsoleState.UNDERSTANDING_LOCAL)
                 delay(LOCAL_THINK_MS)
-                val reply = localEngine.respond(text, statusProvider)
+                val reply = localEngine.respond(text, statusProvider, locale)
                 store.appendTurn(ConversationTurn.Role.HERMES, reply.text, ConversationTurn.Source.LOCAL, ConversationTurn.Delivery.DELIVERED, note = reply.intent)
                 speakAndFinish(reply.text, captions = store.settings.value.captionsEnabled)
             }
             RoutingAction.ROUTE_TOWER -> {
                 store.updateTurn(ownerTurn.id) { it.copy(source = ConversationTurn.Source.TOWER) }
-                towerExchange(text, decision, ownerTurn.id)
+                towerExchange(text, decision, ownerTurn.id, locale)
             }
             RoutingAction.QUEUE_FOR_TOWER -> {
                 store.updateTurn(ownerTurn.id) {
@@ -312,16 +329,19 @@ class ScriptedConsoleDriver(
                 }
                 store.setQueueCount(store.queuedTurns().size)
                 store.transition(ConsoleState.REQUEST_QUEUED)
+                store.setStatusNote(ResponseCatalog.text(ResponseCategory.QUEUED, locale))
                 events.log("QUEUE", "queued total=${store.queuedTurns().size}")
                 delay(QUEUED_DISPLAY_MS)
                 store.transition(ConsoleState.IDLE)
             }
             RoutingAction.DECLINE -> {
-                val message = "I cannot do that. ${decision.reason}"
+                // §23: the diagnostic English reason stays in the log + turn note;
+                // the OWNER-VISIBLE text is the localized decline.
+                val message = ResponseCatalog.text(ResponseCategory.DECLINE, locale)
                 store.updateTurn(ownerTurn.id) {
                     it.copy(
                         delivery = ConversationTurn.Delivery.DELIVERED,
-                        note = "declined: ${decision.intent}",
+                        note = "declined: ${decision.intent}; ${decision.reason}",
                     )
                 }
                 store.transition(ConsoleState.UNDERSTANDING_LOCAL)
@@ -332,7 +352,7 @@ class ScriptedConsoleDriver(
         }
     }
 
-    private suspend fun towerExchange(text: String, decision: RoutingDecision, ownerTurnId: Long) {
+    private suspend fun towerExchange(text: String, decision: RoutingDecision, ownerTurnId: Long, locale: String) {
         if (store.transition(ConsoleState.CONTACTING_TOWER) == null) {
             store.updateTurn(ownerTurnId) { it.copy(delivery = ConversationTurn.Delivery.FAILED, note = "console busy") }
             return
@@ -344,7 +364,7 @@ class ScriptedConsoleDriver(
             conversationId = session.current().conversationId,
             requestId = "req-${"%06d".format(requestCounter.incrementAndGet())}",
             transcript = text,
-            language = "it-IT",
+            language = locale,
             confidence = decision.confidence,
             requestedMode = store.requestedMode.value.name,
             effectiveMode = store.effectiveMode.value.name,
@@ -362,9 +382,11 @@ class ScriptedConsoleDriver(
                 when (event.type) {
                     TowerEventFrame.ACK -> {
                         store.transition(ConsoleState.TOWER_PROCESSING)
-                        store.setStatusNote("Tower accepted the request.")
+                        store.setStatusNote(ResponseCatalog.text(ResponseCategory.TOWER_ACK, locale))
                     }
-                    TowerEventFrame.PROGRESS -> store.setStatusNote("Tower: ${event.stage?.lowercase() ?: "working"}")
+                    TowerEventFrame.PROGRESS -> store.setStatusNote(
+                        ResponseCatalog.text(ResponseCategory.TOWER_PROGRESS, locale, event.stage?.lowercase() ?: "working"),
+                    )
                     TowerEventFrame.DELTA -> {
                         if (event.deltaText != null) buffer.append(event.deltaText)
                         store.setCaption(buffer.toString())
@@ -378,7 +400,7 @@ class ScriptedConsoleDriver(
                             ConversationTurn.Role.HERMES, finalText, ConversationTurn.Source.TOWER,
                             ConversationTurn.Delivery.DELIVERED, receiptRef = event.receiptRef,
                         )
-                        store.setStatusNote("Receipt ${event.receiptRef ?: "pending"}")
+                        store.setStatusNote(ResponseCatalog.text(ResponseCategory.TOWER_RECEIPT, locale, event.receiptRef ?: "pending"))
                         speakAndFinish(finalText, captions = store.settings.value.captionsEnabled)
                     }
                     TowerEventFrame.ERROR -> {
@@ -398,13 +420,21 @@ class ScriptedConsoleDriver(
                             store.updateTurn(ownerTurnId) {
                                 it.copy(delivery = ConversationTurn.Delivery.FAILED, note = "$classification: ${err?.message ?: "error"}")
                             }
+                            val classified = when (classification) {
+                                "TRANSPORT" -> ResponseCatalog.text(ResponseCategory.BRIDGE_ERR_TRANSPORT, locale)
+                                "TOWER_INTERNAL" -> ResponseCatalog.text(ResponseCategory.BRIDGE_ERR_TOWER_INTERNAL, locale)
+                                else -> ResponseCatalog.text(ResponseCategory.BRIDGE_ERR_OTHER, locale)
+                            }
                             store.appendTurn(
                                 ConversationTurn.Role.HERMES,
-                                "The request failed at the Tower ($classification). ${err?.message ?: ""}".trim(),
+                                ResponseCatalog.text(ResponseCategory.TOWER_ERROR, locale, classified, err?.message ?: "").trim(),
                                 ConversationTurn.Source.TOWER, ConversationTurn.Delivery.FAILED, note = classification,
                             )
                             store.transition(ConsoleState.ERROR)
-                            store.setStatusNote(if (retryable) "Retry available for non-consequential requests." else "Non-retryable Tower error.")
+                            store.setStatusNote(
+                                if (retryable) ResponseCatalog.text(ResponseCategory.TOWER_ERROR_RETRYABLE_NOTE, locale)
+                                else ResponseCatalog.text(ResponseCategory.TOWER_ERROR_FATAL_NOTE, locale),
+                            )
                             delay(ERROR_DISPLAY_MS)
                             store.transition(ConsoleState.IDLE)
                         }
@@ -441,7 +471,7 @@ class ScriptedConsoleDriver(
                 conversationId = session.current().conversationId,
                 requestId = "req-${"%06d".format(requestCounter.incrementAndGet())}",
                 transcript = turn.text,
-                language = "it-IT",
+                language = currentLocale(),
                 confidence = 0.9f,
                 requestedMode = store.requestedMode.value.name,
                 effectiveMode = store.effectiveMode.value.name,

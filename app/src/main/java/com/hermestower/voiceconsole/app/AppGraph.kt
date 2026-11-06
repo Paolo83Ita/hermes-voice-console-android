@@ -8,6 +8,7 @@ import com.hermestower.voiceconsole.core.state.ConsoleStateStore
 import com.hermestower.voiceconsole.domain.TowerEndpoint
 import com.hermestower.voiceconsole.health.AndroidDeviceHealthMonitor
 import com.hermestower.voiceconsole.local.MockLocalConversationEngine
+import com.hermestower.voiceconsole.locale.ResponseLocaleResolver
 import com.hermestower.voiceconsole.migration.SettingsMigrator
 import com.hermestower.voiceconsole.migration.SharedPreferencesKeyValueStore
 import com.hermestower.voiceconsole.models.AndroidDeviceResourceReader
@@ -248,6 +249,13 @@ class AppGraph(private val context: Context) {
 
     val localEngine = MockLocalConversationEngine()
 
+    // GRAPH 4.10 CP-G4.10-002: the ONE response-locale authority (§4 precedence
+    // chain). Every local text producer consumes the resolved tag from HERE —
+    // no producer duplicates locale logic.
+    val responseLocaleResolver = ResponseLocaleResolver(
+        appLanguageTag = { com.hermestower.voiceconsole.locale.AppLanguage.effectiveTag(context) },
+    )
+
     // GRAPH 4.6 §6: OPTIONAL LOCAL LLM — one verified candidate (catalog identity
     // org.qwen.qwen2.5-0.5b-instruct.q5-k-m: Qwen2.5-0.5B-Instruct GGUF q5_k_m,
     // Apache-2.0, revision-bound HF source, known SHA-256 + size), DEFAULT DISABLED
@@ -261,6 +269,7 @@ class AppGraph(private val context: Context) {
             expectedSha256 = qwen.sha256,
             expectedSizeBytes = qwen.downloadSizeBytes,
             enabledProvider = { store.settings.value.localLlmEnabled },
+            localeTagProvider = { responseLocaleResolver.resolve().tag },
         )
     }
 
@@ -396,12 +405,15 @@ class AppGraph(private val context: Context) {
                 else -> com.hermestower.voiceconsole.core.routing.Connectivity.DISCONNECTED
             }
         },
-        localExecutor = { text -> localEngine.respond(text) { "" }.text },
+        localExecutor = { text -> localEngine.respond(text, { "" }, responseLocaleResolver.resolve().tag).text },
         towerExecutor = { _ -> null },
     )
 
     val simulator = DeterministicTowerSimulator()
-    val bridge = MockTowerBridge(simulator)
+    val bridge = MockTowerBridge(
+        simulator,
+        localeTagProvider = { responseLocaleResolver.resolve().tag },
+    )
 
     // GRAPH 4 FINAL §13: ACTIVE-RUNTIME READ-BACK — the safe Diagnostics view
     // consumes this snapshot; every value is read from the LIVE engine objects
@@ -503,6 +515,7 @@ class AppGraph(private val context: Context) {
                 append(health.statusSummary())
             }
         },
+        localeResolver = responseLocaleResolver,
     )
 
     // G4-C03: real microphone path coordinator (single state authority, single
@@ -515,6 +528,7 @@ class AppGraph(private val context: Context) {
         hasMicPermission = micPermissionGranted,
         keyValueStore = keyValueStore,
         events = events,
+        statusLocale = { responseLocaleResolver.resolve().tag },
     )
 
     fun start() {

@@ -6,9 +6,9 @@
     <string name="attribution_note">attribution is real — local answers never claim the Tower</string>
     <string name="composer_cd">Write a message</string>
     <string name="composer_hint">Write a message…</string>
-    <string name="composer_send">send</string>
-    <string name="composer_speak_instead">speak instead</string>
-    <string name="composer_stop">stop</string>
+    <string name="composer_send">Send</string>
+    <string name="composer_speak_instead">Speak</string>
+    <string name="composer_stop">Interrupt</string>
     <string name="desc_bridge_fmt">Tower bridge: %1$s, endpoint %2$s</string>
     <string name="desc_mic_live">System recognizer is capturing — push-to-talk active</string>
     <string name="desc_mic_ready">Microphone ready for push-to-talk; capture runs only during a turn</string>

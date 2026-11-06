@@ -6,9 +6,9 @@
     <string name="attribution_note">Die Zuordnung ist echt — lokale Antworten geben sich nie als Tower aus</string>
     <string name="composer_cd">Nachricht schreiben</string>
     <string name="composer_hint">Nachricht schreiben…</string>
-    <string name="composer_send">senden</string>
-    <string name="composer_speak_instead">stattdessen sprechen</string>
-    <string name="composer_stop">stoppen</string>
+    <string name="composer_send">Senden</string>
+    <string name="composer_speak_instead">Sprechen</string>
+    <string name="composer_stop">Unterbrechen</string>
     <string name="desc_bridge_fmt">Tower-Brücke: %1$s, Endpunkt %2$s</string>
     <string name="desc_mic_live">Systemerkennung erfasst — Sprechtaste aktiv</string>
     <string name="desc_mic_ready">Mikrofon bereit für die Sprechtaste; Aufnahme nur während eines Sprechturns</string>

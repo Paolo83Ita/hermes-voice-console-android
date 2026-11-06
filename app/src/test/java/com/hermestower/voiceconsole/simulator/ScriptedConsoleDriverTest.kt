@@ -141,4 +141,80 @@ class ScriptedConsoleDriverTest {
         assertTrue(!allEvents.contains(secretPhrase))
         assertTrue(allEvents.contains("ROUTE"))
     }
+
+    // ---- GRAPH 4.10 CP-G4.10-002: response-language authority (P0-01) ----
+
+    @Test
+    fun `italian app language produces italian visible and spoken text end to end`() = runTest {
+        val italianResolver = com.hermestower.voiceconsole.locale.ResponseLocaleResolver(
+            appLanguageTag = { "it" },
+            systemLanguageTag = { "it" },
+        )
+        scope = CoroutineScope(SupervisorJob() + UnconfinedTestDispatcher(testScheduler))
+        val italianBridge = MockTowerBridge(DeterministicTowerSimulator(), UnconfinedTestDispatcher(testScheduler), localeTagProvider = { "it" })
+        val mockTts = MockTextToSpeechEngine(UnconfinedTestDispatcher(testScheduler))
+        val italianDriver = ScriptedConsoleDriver(
+            scope = scope,
+            store = store,
+            router = RuleBasedIntentRouter(),
+            localEngine = MockLocalConversationEngine(),
+            bridge = italianBridge,
+            tts = mockTts,
+            events = events,
+            session = DefaultSessionController(),
+            statusProvider = { fixedStatus },
+            localeResolver = italianResolver,
+        )
+        store.transition(ConsoleState.IDLE)
+        italianBridge.handshake()
+        italianDriver.start()
+
+        italianDriver.submitText("good day hermes")
+        advanceUntilIdle()
+
+        val turns = store.turns.value
+        assertEquals(2, turns.size)
+        // Visible assistant text is ITALIAN — the exact P0-01 defect is dead.
+        assertEquals(
+            com.hermestower.voiceconsole.locale.ResponseCatalog.text(
+                com.hermestower.voiceconsole.locale.ResponseCategory.GREETING, "it",
+            ),
+            turns[1].text,
+        )
+        // TTS input equals the visible text (§6 coherence) — mock TTS records it.
+        assertEquals(turns[1].text, mockTts.lastSpokenText)
+    }
+
+    @Test
+    fun `italian tower path yields italian simulated response and localized notes`() = runTest {
+        val italianResolver = com.hermestower.voiceconsole.locale.ResponseLocaleResolver(
+            appLanguageTag = { "it" },
+            systemLanguageTag = { "it" },
+        )
+        scope = CoroutineScope(SupervisorJob() + UnconfinedTestDispatcher(testScheduler))
+        val italianBridge = MockTowerBridge(DeterministicTowerSimulator(), UnconfinedTestDispatcher(testScheduler), localeTagProvider = { "it" })
+        val italianDriver = ScriptedConsoleDriver(
+            scope = scope,
+            store = store,
+            router = RuleBasedIntentRouter(),
+            localEngine = MockLocalConversationEngine(),
+            bridge = italianBridge,
+            tts = MockTextToSpeechEngine(UnconfinedTestDispatcher(testScheduler)),
+            events = events,
+            session = DefaultSessionController(),
+            statusProvider = { fixedStatus },
+            localeResolver = italianResolver,
+        )
+        store.transition(ConsoleState.IDLE)
+        italianBridge.handshake()
+        italianDriver.start()
+
+        italianDriver.submitText("prepare tomorrow mission plan")
+        advanceUntilIdle()
+
+        val turns = store.turns.value
+        val hermesTurn = turns.last { it.role == ConversationTurn.Role.HERMES }
+        assertTrue(hermesTurn.text.contains("predisporre un piano di missione"))
+        assertTrue(hermesTurn.text.contains("simulazione"))
+    }
 }

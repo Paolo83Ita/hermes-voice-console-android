@@ -26,11 +26,17 @@ class MockTextToSpeechEngine(
     private val _state = MutableStateFlow(TextToSpeechEngine.State.READY)
     override val state: StateFlow<TextToSpeechEngine.State> = _state.asStateFlow()
 
+    /** GRAPH 4.10 §6: read-back of the last speak() INPUT (visible-text coherence test seam). */
+    @Volatile
+    var lastSpokenText: String? = null
+        private set
+
     @Volatile
     private var generation = 0L
 
     override fun speak(text: String, rate: Float): Flow<Float> = flow {
         val myGen = ++generation
+        lastSpokenText = text
         _state.value = TextToSpeechEngine.State.SPEAKING
         try {
             val durationMs = speakingDurationMs(text, rate)

@@ -16,6 +16,14 @@ interface LocalConversationEngine {
     val modelState: StateFlow<ModelState>
     /** Provider of truthful device status text (real values only — no fake telemetry). */
     fun respond(text: String, statusProvider: () -> String): LocalReply
+
+    /**
+     * GRAPH 4.10 §4/§5: locale-aware local response. The locale tag comes from
+     * the ONE ResponseLocaleResolver authority — producers never resolve locale
+     * themselves. Legacy two-arg form defaults to English (JVM tests).
+     */
+    fun respond(text: String, statusProvider: () -> String, localeTag: String): LocalReply =
+        respond(text, statusProvider)
 }
 
 /**

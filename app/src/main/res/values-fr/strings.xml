@@ -6,9 +6,9 @@
     <string name="attribution_note">l’attribution est réelle — les réponses locales ne se réclament jamais de la Tower</string>
     <string name="composer_cd">Écrire un message</string>
     <string name="composer_hint">Écrire un message…</string>
-    <string name="composer_send">envoyer</string>
-    <string name="composer_speak_instead">parler plutôt</string>
-    <string name="composer_stop">arrêter</string>
+    <string name="composer_send">Envoyer</string>
+    <string name="composer_speak_instead">Parler</string>
+    <string name="composer_stop">Interrompre</string>
     <string name="desc_bridge_fmt">Passerelle de la Tower : %1$s, endpoint %2$s</string>
     <string name="desc_mic_live">Le système est en cours de capture — appui pour parler actif</string>
     <string name="desc_mic_ready">Micro prêt pour l’appui pour parler ; la capture ne s’effectue que pendant un tour</string>

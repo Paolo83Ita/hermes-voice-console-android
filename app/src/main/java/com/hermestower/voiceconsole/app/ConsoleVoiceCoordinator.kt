@@ -3,6 +3,8 @@ package com.hermestower.voiceconsole.app
 import com.hermestower.voiceconsole.core.state.ConsoleState
 import com.hermestower.voiceconsole.core.state.ConsoleStateStore
 import com.hermestower.voiceconsole.local.MockLocalConversationEngine
+import com.hermestower.voiceconsole.locale.ResponseCategory
+import com.hermestower.voiceconsole.locale.ResponseCatalog
 import com.hermestower.voiceconsole.migration.KeyValueStore
 import com.hermestower.voiceconsole.privacy.LogRedactor
 import com.hermestower.voiceconsole.simulator.ScriptedConsoleDriver
@@ -49,6 +51,8 @@ class ConsoleVoiceCoordinator(
     private val keyValueStore: com.hermestower.voiceconsole.migration.KeyValueStore,
     private val events: com.hermestower.voiceconsole.domain.LocalEventStore,
     private val languageTag: String = "it-IT",
+    /** GRAPH 4.10 §4: application-language tag for user-visible status notes. */
+    private val statusLocale: () -> String = { "en" },
 ) {
 
     private val _micState = MutableStateFlow(MicUiState.IDLE)
@@ -88,7 +92,7 @@ class ConsoleVoiceCoordinator(
     fun onPushToTalkPress() {
         _lastRefusal.value = null
         if (store.privacyMuted.value) {
-            _lastRefusal.value = "Privacy mute is engaged — the microphone is physically disconnected."
+            _lastRefusal.value = ResponseCatalog.text(ResponseCategory.MIC_PRIVACY_REFUSAL, statusLocale())
             events.log("MIC", "push-to-talk refused: privacy mute")
             return
         }
@@ -100,7 +104,7 @@ class ConsoleVoiceCoordinator(
         }
         if (!systemStt.isAvailable) {
             _micState.value = MicUiState.UNAVAILABLE
-            _lastRefusal.value = "No system speech recognizer is available on this device — use text input."
+            _lastRefusal.value = ResponseCatalog.text(ResponseCategory.MIC_UNAVAILABLE, statusLocale())
             events.log("MIC", "push-to-talk refused: recognizer unavailable")
             return
         }
@@ -114,7 +118,7 @@ class ConsoleVoiceCoordinator(
         if (!started) {
             _micState.value = MicUiState.UNAVAILABLE
             store.transition(ConsoleState.IDLE)
-            _lastRefusal.value = "The recognizer refused to start — use text input."
+            _lastRefusal.value = ResponseCatalog.text(ResponseCategory.MIC_REFUSED, statusLocale())
             events.log("MIC", "recognizer start refused")
             return
         }
@@ -128,7 +132,7 @@ class ConsoleVoiceCoordinator(
         if (_micState.value == MicUiState.LISTENING) _micState.value = MicUiState.IDLE
         if (store.currentState() == ConsoleState.LISTENING) {
             store.transition(ConsoleState.IDLE)
-            store.setStatusNote("Capture stopped ($reason).")
+            store.setStatusNote(ResponseCatalog.text(ResponseCategory.MIC_CAPTURE_STOPPED, statusLocale(), reason))
         }
         events.log("MIC", "capture stopped: $reason")
     }
@@ -166,7 +170,7 @@ class ConsoleVoiceCoordinator(
             _micState.value = MicUiState.IDLE
             val final = text.trim()
             if (final.isEmpty()) {
-                store.setStatusNote("No speech captured.")
+                store.setStatusNote(ResponseCatalog.text(ResponseCategory.MIC_EMPTY, statusLocale()))
                 if (store.currentState() == ConsoleState.LISTENING) store.transition(ConsoleState.IDLE)
                 events.log("MIC", "final transcript empty")
                 return
@@ -175,7 +179,7 @@ class ConsoleVoiceCoordinator(
             // SAME pipeline as typed text — same routing, attribution, history.
             events.log("MIC", "final transcript len=${final.length} conf=${confidence ?: -1f}")
             store.setTranscriptDraft(final)
-            driver.submitUtterance(final, confidence ?: 0.9f)
+            driver.submitUtterance(final, confidence ?: 0.9f, languageHint = languageTag)
         }
 
         override fun onError(error: SystemSttError) {
@@ -186,14 +190,14 @@ class ConsoleVoiceCoordinator(
             store.setStatusNote(
                 when (error.kind) {
                     com.hermestower.voiceconsole.voice.SystemSttErrorKind.NO_SPEECH ->
-                        "No speech detected within the listening window."
+                        ResponseCatalog.text(ResponseCategory.MIC_NO_SPEECH, statusLocale())
                     com.hermestower.voiceconsole.voice.SystemSttErrorKind.NETWORK_REQUIRED ->
-                        "The system recognizer needs network for this phrase — offline STT is pending qualification. Text input works offline."
+                        ResponseCatalog.text(ResponseCategory.MIC_NETWORK, statusLocale())
                     com.hermestower.voiceconsole.voice.SystemSttErrorKind.BUSY ->
-                        "The recognizer is busy — try again."
+                        ResponseCatalog.text(ResponseCategory.MIC_BUSY, statusLocale())
                     com.hermestower.voiceconsole.voice.SystemSttErrorKind.PERMISSION ->
-                        "Microphone permission was revoked during capture."
-                    else -> "Speech recognition failed (code ${error.systemCode})."
+                        ResponseCatalog.text(ResponseCategory.MIC_PERMISSION_REVOKED, statusLocale())
+                    else -> ResponseCatalog.text(ResponseCategory.MIC_FAILED, statusLocale(), error.systemCode)
                 },
             )
             events.log("MIC", "recognizer error kind=${error.kind.name} code=${error.systemCode}")

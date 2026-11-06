@@ -125,7 +125,12 @@ class LocalLlmEngineTest {
         assertTrue(built.startsWith(SafePromptBuilder.SYSTEM_SCOPE))
         assertTrue(built.contains("NOT Hermes Tower"))
         assertTrue(built.contains("Truthful device status: STATUS 8/10"))
-        assertTrue(built.length <= SafePromptBuilder.SYSTEM_SCOPE.length + SafePromptBuilder.MAX_INPUT_CHARS + 32)
+        // GRAPH 4.10 §4: the system prompt pins the response language.
+        assertTrue(built.contains("Respond in language code 'en' only."))
+        val localized = SafePromptBuilder.build("ciao", "STATUS 8/10", "it")
+        assertTrue(localized.contains("Respond in language code 'it' only."))
+        // Length budget: scope + sanitized input + the language directive (37 chars max).
+        assertTrue(built.length <= SafePromptBuilder.SYSTEM_SCOPE.length + SafePromptBuilder.MAX_INPUT_CHARS + 96)
         assertFalse(built.contains("\u0000"))
         assertEquals(512, SafePromptBuilder.MAX_INPUT_CHARS)
     }

@@ -6,9 +6,9 @@
     <string name="attribution_note">la atribución es real — las respuestas locales nunca se atribuyen a la Tower</string>
     <string name="composer_cd">Escribe un mensaje</string>
     <string name="composer_hint">Escribe un mensaje…</string>
-    <string name="composer_send">enviar</string>
-    <string name="composer_speak_instead">hablar en su lugar</string>
-    <string name="composer_stop">detener</string>
+    <string name="composer_send">Enviar</string>
+    <string name="composer_speak_instead">Habla</string>
+    <string name="composer_stop">Interrumpir</string>
     <string name="desc_bridge_fmt">Puente de la Tower: %1$s, endpoint %2$s</string>
     <string name="desc_mic_live">El reconocedor del sistema está capturando — pulsar para hablar activo</string>
     <string name="desc_mic_ready">Micrófono listo para pulsar para hablar; la captura ocurre solo durante un turno</string>

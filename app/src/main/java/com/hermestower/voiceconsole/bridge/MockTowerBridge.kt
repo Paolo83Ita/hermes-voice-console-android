@@ -5,6 +5,9 @@ import com.hermestower.voiceconsole.domain.BridgeError
 import com.hermestower.voiceconsole.domain.BridgeResult
 import com.hermestower.voiceconsole.domain.TowerBridge
 import com.hermestower.voiceconsole.domain.TowerEndpoint
+import com.hermestower.voiceconsole.locale.ResponseCategory
+import com.hermestower.voiceconsole.locale.ResponseCatalog
+import com.hermestower.voiceconsole.locale.ResponseLocaleResolver
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.CoroutineDispatcher
 import kotlinx.coroutines.delay
@@ -26,10 +29,17 @@ enum class BridgeFault { NONE, DISCONNECT_AT_ACK, ERROR_AFTER_PROGRESS, SLOW_TOW
 /**
  * Mock TowerBridge: deterministic, fault-injectable, zero network (D-005).
  * Emits the proposed contract frames: ACK -> PROGRESS* -> DELTA* -> FINAL(receiptRef).
+ *
+ * GRAPH 4.10 CP-G4.10-002: simulated fault MESSAGES are localized via the
+ * ResponseCatalog; classifications stay protocol identifiers (diagnostics).
+ * Request-path errors follow the frame's explicit conversation language
+ * (precedence 1 of the ResponseLocaleResolver chain); handshake errors use
+ * the injected application-language provider.
  */
 class MockTowerBridge(
     private val simulator: DeterministicTowerSimulator,
     private val dispatcher: CoroutineDispatcher = Dispatchers.Default,
+    private val localeTagProvider: () -> String = { "en" },
 ) : TowerBridge {
 
     private val fault = AtomicReference(BridgeFault.NONE)
@@ -60,16 +70,17 @@ class MockTowerBridge(
     }
 
     override suspend fun handshake(): BridgeResult<Unit> = withContext(dispatcher) {
+        val locale = ResponseLocaleResolver.normalize(localeTagProvider()) ?: "en"
         _connection.update { it.copy(status = ConnectionStatus.BridgeStatus.CONNECTING) }
         delay(HANDSHAKE_MS)
         when (fault.get()) {
             BridgeFault.DISCONNECT_AT_ACK -> {
                 _connection.update { it.copy(status = ConnectionStatus.BridgeStatus.DISCONNECTED) }
-                BridgeResult.Failure(BridgeError.TRANSPORT, "Simulated transport failure during handshake.", retryable = true)
+                BridgeResult.Failure(BridgeError.TRANSPORT, ResponseCatalog.text(ResponseCategory.BRIDGE_TRANSPORT_FAILURE, locale), retryable = true)
             }
             BridgeFault.ERROR_AFTER_PROGRESS -> {
                 _connection.update { it.copy(status = ConnectionStatus.BridgeStatus.DISCONNECTED) }
-                BridgeResult.Failure(BridgeError.TOWER_INTERNAL, "Simulated Tower error during handshake.", retryable = false)
+                BridgeResult.Failure(BridgeError.TOWER_INTERNAL, ResponseCatalog.text(ResponseCategory.BRIDGE_TOWER_FAILURE, locale), retryable = false)
             }
             else -> {
                 _connection.update {
@@ -84,16 +95,17 @@ class MockTowerBridge(
     }
 
     override fun sendRequest(frame: TowerRequestFrame): Flow<TowerEventFrame> = flow {
+        val locale = ResponseLocaleResolver.normalize(frame.language) ?: localeTagProvider.let { ResponseLocaleResolver.normalize(it()) ?: "en" }
         emit(ack(frame.requestId))
         when (fault.get()) {
             BridgeFault.DISCONNECT_AT_ACK -> {
-                emit(errorFrame(frame.requestId, BridgeError.TRANSPORT, "Simulated transport failure after acceptance.", retryable = true))
+                emit(errorFrame(frame.requestId, BridgeError.TRANSPORT, ResponseCatalog.text(ResponseCategory.BRIDGE_TRANSPORT_FAILURE, locale), retryable = true))
                 return@flow
             }
             BridgeFault.ERROR_AFTER_PROGRESS -> {
                 emit(progress(frame.requestId, "ROUTED"))
                 delay(PROGRESS_MS)
-                emit(errorFrame(frame.requestId, BridgeError.TOWER_INTERNAL, "Simulated Tower internal error.", retryable = false))
+                emit(errorFrame(frame.requestId, BridgeError.TOWER_INTERNAL, ResponseCatalog.text(ResponseCategory.BRIDGE_TOWER_FAILURE, locale), retryable = false))
                 return@flow
             }
             else -> Unit
@@ -103,7 +115,7 @@ class MockTowerBridge(
         emit(progress(frame.requestId, "PLANNING"))
         if (fault.get() == BridgeFault.SLOW_TOWER) delay(SLOW_EXTRA_MS)
 
-        val response = simulator.respond(frame.transcript)
+        val response = simulator.respond(frame.transcript, locale)
         simulator.streamChunks(response).forEach { chunk ->
             emit(
                 TowerEventFrame(

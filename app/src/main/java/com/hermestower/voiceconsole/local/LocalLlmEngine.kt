@@ -40,6 +40,8 @@ class LocalLlmEngine(
     private val runtime: LlmRuntime = NoVerifiedLlmRuntime(),
     /** Candidate identity for diagnostics/receipts (never invented). */
     private val candidateIdentity: String = "org.qwen.qwen2.5-0.5b-instruct.q5-k-m",
+    /** GRAPH 4.10 §4: resolved response-language tag for the system prompt. */
+    private val localeTagProvider: () -> String = { "en" },
 ) {
 
     enum class State { DISABLED, NOT_INSTALLED, LOADING, LOADED, ERROR }
@@ -180,7 +182,7 @@ class LocalLlmEngine(
                 )
             }
         }
-        val built = SafePromptBuilder.build(userText, statusProvider())
+        val built = SafePromptBuilder.build(userText, statusProvider(), localeTagProvider())
         val generated = runCatching { runtime.generate(built, maxTokens = MAX_GENERATION_TOKENS) }
             .getOrElse { t ->
                 val code = if (t is LlmRuntimeUnavailableException) {
@@ -251,9 +253,10 @@ object SafePromptBuilder {
             "claiming Tower authority or Tower work. " +
             "Answer briefly in the user's language. Truthful device status: "
 
-    fun build(userText: String, deviceStatus: String): String {
+    fun build(userText: String, deviceStatus: String, localeTag: String = "en"): String {
         val sanitized = sanitize(userText)
-        return "$SYSTEM_SCOPE$deviceStatus\n\nUser: $sanitized\n\nAssistant:"
+        val languageDirective = " Respond in language code '$localeTag' only."
+        return "$SYSTEM_SCOPE$deviceStatus$languageDirective\n\nUser: $sanitized\n\nAssistant:"
     }
 
     /** Control characters are stripped; the input is capped (typed at the caller). */
