@@ -694,3 +694,27 @@ is the fallback for lookup misses. Both placeholders remain INTACT; CP-G4-024
 STAGED. THIS commit's dual-sample push runs are the deciding evidence: ANY
 lane showing gate 6/6 green + regression green-or-typed + residual typed →
 fill the two placeholders ONLY from that lane's artifacts → §10 terminality.
+
+## 24. §0 fresh read-back — session of 2026-11-06, part 17 (fix 23 / R-40)
+
+### 24.1 Authority verification
+
+Fresh fetch read-back: remote tip = local HEAD = `3e13618` (fix 22 / R-39);
+`main` untouched (`e7ab101`).
+
+### 24.2 Run #154 (42179349955 @ `3e13618`) — arbitrated from full lane logs
+
+The recovery chain's 3rd consecutive production recovery (RECOVERY_OK); lane
+2's gate A passed ON THE RELAUNCHED GUEST; gate B's history anchor n=2;
+gate C's open-studio LOOKUP MISS n=3 — the accessible matcher also misses the
+clickable-container + text-child shape (neither onAllNodesWithText+OnClick nor
+hasText+hasClickAction matches it).
+
+### 24.3 Repair executed (fix 23 / R-40) + Next Exact Action
+
+gateTapLabeledRow (the R-26/R-35 on-screen physical tap) factored out and
+shared with gateActivateRow as the final last mile. Both placeholders remain
+INTACT; CP-G4-024 STAGED. THIS commit's dual-sample push runs are the deciding
+evidence: ANY lane showing gate 6/6 green + regression green-or-typed +
+residual typed → fill the two placeholders ONLY from that lane's artifacts →
+§10 terminality.

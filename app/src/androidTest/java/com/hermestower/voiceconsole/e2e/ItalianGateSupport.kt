@@ -314,6 +314,36 @@ fun HermesComposeRule.gateOpenDrawerAndActivateRow(label: String, attempts: Int 
 }
 
 /**
+ * R-40 (run #154 42179349955 @ 3e13618 — the open-studio lookup miss reached
+ * n=3 and the R-37 accessible matcher ALSO misses it: the control is a
+ * clickable CONTAINER whose text lives in a child, so neither
+ * onAllNodesWithText+OnClick nor hasText+hasClickAction matches it): the
+ * R-26/R-35 last-mile physical tap — ONE tap at the center of the on-screen
+ * node whose text STARTS WITH [label] — factored out of gateNavigateTo and
+ * shared with gateActivateRow as its final fallback. The tap lands on the
+ * container through the child; the destination/dialog anchor after the call
+ * still decides success — nothing weakened.
+ */
+fun HermesComposeRule.gateTapLabeledRow(label: String): Boolean {
+    val nodes = runCatching {
+        onAllNodesWithText(label, substring = true, ignoreCase = true).fetchSemanticsNodes()
+    }.getOrDefault(emptyList())
+    val rootBounds = runCatching {
+        onRoot().fetchSemanticsNode().boundsInRoot
+    }.getOrDefault(androidx.compose.ui.geometry.Rect.Zero)
+    val tapIdx = nodes.indexOfFirst { n ->
+        n.config.get(SemanticsProperties.Text)?.any { it.text.startsWith(label, ignoreCase = true) } == true &&
+            runCatching { rootBounds.contains(n.boundsInRoot.center) }.getOrDefault(true)
+    }
+    if (tapIdx < 0) return false
+    return runCatching {
+        onAllNodesWithText(label, substring = true, ignoreCase = true)[tapIdx]
+            .performTouchInput { click() }
+        true
+    }.getOrDefault(false)
+}
+
+/**
  * R-37 (runs #145/#149/#150 — the MODEL SANCTUM anchor timeout n=3): port the
  * CLOUD-PROVEN activation from the regression suite (E2ECommon
  * openDrawerAndNavigate → activateRowFrozen → activateAccessible) — match
@@ -372,8 +402,9 @@ fun HermesComposeRule.gateActivateRow(label: String): Boolean {
     }.getOrNull()
     if (row == null) {
         // R-39: the lookup found NO clickable node (the open-studio class) —
-        // try the regression-suite matcher before reporting failure.
-        return gateActivateRowAccessible(label)
+        // try the regression-suite matcher, then the R-40 shared physical tap
+        // (the clickable-container + text-child shape) before reporting failure.
+        return gateActivateRowAccessible(label) || gateTapLabeledRow(label)
     }
     val click = row.config[SemanticsActions.OnClick]?.action ?: return false
     androidx.test.platform.app.InstrumentationRegistry.getInstrumentation().runOnMainSync { click() }
@@ -476,47 +507,17 @@ fun HermesComposeRule.gateNavigateTo(labelRes: Int, anchor: String, timeoutMs: L
             // OnClick-filtered onAllNodesWithText lookup missed (the matcher
             // difference: hasText matches ContentDescription-carrying rows too).
         } else {
-            // R-26 (runs #137 + #142 lane 1 — the SAME failure signature twice,
-            // now with full dumps): the row text is dump-proven present ("Modelli
-            // e Voce Componenti installati…", "Torre attuale e riconnessione…")
-            // while NO text-matching node exposes OnClick in EITHER tree on this
-            // fleet. The last-mile fallback is the REAL user path: one physical
-            // tap at the center of the node whose text STARTS WITH the row label
-            // (the hub row renders label+sub merged, so the row's text begins
-            // with its label; body text like the console engine_row can CONTAIN
-            // "Modelli e voce" without starting with it — the prefix
-            // discriminates). The destination anchor after this block still
+            // R-26 + R-35 + R-40: the last-mile fallback is the REAL user path —
+            // ONE physical tap at the center of the ON-SCREEN node whose text
+            // STARTS WITH the row label (factored into gateTapLabeledRow, now
+            // shared with gateActivateRow for the clickable-container +
+            // text-child shape). The destination anchor after this block still
             // decides success — a tap that does not navigate fails the anchor
             // honestly with the visible dump. Nothing weakened.
-            val nodes = runCatching {
-                onAllNodesWithText(label, substring = true, ignoreCase = true).fetchSemanticsNodes()
-            }.getOrDefault(emptyList())
-            // R-35 (runs #145 lane 1 + #149 lane 2 — the SAME MODEL SANCTUM
-            // anchor timeout TWICE, identical dump signature): the drawer's
-            // hidden-but-composed rows are in the semantics tree even when the
-            // drawer is closed, so the prefix match can pick the DRAWER's row
-            // ("Modelli e voce") instead of the ON-SCREEN hub row ("Modelli e
-            // Voce Componenti installati…") — the physical tap then lands on a
-            // translated-off-screen node and nothing navigates. The hub row is
-            // the on-screen one: require the node's center to lie inside the
-            // root bounds (a closed drawer's rows sit outside them). If bounds
-            // are unavailable the old semantics hold (fail-open); the
-            // destination anchor after the tap STILL decides success — a tap
-            // that does not navigate fails the anchor honestly. Nothing
-            // weakened; the OnClick direct-dispatch path above is unchanged.
-            val rootBounds = runCatching {
-                onRoot().fetchSemanticsNode().boundsInRoot
-            }.getOrDefault(androidx.compose.ui.geometry.Rect.Zero)
-            val tapIdx = nodes.indexOfFirst { n ->
-                n.config.get(SemanticsProperties.Text)?.any { it.text.startsWith(label, ignoreCase = true) } == true &&
-                    runCatching { rootBounds.contains(n.boundsInRoot.center) }.getOrDefault(true)
-            }
-            check(tapIdx >= 0) {
+            check(gateTapLabeledRow(label)) {
                 "settings-hub row '$label' not found (it); visible texts: " +
                     gateVisibleTexts().take(40)
             }
-            onAllNodesWithText(label, substring = true, ignoreCase = true)[tapIdx]
-                .performTouchInput { click() }
         }
     }
     gateAwaitAnchor(anchor, timeoutMs = timeoutMs)

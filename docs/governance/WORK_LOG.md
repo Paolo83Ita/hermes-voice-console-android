@@ -1342,3 +1342,17 @@ docs/governance/{ITALIAN_GATE_NAVIGATION_FAILURE_LEDGER,WORK_LOG,GRAPH46_READBAC
 COMMIT: (this commit).
 CHECKPOINT: CP-G4-023 fix 22 (R-39); CP-G4-024 STAGED.
 NEXT: the dual-sample push runs arbitrate ITALIAN_UI_COMPLETE.
+
+## G4-N46 — CP-G4-023 fix 23 / R-40 (shared physical tap for the container+child shape)
+
+Run #154 (42179349955 @ 3e13618): 3rd consecutive KVM recovery; lane 2's gate
+A passed ON THE RELAUNCHED GUEST; B history anchor n=2; C open-studio lookup
+miss n=3 — both matchers miss the clickable-container + text-child shape.
+R-40: gateTapLabeledRow (the R-26/R-35 on-screen tap) factored out and shared
+with gateActivateRow as the final last mile. Anchors still decide. No test
+deleted, skipped or weakened.
+FILES: app/src/androidTest/java/com/hermestower/voiceconsole/e2e/ItalianGateSupport.kt;
+docs/governance/{ITALIAN_GATE_NAVIGATION_FAILURE_LEDGER,WORK_LOG,GRAPH46_READBACK,CHECKPOINT_INDEX}.md.
+COMMIT: (this commit).
+CHECKPOINT: CP-G4-023 fix 23 (R-40); CP-G4-024 STAGED.
+NEXT: the dual-sample push runs arbitrate ITALIAN_UI_COMPLETE.

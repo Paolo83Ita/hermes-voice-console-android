@@ -491,3 +491,14 @@ No test deleted, skipped or weakened; no assertion touched.
 | Narrow repair | **R-39**: gateActivateRow restored to runOnMainSync-FIRST (cloud-proven through #152); the R-37 accessible matcher (hasText+hasClickAction, direct invocation) becomes the fallback for LOOKUP MISSES (the open-studio class); the anchors still decide everything — nothing weakened |
 | Semantics | nothing deleted, skipped or weakened: dispatch order + one lookup fallback; every walk, assertion and anchor untouched |
 | Complete gate rerun | THIS commit's push run (two samples) |
+
+## R-40 — the clickable-container + text-child shape: the shared physical tap as the final last mile (run #154 42179349955 @ 3e13618)
+
+| Field | Value |
+| --- | --- |
+| Evidence — the recovery chain (3rd consecutive production recovery) | lane 1: gate A OK, gate B died with the device → R-28 → RECOVERY_OK (the KVM relaunch, 3rd consecutive) → the relaunched guest died ~60 s in (fragility n=2, but #150's relaunched guest passed A+B+C — a coin flip, honestly typed); lane 2: gate A OK ON THE RELAUNCHED GUEST (the re-invocation succeeded), gate B = the "Cronologia della conversazione" anchor timeout (n=2), gate C = `open-studio control not found (it)` **n=3 — the R-37 accessible matcher ALSO misses it** |
+| Mechanism (now complete) | the open-studio control (and the Archive history rows) are CLICKABLE CONTAINERS whose text lives in a CHILD node: neither `onAllNodesWithText+OnClick` nor `hasText+hasClickAction` matches them — exactly the shape the R-26/R-35 physical tap was built for (it navigates the tower-status hub row — the same shape — in every sample where the walk reaches it) |
+| Typed classification | **TEST_LOOKUP_DEFECT (container+child shape unmatched by both matchers) — open-studio n=3** |
+| Narrow repair | **R-40**: the R-26/R-35 tap factored into `gateTapLabeledRow(label)` (on-screen center-of-prefix-match tap, fail-open bounds) and shared: gateNavigateTo's fallback (unchanged semantics) AND gateActivateRow's final fallback after the accessible matcher — the anchors still decide everything — nothing weakened |
+| Semantics | nothing deleted, skipped or weakened: one helper extraction + one fallback link; every walk, assertion and anchor untouched |
+| Complete gate rerun | THIS commit's push run (two samples) |
