@@ -101,7 +101,7 @@
     <string name="settings_display_visual_sub">Tema, luminosità, movimento ridotto, protezione da burn-in</string>
     <string name="settings_cat_diagnostics">Diagnostica</string>
     <string name="settings_diag_selftest">Centro Autoverifica</string>
-    <string name="settings_diag_selftest_sub">50 prove deterministiche di qualifica</string>
+    <string name="settings_diag_selftest_sub">51 prove deterministiche di qualifica</string>
     <string name="settings_diag_engine">Diagnostica dei motori</string>
     <string name="settings_diag_engine_sub">Salute del dispositivo, prove del ponte, registri oscurati</string>
     <string name="settings_diag_intelligence">Interno di Intelligenza Locale</string>

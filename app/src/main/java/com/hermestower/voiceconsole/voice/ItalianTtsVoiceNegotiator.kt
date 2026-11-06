@@ -132,15 +132,18 @@ object ItalianTtsVoiceNegotiator {
         engineName: String?,
         availableItalianVoiceNames: List<String>,
     ): TtsVoiceReadback {
-        val activeLocale = activeVoiceLocaleTag?.lowercase(Locale.ROOT)
-        val activeLanguage = activeLocale?.substringBefore('-')
+        // Italian is audible when EITHER the active voice's locale OR the
+        // engine's language read-back reports Italian ("it", "it-IT", "it_IT"
+        // all start with "it"; no other language code does).
+        val activeIsItalian =
+            activeVoiceLocaleTag?.lowercase(Locale.ROOT)?.startsWith("it") == true ||
+                activeLanguageTag?.lowercase(Locale.ROOT)?.startsWith("it") == true
         val status = when {
             setLanguageResult == TtsLanguageResultCode.LANG_MISSING_DATA ->
                 ItalianTtsVoiceStatus.ITALIAN_VOICE_MISSING_DATA
             setLanguageResult == TtsLanguageResultCode.LANG_NOT_SUPPORTED ->
                 ItalianTtsVoiceStatus.ITALIAN_VOICE_NOT_SUPPORTED
-            activeLanguage == "it" || activeLocale?.startsWith("it-") == true ->
-                ItalianTtsVoiceStatus.ITALIAN_VOICE_ACTIVE
+            activeIsItalian -> ItalianTtsVoiceStatus.ITALIAN_VOICE_ACTIVE
             // setLanguage accepted (or even succeeded) yet the audible voice is
             // not Italian → the engine silently fell back to its default voice.
             else -> ItalianTtsVoiceStatus.FALLBACK_VOICE_TRIGGERED

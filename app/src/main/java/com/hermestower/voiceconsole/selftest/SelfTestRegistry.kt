@@ -38,7 +38,7 @@ import java.time.Duration
 import java.time.Instant
 
 /**
- * The 50 deterministic self-tests (GRAPH 2 §11 + GRAPH 4 G4-C11 expansion,
+ * The 51 deterministic self-tests (GRAPH 2 §11 + GRAPH 4 G4-C11 expansion,
  * ST-46..ST-50: bundled delivery, QR pairing, archive truth). Every check is bounded, offline
  * (127.0.0.1 only) and side-effect limited to its own fixture. Real acoustic,
  * LLM and soak qualification stay QUALIFICATION_PENDING_DEVICE.

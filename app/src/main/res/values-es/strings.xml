@@ -101,7 +101,7 @@
     <string name="settings_display_visual_sub">Tema, brillo, movimiento reducido, protección contra retención</string>
     <string name="settings_cat_diagnostics">Diagnóstico</string>
     <string name="settings_diag_selftest">Centro de Autoprueba</string>
-    <string name="settings_diag_selftest_sub">50 pruebas deterministas de calificación</string>
+    <string name="settings_diag_selftest_sub">51 pruebas deterministas de calificación</string>
     <string name="settings_diag_engine">Diagnóstico de motores</string>
     <string name="settings_diag_engine_sub">Salud del dispositivo, pruebas de puente, registros depurados</string>
     <string name="settings_diag_intelligence">Funcionamiento interno de la Inteligencia local</string>

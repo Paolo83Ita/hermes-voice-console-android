@@ -101,7 +101,7 @@
     <string name="settings_display_visual_sub">Design, Helligkeit, reduzierte Bewegung, Burn-in-Schutz</string>
     <string name="settings_cat_diagnostics">Diagnose</string>
     <string name="settings_diag_selftest">Selbsttest-Zentrum</string>
-    <string name="settings_diag_selftest_sub">50 deterministische Qualifikationsprüfungen</string>
+    <string name="settings_diag_selftest_sub">51 deterministische Qualifikationsprüfungen</string>
     <string name="settings_diag_engine">Motor-Diagnose</string>
     <string name="settings_diag_engine_sub">Gerätezustand, Brückentests, geschwärzte Protokolle</string>
     <string name="settings_diag_intelligence">Internes der Lokalen Intelligenz</string>

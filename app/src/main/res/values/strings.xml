@@ -101,7 +101,7 @@
     <string name="settings_display_visual_sub">Theme, brightness, reduced motion, burn-in protection</string>
     <string name="settings_cat_diagnostics">Diagnostics</string>
     <string name="settings_diag_selftest">Self-Test Center</string>
-    <string name="settings_diag_selftest_sub">50 deterministic qualification trials</string>
+    <string name="settings_diag_selftest_sub">51 deterministic qualification trials</string>
     <string name="settings_diag_engine">Engine diagnostics</string>
     <string name="settings_diag_engine_sub">Device health, bridge tests, redacted logs</string>
     <string name="settings_diag_intelligence">Local Intelligence internals</string>

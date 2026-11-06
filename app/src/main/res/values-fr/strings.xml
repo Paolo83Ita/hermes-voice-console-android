@@ -101,7 +101,7 @@
     <string name="settings_display_visual_sub">Thème, luminosité, mouvement réduit, protection contre le marquage</string>
     <string name="settings_cat_diagnostics">Diagnostics</string>
     <string name="settings_diag_selftest">Centre d’Auto-test</string>
-    <string name="settings_diag_selftest_sub">50 épreuves déterministes de qualification</string>
+    <string name="settings_diag_selftest_sub">51 épreuves déterministes de qualification</string>
     <string name="settings_diag_engine">Diagnostics des moteurs</string>
     <string name="settings_diag_engine_sub">Santé de l’appareil, tests de passerelle, journaux expurgés</string>
     <string name="settings_diag_intelligence">Fonctionnement interne de l’Intelligence locale</string>
