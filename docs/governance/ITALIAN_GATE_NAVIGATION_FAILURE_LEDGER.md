@@ -480,3 +480,14 @@ No test deleted, skipped or weakened; no assertion touched.
 | Narrow repair | **R-38**: gateActivateRow now invokes the OnClick action DIRECTLY first (the cloud-proven mechanism: MODEL SANCTUM twice via R-37, the whole regression suite forever) with the runOnMainSync dispatch kept as the second arm; the destination/dialog anchors still decide success — nothing weakened |
 | Semantics | nothing deleted, skipped or weakened: one dispatch-order change inside the activation helper; every walk, assertion and anchor untouched |
 | Complete gate rerun | THIS commit's push run (two samples) |
+
+## R-39 — the direct-first order silently no-ops DRAWER rows: restore the proven order + the accessible fallback for lookup misses (run #153 42166808455 @ f6ed414)
+
+| Field | Value |
+| --- | --- |
+| Evidence | ALL SIX gates failed with the ITALIAN CONSOLE visible ("CONSOLE ORACOLO VOCALE… modalità HYBRID"): every walk died at the settings fallback — the R-38 direct-first dispatch of the "Impostazioni" DRAWER row returned true WITHOUT navigating, and `gateAwaitAnchor("Impostazioni")` FALSE-MATCHED the still-open drawer's own row text (the hub title and the drawer row share the string), so every hub-row lookup then ran against the console+drawer tree and typed out; the regression suite (English, its own helpers) stayed green |
+| The dispatch matrix now complete | drawer/hub rows: runOnMainSync WORKS (every sample through #152), direct SILENTLY FAILS (#153, n=6); Model-Manager destination via the accessible matcher: direct WORKS (#149/#150, R-37); inner controls: open-studio = LOOKUP miss (no OnClick on the text node — n=2, #152), details/history dispatch-no-effect (n=2+1, #152 — transition-race candidates, anchors still arbitrate) |
+| Typed classification | **TEST_ACTIVATION_DEFECT (R-38's direct-first order was wrong for drawer rows — reverted)** |
+| Narrow repair | **R-39**: gateActivateRow restored to runOnMainSync-FIRST (cloud-proven through #152); the R-37 accessible matcher (hasText+hasClickAction, direct invocation) becomes the fallback for LOOKUP MISSES (the open-studio class); the anchors still decide everything — nothing weakened |
+| Semantics | nothing deleted, skipped or weakened: dispatch order + one lookup fallback; every walk, assertion and anchor untouched |
+| Complete gate rerun | THIS commit's push run (two samples) |

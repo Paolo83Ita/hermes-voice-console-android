@@ -668,3 +668,29 @@ runOnMainSync second arm. Both placeholders remain INTACT; CP-G4-024 STAGED.
 THIS commit's dual-sample push runs are the deciding evidence: ANY lane
 showing gate 6/6 green + regression green-or-typed + residual typed → fill
 the two placeholders ONLY from that lane's artifacts → §10 terminality.
+
+## 23. §0 fresh read-back — session of 2026-11-06, part 16 (fix 22 / R-39)
+
+### 23.1 Authority verification
+
+Fresh fetch read-back: remote tip = local HEAD = `f6ed414` (fix 21 / R-38);
+`main` untouched (`e7ab101`).
+
+### 23.2 Run #153 (42166808455 @ `f6ed414`) — arbitrated from full lane logs
+
+ALL SIX gates failed with the Italian console visible: the R-38 direct-first
+dispatch silently no-oped the "Impostazioni" DRAWER row and
+gateAwaitAnchor("Impostazioni") false-matched the still-open drawer's own row
+text (the hub title and the drawer row share the string); every hub-row lookup
+then ran against the console+drawer tree. The dispatch matrix is now complete:
+drawer/hub rows = runOnMainSync (proven through #152); the model-manager
+destination = accessible direct invocation (R-37, proven #149/#150); the
+open-studio control = lookup miss (no OnClick on its text node, n=2).
+
+### 23.3 Repair executed (fix 22 / R-39) + Next Exact Action
+
+gateActivateRow restored to runOnMainSync-first; the R-37 accessible matcher
+is the fallback for lookup misses. Both placeholders remain INTACT; CP-G4-024
+STAGED. THIS commit's dual-sample push runs are the deciding evidence: ANY
+lane showing gate 6/6 green + regression green-or-typed + residual typed →
+fill the two placeholders ONLY from that lane's artifacts → §10 terminality.

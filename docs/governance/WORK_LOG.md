@@ -1327,3 +1327,18 @@ docs/governance/{ITALIAN_GATE_NAVIGATION_FAILURE_LEDGER,WORK_LOG,GRAPH46_READBAC
 COMMIT: (this commit).
 CHECKPOINT: CP-G4-023 fix 21 (R-38); CP-G4-024 STAGED.
 NEXT: the dual-sample push runs arbitrate ITALIAN_UI_COMPLETE.
+
+## G4-N45 — CP-G4-023 fix 22 / R-39 (dispatch order restored + lookup-miss fallback)
+
+Run #153 (42166808455 @ f6ed414): ALL SIX gates failed with the Italian
+console visible — R-38's direct-first dispatch silently no-oped the
+Impostazioni drawer row and the hub anchor false-matched the drawer's own row
+text. Dispatch matrix complete (drawer/hub=runOnMainSync proven;
+model-manager=accessible direct proven; open-studio=lookup miss). R-39:
+runOnMainSync restored first; gateActivateRowAccessible is the fallback for
+lookup misses. Anchors still decide. No test deleted, skipped or weakened.
+FILES: app/src/androidTest/java/com/hermestower/voiceconsole/e2e/ItalianGateSupport.kt;
+docs/governance/{ITALIAN_GATE_NAVIGATION_FAILURE_LEDGER,WORK_LOG,GRAPH46_READBACK,CHECKPOINT_INDEX}.md.
+COMMIT: (this commit).
+CHECKPOINT: CP-G4-023 fix 22 (R-39); CP-G4-024 STAGED.
+NEXT: the dual-sample push runs arbitrate ITALIAN_UI_COMPLETE.
