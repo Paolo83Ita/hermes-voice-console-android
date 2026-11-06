@@ -343,8 +343,16 @@ fun HermesComposeRule.gateActivateRowAccessible(label: String): Boolean {
 
 /**
  * Activates the first clickable node labeled [label] (drawer rows, hub rows,
- * screen buttons) — the accessible OnClick dispatched ON MAIN (ledger R-3).
- * Bounded virtual pump first (frozen-clock physics, CP-G4-007).
+ * screen buttons) — the accessible OnClick dispatched DIRECTLY first (the
+ * cloud-proven mechanism: R-37/R-38 evidence — the runOnMainSync dispatch
+ * silently no-ops for several controls on the hosted fleet (open-studio
+ * "not found" n=2, the Model-Manager details sheet n=2, the Archive history
+ * anchor n=1, and the MODEL SANCTUM row n=3 before R-37), while the direct
+ * invocation navigates every time (MODEL SANCTUM twice, the whole regression
+ * suite)), with the runOnMainSync dispatch kept as the second arm (ledger
+ * R-3's original mechanism). Bounded virtual pump first (frozen-clock
+ * physics, CP-G4-007). The destination/dialog anchor after the call still
+ * decides success — nothing weakened.
  */
 fun HermesComposeRule.gateActivateRow(label: String): Boolean {
     var advanced = 0L
@@ -362,6 +370,8 @@ fun HermesComposeRule.gateActivateRow(label: String): Boolean {
             .firstOrNull { it.config[SemanticsActions.OnClick]?.action != null }
     }.getOrNull() ?: return false
     val click = row.config[SemanticsActions.OnClick]?.action ?: return false
+    // R-38: DIRECT invocation first (cloud-proven); runOnMainSync second arm.
+    if (runCatching { click() }.isSuccess) return true
     androidx.test.platform.app.InstrumentationRegistry.getInstrumentation().runOnMainSync { click() }
     return true
 }

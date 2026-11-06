@@ -1312,3 +1312,18 @@ FILES: app/src/androidTest/java/com/hermestower/voiceconsole/e2e/ItalianGateSupp
 COMMIT: (this commit).
 CHECKPOINT: CP-G4-023 fix 20 (R-37) deployment repair; CP-G4-024 STAGED.
 NEXT: the dual-sample push runs arbitrate ITALIAN_UI_COMPLETE.
+
+## G4-N44 — CP-G4-023 fix 21 / R-38 (direct OnClick invocation in gateActivateRow)
+
+Run #152 (42156036907 @ 6feecf4): R-37 VERIFIED — MODEL SANCTUM navigation
+succeeded on both lanes; the failure class moved to gateActivateRow's
+runOnMainSync-dispatched INNER controls (C open-studio n=2, D Voce-e-audio
+anchor n=2, B Cronologia anchor n=1 — dispatch true, no effect). R-38:
+gateActivateRow invokes the OnClick action DIRECTLY first (cloud-proven) with
+runOnMainSync as the second arm; anchors still decide. No test deleted,
+skipped or weakened.
+FILES: app/src/androidTest/java/com/hermestower/voiceconsole/e2e/ItalianGateSupport.kt;
+docs/governance/{ITALIAN_GATE_NAVIGATION_FAILURE_LEDGER,WORK_LOG,GRAPH46_READBACK,CHECKPOINT_INDEX}.md.
+COMMIT: (this commit).
+CHECKPOINT: CP-G4-023 fix 21 (R-38); CP-G4-024 STAGED.
+NEXT: the dual-sample push runs arbitrate ITALIAN_UI_COMPLETE.

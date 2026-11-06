@@ -469,3 +469,14 @@ No test deleted, skipped or weakened; no assertion touched.
 | Narrow repair | **R-37**: `gateActivateRowAccessible` — the regression's exact mechanism (hasText+hasClickAction matcher → direct OnClick invocation, frozen-clock bounded pump) added to gateNavigateTo's drawer step AND its hub step (before the physical tap last mile); the hub OnClick dispatch now tries the direct invocation FIRST with runOnMainSync as the second arm; the destination anchor STILL decides success — nothing weakened |
 | Semantics | nothing deleted, skipped or weakened: every walk, assertion and anchor unchanged; only the ACTIVATION mechanism is unified with the cloud-proven one |
 | Complete gate rerun | THIS commit's push run (two samples) |
+
+## R-38 — the runOnMainSync dispatch silently no-ops fleet-wide: direct invocation everywhere (run #152 42156036907 @ 6feecf4)
+
+| Field | Value |
+| --- | --- |
+| Evidence — R-37 VERIFIED | gate D's MODEL SANCTUM navigation SUCCEEDED on BOTH lanes (the R-37 accessible dispatch works; the walk moved past navigation to the details-sheet anchor) |
+| Evidence — the new n=2 class | BOTH lanes failed at gateActivateRow-dispatched INNER controls with the dispatch returning true but no effect: gate C `open-studio control not found (it)` (n=2), gate D `no anchor of [Voce e audio] composed within 60000 ms` (n=2), gate B `no anchor of [Cronologia della conversazione]` (n=1, lane 1) — the common mechanism: gateActivateRow's runOnMainSync { click() } returns without throwing but the dialog/destination never composes — the SAME silent no-op class that killed the MODEL SANCTUM row n=3 before R-37 |
+| Typed classification | **TEST_ACTIVATION_DEFECT (runOnMainSync dispatch) — fleet-wide, now n=3+2+2+2 across four controls** |
+| Narrow repair | **R-38**: gateActivateRow now invokes the OnClick action DIRECTLY first (the cloud-proven mechanism: MODEL SANCTUM twice via R-37, the whole regression suite forever) with the runOnMainSync dispatch kept as the second arm; the destination/dialog anchors still decide success — nothing weakened |
+| Semantics | nothing deleted, skipped or weakened: one dispatch-order change inside the activation helper; every walk, assertion and anchor untouched |
+| Complete gate rerun | THIS commit's push run (two samples) |

@@ -643,3 +643,28 @@ INTACT; CP-G4-024 STAGED. THIS commit's dual-sample push runs are the deciding
 evidence: ANY lane showing gate 6/6 green + regression green-or-typed +
 residual typed → fill the two placeholders ONLY from that lane's artifacts →
 §10 terminality.
+
+## 22. §0 fresh read-back — session of 2026-11-06, part 15 (fix 21 / R-38)
+
+### 22.1 Authority verification
+
+Fresh fetch read-back: remote tip = local HEAD = `6feecf4` (fix 20 deployment
+repair); `main` untouched (`e7ab101`). The fix-20 build run (42156036772) =
+SUCCESS (R-27 gate validates the R-37 code compiles).
+
+### 22.2 Run #152 (42156036907 @ `6feecf4`) — arbitrated from full lane logs
+
+R-37 VERIFIED: gate D's MODEL SANCTUM navigation succeeded on BOTH lanes. The
+failure class moved to gateActivateRow's runOnMainSync-dispatched INNER
+controls: C `open-studio control not found` (n=2), D `Voce e audio` anchor
+(n=2), B `Cronologia della conversazione` anchor (n=1) — dispatch returns
+true with no effect, the same silent no-op class as the pre-R-37 MODEL
+SANCTUM (n=3).
+
+### 22.3 Repair executed (fix 21 / R-38) + Next Exact Action
+
+gateActivateRow invokes the OnClick action DIRECTLY first (cloud-proven),
+runOnMainSync second arm. Both placeholders remain INTACT; CP-G4-024 STAGED.
+THIS commit's dual-sample push runs are the deciding evidence: ANY lane
+showing gate 6/6 green + regression green-or-typed + residual typed → fill
+the two placeholders ONLY from that lane's artifacts → §10 terminality.
