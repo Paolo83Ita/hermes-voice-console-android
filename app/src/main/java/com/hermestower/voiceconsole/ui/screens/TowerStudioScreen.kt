@@ -34,8 +34,14 @@ import com.hermestower.voiceconsole.tower.TowerConnectionProfile
 import com.hermestower.voiceconsole.tower.TowerConnectionTester
 import com.hermestower.voiceconsole.tower.TowerProfileValidator
 import com.hermestower.voiceconsole.tower.TowerProfileWriteResult
+import com.hermestower.voiceconsole.locale.StateLabels
+import androidx.compose.foundation.layout.BoxWithConstraints
 import com.hermestower.voiceconsole.ui.components.SectionCard
+import com.hermestower.voiceconsole.ui.components.ConsoleWindowWidthClass
 import com.hermestower.voiceconsole.ui.components.MeanderBand
+import com.hermestower.voiceconsole.ui.components.ResponsiveAction
+import com.hermestower.voiceconsole.ui.components.ResponsiveActionGroup
+import com.hermestower.voiceconsole.ui.components.consoleWindowWidthClass
 import com.hermestower.voiceconsole.ui.theme.HermesType
 import com.hermestower.voiceconsole.ui.theme.hermesColors
 import kotlinx.coroutines.launch
@@ -83,7 +89,7 @@ fun TowerStudioScreen(graph: AppGraph, onOpenScanner: (() -> Unit)? = null) {
     var routingThreshold by rememberSaveable { mutableStateOf((existing?.localTowerRoutingThreshold ?: 0.55f).toString()) }
     var verbosity by rememberSaveable { mutableStateOf(existing?.diagnosticsVerbosity ?: "REDACTED_SUMMARY") }
 
-    var message by remember { mutableStateOf(context.getString(R.string.ts_msg_config_state, graph.profileStore.state().displayLabel)) }
+    var message by remember { mutableStateOf(context.getString(R.string.ts_msg_config_state, StateLabels.label(graph.profileStore.state().name, com.hermestower.voiceconsole.locale.AppLanguage.effectiveTag(context)))) }
     var testOutcome by remember { mutableStateOf<TowerConnectionTester.Report?>(null) }
 
     fun buildProfile(): TowerConnectionProfile {
@@ -119,14 +125,17 @@ fun TowerStudioScreen(graph: AppGraph, onOpenScanner: (() -> Unit)? = null) {
         )
     }
 
+    // GRAPH 4.10 §19: the width class is measured from the ACTUAL available
+    // width inside the padding (never physical pixels).
+    BoxWithConstraints(Modifier.fillMaxSize().padding(16.dp)) {
+    val widthClass = consoleWindowWidthClass(maxWidth.value)
     Column(
         Modifier
             .fillMaxSize()
-            .verticalScroll(rememberScrollState())
-            .padding(16.dp),
+            .verticalScroll(rememberScrollState()),
         verticalArrangement = Arrangement.spacedBy(12.dp),
     ) {
-        Text(stringResource(R.string.ts_title), style = HermesType.screenTitle, color = c.ink)
+        Text(stringResource(R.string.ts_title), style = HermesType.screenTitle, color = c.ink, maxLines = 2)
         MeanderBand(colors = hermesColors, modifier = Modifier.padding(top = 6.dp))
         Text(
             stringResource(R.string.ts_intro),
@@ -208,152 +217,157 @@ fun TowerStudioScreen(graph: AppGraph, onOpenScanner: (() -> Unit)? = null) {
             }
         }
 
+        val uiLocale = com.hermestower.voiceconsole.locale.AppLanguage.effectiveTag(context)
+
         SectionCard(title = stringResource(R.string.ts_section_actions)) {
-            if (onOpenScanner != null) {
-                Text(
-                    stringResource(R.string.ts_qr_hint),
-                    style = HermesType.bodySecondary, color = c.inkSecondary,
-                )
-                Button(onClick = { onOpenScanner() }) { Text(stringResource(R.string.ts_action_scan_qr)) }
-            }
-            Row(horizontalArrangement = Arrangement.spacedBy(6.dp)) {
-                TextButton(onClick = {
-                    when (val r = graph.profileStore.saveDraft(buildProfile())) {
-                        is TowerProfileWriteResult.Written -> message = context.getString(R.string.ts_msg_draft_saved, graph.profileStore.state().displayLabel)
-                        is TowerProfileWriteResult.Rejected -> message = context.getString(R.string.ts_msg_draft_rejected, r.reason)
-                    }
-                }) { Text(stringResource(R.string.ts_action_save_draft)) }
-                TextButton(onClick = {
-                    val profile = buildProfile()
-                    val report = TowerProfileValidator.validate(
-                        profile,
-                        secretPresent = graph.profileStore.secretFor(profile.profileId) != null || secret.isNotBlank(),
-                        nowIso = java.time.Instant.now().toString(),
-                    )
-                    message = if (report.passed) context.getString(R.string.ts_msg_validation_passed)
-                        else context.getString(R.string.ts_msg_validation_failed, report.issues.joinToString("; ") { it.toString() })
-                }) { Text(stringResource(R.string.ts_action_validate)) }
-            }
-            Row(horizontalArrangement = Arrangement.spacedBy(6.dp)) {
-                TextButton(onClick = {
-                    val profile = buildProfile()
-                    if (secret.isNotBlank()) graph.profileStore.setSecret(profile.profileId, secret.toCharArray())
-                    val report = TowerProfileValidator.validate(
-                        profile,
-                        secretPresent = graph.profileStore.secretFor(profile.profileId) != null,
-                        nowIso = java.time.Instant.now().toString(),
-                    )
-                    if (!report.passed) {
-                        message = context.getString(R.string.ts_msg_cannot_test, report.issues.joinToString("; ") { it.toString() })
-                    } else {
-                        graph.realBridge.configure(profile)
-                        val r = TowerConnectionTester.test(
-                            profile,
-                            graph.profileStore.secretFor(profile.profileId),
-                            java.time.Instant.now().toString(),
-                        )
-                        testOutcome = r
-                        message = context.getString(R.string.ts_msg_connection_test, r.outcome.name, r.detail)
-                    }
-                }) { Text(stringResource(R.string.ts_action_test)) }
-                TextButton(onClick = {
-                    val profile = buildProfile()
-                    if (secret.isBlank() && graph.profileStore.secretFor(profile.profileId) == null && mode != TransportMode.MOCK_SIMULATOR) {
-                        message = context.getString(R.string.ts_msg_pairing_required)
-                    } else {
-                        if (secret.isNotBlank()) graph.profileStore.setPairingCode(profile.profileId, secret.toCharArray())
-                        message = context.getString(R.string.ts_msg_pairing_recorded, profile.profileId)
-                    }
-                }) { Text(stringResource(R.string.ts_action_pair)) }
-            }
-            Row(horizontalArrangement = Arrangement.spacedBy(6.dp)) {
-                Button(onClick = {
-                    val profile = buildProfile()
-                    if (secret.isNotBlank()) graph.profileStore.setSecret(profile.profileId, secret.toCharArray())
-                    when (val r = graph.profileStore.saveValidated(profile)) {
-                        is TowerProfileWriteResult.Written -> {
-                            graph.realBridge.configure(r.profile)
-                            message = context.getString(R.string.ts_msg_saved_use_test, mode.displayLabel)
-                        }
-                        is TowerProfileWriteResult.Rejected -> message = context.getString(R.string.ts_msg_save_rejected, r.reason)
-                    }
-                }) { Text(stringResource(R.string.ts_action_save_connect)) }
-                TextButton(onClick = {
-                    graph.realBridge.configure(buildProfile())
-                    graph.scope.launch {
-                        val result = graph.realBridge.handshake()
-                        message = when (result) {
-                            is BridgeResult.Success -> context.getString(R.string.ts_msg_connected, graph.realBridge.connection.value.endpointLabel)
-                            is BridgeResult.Failure -> context.getString(R.string.ts_msg_not_connected, result.error, result.message)
-                        }
-                    }
-                }) { Text(stringResource(R.string.ts_action_connect)) }
-                TextButton(onClick = {
-                    message = context.getString(R.string.ts_msg_disconnected)
-                }) { Text(stringResource(R.string.ts_action_disconnect)) }
-            }
-            Row(horizontalArrangement = Arrangement.spacedBy(6.dp)) {
-                TextButton(onClick = {
-                    val removed = graph.profileStore.clearSensitiveValues(existing?.profileId ?: "profile-owner-1")
-                    secret = ""
-                    message = if (removed) context.getString(R.string.ts_msg_cleared) else context.getString(R.string.ts_msg_no_sensitive)
-                }) { Text(stringResource(R.string.ts_action_clear_sensitive)) }
-                TextButton(onClick = {
-                    runCatching { graph.profileStore.exportSecretClean(existing?.profileId ?: "profile-owner-1") }
-                        .onSuccess { exported ->
-                            val text = kotlinx.serialization.json.Json.encodeToString(
-                                com.hermestower.voiceconsole.tower.ExportedProfile.serializer(),
-                                exported,
-                            )
-                            graph.keyValueStore.putString("last_secret_clean_export", text.take(200_000))
-                            message = context.getString(R.string.ts_msg_export_stored, exported.accessToken, exported.pairingSecret)
-                        }
-                        .onFailure { message = context.getString(R.string.ts_msg_export_failed, it.message ?: "") }
-                }) { Text(stringResource(R.string.ts_action_export)) }
-            }
-            Row(horizontalArrangement = Arrangement.spacedBy(6.dp)) {
-                TextButton(onClick = {
-                    val stored = graph.keyValueStore.getString("last_secret_clean_export")
-                    if (stored == null) {
-                        message = context.getString(R.string.ts_msg_no_import)
-                    } else {
-                        runCatching {
-                            kotlinx.serialization.json.Json.decodeFromString(
-                                com.hermestower.voiceconsole.tower.ExportedProfile.serializer(),
-                                stored,
-                            )
-                        }.onSuccess { extracted ->
-                            when (val r = graph.profileStore.importExported(extracted, confirmOverwrite = false)) {
-                                is ImportResult.Imported -> message = context.getString(R.string.ts_msg_imported, r.profile.profileName)
-                                is ImportResult.Conflict -> message = context.getString(R.string.ts_msg_import_conflict, r.message)
-                                is ImportResult.Rejected -> message = context.getString(R.string.ts_msg_import_rejected, r.reason)
+            // GRAPH 4.10 §21: the rearchitected action layout. PRIMARY full-width;
+            // connection / profile / destructive groups through ResponsiveActionGroup
+            // (§22) — at compact width long Italian labels stack full-width, so the
+            // one-character-per-line defect class is dead.
+            ResponsiveActionGroup(
+                widthClass = widthClass,
+                primary = ResponsiveAction(
+                    key = "save_connect",
+                    label = stringResource(R.string.ts_action_save_connect),
+                    onClick = {
+                        val profile = buildProfile()
+                        if (secret.isNotBlank()) graph.profileStore.setSecret(profile.profileId, secret.toCharArray())
+                        when (val r = graph.profileStore.saveValidated(profile)) {
+                            is TowerProfileWriteResult.Written -> {
+                                graph.realBridge.configure(r.profile)
+                                message = context.getString(R.string.ts_msg_saved_use_test, StateLabels.label(mode.name, uiLocale))
                             }
-                        }.onFailure { message = context.getString(R.string.ts_msg_import_failed, it.message ?: "") }
-                    }
-                }) { Text(stringResource(R.string.ts_action_import)) }
-                TextButton(onClick = {
-                    when (val r = graph.profileStore.restorePrevious()) {
-                        is TowerProfileWriteResult.Written -> message = context.getString(R.string.ts_msg_restored, r.profile.profileName)
-                        is TowerProfileWriteResult.Rejected -> message = r.reason
-                    }
-                }) { Text(stringResource(R.string.ts_action_restore)) }
-                TextButton(onClick = {
-                    when (val r = graph.profileStore.resetToMock()) {
-                        is TowerProfileWriteResult.Written -> {
-                            mode = TransportMode.MOCK_SIMULATOR
-                            baseUrl = ""
-                            secret = ""
-                            message = context.getString(R.string.ts_msg_reset_mock, r.profile.profileName)
+                            is TowerProfileWriteResult.Rejected -> message = context.getString(R.string.ts_msg_save_rejected, r.reason)
                         }
-                        is TowerProfileWriteResult.Rejected -> message = r.reason
-                    }
-                }) { Text(stringResource(R.string.ts_action_reset_mock)) }
-            }
+                    },
+                ),
+                secondary = listOf(
+                    ResponsiveAction(key = "connect", label = stringResource(R.string.ts_action_connect), onClick = {
+                        graph.realBridge.configure(buildProfile())
+                        graph.scope.launch {
+                            val result = graph.realBridge.handshake()
+                            message = when (result) {
+                                is BridgeResult.Success -> context.getString(R.string.ts_msg_connected, graph.realBridge.connection.value.endpointLabel)
+                                is BridgeResult.Failure -> context.getString(R.string.ts_msg_not_connected, result.error, result.message)
+                            }
+                        }
+                    }),
+                    ResponsiveAction(key = "disconnect", label = stringResource(R.string.ts_action_disconnect), onClick = {
+                        message = context.getString(R.string.ts_msg_disconnected)
+                    }),
+                    ResponsiveAction(key = "save_draft", label = stringResource(R.string.ts_action_save_draft), onClick = {
+                        when (val r = graph.profileStore.saveDraft(buildProfile())) {
+                            is TowerProfileWriteResult.Written -> message = context.getString(R.string.ts_msg_draft_saved, StateLabels.label(graph.profileStore.state().name, uiLocale))
+                            is TowerProfileWriteResult.Rejected -> message = context.getString(R.string.ts_msg_draft_rejected, r.reason)
+                        }
+                    }),
+                    ResponsiveAction(key = "validate", label = stringResource(R.string.ts_action_validate), onClick = {
+                        val profile = buildProfile()
+                        val report = TowerProfileValidator.validate(
+                            profile,
+                            secretPresent = graph.profileStore.secretFor(profile.profileId) != null || secret.isNotBlank(),
+                            nowIso = java.time.Instant.now().toString(),
+                        )
+                        message = if (report.passed) context.getString(R.string.ts_msg_validation_passed)
+                            else context.getString(R.string.ts_msg_validation_failed, report.issues.joinToString("; ") { it.toString() })
+                    }),
+                    ResponsiveAction(key = "test", label = stringResource(R.string.ts_action_test), onClick = {
+                        val profile = buildProfile()
+                        if (secret.isNotBlank()) graph.profileStore.setSecret(profile.profileId, secret.toCharArray())
+                        val report = TowerProfileValidator.validate(
+                            profile,
+                            secretPresent = graph.profileStore.secretFor(profile.profileId) != null,
+                            nowIso = java.time.Instant.now().toString(),
+                        )
+                        if (!report.passed) {
+                            message = context.getString(R.string.ts_msg_cannot_test, report.issues.joinToString("; ") { it.toString() })
+                        } else {
+                            graph.realBridge.configure(profile)
+                            val r = TowerConnectionTester.test(
+                                profile,
+                                graph.profileStore.secretFor(profile.profileId),
+                                java.time.Instant.now().toString(),
+                            )
+                            testOutcome = r
+                            message = context.getString(R.string.ts_msg_connection_test, StateLabels.label(r.outcome.name, uiLocale), r.detail)
+                        }
+                    }),
+                    ResponsiveAction(key = "pair", label = stringResource(R.string.ts_action_pair), onClick = {
+                        val profile = buildProfile()
+                        if (secret.isBlank() && graph.profileStore.secretFor(profile.profileId) == null && mode != TransportMode.MOCK_SIMULATOR) {
+                            message = context.getString(R.string.ts_msg_pairing_required)
+                        } else {
+                            if (secret.isNotBlank()) graph.profileStore.setPairingCode(profile.profileId, secret.toCharArray())
+                            message = context.getString(R.string.ts_msg_pairing_recorded, profile.profileId)
+                        }
+                    }),
+                ),
+                management = listOf(
+                    ResponsiveAction(key = "scan_qr", label = stringResource(R.string.ts_action_scan_qr), onClick = { onOpenScanner?.invoke() }),
+                    ResponsiveAction(key = "import", label = stringResource(R.string.ts_action_import), onClick = {
+                        val stored = graph.keyValueStore.getString("last_secret_clean_export")
+                        if (stored == null) {
+                            message = context.getString(R.string.ts_msg_no_import)
+                        } else {
+                            runCatching {
+                                kotlinx.serialization.json.Json.decodeFromString(
+                                    com.hermestower.voiceconsole.tower.ExportedProfile.serializer(),
+                                    stored,
+                                )
+                            }.onSuccess { extracted ->
+                                when (val r = graph.profileStore.importExported(extracted, confirmOverwrite = false)) {
+                                    is ImportResult.Imported -> message = context.getString(R.string.ts_msg_imported, r.profile.profileName)
+                                    is ImportResult.Conflict -> message = context.getString(R.string.ts_msg_import_conflict, r.message)
+                                    is ImportResult.Rejected -> message = context.getString(R.string.ts_msg_import_rejected, r.reason)
+                                }
+                            }.onFailure { message = context.getString(R.string.ts_msg_import_failed, it.message ?: "") }
+                        }
+                    }),
+                    ResponsiveAction(key = "export", label = stringResource(R.string.ts_action_export), onClick = {
+                        runCatching { graph.profileStore.exportSecretClean(existing?.profileId ?: "profile-owner-1") }
+                            .onSuccess { exported ->
+                                val text = kotlinx.serialization.json.Json.encodeToString(
+                                    com.hermestower.voiceconsole.tower.ExportedProfile.serializer(),
+                                    exported,
+                                )
+                                graph.keyValueStore.putString("last_secret_clean_export", text.take(200_000))
+                                message = context.getString(R.string.ts_msg_export_stored, exported.accessToken, exported.pairingSecret)
+                            }
+                            .onFailure { message = context.getString(R.string.ts_msg_export_failed, it.message ?: "") }
+                    }),
+                    ResponsiveAction(key = "restore", label = stringResource(R.string.ts_action_restore), onClick = {
+                        when (val r = graph.profileStore.restorePrevious()) {
+                            is TowerProfileWriteResult.Written -> message = context.getString(R.string.ts_msg_restored, r.profile.profileName)
+                            is TowerProfileWriteResult.Rejected -> message = r.reason
+                        }
+                    }),
+                ),
+                destructive = listOf(
+                    ResponsiveAction(key = "clear_sensitive", label = stringResource(R.string.ts_action_clear_sensitive), onClick = {
+                        val removed = graph.profileStore.clearSensitiveValues(existing?.profileId ?: "profile-owner-1")
+                        secret = ""
+                        message = if (removed) context.getString(R.string.ts_msg_cleared) else context.getString(R.string.ts_msg_no_sensitive)
+                    }),
+                    ResponsiveAction(key = "reset_mock", label = stringResource(R.string.ts_action_reset_mock), onClick = {
+                        when (val r = graph.profileStore.resetToMock()) {
+                            is TowerProfileWriteResult.Written -> {
+                                mode = TransportMode.MOCK_SIMULATOR
+                                baseUrl = ""
+                                secret = ""
+                                message = context.getString(R.string.ts_msg_reset_mock, r.profile.profileName)
+                            }
+                            is TowerProfileWriteResult.Rejected -> message = r.reason
+                        }
+                    }),
+                ),
+            )
         }
 
         testOutcome?.let { r ->
             SectionCard(title = stringResource(R.string.ts_section_last_test)) {
-                Text(context.getString(R.string.ts_msg_outcome, r.outcome.name), style = HermesType.body, color = c.ink)
+                // §23: the outcome is localized — raw English enum values never
+                // appear in ordinary UI.
+                Text(context.getString(R.string.ts_msg_outcome, StateLabels.label(r.outcome.name, uiLocale)), style = HermesType.body, color = c.ink)
                 Text(
                     context.getString(
                         R.string.ts_msg_dns_line,
@@ -379,5 +393,6 @@ fun TowerStudioScreen(graph: AppGraph, onOpenScanner: (() -> Unit)? = null) {
         }
 
         Text(message, style = HermesType.body, color = c.energy)
+        }
     }
 }

@@ -44,6 +44,7 @@ import com.google.mlkit.vision.barcode.common.Barcode
 import com.google.mlkit.vision.common.InputImage
 import com.hermestower.voiceconsole.app.AppGraph
 import com.hermestower.voiceconsole.pairing.QrPairingScanFlow
+import com.hermestower.voiceconsole.ui.components.ResponsiveScreenHeader
 import com.hermestower.voiceconsole.ui.components.SectionCard
 import com.hermestower.voiceconsole.ui.components.MeanderBand
 import com.hermestower.voiceconsole.ui.theme.HermesType
@@ -102,7 +103,7 @@ fun QrScannerScreen(graph: AppGraph, onBack: () -> Unit) {
             .padding(16.dp),
         verticalArrangement = Arrangement.spacedBy(12.dp),
     ) {
-        Text(stringResource(com.hermestower.voiceconsole.R.string.qr_title), style = HermesType.screenTitle, color = c.ink)
+        ResponsiveScreenHeader(title = stringResource(com.hermestower.voiceconsole.R.string.qr_title))
         MeanderBand(colors = hermesColors, modifier = Modifier.padding(top = 6.dp))
         Text(
             stringResource(com.hermestower.voiceconsole.R.string.qr_intro),

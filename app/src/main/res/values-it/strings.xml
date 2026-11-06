@@ -425,8 +425,8 @@
     <string name="ts_action_clear_sensitive">Cancella valori sensibili</string>
     <string name="ts_action_export">Esporta profilo senza segreti</string>
     <string name="ts_action_import">Importa profilo</string>
-    <string name="ts_action_restore">Ripristina precedente</string>
-    <string name="ts_action_reset_mock">Reimposta su modalità Mock</string>
+    <string name="ts_action_restore">Ripristina configurazione precedente</string>
+    <string name="ts_action_reset_mock">Ripristina modalità Mock</string>
     <string name="ts_section_last_test">Ultima prova di connessione</string>
     <string name="ts_msg_config_state">Stato configurazione: %1$s</string>
     <string name="ts_msg_draft_saved">Bozza salvata. Stato: %1$s</string>

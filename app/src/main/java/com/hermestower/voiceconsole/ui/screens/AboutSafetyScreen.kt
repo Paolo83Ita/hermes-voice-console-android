@@ -27,6 +27,7 @@ import androidx.compose.ui.unit.dp
 import com.hermestower.voiceconsole.R as Res
 import com.hermestower.voiceconsole.app.AppGraph
 import com.hermestower.voiceconsole.app.BuildIdentity
+import com.hermestower.voiceconsole.ui.components.ResponsiveScreenHeader
 import com.hermestower.voiceconsole.ui.components.SectionCard
 import com.hermestower.voiceconsole.ui.components.MeanderBand
 import com.hermestower.voiceconsole.ui.components.TruthBadge
@@ -55,7 +56,7 @@ fun AboutSafetyScreen(graph: AppGraph) {
             .padding(16.dp),
         verticalArrangement = Arrangement.spacedBy(12.dp),
     ) {
-        Text(stringResource(Res.string.about_title), style = HermesType.screenTitle, color = c.ink)
+        ResponsiveScreenHeader(title = stringResource(Res.string.about_title))
         MeanderBand(colors = hermesColors, modifier = Modifier.padding(top = 6.dp))
 
         // ---- OWNER PHYSICAL RETEST §1: BUILD INFORMATION (the in-app proof) ----

@@ -25,6 +25,7 @@ import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import com.hermestower.voiceconsole.app.AppGraph
 import com.hermestower.voiceconsole.selftest.SelfTestMode
 import com.hermestower.voiceconsole.selftest.SelfTestState
+import com.hermestower.voiceconsole.ui.components.ResponsiveScreenHeader
 import com.hermestower.voiceconsole.ui.components.SectionCard
 import com.hermestower.voiceconsole.ui.components.MeanderBand
 import com.hermestower.voiceconsole.ui.theme.HermesType
@@ -53,7 +54,7 @@ fun SelfTestScreen(graph: AppGraph) {
             .padding(16.dp),
         verticalArrangement = Arrangement.spacedBy(12.dp),
     ) {
-        Text(stringResource(com.hermestower.voiceconsole.R.string.st_title), style = HermesType.screenTitle, color = c.ink)
+        ResponsiveScreenHeader(title = stringResource(com.hermestower.voiceconsole.R.string.st_title))
         MeanderBand(colors = hermesColors, modifier = Modifier.padding(top = 6.dp))
         Text(
             stringResource(com.hermestower.voiceconsole.R.string.st_intro),

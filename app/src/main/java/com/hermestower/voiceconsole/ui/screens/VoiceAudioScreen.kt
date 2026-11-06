@@ -28,6 +28,7 @@ import androidx.compose.ui.unit.dp
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import com.hermestower.voiceconsole.R as Res
 import com.hermestower.voiceconsole.app.AppGraph
+import com.hermestower.voiceconsole.ui.components.ResponsiveScreenHeader
 import com.hermestower.voiceconsole.ui.components.SectionCard
 import com.hermestower.voiceconsole.ui.components.MeanderBand
 import com.hermestower.voiceconsole.ui.components.BadgeFlowRow
@@ -66,7 +67,7 @@ fun VoiceAudioScreen(graph: AppGraph) {
             .padding(16.dp),
         verticalArrangement = Arrangement.spacedBy(12.dp),
     ) {
-        Text(stringResource(Res.string.voice_title), style = HermesType.screenTitle, color = c.ink)
+        ResponsiveScreenHeader(title = stringResource(Res.string.voice_title))
         MeanderBand(colors = hermesColors, modifier = Modifier.padding(top = 6.dp))
 
         // ---- GRAPH 4.10 §17: Listening mode (the §14 authority is the only writer) ----

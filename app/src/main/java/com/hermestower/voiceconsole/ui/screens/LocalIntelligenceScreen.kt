@@ -17,6 +17,7 @@ import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.unit.dp
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import com.hermestower.voiceconsole.app.AppGraph
+import com.hermestower.voiceconsole.ui.components.ResponsiveScreenHeader
 import com.hermestower.voiceconsole.ui.components.SectionCard
 import com.hermestower.voiceconsole.ui.components.MeanderBand
 import com.hermestower.voiceconsole.ui.components.TruthBadge
@@ -44,7 +45,7 @@ fun LocalIntelligenceScreen(graph: AppGraph) {
             .padding(16.dp),
         verticalArrangement = Arrangement.spacedBy(12.dp),
     ) {
-        Text(stringResource(com.hermestower.voiceconsole.R.string.li_title), style = HermesType.screenTitle, color = c.ink)
+        ResponsiveScreenHeader(title = stringResource(com.hermestower.voiceconsole.R.string.li_title))
         MeanderBand(colors = hermesColors, modifier = Modifier.padding(top = 6.dp))
 
         SectionCard(title = stringResource(com.hermestower.voiceconsole.R.string.li_engine_card)) {

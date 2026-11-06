@@ -119,6 +119,7 @@ fun ConsoleScreen(
 
     var showDialog by remember { mutableStateOf(false) }
     var injectText by remember { mutableStateOf("") }
+    var moreActions by remember { mutableStateOf(false) }
 
     // ---- GRAPH 4 G4-C03: real microphone path (Owner delta §5) ----
     val micState by graph.voiceCoordinator.micState.collectAsStateWithLifecycle()
@@ -509,18 +510,7 @@ fun ConsoleScreen(
                 horizontalArrangement = Arrangement.Center,
                 verticalAlignment = Alignment.CenterVertically,
             ) {
-                IconButton(onClick = { graph.driver.setPrivacyMuted(!muted) }) {
-                    MedallionDisc(
-                        cd = stringResource(muteSemantics.contentDescriptionRes),
-                        icon = medallionIcon(muteSemantics.icon),
-                        tint = if (muted) m.redBronze else m.bronzeLight,
-                        m = m,
-                        sealed = muted,
-                        sealColor = m.redBronze,
-                    )
-                }
-                Spacer(Modifier.size(8.dp))
-                // ---- central push-to-talk medallion (G4-C03 §5) ----
+                // §18: the ONE PRIMARY control (state-driven, always first).
                 IconButton(onClick = {
                     when (micState) {
                         MicUiState.PERMISSION_REQUIRED, MicUiState.DENIED ->
@@ -541,16 +531,19 @@ fun ConsoleScreen(
                     )
                 }
                 Spacer(Modifier.size(8.dp))
-                IconButton(onClick = { graph.driver.repeatLastSpoken() }) {
+                // §18: SECONDARY 1 — privacy mute (always MicOff + red-bronze seal).
+                IconButton(onClick = { graph.driver.setPrivacyMuted(!muted) }) {
                     MedallionDisc(
-                        cd = stringResource(com.hermestower.voiceconsole.R.string.repeat_cd),
-                        icon = Icons.Filled.Replay,
-                        tint = m.bronzeLight,
+                        cd = stringResource(muteSemantics.contentDescriptionRes),
+                        icon = medallionIcon(muteSemantics.icon),
+                        tint = if (muted) m.redBronze else m.bronzeLight,
                         m = m,
+                        sealed = muted,
+                        sealColor = m.redBronze,
                     )
                 }
                 Spacer(Modifier.size(8.dp))
-                // ---- speaker control (§11): mute / unmute / stop / manual playback ----
+                // §18: SECONDARY 2 — the functional speaker control (§11).
                 IconButton(onClick = {
                     when {
                         isSpeaking -> graph.driver.stopSpeaking() // stops CURRENT only, policy unchanged
@@ -579,7 +572,7 @@ fun ConsoleScreen(
                     )
                 }
                 Spacer(Modifier.size(8.dp))
-                // ---- continuous listening (§17): Ascolto continuo / Ferma ascolto continuo ----
+                // §18: SECONDARY 3 — continuous listening (§17).
                 IconButton(onClick = {
                     if (continuousActive) {
                         graph.continuousListening.stop(
@@ -602,21 +595,40 @@ fun ConsoleScreen(
                     )
                 }
                 Spacer(Modifier.size(8.dp))
-                IconButton(onClick = { graph.driver.injectWake() }) {
+                // §18: SECONDARY 4 — repeat the last response.
+                IconButton(onClick = { graph.driver.repeatLastSpoken() }) {
                     MedallionDisc(
-                        cd = stringResource(com.hermestower.voiceconsole.R.string.sim_wake_cd),
-                        icon = Icons.Outlined.Send,
-                        tint = m.gold,
+                        cd = stringResource(com.hermestower.voiceconsole.R.string.repeat_cd),
+                        icon = Icons.Filled.Replay,
+                        tint = m.bronzeLight,
                         m = m,
                     )
                 }
-                Spacer(Modifier.size(8.dp))
-                IconButton(onClick = { showDialog = true }) {
-                    MedallionDisc(
-                        cd = stringResource(com.hermestower.voiceconsole.R.string.inject_cd),
-                        icon = Icons.Outlined.History,
-                        tint = m.bronzeLight,
-                        m = m,
+            }
+            // §18: additional (simulation) actions live behind "Altre azioni" —
+            // never six+ equal circular buttons with ambiguous priority.
+            Box(Modifier.fillMaxWidth(), contentAlignment = Alignment.Center) {
+                androidx.compose.material3.TextButton(onClick = { moreActions = true }) {
+                    Text(
+                        stringResource(com.hermestower.voiceconsole.R.string.mm_more_actions),
+                        style = MonumentalType.sealSub,
+                        color = m.inkSecondary,
+                    )
+                }
+                androidx.compose.material3.DropdownMenu(expanded = moreActions, onDismissRequest = { moreActions = false }) {
+                    androidx.compose.material3.DropdownMenuItem(
+                        text = { Text(stringResource(com.hermestower.voiceconsole.R.string.sim_wake_cd)) },
+                        onClick = {
+                            moreActions = false
+                            graph.driver.injectWake()
+                        },
+                    )
+                    androidx.compose.material3.DropdownMenuItem(
+                        text = { Text(stringResource(com.hermestower.voiceconsole.R.string.inject_cd)) },
+                        onClick = {
+                            moreActions = false
+                            showDialog = true
+                        },
                     )
                 }
             }

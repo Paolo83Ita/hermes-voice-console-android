@@ -28,6 +28,7 @@ import com.hermestower.voiceconsole.archive.ArchiveConversation
 import com.hermestower.voiceconsole.archive.ArchiveMission
 import com.hermestower.voiceconsole.archive.ArchiveSource
 import com.hermestower.voiceconsole.archive.MockTowerArchive
+import com.hermestower.voiceconsole.ui.components.ResponsiveScreenHeader
 import com.hermestower.voiceconsole.ui.components.SectionCard
 import com.hermestower.voiceconsole.ui.components.MeanderBand
 import com.hermestower.voiceconsole.ui.components.TruthBadge
@@ -58,7 +59,7 @@ fun ArchiveScreen(archive: MockTowerArchive) {
             .padding(16.dp),
         verticalArrangement = Arrangement.spacedBy(12.dp),
     ) {
-        Text(stringResource(Res.string.archive_title), style = HermesType.screenTitle, color = c.ink)
+        ResponsiveScreenHeader(title = stringResource(Res.string.archive_title))
         MeanderBand(colors = hermesColors, modifier = Modifier.padding(top = 6.dp))
         Text(stringResource(Res.string.archive_subtitle), style = MonumentalType.sealSub, color = m.gold)
         TruthBadge(stringResource(Res.string.archive_simulated_badge), c.inkSecondary)

@@ -37,6 +37,7 @@ import com.hermestower.voiceconsole.models.VoiceModelProfile
 import android.content.Intent
 import android.net.Uri
 import com.hermestower.voiceconsole.towersim.LocalTowerMockServer
+import com.hermestower.voiceconsole.ui.components.ResponsiveScreenHeader
 import com.hermestower.voiceconsole.ui.components.SectionCard
 import com.hermestower.voiceconsole.ui.components.AdaptiveAction
 import com.hermestower.voiceconsole.ui.components.AdaptiveActionsRow
@@ -101,7 +102,7 @@ fun ModelManagerScreen(graph: AppGraph) {
             .padding(16.dp),
         verticalArrangement = Arrangement.spacedBy(12.dp),
     ) {
-        Text("MODEL SANCTUM", style = HermesType.screenTitle, color = c.ink)
+        ResponsiveScreenHeader(title = "MODEL SANCTUM")
         MeanderBand(colors = hermesColors, modifier = Modifier.padding(top = 6.dp))
         Text(stringResource(R.string.mm_subtitle), style = HermesType.sectionLabel, color = c.bronze)
         Text(

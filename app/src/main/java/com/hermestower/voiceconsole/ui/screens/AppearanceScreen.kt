@@ -35,6 +35,7 @@ import com.hermestower.voiceconsole.locale.AppLanguage
 import com.hermestower.voiceconsole.R as Res
 import com.hermestower.voiceconsole.ui.components.ModeChip
 import com.hermestower.voiceconsole.ui.components.MeanderBand
+import com.hermestower.voiceconsole.ui.components.ResponsiveScreenHeader
 import com.hermestower.voiceconsole.ui.components.SectionCard
 import com.hermestower.voiceconsole.ui.components.TruthBadge
 import com.hermestower.voiceconsole.ui.monumental.MonumentalType
@@ -64,7 +65,7 @@ fun AppearanceScreen(graph: AppGraph) {
             .padding(16.dp),
         verticalArrangement = Arrangement.spacedBy(12.dp),
     ) {
-        Text(stringResource(Res.string.appearance_title), style = HermesType.screenTitle, color = c.ink)
+        ResponsiveScreenHeader(title = stringResource(Res.string.appearance_title))
         MeanderBand(colors = hermesColors, modifier = Modifier.padding(top = 6.dp))
         Text(stringResource(Res.string.appearance_subtitle), style = MonumentalType.sealSub, color = m.gold)
 

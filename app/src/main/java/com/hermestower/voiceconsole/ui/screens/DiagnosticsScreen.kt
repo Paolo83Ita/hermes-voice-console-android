@@ -26,6 +26,7 @@ import com.hermestower.voiceconsole.R as Res
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import com.hermestower.voiceconsole.app.AppGraph
 import com.hermestower.voiceconsole.bridge.BridgeFault
+import com.hermestower.voiceconsole.ui.components.ResponsiveScreenHeader
 import com.hermestower.voiceconsole.ui.components.SectionCard
 import com.hermestower.voiceconsole.ui.components.MeanderBand
 import com.hermestower.voiceconsole.ui.components.TruthBadge
@@ -57,7 +58,7 @@ fun DiagnosticsScreen(graph: AppGraph, onOpenStudio: () -> Unit = {}, onOpenSelf
             .padding(16.dp),
         verticalArrangement = Arrangement.spacedBy(12.dp),
     ) {
-        Text(stringResource(Res.string.diag_title), style = HermesType.screenTitle, color = c.ink)
+        ResponsiveScreenHeader(title = stringResource(Res.string.diag_title))
         MeanderBand(colors = hermesColors, modifier = Modifier.padding(top = 6.dp))
         BadgeFlowRow(horizontalSpacing = 8.dp) {
             TextButton(onClick = onOpenStudio) { Text(stringResource(Res.string.diag_studio_link)) }
