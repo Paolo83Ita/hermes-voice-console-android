@@ -150,7 +150,8 @@ fun VoiceAudioScreen(graph: AppGraph) {
                     val ctx = androidx.compose.ui.platform.LocalContext.current
                     TextButton(onClick = {
                         runCatching {
-                            ctx.startActivity(android.content.Intent(android.provider.Settings.ACTION_TTS_SETTINGS)
+                            // "android.settings.TTS_SETTINGS" — the system Text-to-speech screen.
+                            ctx.startActivity(android.content.Intent("android.settings.TTS_SETTINGS")
                                 .addFlags(android.content.Intent.FLAG_ACTIVITY_NEW_TASK))
                         }
                     }) {

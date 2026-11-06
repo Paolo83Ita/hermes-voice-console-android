@@ -183,7 +183,9 @@ class AndroidSystemTtsEngine(
         val activeVoice: Voice? = runCatching { engine.voice }.getOrNull()
         val activeVoiceName = activeVoice?.name
         val activeVoiceLocaleTag = activeVoice?.locale?.toLanguageTag()
-        val activeLanguageTag = runCatching { engine.language?.replace('_', '-') }.getOrNull()
+        // getLanguage() returns a Locale (deprecated but still the engine's truth) —
+        // read it back as a language tag; null when the engine reports nothing.
+        val activeLanguageTag = runCatching { engine.language?.toLanguageTag() }.getOrNull()
 
         val readback = ItalianTtsVoiceNegotiator.classify(
             requestedLocaleTag = requestLocale.toLanguageTag(),
