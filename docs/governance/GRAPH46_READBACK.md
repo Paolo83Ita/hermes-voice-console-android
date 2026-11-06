@@ -718,3 +718,29 @@ INTACT; CP-G4-024 STAGED. THIS commit's dual-sample push runs are the deciding
 evidence: ANY lane showing gate 6/6 green + regression green-or-typed +
 residual typed → fill the two placeholders ONLY from that lane's artifacts →
 §10 terminality.
+
+## 25. §0 fresh read-back — session of 2026-11-06, part 18 (fix 24 / R-41)
+
+### 25.1 Authority verification
+
+Fresh fetch read-back: remote tip = local HEAD = `b60068d` (fix 23 / R-40);
+`main` untouched (`e7ab101`).
+
+### 25.2 Run #155 (42186095976 @ `b60068d`) — arbitrated from full lane logs
+
+BOTH lanes, all failures, the SAME settings-hub dump (B history anchor n=3,
+C open-studio n=4 with the R-40 tap, D details anchor n=3): the walks never
+left the hub — the drawer's hidden-but-composed rows false-match substring
+anchors and row lookups (B's history activation matched the hub's own
+"Cronologia delle conversazioni" card and dispatched the wrong control). The
+4th production KVM recovery (RECOVERY_OK) + gate A green on the relaunched
+guest both recurred.
+
+### 25.3 Repair executed (fix 24 / R-41) + Next Exact Action
+
+The R-35 on-screen bounds rule becomes SYSTEMIC: gateRootBounds + gateOnScreen
+helpers; gateActivateRow's two scans and gateAwaitAnchor's three scans count
+only on-screen nodes (fail-open). Both placeholders remain INTACT; CP-G4-024
+STAGED. THIS commit's dual-sample push runs are the deciding evidence: ANY
+lane showing gate 6/6 green + regression green-or-typed + residual typed →
+fill the two placeholders ONLY from that lane's artifacts → §10 terminality.

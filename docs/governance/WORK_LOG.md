@@ -1356,3 +1356,19 @@ docs/governance/{ITALIAN_GATE_NAVIGATION_FAILURE_LEDGER,WORK_LOG,GRAPH46_READBAC
 COMMIT: (this commit).
 CHECKPOINT: CP-G4-023 fix 23 (R-40); CP-G4-024 STAGED.
 NEXT: the dual-sample push runs arbitrate ITALIAN_UI_COMPLETE.
+
+## G4-N47 — CP-G4-023 fix 24 / R-41 (systemic on-screen match filter)
+
+Run #155 (42186095976 @ b60068d): both lanes, all failures, the SAME hub dump
+— the walks never left the hub: the drawer's hidden-but-composed rows
+false-matched substring anchors and row lookups (B's history activation
+matched the hub's own Cronologia card and dispatched the wrong control; C
+open-studio n=4 even with the tap; D details anchor n=3). R-41: the R-35
+on-screen bounds rule becomes systemic — gateRootBounds + gateOnScreen;
+gateActivateRow's two scans and gateAwaitAnchor's three scans count only
+on-screen nodes (fail-open). No test deleted, skipped or weakened.
+FILES: app/src/androidTest/java/com/hermestower/voiceconsole/e2e/ItalianGateSupport.kt;
+docs/governance/{ITALIAN_GATE_NAVIGATION_FAILURE_LEDGER,WORK_LOG,GRAPH46_READBACK,CHECKPOINT_INDEX}.md.
+COMMIT: (this commit).
+CHECKPOINT: CP-G4-023 fix 24 (R-41); CP-G4-024 STAGED.
+NEXT: the dual-sample push runs arbitrate ITALIAN_UI_COMPLETE.

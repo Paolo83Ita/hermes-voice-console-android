@@ -502,3 +502,14 @@ No test deleted, skipped or weakened; no assertion touched.
 | Narrow repair | **R-40**: the R-26/R-35 tap factored into `gateTapLabeledRow(label)` (on-screen center-of-prefix-match tap, fail-open bounds) and shared: gateNavigateTo's fallback (unchanged semantics) AND gateActivateRow's final fallback after the accessible matcher — the anchors still decide everything — nothing weakened |
 | Semantics | nothing deleted, skipped or weakened: one helper extraction + one fallback link; every walk, assertion and anchor untouched |
 | Complete gate rerun | THIS commit's push run (two samples) |
+
+## R-41 — the systemic false-match: the drawer's hidden-but-composed rows (run #155 42186095976 @ b60068d)
+
+| Field | Value |
+| --- | --- |
+| Evidence | BOTH lanes, ALL the failures, the SAME dump: the SETTINGS HUB visible (B `Cronologia della conversazione` anchor n=3, C `open-studio control not found` n=4 even with the R-40 tap, D `Voce e audio` anchor n=3) — the walks never LEFT the hub; B's history activation matched the hub's OWN "Cronologia delle conversazioni" card (substring, ignoreCase) and dispatched the WRONG control; the drawer's rows sit in the semantics tree even when the drawer is closed and false-match every substring scan (anchors AND row lookups) |
+| Mechanism (systemic) | the R-35 on-screen bounds rule existed ONLY in the tap fallback — the anchor awaits and the row lookups still matched off-screen (hidden drawer) content; a silently no-oped drawer dispatch leaves the walk on the hub, where hub cards share substrings with the walk's targets |
+| Typed classification | **TEST_MATCH_DEFECT (systemic off-screen false-match) — the root cause of the B/C/D failure cluster** |
+| Narrow repair | **R-41**: the R-35 bounds rule becomes SYSTEMIC — `gateRootBounds()` + `gateOnScreen()` shared helpers; gateActivateRow's two scans and gateAwaitAnchor's three scans (the vararg loop, the locale-switch found-poll and the persisted-poll) now count ONLY on-screen nodes (fail-open when bounds are unavailable); the anchors still decide everything — nothing weakened |
+| Semantics | nothing deleted, skipped or weakened: match-surface correction only (off-screen nodes were never legitimately clickable/visible); every walk, assertion and anchor untouched |
+| Complete gate rerun | THIS commit's push run (two samples) |

@@ -253,11 +253,14 @@ fun HermesComposeRule.gateSwitchLocaleAndAwait(code: String, timeoutMs: Long = 4
     AppLanguage.apply(ctx, code)
     val deadline = System.currentTimeMillis() + timeoutMs
     while (System.currentTimeMillis() < deadline) {
+        val root = gateRootBounds()
         val found = runCatching {
             if (wizardVisible) {
-                onAllNodesWithText(anchor, substring = true, ignoreCase = true).fetchSemanticsNodes().isNotEmpty()
+                onAllNodesWithText(anchor, substring = true, ignoreCase = true).fetchSemanticsNodes()
+                    .any { gateOnScreen(it, root) }
             } else {
-                onAllNodesWithContentDescription(anchor, substring = true).fetchSemanticsNodes().isNotEmpty()
+                onAllNodesWithContentDescription(anchor, substring = true).fetchSemanticsNodes()
+                    .any { gateOnScreen(it, root) }
             }
         }.getOrDefault(false)
         if (found) {
@@ -273,9 +276,11 @@ fun HermesComposeRule.gateSwitchLocaleAndAwait(code: String, timeoutMs: Long = 4
             }
             val persisted = runCatching {
                 if (wizardVisible) {
-                    onAllNodesWithText(anchor, substring = true, ignoreCase = true).fetchSemanticsNodes().isNotEmpty()
+                    onAllNodesWithText(anchor, substring = true, ignoreCase = true).fetchSemanticsNodes()
+                        .any { gateOnScreen(it, root) }
                 } else {
-                    onAllNodesWithContentDescription(anchor, substring = true).fetchSemanticsNodes().isNotEmpty()
+                    onAllNodesWithContentDescription(anchor, substring = true).fetchSemanticsNodes()
+                        .any { gateOnScreen(it, root) }
                 }
             }.getOrDefault(false)
             if (persisted) return
@@ -344,6 +349,23 @@ fun HermesComposeRule.gateTapLabeledRow(label: String): Boolean {
 }
 
 /**
+ * R-41 (run #155 42186095976 @ b60068d — B/C/D ALL failed with the SETTINGS
+ * HUB visible): the drawer's hidden-but-composed rows FALSE-MATCH substring
+ * anchors and text lookups (B's history activation matched the hub's own
+ * "Cronologia delle conversazioni" card; drawer rows dispatched silently when
+ * the drawer had closed behind them). The R-35 bounds rule becomes systemic:
+ * a node counts only when its center lies INSIDE the root bounds (a closed
+ * drawer's rows are translated outside them). Fail-open when bounds are
+ * unavailable. Nothing weakened — the anchors still decide.
+ */
+fun HermesComposeRule.gateRootBounds(): androidx.compose.ui.geometry.Rect =
+    runCatching { onRoot().fetchSemanticsNode().boundsInRoot }
+        .getOrDefault(androidx.compose.ui.geometry.Rect.Zero)
+
+fun HermesComposeRule.gateOnScreen(node: androidx.compose.ui.semantics.SemanticsNode, root: androidx.compose.ui.geometry.Rect): Boolean =
+    runCatching { root.contains(node.boundsInRoot.center) }.getOrDefault(true)
+
+/**
  * R-37 (runs #145/#149/#150 — the MODEL SANCTUM anchor timeout n=3): port the
  * CLOUD-PROVEN activation from the regression suite (E2ECommon
  * openDrawerAndNavigate → activateRowFrozen → activateAccessible) — match
@@ -386,19 +408,20 @@ fun HermesComposeRule.gateActivateRowAccessible(label: String): Boolean {
  * anchor after the call still decides success — nothing weakened.
  */
 fun HermesComposeRule.gateActivateRow(label: String): Boolean {
+    val root = gateRootBounds()
     var advanced = 0L
     while (advanced < 5_000L) {
         mainClock.advanceTimeBy(100)
         advanced += 100
         val found = runCatching {
             onAllNodesWithText(label, substring = true, ignoreCase = true).fetchSemanticsNodes()
-                .firstOrNull { it.config[SemanticsActions.OnClick]?.action != null }
+                .firstOrNull { gateOnScreen(it, root) && it.config[SemanticsActions.OnClick]?.action != null }
         }.getOrNull()
         if (found != null) break
     }
     val row = runCatching {
         onAllNodesWithText(label, substring = true, ignoreCase = true).fetchSemanticsNodes()
-            .firstOrNull { it.config[SemanticsActions.OnClick]?.action != null }
+            .firstOrNull { gateOnScreen(it, root) && it.config[SemanticsActions.OnClick]?.action != null }
     }.getOrNull()
     if (row == null) {
         // R-39: the lookup found NO clickable node (the open-studio class) —
@@ -423,9 +446,11 @@ fun HermesComposeRule.gateActivateRow(label: String): Boolean {
 fun HermesComposeRule.gateAwaitAnchor(vararg anchors: String, timeoutMs: Long = 60_000) {
     val deadline = System.currentTimeMillis() + timeoutMs
     while (System.currentTimeMillis() < deadline) {
+        val root = gateRootBounds()
         val found = runCatching {
             anchors.any { anchor ->
-                onAllNodesWithText(anchor, substring = true, ignoreCase = true).fetchSemanticsNodes().isNotEmpty()
+                onAllNodesWithText(anchor, substring = true, ignoreCase = true).fetchSemanticsNodes()
+                    .any { gateOnScreen(it, root) }
             }
         }.getOrDefault(false)
         if (found) {
