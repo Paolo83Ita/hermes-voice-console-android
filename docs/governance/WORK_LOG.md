@@ -1259,3 +1259,23 @@ docs/governance/{ITALIAN_GATE_NAVIGATION_FAILURE_LEDGER,WORK_LOG,GRAPH46_READBAC
 COMMIT: (this commit).
 CHECKPOINT: CP-G4-023 fix 18 (R-34); CP-G4-024 STAGED.
 NEXT: the dual-sample push runs arbitrate ITALIAN_UI_COMPLETE.
+
+## G4-N41 — CP-G4-023 fix 19 / R-35+R-36 (on-screen tap target + drawer-open retry)
+
+Run #149 (42127520115 @ 5dce40c): lane 1 VERIFIED THE WHOLE RECOVERY CHAIN —
+system-crash marker (R-31) → R-28 relaunch → RECOVERY_OK in ~86 s (the R-34
+KVM grant works; 5 earlier relaunches died at 20-30 min) → gate A1 PASSED on
+the relaunched guest; the fragile relaunched guest died again ~50 s later.
+Lane 2 (2h43min): B/E/F green; C = console drawer row not found after the
+scanner back (n=1); D = MODEL SANCTUM anchor timeout (n=2 — the R-26 fallback
+tap lands on the drawer's hidden-but-composed row instead of the on-screen hub
+row). R-35: the fallback tap requires the node's center inside the root bounds
+(fail-open). R-36: gateOpenDrawerAndActivateRow retries 3× with the bounded
+settle. A/Onboarding/VoiceFlow silent stream breaks: no code change evidence.
+No test deleted, skipped or weakened.
+FILES: app/src/androidTest/java/com/hermestower/voiceconsole/e2e/
+{ItalianGateSupport,ItalianGateC_TowerGateQrScannerTest}.kt;
+docs/governance/{ITALIAN_GATE_NAVIGATION_FAILURE_LEDGER,WORK_LOG,GRAPH46_READBACK,CHECKPOINT_INDEX}.md.
+COMMIT: (this commit).
+CHECKPOINT: CP-G4-023 fix 19 (R-35+R-36); CP-G4-024 STAGED.
+NEXT: the dual-sample push runs arbitrate ITALIAN_UI_COMPLETE.

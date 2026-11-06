@@ -585,3 +585,32 @@ CP-G4-024 STAGED. THIS commit's dual-sample push runs are the deciding
 evidence: ANY lane showing gate 6/6 green + regression green-or-typed +
 residual typed → fill the two placeholders ONLY from that lane's artifacts →
 §10 terminality.
+
+## 20. §0 fresh read-back — session of 2026-11-05/06, part 13 (fix 19 / R-35+R-36)
+
+### 20.1 Authority verification
+
+Fresh fetch read-back: remote tip = local HEAD = `5dce40c` (fix 18 / R-34);
+`main` untouched (`e7ab101`).
+
+### 20.2 Run #149 (42127520115 @ `5dce40c`) — arbitrated from full lane logs
+
+Lane 1: the ENTIRE recovery chain verified in production — `INSTRUMENTATION_
+ABORTED: System has crashed.` → the R-31 marker → R-28 relaunch →
+`R-28 RECOVERY_OK` in ~86 s (the R-34 KVM grant works) → gate A1 PASSED on
+the relaunched guest → the fragile relaunched guest died again ~50 s later.
+Lane 2 (2h43min, the longest lane ever): gates B, E, F `OK`; C = console
+drawer row not found after the scanner back (n=1); D = MODEL SANCTUM anchor
+timeout (n=2, identical dump signature — the R-26 fallback tap picks the
+drawer's hidden-but-composed row instead of the on-screen hub row); A +
+Onboarding + VoiceFlow = silent stream breaks on a live guest.
+
+### 20.3 Repair executed (fix 19 / R-35+R-36) + Next Exact Action
+
+R-35: the R-26 fallback tap requires the node's center inside the root bounds
+(a closed drawer's rows sit outside them; fail-open when bounds are
+unavailable). R-36: gate C's drawer open + row tap repeats up to 3 times with
+the bounded settle. Both placeholders remain INTACT; CP-G4-024 STAGED. THIS
+commit's dual-sample push runs are the deciding evidence: ANY lane showing
+gate 6/6 green + regression green-or-typed + residual typed → fill the two
+placeholders ONLY from that lane's artifacts → §10 terminality.

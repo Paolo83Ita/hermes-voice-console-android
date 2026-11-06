@@ -13,6 +13,7 @@ import androidx.compose.ui.test.click
 import androidx.compose.ui.test.onAllNodesWithContentDescription
 import androidx.compose.ui.test.onAllNodesWithText
 import androidx.compose.ui.test.onNodeWithContentDescription
+import androidx.compose.ui.test.onRoot
 import androidx.compose.ui.test.performClick
 import androidx.compose.ui.test.performTouchInput
 import androidx.test.espresso.AppNotIdleException
@@ -287,6 +288,26 @@ fun HermesComposeRule.gateOpenDrawer() {
 }
 
 /**
+ * R-36 (run #149 lane 2, job 127595389539 — "console drawer row not found"
+ * right after the scanner back path, n=1): the screen behind the drawer can
+ * still be settling when the single drawer-open click lands, leaving the row
+ * lookup running against a not-yet-open drawer. The REAL user path — open
+ * the drawer, tap the row — is repeated up to [attempts] times with the same
+ * bounded settle the anchors use. The destination anchor after the call
+ * still decides success — nothing weakened.
+ */
+fun HermesComposeRule.gateOpenDrawerAndActivateRow(label: String, attempts: Int = 3): Boolean {
+    repeat(attempts) { index ->
+        gateOpenDrawer()
+        if (index < attempts - 1 && !ciLifecycleProfileRequested) {
+            repeat(6) { mainClock.advanceTimeBy(100); Thread.sleep(25) }
+        }
+        if (gateActivateRow(label)) return true
+    }
+    return false
+}
+
+/**
  * Activates the first clickable node labeled [label] (drawer rows, hub rows,
  * screen buttons) — the accessible OnClick dispatched ON MAIN (ledger R-3).
  * Bounded virtual pump first (frozen-clock physics, CP-G4-007).
@@ -409,8 +430,25 @@ fun HermesComposeRule.gateNavigateTo(labelRes: Int, anchor: String, timeoutMs: L
             val nodes = runCatching {
                 onAllNodesWithText(label, substring = true, ignoreCase = true).fetchSemanticsNodes()
             }.getOrDefault(emptyList())
+            // R-35 (runs #145 lane 1 + #149 lane 2 — the SAME MODEL SANCTUM
+            // anchor timeout TWICE, identical dump signature): the drawer's
+            // hidden-but-composed rows are in the semantics tree even when the
+            // drawer is closed, so the prefix match can pick the DRAWER's row
+            // ("Modelli e voce") instead of the ON-SCREEN hub row ("Modelli e
+            // Voce Componenti installati…") — the physical tap then lands on a
+            // translated-off-screen node and nothing navigates. The hub row is
+            // the on-screen one: require the node's center to lie inside the
+            // root bounds (a closed drawer's rows sit outside them). If bounds
+            // are unavailable the old semantics hold (fail-open); the
+            // destination anchor after the tap STILL decides success — a tap
+            // that does not navigate fails the anchor honestly. Nothing
+            // weakened; the OnClick direct-dispatch path above is unchanged.
+            val rootBounds = runCatching {
+                onRoot().fetchSemanticsNode().boundsInRoot
+            }.getOrDefault(androidx.compose.ui.geometry.Rect.Zero)
             val tapIdx = nodes.indexOfFirst { n ->
-                n.config.get(SemanticsProperties.Text)?.any { it.text.startsWith(label, ignoreCase = true) } == true
+                n.config.get(SemanticsProperties.Text)?.any { it.text.startsWith(label, ignoreCase = true) } == true &&
+                    runCatching { rootBounds.contains(n.boundsInRoot.center) }.getOrDefault(true)
             }
             check(tapIdx >= 0) {
                 "settings-hub row '$label' not found (it); visible texts: " +

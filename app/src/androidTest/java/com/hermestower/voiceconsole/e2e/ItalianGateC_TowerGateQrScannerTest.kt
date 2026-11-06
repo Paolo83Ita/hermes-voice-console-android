@@ -74,9 +74,12 @@ class ItalianGateC_TowerGateQrScannerTest {
         violations += compose.gateCollectViolations("Tower Connection Studio (after scanner back)", pool)
 
         // ---- Return to the safe route (Console) through the REAL UI. ----
-        compose.gateOpenDrawer()
+        // R-36 (run #149 lane 2): the drawer open + row tap is retried up to 3
+        // times (bounded settle between attempts) — the screen behind the
+        // drawer can still be settling right after the scanner back path; the
+        // destination anchor below still decides success.
         check(
-            compose.gateActivateRow(ItalianGate.localizedString(R.string.dest_console, "it")),
+            compose.gateOpenDrawerAndActivateRow(ItalianGate.localizedString(R.string.dest_console, "it")),
         ) { "console drawer row not found (it)" }
         compose.gateAwaitAnchor("HERMES")
 
