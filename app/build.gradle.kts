@@ -18,9 +18,9 @@ android {
         minSdk = 30
         targetSdk = 35
         // OWNER PHYSICAL RETEST FAILURE (CP-G4-029): the repair build version
-        // MUST exceed the shipped 0.3.1-alpha-graph4-owner-repair / versionCode 4.
-        versionCode = 5
-        versionName = "0.3.2-alpha-graph4.9-local-models"
+        // MUST exceed the shipped 0.3.2-alpha-graph4.9-local-models / versionCode 5.
+        versionCode = 6
+        versionName = "0.3.3-alpha-graph4.10-owner-repair"
         testInstrumentationRunner = "androidx.test.runner.AndroidJUnitRunner"
 
         // OWNER PHYSICAL RETEST §1 (build provenance): authoritative build
@@ -42,7 +42,7 @@ android {
         buildConfigField("String", "BUILD_TIMESTAMP_ISO8601", "\"$buildStamp\"")
         buildConfigField("String", "BUILD_WORKFLOW_RUN_ID", "\"$ciRun\"")
         buildConfigField("String", "BUILD_WORKFLOW_REF", "\"$ciRef\"")
-        buildConfigField("String", "BUILD_LABEL", "\"${project.findProperty("hermes.buildLabel") ?: "GRAPH 4.9 LOCAL MODELS 1"}\"")
+        buildConfigField("String", "BUILD_LABEL", "\"${project.findProperty("hermes.buildLabel") ?: "POCO XIAOMI OWNER REPAIR 3"}\"")
     }
 
     // GRAPH 4 FINAL §20: DUAL APK OUTPUT — the UNIVERSAL debug APK keeps every
