@@ -113,3 +113,18 @@ remains the authoritative package (unchanged rule).
   signature that matches the Owner's PHYS-FAIL-01 family.
 - CP-G4.12-001 evidence complete. Next: `OWNER_PHYSICAL_FINDINGS_GRAPH412.md`
   (§2), then the §40 repair order beginning with crash evidence (§3).
+
+## 8. Execution-close read-back (appended at mission close)
+
+- Local HEAD == remote tip: **979e5ef** (fast-forward only from bb70165; main
+  untouched; no force-push; tree clean).
+- CI android-debug-build at 979e5ef: run **42420686766 BUILD_SUCCESSFUL** —
+  SHA-stamped artifacts (debug APK / lint report / test results) uploaded with
+  the commit hash `979e5ef5f9e709ac170ba9ed68aa9df39b2f44ff`. This is the
+  authoritative package.
+- CI android-e2e at 979e5ef: run **42420686751 in flight** at close (emulator
+  fleet lane; not an Owner-package gate — its verdict is recorded by the
+  existing arbitration flow).
+- Terminal pre-device state reached: **POCO_XIAOMI_PHYSICAL_REPAIR_PACKAGE_READY**.
+  Physical verdicts remain Owner-only (runbook:
+  docs/receipts/OWNER_POCO_XIAOMI_RETEST_PACKAGE_5_GRAPH412.md).
