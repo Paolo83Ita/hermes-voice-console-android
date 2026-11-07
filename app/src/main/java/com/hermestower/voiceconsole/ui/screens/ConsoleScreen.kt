@@ -80,7 +80,7 @@ import com.hermestower.voiceconsole.ui.components.StatusPill
 import com.hermestower.voiceconsole.ui.monumental.BurnInRegion
 import com.hermestower.voiceconsole.ui.monumental.MonumentalColors
 import com.hermestower.voiceconsole.ui.monumental.MonumentalType
-import com.hermestower.voiceconsole.ui.monumental.OracleCore
+import com.hermestower.voiceconsole.ui.monumental.ReforgedTowerVisual
 import com.hermestower.voiceconsole.ui.monumental.TowerEnergyPhase
 import com.hermestower.voiceconsole.ui.monumental.TowerArchitecture
 import com.hermestower.voiceconsole.ui.monumental.drawTowerFrame
@@ -276,16 +276,19 @@ fun ConsoleScreen(
                     label = "towerChatFocus",
                 )
                 val coreH = maxWidth * (1420f / 1080f) * coreScale
-                OracleCore(
+                // GRAPH 4.10 §29: the procedural Tower is REJECTED by the Owner —
+                // the Console renders the Owner-reference-derived LAYERED central
+                // Tower (ReforgedTowerVisual, §31 layers + §34 state animations,
+                // §35 performance profiles). Same §33 stage sizing (chat focus).
+                ReforgedTowerVisual(
                     state = state,
-                    // CP-G4-016: CI_LIFECYCLE_PROFILE flows through the same
-                    // static-frame gate as reduced motion (TEST_ONLY debug seam).
+                    speakingAmplitude = amplitude,
+                    quality = quality,
                     reducedMotion = settings.reducedMotion ||
                         com.hermestower.voiceconsole.ui.runtime.MotionProfile.ornamentsFrozen,
-                    quality = quality,
-                    speakingAmplitude = amplitude,
-                    queueCount = queueCount,
-                    colors = m,
+                    privacyMuted = muted,
+                    continuousActive = continuousActive,
+                    chatSpeechMuted = speechMode == com.hermestower.voiceconsole.voice.ChatSpeechOutputPolicy.Mode.MUTED,
                     modifier = Modifier
                         .fillMaxWidth()
                         .height(coreH),
@@ -298,9 +301,6 @@ fun ConsoleScreen(
                     frozen = settings.reducedMotion ||
                         com.hermestower.voiceconsole.ui.runtime.MotionProfile.ornamentsFrozen,
                 )
-                Canvas(Modifier.matchParentSize()) {
-                    drawTowerFrame(towerPhase, com.hermestower.voiceconsole.ui.monumental.QualityBudgets.of(quality), m)
-                }
                 StateOverlayChip(
                     state,
                     effectiveMode,

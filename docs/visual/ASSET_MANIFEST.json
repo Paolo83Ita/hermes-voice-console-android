@@ -1,0 +1,223 @@
+{
+  "manifestVersion": "graph-4.10-central-tower-refoundation-1",
+  "ownerReference": "upload/Immagine_Hermes_Tower.png (1536x1024)",
+  "subjectIsolated": "CENTRAL HERMES TOWER only \u2014 model towers, model/provider names, side brains, winged messengers, colored arrows, side audit panels, sky, fire bowls and the poster composition are REMOVED",
+  "measuredCoreCenter": [
+    789,
+    413
+  ],
+  "displayTarget": "portrait phone; single scalable source per layer justified (layers are scale-stable at 0.5x-3x; no 4K assets embedded)",
+  "canvasOwnedDynamics": "ring rotation, portal breathing, energy pulses, messenger packets, state overlays",
+  "layers": [
+    {
+      "assetId": "tower_rear",
+      "sourceReference": "upload/Immagine_Hermes_Tower.png (Owner-provided reference; central Tower subject)",
+      "transformationMethod": "central-band isolation + sky/band color separation + ring-zone exclusion + symmetry hole-fill + speck clean + 1.2px feather",
+      "licenseAndUsageBasis": "Owner-commissioned project-internal derivative of the Owner reference image; original derivative implementation for the Console; the full poster is NOT shipped",
+      "dimensions": "720x1653",
+      "encodedBytes": 222296,
+      "decodedMemoryEstimateBytes": 4760640,
+      "sha256": "3b117e9c00b17411d089052caface2c17da5267ba70f2b26d57bdee721809462",
+      "alpha": "transparent-webp",
+      "visualOrder": 0,
+      "qualityProfile": "BALANCED default; LOW renders static rear + portal only; HIGH adds particles (Canvas)",
+      "fallback": "solid-bronze silhouette + Canvas portal if WebP decode fails",
+      "stateUsage": "all states (static architecture)",
+      "sourceBox": [
+        566,
+        0,
+        1012,
+        1024
+      ]
+    },
+    {
+      "assetId": "tower_sign",
+      "sourceReference": "upload/Immagine_Hermes_Tower.png (Owner-provided reference; central Tower subject)",
+      "transformationMethod": "sign-band isolation + tone/brightness separation + speck clean + feather",
+      "licenseAndUsageBasis": "Owner-commissioned project-internal derivative of the Owner reference image; original derivative implementation for the Console; the full poster is NOT shipped",
+      "dimensions": "629x203",
+      "encodedBytes": 38672,
+      "decodedMemoryEstimateBytes": 510748,
+      "sha256": "d2861cb5e7a539a8c584f509887534e9675986273d8a60d6717a9943e867246f",
+      "alpha": "transparent-webp",
+      "visualOrder": 1,
+      "qualityProfile": "BALANCED default; LOW renders static rear + portal only; HIGH adds particles (Canvas)",
+      "fallback": "solid-bronze silhouette + Canvas portal if WebP decode fails",
+      "stateUsage": "all states",
+      "sourceBox": [
+        596,
+        6,
+        986,
+        132
+      ]
+    },
+    {
+      "assetId": "tower_outer_ring",
+      "sourceReference": "upload/Immagine_Hermes_Tower.png (Owner-provided reference; central Tower subject)",
+      "transformationMethod": "annulus r126-178 around the measured core (789,413) + tone separation + feather (Canvas rotates it)",
+      "licenseAndUsageBasis": "Owner-commissioned project-internal derivative of the Owner reference image; original derivative implementation for the Console; the full poster is NOT shipped",
+      "dimensions": "645x645",
+      "encodedBytes": 86742,
+      "decodedMemoryEstimateBytes": 1664100,
+      "sha256": "ce58918ddf37bc170d75dc4cf46e37e21f7745f48e1f42d16665e661ba4a3980",
+      "alpha": "transparent-webp",
+      "visualOrder": 4,
+      "qualityProfile": "BALANCED default; LOW renders static rear + portal only; HIGH adds particles (Canvas)",
+      "fallback": "solid-bronze silhouette + Canvas portal if WebP decode fails",
+      "stateUsage": "IDLE slow / TOWER_PROCESSING differentiated rotation",
+      "sourceBox": [
+        589,
+        213,
+        989,
+        613
+      ]
+    },
+    {
+      "assetId": "tower_middle_ring",
+      "sourceReference": "upload/Immagine_Hermes_Tower.png (Owner-provided reference; central Tower subject)",
+      "transformationMethod": "annulus r86-126 around the measured core (789,413) + tone separation + feather (Canvas rotates it)",
+      "licenseAndUsageBasis": "Owner-commissioned project-internal derivative of the Owner reference image; original derivative implementation for the Console; the full poster is NOT shipped",
+      "dimensions": "645x645",
+      "encodedBytes": 49466,
+      "decodedMemoryEstimateBytes": 1664100,
+      "sha256": "163192058f7fd1650b10fdee4833d9dc954cef72d94c2d67c698c3435bf81c73",
+      "alpha": "transparent-webp",
+      "visualOrder": 5,
+      "qualityProfile": "BALANCED default; LOW renders static rear + portal only; HIGH adds particles (Canvas)",
+      "fallback": "solid-bronze silhouette + Canvas portal if WebP decode fails",
+      "stateUsage": "IDLE slow / TOWER_PROCESSING differentiated rotation",
+      "sourceBox": [
+        589,
+        213,
+        989,
+        613
+      ]
+    },
+    {
+      "assetId": "tower_inner_ring",
+      "sourceReference": "upload/Immagine_Hermes_Tower.png (Owner-provided reference; central Tower subject)",
+      "transformationMethod": "annulus r46-86 around the measured core (789,413) + tone separation + feather (Canvas rotates it)",
+      "licenseAndUsageBasis": "Owner-commissioned project-internal derivative of the Owner reference image; original derivative implementation for the Console; the full poster is NOT shipped",
+      "dimensions": "645x645",
+      "encodedBytes": 34238,
+      "decodedMemoryEstimateBytes": 1664100,
+      "sha256": "4a2764c907742672813dba4b4653f279e49756d9e34246c5d6b868475ccf95ea",
+      "alpha": "transparent-webp",
+      "visualOrder": 6,
+      "qualityProfile": "BALANCED default; LOW renders static rear + portal only; HIGH adds particles (Canvas)",
+      "fallback": "solid-bronze silhouette + Canvas portal if WebP decode fails",
+      "stateUsage": "IDLE slow / TOWER_PROCESSING differentiated rotation",
+      "sourceBox": [
+        589,
+        213,
+        989,
+        613
+      ]
+    },
+    {
+      "assetId": "tower_portal",
+      "sourceReference": "upload/Immagine_Hermes_Tower.png (Owner-provided reference; central Tower subject)",
+      "transformationMethod": "bright-cyan threshold within r<64 of the core + feather (Canvas drives breathing/amplitude)",
+      "licenseAndUsageBasis": "Owner-commissioned project-internal derivative of the Owner reference image; original derivative implementation for the Console; the full poster is NOT shipped",
+      "dimensions": "645x645",
+      "encodedBytes": 23034,
+      "decodedMemoryEstimateBytes": 1664100,
+      "sha256": "2b8975eca4ae30d5141d619c40ad513928448d723104efe4a48a04c2e82305c5",
+      "alpha": "transparent-webp",
+      "visualOrder": 5,
+      "qualityProfile": "BALANCED default; LOW renders static rear + portal only; HIGH adds particles (Canvas)",
+      "fallback": "solid-bronze silhouette + Canvas portal if WebP decode fails",
+      "stateUsage": "IDLE breathing / SPEAKING amplitude / LOCAL response cyan-gold",
+      "sourceBox": [
+        589,
+        213,
+        989,
+        613
+      ]
+    },
+    {
+      "assetId": "tower_lower_gate",
+      "sourceReference": "upload/Immagine_Hermes_Tower.png (Owner-provided reference; central Tower subject)",
+      "transformationMethod": "gate-band isolation (cyan arch + bronze frame) + feather",
+      "licenseAndUsageBasis": "Owner-commissioned project-internal derivative of the Owner reference image; original derivative implementation for the Console; the full poster is NOT shipped",
+      "dimensions": "291x342",
+      "encodedBytes": 26544,
+      "decodedMemoryEstimateBytes": 398088,
+      "sha256": "dcd2d5ce534021c57007346011a44f9c222c6d754f87f50d6b90dc9af0b19106",
+      "alpha": "transparent-webp",
+      "visualOrder": 6,
+      "qualityProfile": "BALANCED default; LOW renders static rear + portal only; HIGH adds particles (Canvas)",
+      "fallback": "solid-bronze silhouette + Canvas portal if WebP decode fails",
+      "stateUsage": "LISTENING input gate open / PRIVACY MUTED gate closed + red-bronze seal (Canvas overlay)",
+      "sourceBox": [
+        700,
+        660,
+        880,
+        872
+      ]
+    },
+    {
+      "assetId": "tower_stairs",
+      "sourceReference": "upload/Immagine_Hermes_Tower.png (Owner-provided reference; central Tower subject)",
+      "transformationMethod": "stairs/plinth band isolation + tone separation + feather",
+      "licenseAndUsageBasis": "Owner-commissioned project-internal derivative of the Owner reference image; original derivative implementation for the Console; the full poster is NOT shipped",
+      "dimensions": "484x154",
+      "encodedBytes": 15584,
+      "decodedMemoryEstimateBytes": 298144,
+      "sha256": "c5ec59c57b6b564f1a0135a11cf27fe826762cf11dd90b4b38d80231e7a21502",
+      "alpha": "transparent-webp",
+      "visualOrder": 7,
+      "qualityProfile": "BALANCED default; LOW renders static rear + portal only; HIGH adds particles (Canvas)",
+      "fallback": "solid-bronze silhouette + Canvas portal if WebP decode fails",
+      "stateUsage": "all states (static base)",
+      "sourceBox": [
+        640,
+        790,
+        940,
+        886
+      ]
+    },
+    {
+      "assetId": "tower_foreground",
+      "sourceReference": "upload/Immagine_Hermes_Tower.png (Owner-provided reference; central Tower subject)",
+      "transformationMethod": "foreground bronze strip isolation + feather",
+      "licenseAndUsageBasis": "Owner-commissioned project-internal derivative of the Owner reference image; original derivative implementation for the Console; the full poster is NOT shipped",
+      "dimensions": "629x32",
+      "encodedBytes": 6232,
+      "decodedMemoryEstimateBytes": 80512,
+      "sha256": "d976f375a2d03ea4f1be5a02399fc5d6d18873ae6888ed29502b25d05ce59047",
+      "alpha": "transparent-webp",
+      "visualOrder": 8,
+      "qualityProfile": "BALANCED default; LOW renders static rear + portal only; HIGH adds particles (Canvas)",
+      "fallback": "solid-bronze silhouette + Canvas portal if WebP decode fails",
+      "stateUsage": "all states (static base)",
+      "sourceBox": [
+        596,
+        868,
+        986,
+        888
+      ]
+    },
+    {
+      "assetId": "tower_energy",
+      "sourceReference": "upload/Immagine_Hermes_Tower.png (Owner-provided reference; central Tower subject)",
+      "transformationMethod": "bright-cyan vertical path below the core + heavy feather (Canvas pulses it upward on CONTACTING TOWER)",
+      "licenseAndUsageBasis": "Owner-commissioned project-internal derivative of the Owner reference image; original derivative implementation for the Console; the full poster is NOT shipped",
+      "dimensions": "420x722",
+      "encodedBytes": 30690,
+      "decodedMemoryEstimateBytes": 1212960,
+      "sha256": "6150c1087b6609efd7dcee6c99ddf1753d99fcb558ddedeb060f22db81952e5e",
+      "alpha": "transparent-webp",
+      "visualOrder": 9,
+      "qualityProfile": "BALANCED default; LOW renders static rear + portal only; HIGH adds particles (Canvas)",
+      "fallback": "solid-bronze silhouette + Canvas portal if WebP decode fails",
+      "stateUsage": "CONTACTING/TOWER_PROCESSING upward pulse",
+      "sourceBox": [
+        659,
+        453,
+        919,
+        900
+      ]
+    }
+  ]
+}
