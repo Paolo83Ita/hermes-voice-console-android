@@ -147,3 +147,16 @@ Graph 4 checkpoints (branch graph-4/real-voice-pairing-archive-e2e, from ca8980b
 | CP-G4.11-003 | Package 4: v0.3.4-alpha-graph4.11 / code 7 / POCO XIAOMI OWNER PACKAGE 4; local validation APKs hashed; OWNER_POCO_PACKAGE_4_GRAPH411.md runbook; governance convergence + push | OWNER_POCO_PACKAGE_4_GRAPH410 → 4 runbook | local build SUCCESS (CI read-back recorded after push) | this commit |
 
 | CP-G4.11-003 deployment | d83f2de | Pushed 5a567a3..d83f2de with fresh remote read-back (ls-remote tip = d83f2de = local HEAD, tree clean, forward-only, main untouched, no force-push); CI at d83f2de: android-debug-build run 42382864937 BUILD_SUCCESSFUL (artifacts: debug-apk bundle 1,746,144 zip-B, lint report, test results — JUnit XML independently verified 422/422, 0 failed, 0 errors, 0 skipped); android-e2e run 42382864925 in flight at write time (emulator fleet node loop, NOT an Owner-package gate); POCO_OWNER_PACKAGE_4 READY at the CI tip: versionName 0.3.4-alpha-graph4.11 / versionCode 7 / label POCO XIAOMI OWNER PACKAGE 4 (aapt2-verified in the local validation build: arm64 118,799,749 B sha256 501792715d… / universal 248,446,578 B d5481f28… / x86_64 123,515,716 B); the Owner runs the OWNER_POCO_PACKAGE_4_GRAPH411.md runbook next — every physical verdict remains Owner-only (OWNER_VISUAL_RETEST_PENDING, VOICE_SWITCHING_OWNER_VERIFICATION_PENDING, REAL_TOWER_PENDING_GRAPH_1_7) |
+
+| CP-G4.12-001 | Fresh read-back + physical evidence | GRAPH412_FRESH_READBACK.md, OWNER_PHYSICAL_FINDINGS_GRAPH412.md | DONE |
+| CP-G4.12-002 | Crash evidence + first-run safe mode | FirstRunCrashEvidence.kt, FirstRunSafeMode.kt, FirstRunRecoveryDialog.kt, MainActivity wiring | DONE |
+| CP-G4.12-003 | Atomic onboarding completion | OnboardingCompletion.kt, AppNav gate rewrite, OnboardingScreen/AppLanguage/AppearanceScreen single-recreate | DONE |
+| CP-G4.12-004 | Capability state machine + receipts | ModelCapabilityState.kt, CapabilityLadder.kt, ModelRuntimeReceipt.kt | DONE |
+| CP-G4.12-005 | Vosk/Sherpa runtime truth | ST-55/56/57 + AppGraph probes + MODEL_RUNTIME_TRUTH_REPORT.md | DONE |
+| CP-G4.12-006 | Unified interrupt contract | UnifiedInterrupt.kt, AppGraph wiring, ConsoleScreen §15 labels + read-back | DONE |
+| CP-G4.12-007 | Continuous-listening hardening | preserved (PHYS-PASS-02); echo/clear hooks into the interrupt path | DONE (preservation-first) |
+| CP-G4.12-008 | Color contrast audit + repair | inkDim/redBronzeText/Marble repairs, ContrastRatioTest, ACCESSIBILITY_COLOR_CONTRAST_REPORT.md | DONE |
+| CP-G4.12-009 | Responsive + accessibility qualification | 4.10 authorities stand; §21 enum localization; StateLabels 54 keys | DONE |
+| CP-G4.12-010 | First-run performance | §24 staged decode (6 static layers first); §33 height contract | DONE |
+| — | Tower replacement | §26–§34 complete; ASSET_MANIFEST + validation report + replacement report | DONE |
+| — | APKs + retest package | versionCode 8; three variants; OWNER_POCO_XIAOMI_RETEST_PACKAGE_5_GRAPH412.md | DONE |

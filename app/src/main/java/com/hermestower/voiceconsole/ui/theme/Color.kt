@@ -14,14 +14,18 @@ val MarbleOutline = Color(0xFFC9BFA9)
 val MarbleInk = Color(0xFF201E19)
 val MarbleInkSecondary = Color(0xFF5A554A)
 val MarbleBronze = Color(0xFF7A5C2E)
-val MarbleGold = Color(0xFFB08D4C)
-val MarbleEnergy = Color(0xFF0E7490)
+// GRAPH 4.12 §19: deepened for ≥4.5:1 on every marble surface (was 0xFFB08D4C at 2.45–2.90:1).
+val MarbleGold = Color(0xFF7E612F)
+// GRAPH 4.12 §19: deepened for ≥4.5:1 (was 0xFF0E7490 at 4.22:1 on surfaceVariant).
+val MarbleEnergy = Color(0xFF0C6478)
 val MarbleEnergyBright = Color(0xFF06B6D4)
 val MarbleEnergyGlow = Color(0xFF7DD3E8)
 val MarbleStone = Color(0xFFD9D4C8)
 val MarbleStoneShade = Color(0xFFC2BBAB)
-val MarbleOk = Color(0xFF2A7654)
-val MarbleWarn = Color(0xFF9A5B12)
+// GRAPH 4.12 §19: deepened for ≥4.5:1 (was 0xFF2A7654 at 4.34:1).
+val MarbleOk = Color(0xFF276B4D)
+// GRAPH 4.12 §19: deepened for ≥4.5:1 (was 0xFF9A5B12 at 4.27:1).
+val MarbleWarn = Color(0xFF8A5210)
 val MarbleError = Color(0xFFB3261E)
 
 // ==== OBSIDIAN NIGHT (default identity, D-009) ====

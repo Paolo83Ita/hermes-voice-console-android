@@ -130,6 +130,7 @@ private enum class Filter(val label: String) {
 @Composable
 private fun TurnRow(turn: ConversationTurn, onRetry: () -> Unit) {
     val c = hermesColors
+    val context = androidx.compose.ui.platform.LocalContext.current
     val who = when (turn.role) {
         ConversationTurn.Role.OWNER -> stringResource(com.hermestower.voiceconsole.R.string.turn_role_owner)
         else -> if (turn.source == ConversationTurn.Source.TOWER) "HERMES TOWER" else "HERMES · LOCAL"
@@ -143,11 +144,11 @@ private fun TurnRow(turn: ConversationTurn, onRetry: () -> Unit) {
         Text(turn.text, style = HermesType.body, color = c.ink)
         BadgeFlowRow(horizontalSpacing = 6.dp) {
             TruthBadge(
-                text = turn.source.name,
+                text = com.hermestower.voiceconsole.locale.StateLabels.label(turn.source.name, com.hermestower.voiceconsole.locale.AppLanguage.effectiveTag(context)),
                 color = if (turn.source == ConversationTurn.Source.TOWER) c.energy else c.ok,
             )
             TruthBadge(
-                text = turn.delivery.name,
+                text = com.hermestower.voiceconsole.locale.StateLabels.label(turn.delivery.name, com.hermestower.voiceconsole.locale.AppLanguage.effectiveTag(context)),
                 color = when (turn.delivery) {
                     ConversationTurn.Delivery.DELIVERED -> c.ok
                     ConversationTurn.Delivery.PENDING -> c.inkSecondary

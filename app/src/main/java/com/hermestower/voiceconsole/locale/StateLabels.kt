@@ -110,6 +110,89 @@ object StateLabels {
             "it" to "Indirizzo privato Tailscale", "en" to "Tailscale private address",
             "es" to "Dirección privada de Tailscale", "fr" to "Adresse privée Tailscale", "de" to "Private Tailscale-Adresse",
         ),
+
+        // GRAPH 4.12 §21: ordinary-UI enum localization (raw value only in
+        // Advanced Diagnostics). Model install states surfaced on cards:
+        "DISCOVERED" to mapOf(
+            "it" to "Scoperto", "en" to "Discovered", "es" to "Descubierto", "fr" to "Découvert", "de" to "Erkannt",
+        ),
+        "COMPATIBILITY_PENDING" to mapOf(
+            "it" to "Compatibilità in attesa", "en" to "Compatibility pending", "es" to "Compatibilidad pendiente", "fr" to "Compatibilité en attente", "de" to "Kompatibilität offen",
+        ),
+        "INCOMPATIBLE" to mapOf(
+            "it" to "Non compatibile", "en" to "Incompatible", "es" to "Incompatible", "fr" to "Incompatible", "de" to "Inkompatibel",
+        ),
+        "LICENSE_PENDING" to mapOf(
+            "it" to "Licenza da verificare", "en" to "License review pending", "es" to "Licencia pendiente", "fr" to "Licence à vérifier", "de" to "Lizenzprüfung offen",
+        ),
+        "DOWNLOAD_APPROVAL_REQUIRED" to mapOf(
+            "it" to "Approvazione download richiesta", "en" to "Download approval required", "es" to "Se requiere aprobación de descarga", "fr" to "Approbation du téléchargement requise", "de" to "Download-Freigabe erforderlich",
+        ),
+        "DOWNLOADING" to mapOf(
+            "it" to "Download in corso", "en" to "Downloading", "es" to "Descargando", "fr" to "Téléchargement", "de" to "Wird geladen",
+        ),
+        "DOWNLOAD_PAUSED" to mapOf(
+            "it" to "Download in pausa", "en" to "Download paused", "es" to "Descarga en pausa", "fr" to "Téléchargement en pause", "de" to "Download pausiert",
+        ),
+        "DOWNLOADED" to mapOf(
+            "it" to "Scaricato", "en" to "Downloaded", "es" to "Descargado", "fr" to "Téléchargé", "de" to "Geladen",
+        ),
+        "HASH_VERIFICATION_PENDING" to mapOf(
+            "it" to "Verifica hash in attesa", "en" to "Hash verification pending", "es" to "Verificación de hash pendiente", "fr" to "Vérification du hachage en attente", "de" to "Hash-Prüfung offen",
+        ),
+        "HASH_VERIFIED" to mapOf(
+            "it" to "Hash verificato", "en" to "Hash verified", "es" to "Hash verificado", "fr" to "Hachage vérifié", "de" to "Hash geprüft",
+        ),
+        "INSTALLING" to mapOf(
+            "it" to "Installazione in corso", "en" to "Installing", "es" to "Instalando", "fr" to "Installation", "de" to "Wird installiert",
+        ),
+        "INSTALLED" to mapOf(
+            "it" to "Installato", "en" to "Installed", "es" to "Instalado", "fr" to "Installé", "de" to "Installiert",
+        ),
+        "QUALIFICATION_PENDING" to mapOf(
+            "it" to "Qualifica in attesa", "en" to "Qualification pending", "es" to "Cualificación pendiente", "fr" to "Qualification en attente", "de" to "Qualifizierung offen",
+        ),
+        "QUALIFIED" to mapOf(
+            "it" to "Qualificato", "en" to "Qualified", "es" to "Cualificado", "fr" to "Qualifié", "de" to "Qualifiziert",
+        ),
+        "ACTIVE" to mapOf(
+            "it" to "Attivo", "en" to "Active", "es" to "Activo", "fr" to "Actif", "de" to "Aktiv",
+        ),
+        "FAILED" to mapOf(
+            "it" to "Non riuscito", "en" to "Failed", "es" to "Fallido", "fr" to "Échec", "de" to "Fehlgeschlagen",
+        ),
+        "REMOVED" to mapOf(
+            "it" to "Rimosso", "en" to "Removed", "es" to "Eliminado", "fr" to "Supprimé", "de" to "Entfernt",
+        ),
+        // Local LLM runtime truth (§11):
+        "LOCAL_LLM_RUNTIME_UNAVAILABLE" to mapOf(
+            "it" to "Motore locale non disponibile", "en" to "Local engine unavailable", "es" to "Motor local no disponible", "fr" to "Moteur local indisponible", "de" to "Lokale Engine nicht verfügbar",
+        ),
+        "RUNTIME_MISSING" to mapOf(
+            "it" to "Runtime assente", "en" to "Runtime missing", "es" to "Runtime ausente", "fr" to "Runtime absent", "de" to "Runtime fehlt",
+        ),
+        "MODEL_READY" to mapOf(
+            "it" to "Modello pronto", "en" to "Model ready", "es" to "Modelo listo", "fr" to "Modèle prêt", "de" to "Modell bereit",
+        ),
+        // History source / delivery enums:
+        "LOCAL" to mapOf(
+            "it" to "Locale", "en" to "Local", "es" to "Local", "fr" to "Local", "de" to "Lokal",
+        ),
+        "TOWER" to mapOf(
+            "it" to "Torre", "en" to "Tower", "es" to "Torre", "fr" to "Tour", "de" to "Turm",
+        ),
+        "USER" to mapOf(
+            "it" to "Utente", "en" to "User", "es" to "Usuario", "fr" to "Utilisateur", "de" to "Nutzer",
+        ),
+        "DELIVERED" to mapOf(
+            "it" to "Consegnato", "en" to "Delivered", "es" to "Entregado", "fr" to "Livré", "de" to "Zugestellt",
+        ),
+        "PENDING" to mapOf(
+            "it" to "In attesa", "en" to "Pending", "es" to "Pendiente", "fr" to "En attente", "de" to "Ausstehend",
+        ),
+        "QUEUED" to mapOf(
+            "it" to "In coda", "en" to "Queued", "es" to "En cola", "fr" to "En file", "de" to "In Warteschlange",
+        ),
     )
 
     /** The localized label for a state identifier; falls back to the identifier itself. */

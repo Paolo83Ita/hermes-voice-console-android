@@ -35,6 +35,7 @@ import com.hermestower.voiceconsole.ui.theme.hermesColors
  */
 @Composable
 fun LocalIntelligenceScreen(graph: AppGraph) {
+    val context = androidx.compose.ui.platform.LocalContext.current
     val c = hermesColors
     val modelState = graph.localEngine.modelState.collectAsStateWithLifecycle()
 
@@ -50,7 +51,7 @@ fun LocalIntelligenceScreen(graph: AppGraph) {
 
         SectionCard(title = stringResource(com.hermestower.voiceconsole.R.string.li_engine_card)) {
             BadgeFlowRow(horizontalSpacing = 8.dp) {
-                TruthBadge(stringResource(com.hermestower.voiceconsole.R.string.li_state_fmt, modelState.value.name), c.warn)
+                TruthBadge(stringResource(com.hermestower.voiceconsole.R.string.li_state_fmt, com.hermestower.voiceconsole.locale.StateLabels.label(modelState.value.name, com.hermestower.voiceconsole.locale.AppLanguage.effectiveTag(context))), c.warn)
                 TruthBadge(stringResource(com.hermestower.voiceconsole.R.string.li_runtime_none), c.inkSecondary)
             }
             Text(
@@ -104,7 +105,7 @@ fun LocalIntelligenceScreen(graph: AppGraph) {
         val llmDiag = graph.localLlmEngine.diagnostics()
         SectionCard(title = stringResource(com.hermestower.voiceconsole.R.string.li_llm_card)) {
             BadgeFlowRow(horizontalSpacing = 8.dp) {
-                TruthBadge(stringResource(com.hermestower.voiceconsole.R.string.li_state_fmt, llmState.name), c.warn)
+                TruthBadge(stringResource(com.hermestower.voiceconsole.R.string.li_state_fmt, com.hermestower.voiceconsole.locale.StateLabels.label(llmState.name, com.hermestower.voiceconsole.locale.AppLanguage.effectiveTag(context))), c.warn)
                 TruthBadge(stringResource(com.hermestower.voiceconsole.R.string.li_llm_runtime_fmt, llmDiag.runtimeName), c.inkSecondary)
             }
             Text(

@@ -787,4 +787,18 @@ MANUAL_ADVANCED — unabhängige Auswahl pro Komponente, volle Sichtbarkeit, kei
         <string name="mic_cd_mute_disable">Datenschutz-Stummschaltung aktiv: Mikrofon getrennt. Zum Verbinden tippen.</string>
         <string name="mic_cd_stop_speaking">Stimme beenden: Sprachantwort unterbrechen</string>
         <string name="mic_cd_text_send">Getippte Nachricht an die Konsole senden</string>
+    <string name="recovery_title">Die App wurde beim ersten Start geschlossen.</string>
+    <string name="recovery_message">Die letzte Sitzung wurde unerwartet beendet. Wählen Sie, wie es weitergehen soll.</string>
+    <string name="recovery_safe_mode_note">Im abgesicherten Modus bleiben die Sprachmotoren aus, bis Sie jeden einzeln starten.</string>
+    <string name="recovery_action_safe_mode">Im abgesicherten Modus fortfahren</string>
+    <string name="recovery_action_console_no_engines">Konsole ohne Start der Motoren öffnen</string>
+    <string name="recovery_action_retry_onboarding">Einrichtung wiederholen</string>
+    <string name="recovery_action_export">Diagnosedaten exportieren</string>
+    <string name="recovery_export_done">Diagnose exportiert</string>
+    <string name="recovery_export_clipboard">Der Inhalt wurde in die Zwischenablage kopiert (keine Nutzerdaten).</string>
+    <string name="interrupt_stop_listening">Zuhören stoppen</string>
+    <string name="interrupt_cancel_transcription">Transkription abbrechen</string>
+    <string name="interrupt_cancel_request">Anfrage abbrechen</string>
+    <string name="interrupt_stop_voice">Sprachausgabe stoppen</string>
+    <string name="interrupt_stop_continuous">Kontinuierliches Zuhören beenden</string>
 </resources>

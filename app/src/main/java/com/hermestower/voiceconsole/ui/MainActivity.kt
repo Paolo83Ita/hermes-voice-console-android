@@ -7,6 +7,9 @@ import androidx.activity.compose.setContent
 import androidx.activity.enableEdgeToEdge
 import androidx.compose.runtime.DisposableEffect
 import androidx.compose.runtime.getValue
+import androidx.compose.runtime.remember
+import androidx.compose.runtime.setValue
+import androidx.compose.ui.res.stringResource
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import com.hermestower.voiceconsole.app.AppGraphHolder
 import com.hermestower.voiceconsole.ui.runtime.MotionProfile
@@ -48,6 +51,8 @@ class MainActivity : ComponentActivity() {
             )
         }
         val graph = AppGraphHolder.graph(this)
+        // GRAPH 4.12 §3: consume the persisted first-run crash receipt (if any).
+        val priorCrash = com.hermestower.voiceconsole.app.FirstRunCrashEvidence.consume(this)
         setContent {
             val settings by graph.store.settings.collectAsStateWithLifecycle()
             DisposableEffect(settings.keepScreenOn) {
@@ -58,11 +63,56 @@ class MainActivity : ComponentActivity() {
                 }
                 onDispose { }
             }
+            // GRAPH 4.12 §3/§4: the first-run crash recovery dialog gates the
+            // app shell until the Owner picks a typed recovery action.
+            var recoveryHandled by remember { androidx.compose.runtime.mutableStateOf(false) }
+            var exportedReceipt by remember { androidx.compose.runtime.mutableStateOf<String?>(null) }
             HermesTheme(
                 darkTheme = settings.darkTheme,
                 reducedMotion = settings.reducedMotion || MotionProfile.ornamentsFrozen,
                 animationIntensity = settings.animationIntensity,
             ) {
+                if (priorCrash != null && !recoveryHandled &&
+                    com.hermestower.voiceconsole.app.FirstRunCrashEvidence.isFirstRunCrash(priorCrash)
+                ) {
+                    com.hermestower.voiceconsole.ui.screens.FirstRunRecoveryDialog(
+                        graph = graph,
+                        onDismissToConsole = { recoveryHandled = true },
+                        onRetryOnboarding = {
+                            recoveryHandled = true
+                            com.hermestower.voiceconsole.ui.screens.Onboarding.resetForTest(this)
+                        },
+                        onExported = { receipt ->
+                            // Clipboard export (secret-clean content only).
+                            val cm = getSystemService(android.content.Context.CLIPBOARD_SERVICE)
+                                as android.content.ClipboardManager
+                            cm.setPrimaryClip(
+                                android.content.ClipData.newPlainText("hermes-diagnostics", receipt),
+                            )
+                            exportedReceipt = receipt
+                        },
+                    )
+                }
+                if (exportedReceipt != null) {
+                    androidx.compose.material3.AlertDialog(
+                        onDismissRequest = { exportedReceipt = null },
+                        confirmButton = {
+                            androidx.compose.material3.TextButton(
+                                onClick = { exportedReceipt = null },
+                            ) { androidx.compose.material3.Text(stringResource(android.R.string.ok)) }
+                        },
+                        title = {
+                            androidx.compose.material3.Text(
+                                stringResource(com.hermestower.voiceconsole.R.string.recovery_export_done),
+                            )
+                        },
+                        text = {
+                            androidx.compose.material3.Text(
+                                stringResource(com.hermestower.voiceconsole.R.string.recovery_export_clipboard),
+                            )
+                        },
+                    )
+                }
                 AppNav(graph)
             }
         }

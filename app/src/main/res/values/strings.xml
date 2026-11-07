@@ -787,4 +787,18 @@ MANUAL_ADVANCED — independent per-component selection, full visibility, no sil
         <string name="mic_cd_mute_disable">Privacy mute engaged: microphone disconnected. Tap to reconnect.</string>
         <string name="mic_cd_stop_speaking">Stop voice: interrupt the spoken response</string>
         <string name="mic_cd_text_send">Send the typed message to the console</string>
+    <string name="recovery_title">The app closed during the first launch.</string>
+    <string name="recovery_message">The previous session ended unexpectedly. Choose how to proceed.</string>
+    <string name="recovery_safe_mode_note">In safe mode the voice engines stay OFF until you start each one individually.</string>
+    <string name="recovery_action_safe_mode">Continue in safe mode</string>
+    <string name="recovery_action_console_no_engines">Open Console without starting the engines</string>
+    <string name="recovery_action_retry_onboarding">Retry setup</string>
+    <string name="recovery_action_export">Export diagnostic data</string>
+    <string name="recovery_export_done">Diagnostics exported</string>
+    <string name="recovery_export_clipboard">The content was copied to the clipboard (no user data included).</string>
+    <string name="interrupt_stop_listening">Stop listening</string>
+    <string name="interrupt_cancel_transcription">Cancel transcription</string>
+    <string name="interrupt_cancel_request">Cancel request</string>
+    <string name="interrupt_stop_voice">Stop voice</string>
+    <string name="interrupt_stop_continuous">Stop continuous listening</string>
 </resources>

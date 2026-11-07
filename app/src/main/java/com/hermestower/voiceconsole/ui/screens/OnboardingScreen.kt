@@ -111,8 +111,12 @@ fun OnboardingScreen(graph: AppGraph, onFinish: (pendingRoute: String?) -> Unit)
                         FilterChip(
                             selected = AppLanguage.stored(context) == AppLanguage.FOLLOW_SYSTEM,
                             onClick = {
-                                AppLanguage.apply(context, AppLanguage.FOLLOW_SYSTEM)
-                                (context as? Activity)?.recreate()
+                                // GRAPH 4.12 §5: the single sanctioned path — no
+                                // double recreation, session flag for the atomic
+                                // completion contract.
+                                com.hermestower.voiceconsole.onboarding.OnboardingCompletion
+                                    .setLocaleChangedThisSession(context)
+                                AppLanguage.applyThenRecreate(context as Activity, AppLanguage.FOLLOW_SYSTEM)
                             },
                             label = { Text(stringResource(R.string.ob_s1_follow_system)) },
                         )
@@ -125,8 +129,10 @@ fun OnboardingScreen(graph: AppGraph, onFinish: (pendingRoute: String?) -> Unit)
                                 FilterChip(
                                     selected = AppLanguage.stored(context) == code,
                                     onClick = {
-                                        AppLanguage.apply(context, code)
-                                        (context as? Activity)?.recreate()
+                                        // GRAPH 4.12 §5: single sanctioned path.
+                                        com.hermestower.voiceconsole.onboarding.OnboardingCompletion
+                                            .setLocaleChangedThisSession(context)
+                                        AppLanguage.applyThenRecreate(context as Activity, code)
                                     },
                                     label = { Text(label) },
                                 )

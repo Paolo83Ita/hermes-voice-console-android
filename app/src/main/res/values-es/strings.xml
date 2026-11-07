@@ -787,4 +787,18 @@ MANUAL_ADVANCED — selección independiente por componente, visibilidad total, 
         <string name="mic_cd_mute_disable">Silencio de privacidad activo: micrófono desconectado. Toca para reconectar.</string>
         <string name="mic_cd_stop_speaking">Detener la voz: interrumpir la respuesta hablada</string>
         <string name="mic_cd_text_send">Enviar el mensaje escrito a la consola</string>
+    <string name="recovery_title">La app se cerró durante el primer inicio.</string>
+    <string name="recovery_message">La sesión anterior terminó de forma inesperada. Elige cómo continuar.</string>
+    <string name="recovery_safe_mode_note">En modo seguro los motores de voz permanecen apagados hasta que los inicies uno por uno.</string>
+    <string name="recovery_action_safe_mode">Continuar en modo seguro</string>
+    <string name="recovery_action_console_no_engines">Abrir la Consola sin activar los motores</string>
+    <string name="recovery_action_retry_onboarding">Reintentar la configuración</string>
+    <string name="recovery_action_export">Exportar datos de diagnóstico</string>
+    <string name="recovery_export_done">Diagnóstico exportado</string>
+    <string name="recovery_export_clipboard">El contenido se copió al portapapeles (sin datos de usuario).</string>
+    <string name="interrupt_stop_listening">Detener la escucha</string>
+    <string name="interrupt_cancel_transcription">Cancelar la transcripción</string>
+    <string name="interrupt_cancel_request">Cancelar la solicitud</string>
+    <string name="interrupt_stop_voice">Detener la voz</string>
+    <string name="interrupt_stop_continuous">Detener la escucha continua</string>
 </resources>

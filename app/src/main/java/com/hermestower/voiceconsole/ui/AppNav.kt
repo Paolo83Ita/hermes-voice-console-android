@@ -87,6 +87,7 @@ import com.hermestower.voiceconsole.ui.screens.TowerStudioScreen
 import com.hermestower.voiceconsole.ui.screens.VoiceAudioScreen
 import com.hermestower.voiceconsole.ui.nav.DrawerWidthPolicy
 import com.hermestower.voiceconsole.ui.theme.hermesColors
+import androidx.lifecycle.withResumed
 import kotlinx.coroutines.launch
 import java.util.Locale
 
@@ -151,13 +152,57 @@ fun AppNav(graph: AppGraph) {
     var onboardingDone by androidx.compose.runtime.remember {
         androidx.compose.runtime.mutableStateOf(Onboarding.isDone(appContext))
     }
+    // GRAPH 4.12 §5: the ONE-SHOT navigation token — a second onboarding
+    // completion callback can never navigate again (the proven crash class:
+    // `NavBackStackEntry ... INITIALIZED → DESTROYED` under a racing
+    // navigation + recreation window). A pending route that survives a locale
+    // recreation is consumed from COMMITTED storage after RESUMED.
+    val oneShotNavigationToken = remember {
+        java.util.concurrent.atomic.AtomicBoolean(false)
+    }
     var pendingRoute by androidx.compose.runtime.remember {
         androidx.compose.runtime.mutableStateOf<String?>(null)
     }
     if (!onboardingDone) {
         OnboardingScreen(graph) { route ->
-            Onboarding.markDone(appContext)
-            pendingRoute = route
+            val result = com.hermestower.voiceconsole.onboarding.OnboardingCompletion.execute(
+                oneShotNavigationToken = oneShotNavigationToken,
+                validate = { null }, // the six-step wizard holds its own required state
+                persistOnboardingCompleted = { Onboarding.markDone(appContext) },
+                persistLanguage = {
+                    // Language is persisted at selection time (AppLanguage.apply);
+                    // the session flag is cleared on completion.
+                    com.hermestower.voiceconsole.onboarding.OnboardingCompletion.clearSessionFlags(appContext)
+                },
+                persistConnectionMode = {
+                    graph.keyValueStore.putString(
+                        com.hermestower.voiceconsole.onboarding.OnboardingCompletion.CONNECTION_MODE_KEY,
+                        "persisted-by-onboarding-steps",
+                    )
+                },
+                persistVoiceMode = {
+                    graph.keyValueStore.putString(
+                        com.hermestower.voiceconsole.onboarding.OnboardingCompletion.VOICE_MODE_KEY,
+                        "persisted-by-onboarding-steps",
+                    )
+                },
+                cancelOnboardingCoroutines = { /* the composition-scoped scope dies with the gate flip */ },
+                stopOnboardingCollectors = { /* collectAsState collectors die with the composition */ },
+                localeRecreationPending = {
+                    com.hermestower.voiceconsole.onboarding.OnboardingCompletion
+                        .isLocaleChangedThisSession(appContext)
+                },
+                navigation = { deferredRoute -> pendingRoute = deferredRoute },
+                pendingRoute = route,
+                storePendingRoute = { r ->
+                    com.hermestower.voiceconsole.onboarding.OnboardingCompletion.setPendingRoute(appContext, r)
+                },
+                clearPendingRoute = {
+                    com.hermestower.voiceconsole.onboarding.OnboardingCompletion.clearPendingRoute(appContext)
+                },
+            )
+            // Flip the gate regardless of the one-shot outcome: a duplicate
+            // callback may not navigate, but the wizard must still close.
             onboardingDone = true
         }
         return
@@ -172,10 +217,21 @@ fun AppNav(graph: AppGraph) {
 
     // Directive §6: honor the onboarding choices (QR scan / Models) right after
     // the wizard closes, then clear the pending route.
+    // GRAPH 4.12 §5: the navigation runs ONLY after the host is RESUMED and
+    // EXACTLY ONCE. A route that survived a locale recreation is read from
+    // committed storage (the in-memory pendingRoute dies with the old
+    // composition). `lifecycle.withResumed` suspends here until RESUMED, so a
+    // recreation in flight can never catch a half-initialized back-stack entry.
+    val lifecycleOwner = androidx.compose.ui.platform.LocalLifecycleOwner.current
     LaunchedEffect(pendingRoute) {
-        pendingRoute?.let { route ->
+        val route = pendingRoute
+            ?: com.hermestower.voiceconsole.onboarding.OnboardingCompletion.consumePendingRoute(appContext)
+            ?: return@LaunchedEffect
+        pendingRoute = null
+        // §5: run the navigation only while RESUMED — a recreate in flight can
+        // never catch a half-initialized back-stack entry.
+        lifecycleOwner.lifecycle.withResumed {
             navController.navigate(route) { launchSingleTop = true }
-            pendingRoute = null
         }
     }
 

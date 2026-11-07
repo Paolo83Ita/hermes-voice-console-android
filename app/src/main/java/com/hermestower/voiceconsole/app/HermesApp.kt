@@ -10,7 +10,15 @@ class HermesApp : Application() {
 
     override fun onCreate() {
         super.onCreate()
-        graph = AppGraph(this)
+        // GRAPH 4.12 §3: the crash-evidence hook is installed BEFORE any graph
+        // work — the receipt captures the freshest possible process state.
+        FirstRunCrashEvidence.install(this) {
+            "v" + com.hermestower.voiceconsole.BuildConfig.VERSION_NAME +
+                " (" + com.hermestower.voiceconsole.BuildConfig.VERSION_CODE + ")" +
+                " commit=" + (BuildIdentity.injected().gitShaShort.ifBlank { "unrecorded" })
+        }
+        // GRAPH 4.12 §4: FIRST_RUN_SAFE_MODE survives process death (committed prefs).
+        graph = AppGraph(this, firstRunSafeMode = FirstRunSafeMode.isEnabled(this))
         graph.start()
     }
 }

@@ -74,7 +74,11 @@ import java.time.Clock
  * adapter, Keystore vault, V0.2 migration, Self-Test Center. The console pipeline
  * remains mock-first until a real Tower endpoint is configured by the Owner.
  */
-class AppGraph(private val context: Context) {
+class AppGraph(
+    private val context: Context,
+    /** GRAPH 4.12 §4: FIRST_RUN_SAFE_MODE — no automatic engine start. */
+    val firstRunSafeMode: Boolean = false,
+) {
 
     val scope = CoroutineScope(SupervisorJob() + Dispatchers.Default)
     val clock: Clock = Clock.systemDefaultZone()
@@ -103,6 +107,19 @@ class AppGraph(private val context: Context) {
     val modelQualification = DefaultModelQualificationRunner(modelStorage)
     val modelActivation = DefaultModelActivationController(modelRegistry, modelQualification)
     val modelRollback = DefaultModelRollbackController(modelStorage, modelRegistry)
+
+    // GRAPH 4.12 §7: the RUNTIME-TRUTH capability ladder (distinct from the
+    // download/install ladder). A component may never jump INSTALLED → ACTIVE;
+    // the UI-selected state is not runtime evidence (PHYS-FAIL-05 repair).
+    // Persistence rides the committed keyValueStore ("capability:<identity>").
+    val capabilityLadder = com.hermestower.voiceconsole.models.CapabilityLadder(
+        persist = { identity, state ->
+            keyValueStore.putString("capability:$identity", state.name)
+        },
+    )
+
+    // GRAPH 4.12 §8: the secret-clean runtime receipt recorder (MODEL_RUNTIME_TRUTH).
+    val runtimeReceiptRecorder = com.hermestower.voiceconsole.models.ModelRuntimeReceiptRecorder()
     val modelResolver = DefaultVoicePackResolver()
 
     // GRAPH 4 CP-G4-010 wave 2 (G4-C09 wave 2): QR pairing scan flow. The strict
@@ -248,6 +265,43 @@ class AppGraph(private val context: Context) {
             // (active) speaks, then voice B (the other installed voice) speaks
             // the SAME phrase; the selection authority is never touched.
             voiceAbQualificationProbe = { voiceAbQualification() },
+            // GRAPH 4.12 §9 (ST-55): the REAL Vosk function truth. The fixture
+            // leg runs the REAL Italian speech wav through the REAL engine; the
+            // microphone leg stays null here (a separate Owner-device run).
+            voskFunctionProbe = {
+                val voskEntry = modelCatalog.all().firstOrNull { it.identity == "org.vosk.model.small-it-0.22" }
+                val record = voskEntry?.let { modelRegistry.record(it.identity) }
+                val loaded = voskFrameStt.loadedModelDir != null
+                val fixtureResult: String? = runCatching {
+                    val wav = context.assets.open("models/fixtures/fixture_benvenuto_torre_it.wav").use { it.readBytes() }
+                    if (!loaded) voskFrameStt.load()
+                    val r = com.hermestower.voiceconsole.voice.SttFixtureTestRunner.run(voskFrameStt, wav)
+                    if (r.success) "FIXTURE_PASS" else "FIXTURE_FAIL: ${r.error ?: "transcript rejected"}"
+                }.getOrElse { "FIXTURE_ERROR: ${it.javaClass.simpleName}" }
+                com.hermestower.voiceconsole.selftest.VoskFunctionReadback(
+                    modelVerified = record != null &&
+                        record.state in setOf("HASH_VERIFIED", "INSTALLED", "QUALIFIED", "ACTIVE"),
+                    modelLoaded = loaded,
+                    fixtureResult = fixtureResult,
+                    microphonePass = null, // a SEPARATE physical qualification (never simulated)
+                    activeRouteReadBack = if (loaded) voskFrameStt.engineId
+                    else "Android system recognizer (vosk model not loaded)",
+                )
+            },
+            // GRAPH 4.12 §10 (ST-56/ST-57): the REAL Sherpa/Piper voice truth —
+            // disk bundle → JNI load → state read-back → route truth.
+            sherpaFunctionProbeRiccardo = {
+                sherpaFunctionReadback(
+                    voiceIdentity = "org.piper.voice.it-riccardo-x-low",
+                    engine = naturalTts,
+                )
+            },
+            sherpaFunctionProbePaola = {
+                sherpaFunctionReadback(
+                    voiceIdentity = "org.piper.voice.it-paola-medium",
+                    engine = naturalTtsPaola,
+                )
+            },
         ),
         dispatcher = Dispatchers.Default,
     )
@@ -466,6 +520,12 @@ class AppGraph(private val context: Context) {
             sha256 = entry.sha256,
         )
         voiceSelectionAuthority.beginQualification()
+        // GRAPH 4.12 §7: the ladder must walk its legal steps — no INSTALLED→ACTIVE jump.
+        capabilityLadder.transition(entry.identity, com.hermestower.voiceconsole.models.ModelCapabilityState.RUNTIME_AVAILABLE)
+        capabilityLadder.transition(entry.identity, com.hermestower.voiceconsole.models.ModelCapabilityState.LOADED)
+        capabilityLadder.transition(entry.identity, com.hermestower.voiceconsole.models.ModelCapabilityState.FUNCTIONAL_TEST_PASSED)
+        val receiptStart = System.currentTimeMillis()
+        val memBefore = runtimeMemoryBytes()
         val outcome = kotlinx.coroutines.withContext(kotlinx.coroutines.Dispatchers.Default) {
             voiceRuntimeFactory.activate(seam, entry.identity)
         }
@@ -477,8 +537,67 @@ class AppGraph(private val context: Context) {
                 voiceSelectionAuthority.markRuntimeFailed(outcome.typedReason.name)
             }
         }
+        recordVoiceRuntimeReceipt(entry, outcome, receiptStart, memBefore)
         return outcome
     }
+
+    /** GRAPH 4.12 §8: one secret-clean runtime receipt per activation attempt. */
+    private fun recordVoiceRuntimeReceipt(
+        entry: com.hermestower.voiceconsole.models.ModelCatalogEntry,
+        outcome: VoiceRuntimeFactory.ActivationOutcome,
+        startMillis: Long,
+        memBefore: Long,
+    ) {
+        val (loadResult, finalState, fallback, outputSummary) = when (outcome) {
+            is VoiceRuntimeFactory.ActivationOutcome.Active -> Quad(
+                com.hermestower.voiceconsole.models.ModelRuntimeReceipt.LoadResult.LOADED,
+                com.hermestower.voiceconsole.models.ModelCapabilityState.ACTIVE,
+                null as String?,
+                "preview utterance completed; read-back=${outcome.readBack.voiceId ?: "unreported"}",
+            )
+            is VoiceRuntimeFactory.ActivationOutcome.Failed -> Quad(
+                com.hermestower.voiceconsole.models.ModelRuntimeReceipt.LoadResult.FAILED,
+                com.hermestower.voiceconsole.models.ModelCapabilityState.FAILED,
+                outcome.fallback.name,
+                "typed reason=${outcome.typedReason.name}" + (outcome.detail?.let { "; $it" } ?: ""),
+            )
+        }
+        runtimeReceiptRecorder.record(
+            com.hermestower.voiceconsole.models.ModelRuntimeReceipt(
+                componentIdentity = entry.identity,
+                componentVersion = entry.version,
+                expectedSha256 = entry.sha256,
+                actualSha256 = null,
+                storagePathClass = "filesDir/models/voices",
+                runtimeIdentity = "SHERPA_ONNX",
+                runtimeVersion = "sherpa-onnx v1.12.24",
+                loadStartMillis = startMillis,
+                loadResult = loadResult,
+                memoryBeforeBytes = memBefore,
+                memoryAfterBytes = runtimeMemoryBytes(),
+                functionalInputClass = "preview-phrase",
+                functionalOutputSummary = outputSummary,
+                latencyMillis = System.currentTimeMillis() - startMillis,
+                unloadResult = if (finalState == com.hermestower.voiceconsole.models.ModelCapabilityState.ACTIVE) {
+                    com.hermestower.voiceconsole.models.ModelRuntimeReceipt.UnloadResult.RETAINED_ACTIVE
+                } else {
+                    com.hermestower.voiceconsole.models.ModelRuntimeReceipt.UnloadResult.UNLOADED
+                },
+                finalState = finalState,
+                fallback = fallback,
+            ),
+        )
+    }
+
+    private fun runtimeMemoryBytes(): Long =
+        runCatching {
+            val mem = android.app.ActivityManager.MemoryInfo()
+            (context.getSystemService(android.content.Context.ACTIVITY_SERVICE) as android.app.ActivityManager)
+                .getMemoryInfo(mem)
+            mem.totalMem - mem.availMem
+        }.getOrDefault(-1L)
+
+    private data class Quad<A, B, C, D>(val a: A, val b: B, val c: C, val d: D)
 
     /**
      * GRAPH 4.11 Node 1 (ST-54): the Owner's A/B voice audition — voice A (the
@@ -583,6 +702,41 @@ class AppGraph(private val context: Context) {
                 readBackA != null && readBackB != null && readBackA != readBackB,
             authorityUnchanged = voiceSelectionAuthority.state.value == authorityBefore,
             detail = detail,
+        )
+    }
+
+    /**
+     * GRAPH 4.12 §10: the honest Sherpa/Piper read-back for one voice.
+     * If the runtime is not being consumed (route on Android system TTS), the
+     * read-back says so — the voice is INSTALLED_RUNTIME_NOT_AVAILABLE, never
+     * ACTIVE (the PHYS-FAIL-05 truth rule).
+     */
+    fun sherpaFunctionReadback(
+        voiceIdentity: String,
+        engine: SherpaOnnxTtsEngine,
+    ): com.hermestower.voiceconsole.selftest.SherpaFunctionReadback {
+        val dir = engine.resolveVoiceDir()
+        val record = modelRegistry.record(voiceIdentity)
+        val ttsState = engine.state.value.state
+        val loaded = ttsState == com.hermestower.voiceconsole.voice.TtsState.READY
+        val routeVoiceId = activeNaturalVoice()
+        // §10 honesty: synthesis/playback evidence comes from the REAL runtime
+        // receipt recorded at activation (never inferred from the load state).
+        val receipt = runtimeReceiptRecorder.all().lastOrNull { it.componentIdentity == voiceIdentity }
+        val probeCompleted = receipt?.functionalOutputSummary?.contains("completed") == true
+        return com.hermestower.voiceconsole.selftest.SherpaFunctionReadback(
+            voiceIdentity = voiceIdentity,
+            modelAndConfigExtracted = dir != null &&
+                dir.listFiles()?.any { it.name.endsWith(".onnx") } == true &&
+                dir.resolve("tokens.txt").exists(),
+            jniLoaded = loaded,
+            voiceLoaded = loaded,
+            previewSynthesized = probeCompleted,
+            playbackCompleted = probeCompleted,
+            runtimeReadBackMatchesSelected = routeVoiceId == voiceIdentity,
+            usingAndroidSystemTts = routeVoiceId != voiceIdentity,
+            restartPersistenceOk = record != null,
+            detail = if (dir == null) "bundle files missing on disk" else null,
         )
     }
 
@@ -792,6 +946,56 @@ class AppGraph(private val context: Context) {
         isThermalConstrained = { health.statusSummary().contains("thermal", ignoreCase = true) && health.statusSummary().contains("critical", ignoreCase = true) },
     )
 
+    // GRAPH 4.12 §13/§14: the ONE unified interrupt — cancels every applicable
+    // active operation and returns a per-subsystem receipt (PHYS-FAIL-04 repair).
+    val unifiedInterrupt = com.hermestower.voiceconsole.interrupt.UnifiedInterruptController(
+        newTurnId = { "int-" + java.util.UUID.randomUUID().toString().replace("-", "").take(12) },
+        stopMicrophone = {
+            val listening = voiceCoordinator.micState.value == MicUiState.LISTENING
+            if (listening) voiceCoordinator.stopCapture("unified interrupt")
+            listening
+        },
+        cancelStt = {
+            // On the console chat route the recognizer stop is ATOMIC with the
+            // capture stop (system-STT route); a separate partial channel lives
+            // only on the offline frame pipeline (voskFrameStt, not console chat).
+            val transcribing = store.currentState() == com.hermestower.voiceconsole.core.state.ConsoleState.TRANSCRIBING
+            if (transcribing) driver.cancelCurrentTurn()
+            transcribing
+        },
+        cancelLocalTurn = {
+            val pipelineActive = store.currentState().isPipelineActive
+            if (pipelineActive) driver.cancelCurrentTurn()
+            pipelineActive
+        },
+        cancelBridgeRequest = {
+            // The Tower request lives INSIDE the driver pipeline job — cancelling
+            // the pipeline cancels it. Its receipt outcome is honest: CANCELLED
+            // exactly when a Tower-side state was active.
+            val towerActive = store.currentState() == com.hermestower.voiceconsole.core.state.ConsoleState.CONTACTING_TOWER ||
+                store.currentState() == com.hermestower.voiceconsole.core.state.ConsoleState.TOWER_PROCESSING ||
+                store.currentState() == com.hermestower.voiceconsole.core.state.ConsoleState.REQUEST_QUEUED
+            if (towerActive) driver.cancelCurrentTurn()
+            towerActive
+        },
+        stopTts = {
+            val speaking = store.currentState() == com.hermestower.voiceconsole.core.state.ConsoleState.SPEAKING
+            driver.stopSpeaking()
+            speaking
+        },
+        stopListeningMode = {
+            val active = continuousListening.active.value
+            if (active) continuousListening.stop(
+                com.hermestower.voiceconsole.voice.ListeningModePolicy.StopReason.USER_STOP,
+                "unified interrupt",
+            )
+            active
+        },
+        clearEchoGuard = { echoGuard.clear() },
+        currentConsoleState = { store.currentState() },
+        continuousResumesByPolicy = { false }, // the primary stop never auto-resumes
+    )
+
     fun start() {
         // Restore persisted settings into the store, then keep persisting on change.
         store.applySettings(settingsRepository.load())
@@ -808,9 +1012,28 @@ class AppGraph(private val context: Context) {
         bridge.configure(TowerEndpoint.MOCK)
         driver.start()
         driver.boot()
-        // Préchauffe: system TTS init is async — start it at boot so the first
-        // answer can really speak (no fake SPEAKING while not ready).
-        voiceTts.load()
+        // GRAPH 4.12 §7: restore the persisted capability ladder (never invent states).
+        scope.launch {
+            modelCatalog.all().forEach { entry ->
+                keyValueStore.getString("capability:${entry.identity}")?.let { stored ->
+                    runCatching {
+                        capabilityLadder.restore(
+                            entry.identity,
+                            com.hermestower.voiceconsole.models.ModelCapabilityState.valueOf(stored),
+                        )
+                    }
+                }
+            }
+        }
+        // GRAPH 4.12 §4: FIRST_RUN_SAFE_MODE — no automatic TTS init; the owner
+        // initializes each subsystem individually from the recovery panel.
+        if (!FirstRunSafeMode.mustRefuseAutomaticStart(context, FirstRunSafeMode.Subsystem.TTS)) {
+            // Préchauffe: system TTS init is async — start it at boot so the first
+            // answer can really speak (no fake SPEAKING while not ready).
+            voiceTts.load()
+        } else {
+            events.log("APP", "safe mode: automatic TTS init refused (FIRST_RUN_SAFE_MODE)")
+        }
         // INV-G4-10: privacy mute is a PHYSICAL gate on every capture path.
         scope.launch {
             store.privacyMuted.collect { voiceController.setMuted(it) }

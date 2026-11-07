@@ -34,7 +34,7 @@ object AppLanguage {
     /** Applies and persists the selection; call recreate() on the activity after. */
     fun apply(context: Context, languageCode: String) {
         val code = if (languageCode in SUPPORTED || languageCode == FOLLOW_SYSTEM) languageCode else FOLLOW_SYSTEM
-        prefs(context).edit().putString(KEY, code).apply()
+        prefs(context).edit().putString(KEY, code).commit()
         if (Build.VERSION.SDK_INT >= 33 && code != FOLLOW_SYSTEM) {
             runCatching {
                 val lm = context.getSystemService(Context.LOCALE_SERVICE) as android.app.LocaleManager
@@ -47,6 +47,20 @@ object AppLanguage {
                 val lm = context.getSystemService(Context.LOCALE_SERVICE) as android.app.LocaleManager
                 lm.applicationLocales = LocaleList.getEmptyLocaleList()
             }
+        }
+    }
+
+    /**
+     * GRAPH 4.12 §5: the ONLY sanctioned apply+recreate path. On Android 13+
+     * the official per-app locale mechanism recreates by itself — a manual
+     * recreate() here produced a DOUBLE recreation (the proven first-run crash
+     * window). Below 33 the recreate is posted to the NEXT frame, never inside
+     * the click handler that may also be navigating.
+     */
+    fun applyThenRecreate(activity: android.app.Activity, languageCode: String) {
+        apply(activity, languageCode)
+        if (Build.VERSION.SDK_INT < 33) {
+            com.hermestower.voiceconsole.ui.runtime.ActivityRecreation.recreateNextFrame(activity)
         }
     }
 

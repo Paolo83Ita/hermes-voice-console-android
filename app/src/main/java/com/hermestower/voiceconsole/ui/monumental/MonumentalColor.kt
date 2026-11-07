@@ -47,9 +47,16 @@ data class MonumentalColors(
     val amber: Color,
     val redBronze: Color,
     val redBronzeDeep: Color,
+    // GRAPH 4.12 §19: the TEXT variant of the red-bronze identity — the seal
+    // / border keep redBronze; ordinary small TEXT on dark panels uses this
+    // raised variant (≥4.5:1 on every obsidian surface, PHYS-FAIL-02 repair).
+    val redBronzeText: Color,
     // text
     val ink: Color,
     val inkSecondary: Color,
+    // GRAPH 4.12 §18/§19: textMuted (formerly 0xFF6E675C at 3.17–3.63:1 —
+    // a measured WCAG failure on every ordinary label that used it).
+    // 0xFF8A8375 measures ≥4.72:1 on every obsidian surface.
     val inkDim: Color,
 )
 
@@ -83,9 +90,10 @@ val MonumentalObsidian = MonumentalColors(
     amber = Color(0xFFE8A33D),
     redBronze = Color(0xFFC4553B),
     redBronzeDeep = Color(0xFF7E3222),
+    redBronzeText = Color(0xFFDE7A5E),
     ink = Color(0xFFEDE6D8),
     inkSecondary = Color(0xFFA89F8D),
-    inkDim = Color(0xFF6E675C),
+    inkDim = Color(0xFF8A8375),
 )
 
 val LocalMonumentalColors = staticCompositionLocalOf { MonumentalObsidian }

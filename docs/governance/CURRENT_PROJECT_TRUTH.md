@@ -291,3 +291,67 @@ Current terminal state: POCO_XIAOMI_RETEST_PACKAGE_3_READY (physical verdict = O
 - Nodes executed: 1 voice A/B qualification (ST-54 + AppGraph audition, authority untouched); 2 continuous listening 10-turn pins (loop + anti-echo); 3 no-English-under-Italian catalog pin; 4 Xiaomi responsive coverage VERIFIED (4.10 authorities stand); 5 central Tower MEASURED repairs (sign clip, arrow intrusions, static-band stage alignment — manifest graph-4.11-central-tower-refoundation-2, portal/energy byte-identical); 6 version 0.3.4-alpha-graph4.11 / code 7 / label POCO XIAOMI OWNER PACKAGE 4.
 - Verification at the commit: 422/422 unit tests GREEN (was 412; +10 new), lint 0 errors, secret scan 0 findings, local assembleDebug SUCCESS (universal 248,446,578 B / arm64 118,799,749 B sha256 501792715d… / x86_64 123,515,716 B — validation artifacts; the CI build of the pushed commit is the authoritative package).
 - Honest states: OWNER_VISUAL_RETEST_PENDING, VOICE_SWITCHING_OWNER_VERIFICATION_PENDING, physical passes Owner-only, REAL_TOWER_PENDING_GRAPH_1_7 (P2 next: Tower visual → Archive → Graph 1.7 pairing, per the Owner's own note).
+
+---
+
+# GRAPH 4.12 TRUTH (appended 2026-11-08; additive — never a history rewrite)
+
+- Directive: PHYSICAL STABILITY, MODEL RUNTIME TRUTH, UNIFIED STOP CONTROL,
+  ACCESSIBILITY CONTRAST, CENTRAL TOWER REPLACEMENT, OWNER RETEST PACKAGE.
+  No Archive expansion, no LLM expansion, no Graph 1.7 work in this run.
+- Branch: graph-4/real-voice-pairing-archive-e2e; execution start tip bb70165
+  (fresh fetch-verified; the narrative c18e313 superseded).
+- Owner physical verdict on POCO OWNER PACKAGE 4 recorded in
+  OWNER_PHYSICAL_FINDINGS_GRAPH412.md: PASS = Italian local responses +
+  continuous listening; FAIL = first-run crash (PHYS-FAIL-01), low contrast
+  (02), Tower corrupted (03), Interrompi uncertainty (04), model-consumption
+  uncertainty (05). State OWNER_PHYSICAL_RETEST_FAILED_REPAIR_REQUIRED.
+- Crash ROOT CAUSE (evidence, not guesswork): E2E run 42382864925 both lanes
+  E2E_VERDICT_FAILED with `IllegalStateException: State must be at least
+  CREATED to move to DESTROYED, but was INITIALIZED in NavBackStackEntry` —
+  navigation + Activity recreation racing (and on API 33+ a DOUBLE recreate:
+  LocaleManager automatic + manual recreate()). Repairs: §5 atomic completion
+  contract (one-shot navigation token, committed pending-route that survives
+  recreation, RESUMED-gated navigation via lifecycle.withResumed), single
+  sanctioned recreation scheduler (next-frame, finishing-guarded, no manual
+  recreate on 33+), §3 secret-clean crash receipt system, §4
+  FIRST_RUN_SAFE_MODE with typed per-subsystem gates.
+- Model runtime truth (§7/§8/§9/§10/§11): CapabilityLadder (13 distinct
+  states; INSTALLED→ACTIVE jump REFUSED) + ModelRuntimeReceipt (secret-clean,
+  recorded per activation, report renderer) + ST-55 Vosk fixture truth +
+  ST-56/ST-57 Riccardo/Paola consumption truth (system-TTS route can never be
+  ACTIVE) + LOCAL_LLM_RUNTIME_UNAVAILABLE preserved.
+- Unified interrupt (§13–§16): UnifiedInterruptController cancels every
+  applicable subsystem and returns an InterruptReceipt; §15 state-specific
+  labels (Interrompi ascolto / Annulla trascrizione / Annulla richiesta /
+  Interrompi voce / Ferma ascolto continuo) + visible final-state read-back.
+- Contrast (§18–§20): inkDim repaired 0xFF6E675C→0xFF8A8375 (3.17–3.63:1 →
+  ≥4.72:1); redBronzeText 0xFFDE7A5E for small text; Marble Gold/Energy/Warn/Ok
+  deepened to ≥4.5:1; all pinned by ContrastRatioTest;
+  ACCESSIBILITY_COLOR_CONTRAST_REPORT.md is the measured record.
+- Raw enums (§21) moved out of ordinary UI via StateLabels expansion (54 keys);
+  Advanced Diagnostics keeps raw values.
+- Central Tower (§26–§34): the ten rejected layers RETIRED to
+  docs/evidence/quarantined-tower-assets-graph412/ (CENTRAL_TOWER_ASSET_RECONSTRUCTION_FAIL
+  declared); NEW ORIGINAL candidate set (A/B/C) vector-drawn on a 1000×1375
+  normalized stage; candidate A selected (Owner fidelity decision);
+  automated §30 checks PASS (3 candidates, 0 defects); BALANCED decoded 20.9MB
+  < 24MB budget, LOW 11.1MB < 12MB; ReforgedTowerVisual rewritten (12-layer
+  contract, §31 animation, §32 profiles, §24 staged decode — first frame pays
+  only the 6 static layers); §33 height contract (50%/24% usable area).
+- Regression: unit 450/450 GREEN (+28 new), lint 0 errors, secret scan 0.
+- APKs: versionName 0.3.5-alpha-graph4.12-physical-repair / versionCode 8 /
+  label POCO XIAOMI PHYSICAL REPAIR 4; local validation arm64
+  ec3a0217d687f80d… (universal 09f935dc…, x86_64 4409c3dd…); the pushed-commit
+  CI build is the authoritative package (see
+  docs/receipts/GRAPH412_LOCAL_APK_RECEIPT.md).
+- Owner retest package: OWNER_POCO_XIAOMI_RETEST_PACKAGE_5_READY —
+  docs/receipts/OWNER_POCO_XIAOMI_RETEST_PACKAGE_5_GRAPH412.md.
+- Honest states: POCO_XIAOMI_PHYSICAL_REPAIR_PACKAGE_READY (pre-device);
+  OWNER_VISUAL_RETEST_PENDING; VOICE_SWITCHING_OWNER_VERIFICATION_PENDING;
+  physical passes Owner-only. Typed carry-forward unchanged:
+  LOCAL_LLM_RUNTIME_UNAVAILABLE, REAL_TOWER_PENDING_GRAPH_1_7,
+  REAL_ARCHIVE_PENDING_TOWER_API.
+- Forbidden tokens remain UNCLAIMED (grader never self-grants):
+  POCO_XIAOMI_…_RETEST_PASSED, ITALIAN_TTS_OWNER_VERIFIED,
+  VOICE_SWITCHING_OWNER_VERIFIED, RESPONSIVE_UI_QUALIFIED, REAL_TOWER_PAIRING_PASSED.

@@ -200,7 +200,11 @@ fun AppearanceScreen(graph: AppGraph) {
                         // OWNER PHYSICAL FEEDBACK 3: the spoken voice follows the
                         // app language immediately (no recreate dependency).
                         runCatching { graph.voiceTts.applySpokenLocale() }
-                        (context as? Activity)?.recreate()
+                        // GRAPH 4.12 §5: recreation posted to the NEXT frame —
+                        // never inside the click handler (the proven crash window).
+                        (context as? Activity)?.let {
+                            com.hermestower.voiceconsole.ui.runtime.ActivityRecreation.recreateNextFrame(it)
+                        }
                     },
                 )
                 listOf("it" to Res.string.lang_it, "en" to Res.string.lang_en, "es" to Res.string.lang_es, "fr" to Res.string.lang_fr, "de" to Res.string.lang_de)
@@ -215,7 +219,10 @@ fun AppearanceScreen(graph: AppGraph) {
                                 // OWNER PHYSICAL FEEDBACK 3: the spoken voice
                                 // follows the app language immediately.
                                 runCatching { graph.voiceTts.applySpokenLocale() }
-                                (context as? Activity)?.recreate()
+                                // GRAPH 4.12 §5: recreation posted to the NEXT frame.
+                                (context as? Activity)?.let {
+                                    com.hermestower.voiceconsole.ui.runtime.ActivityRecreation.recreateNextFrame(it)
+                                }
                             },
                         )
                     }

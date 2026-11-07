@@ -787,4 +787,18 @@ MANUAL_ADVANCED — selezione indipendente per componente, visibilità totale, n
         <string name="mic_cd_mute_disable">Mute privacy attiva: microfono disconnesso. Tocca per riconnettere.</string>
         <string name="mic_cd_stop_speaking">Interrompi la voce: ferma la risposta parlata</string>
         <string name="mic_cd_text_send">Invia il messaggio scritto alla console</string>
+    <string name="recovery_title">L\'app si è chiusa durante il primo avvio.</string>
+    <string name="recovery_message">La sessione precedente si è interrotta in modo imprevisto. Scegli come procedere.</string>
+    <string name="recovery_safe_mode_note">In modalità sicura i motori vocali restano spenti finché non li avvii singolarmente.</string>
+    <string name="recovery_action_safe_mode">Continua in modalità sicura</string>
+    <string name="recovery_action_console_no_engines">Apri Console senza attivare i motori</string>
+    <string name="recovery_action_retry_onboarding">Riprova configurazione</string>
+    <string name="recovery_action_export">Esporta dati diagnostici</string>
+    <string name="recovery_export_done">Diagnostica esportata</string>
+    <string name="recovery_export_clipboard">Il contenuto è stato copiato negli appunti (nessun dato utente incluso).</string>
+    <string name="interrupt_stop_listening">Interrompi ascolto</string>
+    <string name="interrupt_cancel_transcription">Annulla trascrizione</string>
+    <string name="interrupt_cancel_request">Annulla richiesta</string>
+    <string name="interrupt_stop_voice">Interrompi voce</string>
+    <string name="interrupt_stop_continuous">Ferma ascolto continuo</string>
 </resources>

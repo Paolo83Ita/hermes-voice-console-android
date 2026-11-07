@@ -787,4 +787,18 @@ MANUAL_ADVANCED — sélection indépendante par composant, visibilité totale, 
         <string name="mic_cd_mute_disable">Muet de confidentialité actif : microphone déconnecté. Toucher pour reconnecter.</string>
         <string name="mic_cd_stop_speaking">Arrêter la voix : interrompre la réponse parlée</string>
         <string name="mic_cd_text_send">Envoyer le message tapé à la console</string>
+    <string name="recovery_title">L\'application s\'est fermée pendant le premier démarrage.</string>
+    <string name="recovery_message">La session précédente s\'est terminée de façon inattendue. Choisissez comment procéder.</string>
+    <string name="recovery_safe_mode_note">En mode sans échec, les moteurs vocaux restent éteints jusqu\'à leur démarrage individuel.</string>
+    <string name="recovery_action_safe_mode">Continuer en mode sans échec</string>
+    <string name="recovery_action_console_no_engines">Ouvrir la Console sans activer les moteurs</string>
+    <string name="recovery_action_retry_onboarding">Réessayer la configuration</string>
+    <string name="recovery_action_export">Exporter les données de diagnostic</string>
+    <string name="recovery_export_done">Diagnostics exportés</string>
+    <string name="recovery_export_clipboard">Le contenu a été copié dans le presse-papiers (aucune donnée utilisateur).</string>
+    <string name="interrupt_stop_listening">Arrêter l\'écoute</string>
+    <string name="interrupt_cancel_transcription">Annuler la transcription</string>
+    <string name="interrupt_cancel_request">Annuler la requête</string>
+    <string name="interrupt_stop_voice">Couper la voix</string>
+    <string name="interrupt_stop_continuous">Arrêter l\'écoute continue</string>
 </resources>

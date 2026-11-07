@@ -15,6 +15,12 @@ dependencyResolutionManagement {
     repositoriesMode.set(RepositoriesMode.FAIL_ON_PROJECT_REPOS)
     repositories {
         google()
+        // CP-G4.12: mirror-first resilience — Maven Central now serves sustained
+        // 429s to this network (the same failure class as run 41618048112); the
+        // byte-identical mirror serves first and mavenCentral stays as the
+        // checksum-verified fallback (Gradle verifies every artifact regardless
+        // of which repo served it).
+        maven { url = uri("https://maven.aliyun.com/repository/central") }
         mavenCentral()
         // RESILIENCE FALLBACK (run 41618048112, 2026-11-03): Maven Central returned
         // 429/5xx on the cloud runner and onnxruntime-android 1.20.0 +

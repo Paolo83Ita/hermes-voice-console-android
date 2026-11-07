@@ -1716,3 +1716,22 @@ NEXT: Owner physical retest per OWNER_POCO_XIAOMI_RETEST_PACKAGE_3_GRAPH410.md.
 - Verification: 422/422 unit GREEN, lint 0 errors, secret scan 0, local APKs hashed; CI read-back recorded after push.
 - CHECKPOINT: CP-G4.11-001..003 → POCO_OWNER_PACKAGE_4_READY (local validation) → CI package authoritative.
 NEXT: Owner installs the CI arm64 APK and runs the Package 4 runbook; remaining energy then moves to Tower visual verdict → Archive → Graph 1.7 pairing (Owner's own sequencing note).
+
+## 2026-11-08 — GRAPH 4.12 PHYSICAL REPAIR 4 (single-session execution)
+
+1. Fresh read-back: local was 34 behind → ff-only to bb70165; tree clean;
+   GRAPH412_FRESH_READBACK.md written; E2E run 42382864925 terminal FAILURE
+   analyzed from artifacts (REAL process-crash evidence, not fleet-only).
+2. OWNER_PHYSICAL_FINDINGS_GRAPH412.md recorded (5 defects, 2 passes).
+3. Crash evidence system + FIRST_RUN_SAFE_MODE + atomic onboarding completion
+   (one-shot token, committed pending route, RESUMED-gated navigate) + single
+   recreation scheduler (double-recreate eliminated).
+4. Model capability ladder + runtime receipts + ST-55/56/57 + LLM truth held.
+5. Unified interrupt + InterruptReceipt + state-specific labels + read-back.
+6. Contrast audit + repairs (inkDim, redBronzeText, 4 Marble tokens) + report.
+7. Tower retired/quarantined; new original candidate set generated, validated
+   (§30 PASS), candidate A integrated (12-layer ReforgedTowerVisual rewrite,
+   staged decode, §33 height contract); visual reports written.
+8. Regression 450/450 GREEN; lint 0 errors; secret scan 0 findings.
+9. APKs built locally (validation): universal/arm64/x86_64 @ versionCode 8.
+10. Retest package 5 runbook written; governance appended additively.

@@ -265,17 +265,25 @@ fun ConsoleScreen(
                     .fillMaxWidth()
                     .burnInOffset(burnStep, BurnInRegion.CORE),
             ) {
-                // The core stage keeps the exact design aspect (1080 x 1420) so the
-                // WebP depth layers and the Canvas dynamics align pixel-perfectly.
-                // GRAPH 4 directive §7: when the composer is focused (keyboard
-                // visible) the Tower smoothly shrinks to a compact portal and the
-                // timeline/input area gains the space — chat-focused layout.
+                // GRAPH 4.12 §33: the Tower height is a PERCENTAGE OF THE USABLE
+                // Console area — keyboard closed 45–55% (default 50%), keyboard
+                // open 20–28% (default 24%) — clamped by the stage aspect
+                // (1000×1375) so the twelve layers and the Canvas dynamics stay
+                // pixel-aligned at every size.
                 val imeOpen = WindowInsets.ime.getBottom(LocalDensity.current) > 0
                 val coreScale by animateFloatAsState(
-                    targetValue = if (imeOpen) 0.52f else 1f,
+                    targetValue = if (imeOpen) 0.48f else 1f,
                     label = "towerChatFocus",
                 )
-                val coreH = maxWidth * (1420f / 1080f) * coreScale
+                // The scroll column reports an unbounded height, so the usable
+                // Console area is taken from the real screen metrics (insets-safe
+                // enough for the 45–55% / 20–28% §33 windows on both devices).
+                val heightFraction = if (imeOpen) 0.24f else 0.50f
+                val screenHeightDp =
+                    androidx.compose.ui.platform.LocalConfiguration.current.screenHeightDp.dp
+                val byHeight = screenHeightDp * heightFraction * coreScale
+                val byWidth = maxWidth * 1.375f * coreScale
+                val coreH = minOf(byHeight, byWidth)
                 // GRAPH 4.10 §29: the procedural Tower is REJECTED by the Owner —
                 // the Console renders the Owner-reference-derived LAYERED central
                 // Tower (ReforgedTowerVisual, §31 layers + §34 state animations,
@@ -330,7 +338,7 @@ fun ConsoleScreen(
                 Text(
                     lastRefusal!!,
                     style = MonumentalType.bodySecondary,
-                    color = m.redBronze,
+                    color = m.redBronzeText,
                     modifier = Modifier
                         .padding(horizontal = 18.dp, vertical = 2.dp)
                         .semantics { liveRegion = LiveRegionMode.Assertive },
@@ -502,6 +510,23 @@ fun ConsoleScreen(
                 speechMode,
                 isSpeaking,
             )
+            // GRAPH 4.12 §15: the ONE state-specific interrupt resolver — the
+            // label follows the ACTIVE operation (never one ambiguous Interrompi).
+            val interruptUi = com.hermestower.voiceconsole.interrupt.UnifiedInterruptController.resolve(
+                consoleState = state,
+                micListening = micState == MicUiState.LISTENING,
+                continuousActive = continuousActive,
+            )
+            var interruptReadback by remember { mutableStateOf<String?>(null) }
+            fun runUnifiedInterrupt(source: String) {
+                val receipt = graph.unifiedInterrupt.cancelAllActive(source)
+                // §16: visible final-state read-back (typed, secret-clean).
+                interruptReadback =
+                    "mic=${receipt.microphoneStopResult} stt=${receipt.sttCancelResult} " +
+                    "turn=${receipt.localTurnCancelResult} bridge=${receipt.bridgeCancelResult} " +
+                    "tts=${receipt.ttsStopResult} mode=${receipt.listeningModeResult} " +
+                    "→ ${receipt.finalConsoleState} (${receipt.durationMillis}ms)"
+            }
             Row(
                 Modifier
                     .fillMaxWidth()
@@ -517,8 +542,13 @@ fun ConsoleScreen(
                             micPermissionLauncher.launch(android.Manifest.permission.RECORD_AUDIO)
                         MicUiState.PERMANENTLY_DENIED -> graph.driver.setPrivacyMuted(false)
                         else -> {
-                            if (micState == MicUiState.LISTENING) graph.voiceCoordinator.stopCapture("push-to-talk released")
-                            else graph.voiceCoordinator.onPushToTalkPress()
+                            if (micState == MicUiState.LISTENING) {
+                                // GRAPH 4.12 §13: the primary stop cancels ALL applicable
+                                // active operations (the “Interrompi non-functional” class).
+                                runUnifiedInterrupt("primary stop")
+                            } else {
+                                graph.voiceCoordinator.onPushToTalkPress()
+                            }
                         }
                     }
                 }) {
@@ -646,12 +676,14 @@ fun ConsoleScreen(
                         .semantics { liveRegion = LiveRegionMode.Polite },
                 )
             }
-            // live control label row (Parla / Interrompi ascolto / Interrompi voce). ----
+            // live control label row (§15: the label follows the ACTIVE operation —
+            // Interrompi ascolto / Annulla trascrizione / Annulla richiesta /
+            // Interrompi voce / Ferma ascolto continuo; idle = clearly disabled). ----
             if (muted) {
                 Text(
                     stringResource(com.hermestower.voiceconsole.R.string.mic_label_muted),
                     style = MonumentalType.sealSub,
-                    color = m.redBronze,
+                    color = m.redBronzeText,
                     textAlign = TextAlign.Center,
                     modifier = Modifier
                         .fillMaxWidth()
@@ -659,15 +691,44 @@ fun ConsoleScreen(
                         .semantics { liveRegion = LiveRegionMode.Polite },
                 )
             } else {
+                val interruptLabel = when (interruptUi.labelId) {
+                    com.hermestower.voiceconsole.interrupt.UnifiedInterruptController.LABEL_TRANSCRIBING ->
+                        stringResource(com.hermestower.voiceconsole.R.string.interrupt_cancel_transcription)
+                    com.hermestower.voiceconsole.interrupt.UnifiedInterruptController.LABEL_PROCESSING ->
+                        stringResource(com.hermestower.voiceconsole.R.string.interrupt_cancel_request)
+                    com.hermestower.voiceconsole.interrupt.UnifiedInterruptController.LABEL_SPEAKING ->
+                        stringResource(com.hermestower.voiceconsole.R.string.interrupt_stop_voice)
+                    com.hermestower.voiceconsole.interrupt.UnifiedInterruptController.LABEL_CONTINUOUS ->
+                        stringResource(com.hermestower.voiceconsole.R.string.interrupt_stop_continuous)
+                    else ->
+                        if (interruptUi.cancellable) {
+                            stringResource(com.hermestower.voiceconsole.R.string.interrupt_stop_listening)
+                        } else {
+                            stringResource(pttSemantics.labelRes) // idle: Parla, disabled tone
+                        }
+                }
                 Text(
-                    stringResource(pttSemantics.labelRes),
+                    interruptLabel,
                     style = MonumentalType.sealSub,
-                    color = if (micState == MicUiState.LISTENING) m.cyanCore else m.inkDim,
+                    color = if (interruptUi.enabled) m.cyanCore else m.inkDim,
                     textAlign = TextAlign.Center,
                     modifier = Modifier
                         .fillMaxWidth()
                         .padding(horizontal = 12.dp, vertical = 2.dp),
                 )
+                // §16: the visible final-state read-back after an interrupt.
+                interruptReadback?.let { rb ->
+                    Text(
+                        rb,
+                        style = MonumentalType.sealSub,
+                        color = m.inkSecondary,
+                        textAlign = TextAlign.Center,
+                        modifier = Modifier
+                            .fillMaxWidth()
+                            .padding(horizontal = 12.dp, vertical = 2.dp)
+                            .semantics { liveRegion = LiveRegionMode.Polite },
+                    )
+                }
             }
             // ---- engine truth row (§5: engines are named, simulation labeled) ----
             Text(
@@ -796,7 +857,7 @@ private fun StateOverlayChip(
     val m = monumentalColors
     val chipColor = when (state) {
         ConsoleState.REQUEST_QUEUED -> m.amber
-        ConsoleState.ERROR -> m.redBronze
+        ConsoleState.ERROR -> m.redBronzeText
         ConsoleState.DISCONNECTED, ConsoleState.PRIVACY_MUTED -> m.inkSecondary
         else -> m.cyanCore
     }

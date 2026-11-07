@@ -15,52 +15,57 @@ import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.offset
 import androidx.compose.foundation.layout.size
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.getValue
+import androidx.compose.runtime.mutableStateOf
+import androidx.compose.runtime.remember
+import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.alpha
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.graphics.ColorFilter
+import androidx.compose.ui.graphics.asImageBitmap
 import androidx.compose.ui.graphics.drawscope.Stroke
 import androidx.compose.ui.graphics.graphicsLayer
 import androidx.compose.ui.layout.ContentScale
+import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.platform.LocalDensity
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.unit.IntOffset
-import androidx.compose.ui.unit.dp
+import androidx.compose.ui.unit.IntSize
 import com.hermestower.voiceconsole.R
 import com.hermestower.voiceconsole.core.state.ConsoleState
-import com.hermestower.voiceconsole.ui.monumental.VisualQuality
 import androidx.compose.ui.geometry.Offset
+import kotlinx.coroutines.Dispatchers
+import kotlinx.coroutines.withContext
 import kotlin.math.roundToInt
 
 /**
- * GRAPH 4.10 CP-G4.10-010/011 (§29-§35) — CENTRAL TOWER VISUAL REFOUNDATION.
+ * GRAPH 4.12 §26–§34 — NEW ORIGINAL CENTRAL TOWER (Owner image rejected the
+ * previous cutout-derived set; PHYS-FAIL-03; CENTRAL_TOWER_ASSET_RECONSTRUCTION_FAIL).
  *
- * The Owner REJECTED the procedural Tower. This composable renders the
- * Owner-reference-derived LAYERED central Tower (ten transparent WebP layers,
- * geometry from docs/visual/ASSET_MANIFEST.json) and drives the §34 states:
+ * The shipped layers are ORIGINAL vector-drawn compositions (candidate A,
+ * docs/visual/tower412/ASSET_MANIFEST.json) on ONE normalized stage
+ * (1000×1375), designed from the start for transparency, symmetry, animation,
+ * compact scaling, OLED safety and the LOW/BALANCED/HIGH budgets (§32).
  *
- *  - IDLE: slow outer ring, low portal breathing;
- *  - LISTENING: incoming cyan energy, input gate open;
- *  - TRANSCRIBING: sequential ring pulses;
- *  - UNDERSTANDING_LOCAL: cyan-gold inner mechanism (no remote path);
- *  - CONTACTING_TOWER / TOWER_PROCESSING: upward energy / differentiated ring
- *    rotation;
- *  - SPEAKING: portal and architectural light respond to the audio amplitude;
- *  - CONTINUOUS LISTENING: persistent moderate listening seal;
- *  - PRIVACY MUTED: input gate closed, red-bronze seal;
- *  - CHAT SPEECH MUTED: audio-output glyph muted, microphone state unchanged;
- *  - DISCONNECTED: remote conduit off, local core remains available;
- *  - ERROR: controlled amber fracture — never an aggressive flash.
+ * §24 STAGED DECODE: the first Console frame decodes ONLY the five static
+ * architecture layers; the five animated mechanism layers (outer/middle/
+ * inner/portal/energy) decode asynchronously right after — the first frame
+ * never pays the full twelve-layer decode.
  *
- * Performance profiles (§35): LOW renders the static rear + static portal (no
- * rotation, no particles); BALANCED (default) adds smooth ring movement and
- * state-driven energy; HIGH adds Canvas particles and is NOT the default.
- * Reduced motion freezes every infinite animation honestly.
- *
- * Stage geometry (uniform layer scale): rear 720x1653 defines the stage;
- * core center at (0.500, 0.403) of the stage; ring box = 645/720 of width.
+ * §31 ANIMATION CONTRACT (per state):
+ *   IDLE            slow outer motion, subtle portal breathing;
+ *   LISTENING       incoming energy, open input gate;
+ *   TRANSCRIBING    sequential ring pulses (phase-offset breathing);
+ *   PROCESSING      differentiated mechanisms (three distinct rates/directions);
+ *   SPEAKING        audio-amplitude response on the portal;
+ *   CONTINUOUS      stable low-energy listening state;
+ *   PRIVACY MUTED   input gate closed, red-bronze privacy seal;
+ *   CHAT MUTED      output channel dimmed, microphone unaffected;
+ *   DISCONNECTED    remote conduit off, local portal available;
+ *   ERROR           controlled amber state, never flashing.
  */
 @Composable
 fun ReforgedTowerVisual(
@@ -76,112 +81,133 @@ fun ReforgedTowerVisual(
     val low = quality == VisualQuality.LOW
     val frozen = reducedMotion || low
 
-    val rear = painterResource(R.drawable.tower_rear)
+    // ---- §24 stage 1: static architecture (first frame) ----
+    val rear = painterResource(R.drawable.tower_structure_rear)
     val sign = painterResource(R.drawable.tower_sign)
-    val outer = painterResource(R.drawable.tower_outer_ring)
-    val middle = painterResource(R.drawable.tower_middle_ring)
-    val inner = painterResource(R.drawable.tower_inner_ring)
-    val portal = painterResource(R.drawable.tower_portal)
-    val gate = painterResource(R.drawable.tower_lower_gate)
-    val stairs = painterResource(R.drawable.tower_stairs)
+    val columns = painterResource(R.drawable.tower_columns)
+    val gate = painterResource(R.drawable.tower_lower_gateway)
+    val stairs = painterResource(R.drawable.tower_stairs_plinth)
     val foreground = painterResource(R.drawable.tower_foreground)
-    val energy = painterResource(R.drawable.tower_energy)
+
+    // ---- §24 stage 2: animated mechanisms decode AFTER the first frame ----
+    val context = LocalContext.current
+    var mech by remember { mutableStateOf<TowerMechanismBitmaps?>(null) }
+    LaunchedEffect(Unit) {
+        mech = withContext(Dispatchers.IO) { TowerMechanismBitmaps.decode(context) }
+    }
 
     BoxWithConstraints(modifier) {
         val density = LocalDensity.current
+        // stage proportions: 1000 x 1375
         val stageW = maxWidth
-        val stageH = stageW * (1653f / 720f)
+        val stageH = stageW * (1375f / 1000f)
         val stageHp = with(density) { stageH.toPx() }
         val stageWp = with(density) { stageW.toPx() }
 
-        // static architecture (fills the stage width)
-        Image(rear, contentDescription = null, contentScale = ContentScale.Fit,
+        // static stack (stage-wide, exact proportions)
+        Image(rear, contentDescription = null, contentScale = ContentScale.FillWidth,
             modifier = Modifier.align(Alignment.TopCenter).fillMaxWidth())
-        Image(sign, contentDescription = null, contentScale = ContentScale.Fit,
+        Image(sign, contentDescription = null, contentScale = ContentScale.FillWidth,
             modifier = Modifier.align(Alignment.TopCenter).fillMaxWidth())
-        Image(stairs, contentDescription = null, contentScale = ContentScale.Fit,
+        Image(columns, contentDescription = null, contentScale = ContentScale.FillWidth,
             modifier = Modifier.align(Alignment.TopCenter).fillMaxWidth())
-        Image(gate, contentDescription = null, contentScale = ContentScale.Fit,
+        Image(gate, contentDescription = null, contentScale = ContentScale.FillWidth,
             modifier = Modifier.align(Alignment.TopCenter).fillMaxWidth())
-        Image(foreground, contentDescription = null, contentScale = ContentScale.Fit,
+        Image(stairs, contentDescription = null, contentScale = ContentScale.FillWidth,
+            modifier = Modifier.align(Alignment.TopCenter).fillMaxWidth())
+        Image(foreground, contentDescription = null, contentScale = ContentScale.FillWidth,
             modifier = Modifier.align(Alignment.TopCenter).fillMaxWidth())
 
-        // energy column: width 420/720 of the stage, top at source y = CY+40.
-        val energyW = stageW * (420f / 720f)
+        // oracle center: (0.5, 700/1375) of the stage; mechanism box 544/1000 wide
+        val mechSize = stageW * (544f / 1000f)
+        val mechSizePx = with(density) { mechSize.toPx() }
+        val mechX = ((stageWp - mechSizePx) / 2f).roundToInt()
+        val mechY = (stageHp * (700f / 1375f) - mechSizePx / 2f).roundToInt()
 
-        val ringSize = stageW * (645f / 720f)
-        val ringSizePx = with(density) { ringSize.toPx() }
-        val energyWPx = with(density) { energyW.toPx() }
-        val energyX = ((stageWp - energyWPx) / 2f).roundToInt()
-        val energyY = (stageHp * 0.4425f).roundToInt()
-        val ringX = ((stageWp - ringSizePx) / 2f).roundToInt()
-        val ringY = (stageHp * 0.403f - ringSizePx / 2f).roundToInt()
-
-        // §34 rotation + breathing
+        // §31 rotation rates (differentiated per state)
         val outerAngle = if (frozen) 0f else infiniteAngle(
             when (state) {
-                ConsoleState.TOWER_PROCESSING -> 24_000
-                ConsoleState.CONTACTING_TOWER -> 30_000
+                ConsoleState.TOWER_PROCESSING -> 22_000
+                ConsoleState.CONTACTING_TOWER -> 28_000
+                ConsoleState.UNDERSTANDING_LOCAL -> 40_000
                 else -> 90_000
             },
         )
         val middleAngle = if (frozen) 0f else infiniteAngle(
-            if (state == ConsoleState.TOWER_PROCESSING) 16_000 else -64_000,
+            when (state) {
+                ConsoleState.TOWER_PROCESSING -> -14_000
+                ConsoleState.CONTACTING_TOWER -> -18_000
+                else -> -64_000
+            },
         )
         val innerAngle = if (frozen) 0f else infiniteAngle(
-            if (state == ConsoleState.UNDERSTANDING_LOCAL) 22_000 else 48_000,
+            when (state) {
+                ConsoleState.UNDERSTANDING_LOCAL -> 20_000
+                ConsoleState.TOWER_PROCESSING -> 34_000
+                else -> 48_000
+            },
         )
         val breathing = if (frozen) 0f else infiniteBreath()
+
+        // §31 portal behavior
         val portalPulse = when {
             state == ConsoleState.SPEAKING -> 0.55f + 0.45f * speakingAmplitude.coerceIn(0f, 1f)
             state == ConsoleState.LISTENING -> 0.85f + 0.15f * breathing
+            continuousActive -> 0.78f + 0.08f * breathing
+            state == ConsoleState.TRANSCRIBING -> 0.55f + 0.35f * breathing
+            state == ConsoleState.DISCONNECTED -> 0.45f + 0.08f * breathing
             else -> 0.62f + 0.10f * breathing
         }
         val portalAlpha by animateFloatAsState(portalPulse, label = "portalPulse")
 
+        // §31 energy channel behavior (remote conduit vs local channel)
         val energyAlpha = when {
             privacyMuted -> 0f
             state == ConsoleState.CONTACTING_TOWER || state == ConsoleState.TOWER_PROCESSING -> 0.95f
             state == ConsoleState.LISTENING || continuousActive -> 0.8f
+            state == ConsoleState.TRANSCRIBING -> 0.7f
             state == ConsoleState.DISCONNECTED -> 0.12f
+            state == ConsoleState.SPEAKING -> 0.5f + 0.4f * speakingAmplitude.coerceIn(0f, 1f)
             else -> 0.4f
         }
         val innerGold = state == ConsoleState.UNDERSTANDING_LOCAL
 
-        Image(energy, contentDescription = null, contentScale = ContentScale.Fit,
-            modifier = Modifier
-                .align(Alignment.TopStart)
-                .offset { IntOffset(energyX, energyY) }
-                .size(energyW)
-                .alpha(energyAlpha))
+        val m = mech
+        if (m != null) {
+            Image(m.energy.asImageBitmap(), contentDescription = null, contentScale = ContentScale.FillWidth,
+                modifier = Modifier
+                    .align(Alignment.TopStart)
+                    .offset { IntOffset(mechX, mechY) }
+                    .size(mechSize)
+                    .alpha(energyAlpha))
+            Image(m.outer.asImageBitmap(), contentDescription = null, contentScale = ContentScale.FillWidth,
+                modifier = Modifier
+                    .align(Alignment.TopStart)
+                    .offset { IntOffset(mechX, mechY) }
+                    .size(mechSize)
+                    .graphicsLayer { rotationZ = outerAngle })
+            Image(m.middle.asImageBitmap(), contentDescription = null, contentScale = ContentScale.FillWidth,
+                modifier = Modifier
+                    .align(Alignment.TopStart)
+                    .offset { IntOffset(mechX, mechY) }
+                    .size(mechSize)
+                    .graphicsLayer { rotationZ = middleAngle })
+            Image(m.inner.asImageBitmap(), contentDescription = null, contentScale = ContentScale.FillWidth,
+                colorFilter = if (innerGold) ColorFilter.tint(Color(0x66FFC866)) else null,
+                modifier = Modifier
+                    .align(Alignment.TopStart)
+                    .offset { IntOffset(mechX, mechY) }
+                    .size(mechSize)
+                    .graphicsLayer { rotationZ = innerAngle })
+            Image(m.portal.asImageBitmap(), contentDescription = null, contentScale = ContentScale.FillWidth,
+                modifier = Modifier
+                    .align(Alignment.TopStart)
+                    .offset { IntOffset(mechX, mechY) }
+                    .size(mechSize)
+                    .alpha(portalAlpha))
+        }
 
-        Image(outer, contentDescription = null, contentScale = ContentScale.Fit,
-            modifier = Modifier
-                .align(Alignment.TopStart)
-                .offset { IntOffset(ringX, ringY) }
-                .size(ringSize)
-                .graphicsLayer { rotationZ = outerAngle })
-        Image(middle, contentDescription = null, contentScale = ContentScale.Fit,
-            modifier = Modifier
-                .align(Alignment.TopStart)
-                .offset { IntOffset(ringX, ringY) }
-                .size(ringSize)
-                .graphicsLayer { rotationZ = middleAngle })
-        Image(inner, contentDescription = null, contentScale = ContentScale.Fit,
-            colorFilter = if (innerGold) ColorFilter.tint(Color(0x66FFC866)) else null,
-            modifier = Modifier
-                .align(Alignment.TopStart)
-                .offset { IntOffset(ringX, ringY) }
-                .size(ringSize)
-                .graphicsLayer { rotationZ = innerAngle })
-        Image(portal, contentDescription = null, contentScale = ContentScale.Fit,
-            modifier = Modifier
-                .align(Alignment.TopStart)
-                .offset { IntOffset(ringX, ringY) }
-                .size(ringSize)
-                .alpha(portalAlpha))
-
-        // §34 overlays (Canvas): seals, fracture, particles, speaking light
+        // §31 state overlays (Canvas, zero-bitmap memory): seals, dim, fracture
         TowerStateOverlays(
             privacyMuted = privacyMuted,
             chatSpeechMuted = chatSpeechMuted,
@@ -193,6 +219,29 @@ fun ReforgedTowerVisual(
             amplitude = speakingAmplitude,
             modifier = Modifier.align(Alignment.TopCenter).fillMaxWidth(),
         )
+    }
+}
+
+/** The five animated mechanism layers, decoded OFF the first frame (§24). */
+class TowerMechanismBitmaps private constructor(
+    val outer: android.graphics.Bitmap,
+    val middle: android.graphics.Bitmap,
+    val inner: android.graphics.Bitmap,
+    val portal: android.graphics.Bitmap,
+    val energy: android.graphics.Bitmap,
+) {
+    companion object {
+        fun decode(context: android.content.Context): TowerMechanismBitmaps {
+            fun d(id: Int): android.graphics.Bitmap =
+                android.graphics.BitmapFactory.decodeResource(context.resources, id)
+            return TowerMechanismBitmaps(
+                outer = d(R.drawable.tower_outer_mechanism),
+                middle = d(R.drawable.tower_middle_mechanism),
+                inner = d(R.drawable.tower_inner_mechanism),
+                portal = d(R.drawable.tower_portal),
+                energy = d(R.drawable.tower_energy_paths),
+            )
+        }
     }
 }
 
@@ -222,7 +271,7 @@ private fun infiniteBreath(): Float {
     return b
 }
 
-/** §34 Canvas overlays — seals, fracture, particles, speaking light. */
+/** §31 Canvas overlays — seals, dim, fracture, particles, speaking light. */
 @Composable
 private fun TowerStateOverlays(
     privacyMuted: Boolean,
@@ -238,16 +287,16 @@ private fun TowerStateOverlays(
     val fractureAlpha = if (error) 0.55f + 0.2f * breathing else 0f
     Canvas(modifier) {
         val w = size.width
-        val h = size.height * (1653f / 720f) // the canvas is stage-wide; overlays use stage fractions
-        val core = Offset(w * 0.5f, w * 0.403f * (1653f / 720f))
+        val h = size.width * (1375f / 1000f) // stage-proportional overlay space
+        val core = Offset(w * 0.5f, h * (700f / 1375f))
 
-        // PRIVACY MUTED: input gate closed + red-bronze seal (gate ≈ y 0.78 of stage).
+        // PRIVACY MUTED: input gate closed + red-bronze seal at the gateway.
         if (privacyMuted) {
-            val gate = Offset(w * 0.5f, w * 0.403f * (1653f / 720f) + w * 0.36f)
+            val gate = Offset(w * 0.5f, h * (1120f / 1375f))
             drawCircle(Color(0xCCB3452B), radius = w * 0.055f, center = gate)
             drawCircle(Color(0xFFFFD9C2).copy(alpha = 0.9f), radius = w * 0.02f, center = gate)
         }
-        // CHAT SPEECH MUTED: the audio-OUTPUT glyph only — microphone unchanged.
+        // CHAT SPEECH MUTED: the audio-OUTPUT channel dimmed (mic unaffected).
         if (chatSpeechMuted) {
             drawCircle(
                 Color(0x882B2F3A),

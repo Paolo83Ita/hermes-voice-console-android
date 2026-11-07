@@ -101,6 +101,16 @@ data class SelfTestSubjects(
     // to QUALIFICATION_PENDING_DEVICE; null read-back means no natural voice is
     // ACTIVE at all (BLOCKED_DEPENDENCY with the Sanctum repair path).
     val voiceAbQualificationProbe: (() -> VoiceAbQualificationReadback?)? = null,
+    // GRAPH 4.12 §9 (ST-55): the REAL Vosk function truth — verified download,
+    // loaded model, deterministic Italian fixture transcript. The microphone
+    // leg is a SEPARATE physical qualification (never simulated).
+    val voskFunctionProbe: (() -> VoskFunctionReadback?)? = null,
+    // GRAPH 4.12 §10 (ST-56/ST-57): the REAL Sherpa/Piper function truth for
+    // Riccardo and Paola — verified archive, loaded JNI, synthesized preview,
+    // produced audio, completed playback, runtime read-back. A probe returning
+    // usingAndroidSystemTts=true can NEVER be ACTIVE (INSTALLED_RUNTIME_NOT_AVAILABLE).
+    val sherpaFunctionProbeRiccardo: (() -> SherpaFunctionReadback?)? = null,
+    val sherpaFunctionProbePaola: (() -> SherpaFunctionReadback?)? = null,
 )
 
 /** CP-G4.9-003 (ST-52): the honest snapshot of the spoken-output route. */
@@ -149,6 +159,53 @@ data class VoiceAbQualificationReadback(
     /** The selection authority state is byte-identical before/after the audition. */
     val authorityUnchanged: Boolean,
     /** Typed detail for failures (which leg failed and why). */
+    val detail: String? = null,
+)
+
+/**
+ * GRAPH 4.12 §9 (ST-55): the honest Vosk physical function read-back.
+ * The self-test distinguishes FIXTURE_PASS / MICROPHONE_PASS /
+ * PHYSICAL_QUALIFICATION_PENDING exactly as the directive requires.
+ */
+data class VoskFunctionReadback(
+    /** The download record is verified in the registry (hash-verified chain). */
+    val modelVerified: Boolean,
+    /** The model directory resolves on disk and was loaded by the runtime. */
+    val modelLoaded: Boolean,
+    /** The deterministic fixture leg: "FIXTURE_PASS" or a typed failure, or null (not runnable here). */
+    val fixtureResult: String?,
+    /** The REAL microphone leg: true/false after a physical run, null when not runnable here. */
+    val microphonePass: Boolean?,
+    /** The ACTIVE route read-back (which engine owns the speech input). */
+    val activeRouteReadBack: String,
+    /** Typed detail. */
+    val detail: String? = null,
+)
+
+/**
+ * GRAPH 4.12 §10 (ST-56/ST-57): the honest Sherpa/Piper function read-back.
+ * A voice whose runtime cannot be consumed reports
+ * INSTALLED_RUNTIME_NOT_AVAILABLE — never ACTIVE while on Android system TTS.
+ */
+data class SherpaFunctionReadback(
+    val voiceIdentity: String,
+    /** The archive resolves on disk with model + tokens config. */
+    val modelAndConfigExtracted: Boolean,
+    /** The JNI bridge loaded (libsherpa-onnx-jni present and functional). */
+    val jniLoaded: Boolean,
+    /** The exact voice loaded into the runtime. */
+    val voiceLoaded: Boolean,
+    /** A preview was synthesized and PCM audio produced. */
+    val previewSynthesized: Boolean,
+    /** Playback completed (AudioTrack drained). */
+    val playbackCompleted: Boolean,
+    /** The runtime read-back matches the selected voice identity. */
+    val runtimeReadBackMatchesSelected: Boolean,
+    /** TRUE when the route is still the Android system TTS (then never ACTIVE). */
+    val usingAndroidSystemTts: Boolean,
+    /** The registry/disk state persists across restart. */
+    val restartPersistenceOk: Boolean?,
+    /** Typed detail. */
     val detail: String? = null,
 )
 

@@ -781,6 +781,115 @@ object SelfTestRegistry {
                 }
             },
         )
+            // ---- GRAPH 4.12 §9: ST-55 (Vosk physical function truth) ----
+            def("ST-55", "Vosk function truth (Graph 4.12 §9)", SelfTestCategory.DIAGNOSTICS, setOf(SelfTestMode.STANDARD, SelfTestMode.FULL, SelfTestMode.VOICE_FOUNDATION_ONLY)) { s ->
+                val probe = s.voskFunctionProbe
+                when {
+                    probe == null ->
+                        SelfTestState.QUALIFICATION_PENDING_DEVICE to
+                            "JVM/emulator runtime: the Vosk fixture needs the native libvosk.so runtime. PHYSICAL_QUALIFICATION_PENDING."
+                    else -> {
+                        val rb = probe()
+                        when {
+                            rb == null ->
+                                SelfTestState.SKIPPED_NOT_APPLICABLE to "no Vosk read-back this run."
+                            !rb.modelVerified ->
+                                SelfTestState.BLOCKED_DEPENDENCY to
+                                    "the offline Italian model is not installed/verified in Model Sanctum — install vosk-model-small-it-0.22, then re-run."
+                            !rb.modelLoaded ->
+                                SelfTestState.FAIL to
+                                    ("the model is installed but the runtime could NOT load it (libvosk.so or model files)" +
+                                        (rb.detail?.let { " — $it" } ?: ""))
+                            rb.fixtureResult != "FIXTURE_PASS" ->
+                                SelfTestState.FAIL to
+                                    ("the deterministic fixture leg failed: ${rb.fixtureResult ?: "not runnable"}" +
+                                        (rb.detail?.let { " — $it" } ?: "") +
+                                        " (phrase: Benvenuto alla torre di Hermes, il canale vocale è pronto.)")
+                            rb.microphonePass == null ->
+                                SelfTestState.QUALIFICATION_PENDING_DEVICE to
+                                    "FIXTURE_PASS achieved. The REAL microphone leg is a separate PHYSICAL qualification (Owner device) — route: ${rb.activeRouteReadBack}."
+                            !rb.microphonePass ->
+                                SelfTestState.FAIL to "the real microphone leg failed while the fixture passed — check the capture route: ${rb.activeRouteReadBack}."
+                            else ->
+                                SelfTestState.PASS to
+                                    "FIXTURE_PASS + MICROPHONE_PASS on the verified model; active route ${rb.activeRouteReadBack}."
+                        }
+                    }
+                }
+            }
+
+            // ---- GRAPH 4.12 §10: ST-56 (Riccardo physical function truth) ----
+            def("ST-56", "Riccardo function truth (Graph 4.12 §10)", SelfTestCategory.DIAGNOSTICS, setOf(SelfTestMode.STANDARD, SelfTestMode.FULL, SelfTestMode.VOICE_FOUNDATION_ONLY)) { s ->
+                val probe = s.sherpaFunctionProbeRiccardo
+                when {
+                    probe == null ->
+                        SelfTestState.QUALIFICATION_PENDING_DEVICE to
+                            "JVM/emulator runtime: the piper synthesis needs the sherpa-onnx JNI. PHYSICAL_QUALIFICATION_PENDING."
+                    else -> {
+                        val rb = probe()
+                        when {
+                            rb == null ->
+                                SelfTestState.SKIPPED_NOT_APPLICABLE to "no Riccardo read-back this run."
+                            !rb.modelAndConfigExtracted ->
+                                SelfTestState.BLOCKED_DEPENDENCY to
+                                    "the Riccardo bundle does not resolve on disk — install the voice in Model Sanctum, then re-run."
+                            rb.usingAndroidSystemTts ->
+                                SelfTestState.QUALIFICATION_PENDING_DEVICE to
+                                    "the route is still the Android system TTS: the Riccardo runtime is not being consumed. State stays INSTALLED_RUNTIME_NOT_AVAILABLE — never ACTIVE."
+                            !rb.jniLoaded || !rb.voiceLoaded ->
+                                SelfTestState.FAIL to
+                                    ("the Riccardo runtime did not fully load (jni=${rb.jniLoaded}, voice=${rb.voiceLoaded})" +
+                                        (rb.detail?.let { " — $it" } ?: ""))
+                            !rb.previewSynthesized || !rb.playbackCompleted ->
+                                SelfTestState.FAIL to
+                                    "the Riccardo preview did not complete (synth=${rb.previewSynthesized}, playback=${rb.playbackCompleted})"
+                            !rb.runtimeReadBackMatchesSelected ->
+                                SelfTestState.FAIL to
+                                    "the runtime read-back does NOT match the selected Riccardo identity — route-truth violation."
+                            else ->
+                                SelfTestState.PASS to
+                                    "Riccardo consumed by the REAL runtime: load+synthesis+playback+read-back all verified (restart persistence ${rb.restartPersistenceOk?.toString() ?: "physical qualification pending"})."
+                        }
+                    }
+                }
+            }
+
+            // ---- GRAPH 4.12 §10: ST-57 (Paola physical function truth) ----
+            def("ST-57", "Paola function truth (Graph 4.12 §10)", SelfTestCategory.DIAGNOSTICS, setOf(SelfTestMode.STANDARD, SelfTestMode.FULL, SelfTestMode.VOICE_FOUNDATION_ONLY)) { s ->
+                val probe = s.sherpaFunctionProbePaola
+                when {
+                    probe == null ->
+                        SelfTestState.QUALIFICATION_PENDING_DEVICE to
+                            "JVM/emulator runtime: the piper synthesis needs the sherpa-onnx JNI. PHYSICAL_QUALIFICATION_PENDING."
+                    else -> {
+                        val rb = probe()
+                        when {
+                            rb == null ->
+                                SelfTestState.SKIPPED_NOT_APPLICABLE to "no Paola read-back this run."
+                            !rb.modelAndConfigExtracted ->
+                                SelfTestState.BLOCKED_DEPENDENCY to
+                                    "the Paola bundle does not resolve on disk — install the voice in Model Sanctum, then re-run."
+                            rb.usingAndroidSystemTts ->
+                                SelfTestState.QUALIFICATION_PENDING_DEVICE to
+                                    "the route is still the Android system TTS: the Paola runtime is not being consumed. State stays INSTALLED_RUNTIME_NOT_AVAILABLE — never ACTIVE."
+                            !rb.jniLoaded || !rb.voiceLoaded ->
+                                SelfTestState.FAIL to
+                                    ("the Paola runtime did not fully load (jni=${rb.jniLoaded}, voice=${rb.voiceLoaded})" +
+                                        (rb.detail?.let { " — $it" } ?: ""))
+                            !rb.previewSynthesized || !rb.playbackCompleted ->
+                                SelfTestState.FAIL to
+                                    "the Paola preview did not complete (synth=${rb.previewSynthesized}, playback=${rb.playbackCompleted})"
+                            !rb.runtimeReadBackMatchesSelected ->
+                                SelfTestState.FAIL to
+                                    "the runtime read-back does NOT match the selected Paola identity — route-truth violation."
+                            else ->
+                                SelfTestState.PASS to
+                                    "Paola consumed by the REAL runtime: load+synthesis+playback+read-back all verified (restart persistence ${rb.restartPersistenceOk?.toString() ?: "physical qualification pending"})."
+                        }
+                    }
+                }
+            }
+
     }
 
     // ---------- helpers ----------

@@ -17,10 +17,10 @@ android {
         applicationId = "com.hermestower.voiceconsole"
         minSdk = 30
         targetSdk = 35
-        // GRAPH 4.11 (Node 6): the Owner Package 4 build version MUST exceed
-        // the shipped 0.3.3-alpha-graph4.10-owner-repair / versionCode 6.
-        versionCode = 7
-        versionName = "0.3.4-alpha-graph4.11"
+        // GRAPH 4.12 (§36): the PHYSICAL REPAIR 4 build MUST exceed the shipped
+        // 0.3.4-alpha-graph4.11 / versionCode 7 (POCO OWNER PACKAGE 4).
+        versionCode = 8
+        versionName = "0.3.5-alpha-graph4.12-physical-repair"
         testInstrumentationRunner = "androidx.test.runner.AndroidJUnitRunner"
 
         // OWNER PHYSICAL RETEST §1 (build provenance): authoritative build
@@ -113,6 +113,7 @@ dependencies {
     implementation(libs.activity.compose)
     implementation(libs.navigation.compose)
     implementation(libs.lifecycle.runtime.compose)
+    implementation(libs.lifecycle.runtime.ktx)
     implementation(libs.lifecycle.viewmodel.compose)
     implementation(libs.kotlinx.coroutines.core)
     implementation(libs.kotlinx.coroutines.android)

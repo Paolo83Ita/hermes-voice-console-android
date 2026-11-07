@@ -1,0 +1,362 @@
+{
+  "A": {
+    "candidate": "A",
+    "defects": [],
+    "layers": {
+      "tower_structure_rear": {
+        "w": 576,
+        "h": 792,
+        "sha256": "4f222cbf7c7008a3",
+        "bytes": 12776,
+        "nonblank_ratio": 0.3387,
+        "edge_px": 0,
+        "components": 1,
+        "symmetry": 0.998
+      },
+      "tower_sign": {
+        "w": 576,
+        "h": 792,
+        "sha256": "26c11d5d8b5ebce6",
+        "bytes": 5514,
+        "nonblank_ratio": 0.0503,
+        "edge_px": 0,
+        "components": 1
+      },
+      "tower_columns": {
+        "w": 576,
+        "h": 792,
+        "sha256": "5f49886398ca7179",
+        "bytes": 7170,
+        "nonblank_ratio": 0.1474,
+        "edge_px": 0,
+        "components": 2,
+        "symmetry": 0.993
+      },
+      "tower_outer_mechanism": {
+        "w": 576,
+        "h": 792,
+        "sha256": "85df7fbab5fc2ed2",
+        "bytes": 17614,
+        "nonblank_ratio": 0.0423,
+        "edge_px": 0,
+        "components": 1,
+        "symmetry": 0.998
+      },
+      "tower_middle_mechanism": {
+        "w": 576,
+        "h": 792,
+        "sha256": "b62e48d9d5f6ac00",
+        "bytes": 14482,
+        "nonblank_ratio": 0.0305,
+        "edge_px": 0,
+        "components": 1,
+        "symmetry": 0.999
+      },
+      "tower_inner_mechanism": {
+        "w": 576,
+        "h": 792,
+        "sha256": "c0a66473b4131fc3",
+        "bytes": 11954,
+        "nonblank_ratio": 0.021,
+        "edge_px": 0,
+        "components": 1
+      },
+      "tower_portal": {
+        "w": 576,
+        "h": 792,
+        "sha256": "e1036312687d9498",
+        "bytes": 10292,
+        "nonblank_ratio": 0.0465,
+        "edge_px": 0,
+        "components": 1
+      },
+      "tower_lower_gateway": {
+        "w": 576,
+        "h": 792,
+        "sha256": "5465a7589dc6e2b5",
+        "bytes": 5856,
+        "nonblank_ratio": 0.0444,
+        "edge_px": 0,
+        "components": 1
+      },
+      "tower_stairs_plinth": {
+        "w": 576,
+        "h": 792,
+        "sha256": "6cc9e86342c6b4d8",
+        "bytes": 3752,
+        "nonblank_ratio": 0.0601,
+        "edge_px": 0,
+        "components": 1,
+        "symmetry": 1.0
+      },
+      "tower_foreground": {
+        "w": 576,
+        "h": 792,
+        "sha256": "2cbe0d7563dd4adc",
+        "bytes": 2768,
+        "nonblank_ratio": 0.0096,
+        "edge_px": 0,
+        "components": 1
+      },
+      "tower_energy_paths": {
+        "w": 576,
+        "h": 792,
+        "sha256": "a3d5eca1c555aacd",
+        "bytes": 1916,
+        "nonblank_ratio": 0.0036,
+        "edge_px": 0,
+        "components": 3
+      },
+      "tower_state_overlay": {
+        "w": 576,
+        "h": 792,
+        "sha256": "01cc2e945fe66f6b",
+        "bytes": 940,
+        "nonblank_ratio": 0.0,
+        "edge_px": 0
+      }
+    },
+    "decoded_mb_all_layers": 20.88,
+    "file_bytes_total": 95034
+  },
+  "B": {
+    "candidate": "B",
+    "defects": [],
+    "layers": {
+      "tower_structure_rear": {
+        "w": 576,
+        "h": 792,
+        "sha256": "4296d7ab4f1e3bff",
+        "bytes": 12768,
+        "nonblank_ratio": 0.3252,
+        "edge_px": 0,
+        "components": 1,
+        "symmetry": 0.999
+      },
+      "tower_sign": {
+        "w": 576,
+        "h": 792,
+        "sha256": "e69fd4e8207ccc3a",
+        "bytes": 5136,
+        "nonblank_ratio": 0.0463,
+        "edge_px": 0,
+        "components": 1
+      },
+      "tower_columns": {
+        "w": 576,
+        "h": 792,
+        "sha256": "e6028baf7d0597f9",
+        "bytes": 6894,
+        "nonblank_ratio": 0.1343,
+        "edge_px": 0,
+        "components": 2,
+        "symmetry": 0.99
+      },
+      "tower_outer_mechanism": {
+        "w": 576,
+        "h": 792,
+        "sha256": "1b81e412456601ba",
+        "bytes": 18930,
+        "nonblank_ratio": 0.0511,
+        "edge_px": 0,
+        "components": 1,
+        "symmetry": 0.998
+      },
+      "tower_middle_mechanism": {
+        "w": 576,
+        "h": 792,
+        "sha256": "f49924898db0b9fd",
+        "bytes": 14916,
+        "nonblank_ratio": 0.0394,
+        "edge_px": 0,
+        "components": 1,
+        "symmetry": 0.999
+      },
+      "tower_inner_mechanism": {
+        "w": 576,
+        "h": 792,
+        "sha256": "02776845f272f40c",
+        "bytes": 11724,
+        "nonblank_ratio": 0.0227,
+        "edge_px": 0,
+        "components": 1
+      },
+      "tower_portal": {
+        "w": 576,
+        "h": 792,
+        "sha256": "195e6aa1708e4fa3",
+        "bytes": 9886,
+        "nonblank_ratio": 0.0438,
+        "edge_px": 0,
+        "components": 1
+      },
+      "tower_lower_gateway": {
+        "w": 576,
+        "h": 792,
+        "sha256": "63814789fc14bf23",
+        "bytes": 5746,
+        "nonblank_ratio": 0.0434,
+        "edge_px": 0,
+        "components": 1
+      },
+      "tower_stairs_plinth": {
+        "w": 576,
+        "h": 792,
+        "sha256": "9764af674d7684c1",
+        "bytes": 3644,
+        "nonblank_ratio": 0.0578,
+        "edge_px": 0,
+        "components": 1,
+        "symmetry": 1.0
+      },
+      "tower_foreground": {
+        "w": 576,
+        "h": 792,
+        "sha256": "2cbe0d7563dd4adc",
+        "bytes": 2768,
+        "nonblank_ratio": 0.0096,
+        "edge_px": 0,
+        "components": 1
+      },
+      "tower_energy_paths": {
+        "w": 576,
+        "h": 792,
+        "sha256": "6f50e7c133d25bba",
+        "bytes": 1952,
+        "nonblank_ratio": 0.0036,
+        "edge_px": 0,
+        "components": 3
+      },
+      "tower_state_overlay": {
+        "w": 576,
+        "h": 792,
+        "sha256": "01cc2e945fe66f6b",
+        "bytes": 940,
+        "nonblank_ratio": 0.0,
+        "edge_px": 0
+      }
+    },
+    "decoded_mb_all_layers": 20.88,
+    "file_bytes_total": 95304
+  },
+  "C": {
+    "candidate": "C",
+    "defects": [],
+    "layers": {
+      "tower_structure_rear": {
+        "w": 576,
+        "h": 792,
+        "sha256": "7399bbc04a54e515",
+        "bytes": 12600,
+        "nonblank_ratio": 0.359,
+        "edge_px": 0,
+        "components": 1,
+        "symmetry": 0.999
+      },
+      "tower_sign": {
+        "w": 576,
+        "h": 792,
+        "sha256": "001bc88447e4457b",
+        "bytes": 5800,
+        "nonblank_ratio": 0.0588,
+        "edge_px": 0,
+        "components": 1
+      },
+      "tower_columns": {
+        "w": 576,
+        "h": 792,
+        "sha256": "6ed65d2ef8c59c26",
+        "bytes": 5550,
+        "nonblank_ratio": 0.1214,
+        "edge_px": 0,
+        "components": 2,
+        "symmetry": 0.993
+      },
+      "tower_outer_mechanism": {
+        "w": 576,
+        "h": 792,
+        "sha256": "07329f97f11b4238",
+        "bytes": 17404,
+        "nonblank_ratio": 0.0421,
+        "edge_px": 0,
+        "components": 1,
+        "symmetry": 0.998
+      },
+      "tower_middle_mechanism": {
+        "w": 576,
+        "h": 792,
+        "sha256": "98941f1471edf2a6",
+        "bytes": 13998,
+        "nonblank_ratio": 0.025,
+        "edge_px": 0,
+        "components": 1,
+        "symmetry": 0.999
+      },
+      "tower_inner_mechanism": {
+        "w": 576,
+        "h": 792,
+        "sha256": "aa826f8dc06d57ba",
+        "bytes": 11914,
+        "nonblank_ratio": 0.0231,
+        "edge_px": 0,
+        "components": 1
+      },
+      "tower_portal": {
+        "w": 576,
+        "h": 792,
+        "sha256": "2c32ed861f8fef91",
+        "bytes": 11320,
+        "nonblank_ratio": 0.0561,
+        "edge_px": 0,
+        "components": 1
+      },
+      "tower_lower_gateway": {
+        "w": 576,
+        "h": 792,
+        "sha256": "82d11e3c5f5ea7b3",
+        "bytes": 6452,
+        "nonblank_ratio": 0.047,
+        "edge_px": 0,
+        "components": 1
+      },
+      "tower_stairs_plinth": {
+        "w": 576,
+        "h": 792,
+        "sha256": "404124988d69cb37",
+        "bytes": 3366,
+        "nonblank_ratio": 0.0648,
+        "edge_px": 0,
+        "components": 1,
+        "symmetry": 1.0
+      },
+      "tower_foreground": {
+        "w": 576,
+        "h": 792,
+        "sha256": "2cbe0d7563dd4adc",
+        "bytes": 2768,
+        "nonblank_ratio": 0.0096,
+        "edge_px": 0,
+        "components": 1
+      },
+      "tower_energy_paths": {
+        "w": 576,
+        "h": 792,
+        "sha256": "6e1dc3be70033ffd",
+        "bytes": 1904,
+        "nonblank_ratio": 0.004,
+        "edge_px": 0,
+        "components": 3
+      },
+      "tower_state_overlay": {
+        "w": 576,
+        "h": 792,
+        "sha256": "01cc2e945fe66f6b",
+        "bytes": 940,
+        "nonblank_ratio": 0.0,
+        "edge_px": 0
+      }
+    },
+    "decoded_mb_all_layers": 20.88,
+    "file_bytes_total": 94016
+  }
+}
