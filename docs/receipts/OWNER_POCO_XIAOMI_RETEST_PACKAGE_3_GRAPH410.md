@@ -86,3 +86,17 @@ the Owner may set the passed state.
 - `OWNER_VISUAL_RETEST_PENDING` — unchanged until the Owner judges the Tower.
 - `RESPONSIVE_UI_QUALIFIED` — remains UNCLAIMED (forbidden token) until the Xiaomi physical pass.
 - Real pairing: `REAL_TOWER_PENDING_GRAPH_1_7` — unchanged.
+
+## Remote convergence record (CP-G4.10-014, 2026-11-07)
+
+- Pushed `c18e313..42eda85` to `origin/graph-4/real-voice-pairing-archive-e2e`
+  (forward-only; no force-push; main untouched).
+- Fresh post-push read-back: local HEAD == remote tip `42eda85`, tree clean.
+- CI at `42eda85`: android-debug-build run **42317581730** BUILD_SUCCESSFUL —
+  artifacts `hermes-voice-console-{debug-apk,lint-report,test-results}-42eda85…`;
+  the CI APK carries the fully-stamped build identity (versionName 0.3.3 +
+  label POCO XIAOMI OWNER REPAIR 3, dex-verified locally and CI-built with the
+  workflow run ID injected); android-e2e run **42317581803** in flight at write
+  time (node loop, NOT an Owner-package gate).
+- CI unit count independently verified from the artifact:
+  **412 tests / 0 failures / 0 skipped** (54 XML) — matches the local gate.
