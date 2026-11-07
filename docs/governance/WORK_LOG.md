@@ -1680,3 +1680,27 @@ updated honestly). Version 0.3.2-alpha-graph4.9-local-models / versionCode 5.
 ACTION: full unit suite 335/335 GREEN; lintDebug 0 errors; APKs rebuilt and
 hashed (see the package receipt); commit + push + fresh remote read-back.
 CHECKPOINT: CP-G4.9-009/010 → GRAPH_4_9_IMPLEMENTATION_COMPLETE_OWNER_PHYSICAL_RETEST_PENDING.
+
+NODE GRAPH-4.10-ALL (CP-G4.10-001..014) — Owner physical product repair
+FINDING: eleven binding physical findings (P0-01..P0-11) from the POCO X6 Pro +
+Xiaomi 11 Lite 5G NE retest; fresh read-back at c18e313 confirmed local==remote;
+root causes mapped in GRAPH410_CALL_PATH_REPORT.md (A: hard-coded English in
+MockLocalConversationEngine/DeterministicTowerSimulator/ScriptedConsoleDriver;
+B: no voice-selection runtime truth; C: no width-class authority).
+ACTION: ResponseLocaleResolver + ResponseCatalog (43×5, Owner-mandated Italian
+identity + SIMULATED strings verbatim) consumed by ALL producers;
+VoiceSelectionAuthority + VoiceRuntimeFactory (six-condition activation);
+ChatSpeechOutputPolicy + functional speaker control + TtsReadbackStage grader;
+ListeningModePolicy + ContinuousListeningController + EchoFingerprintGuard;
+§18 console hierarchy; §19-§23 responsive layout layer (width classes, headers,
+Connection Studio rebuild, ResponsiveActionGroup, StateLabels); central Tower
+refoundation (10 layers + ReforgedTowerVisual + 11 states + profiles; OracleCore
+retired); "parla invece"→Parla everywhere. Version 0.3.3-alpha-graph4.10-owner-repair /
+versionCode 6, label POCO XIAOMI OWNER REPAIR 3. APKs: arm64 116,561,845 B
+sha256 4ffefb80d4a51992fe988ce9b6117a633cdd3a26cf51c2b6cedc204ed0e785b3 (preferred) / universal 97e6f8124d59bcbf4f9014eb358e43fae1e9d8ccf816d4c60e735c8663cbdd3d /
+x86_64 0312db163e39477e6f116213c1f457852b8f79534d1313b67bdc90aa193ab245; dex stamps verified. Unit 335→412 GREEN, lint 0 errors.
+TEST: full suite + lint at the shipped version; responsive/echo/policy/authority
+contracts pinned on the JVM; no test deleted, skipped or weakened.
+CHECKPOINT: CP-G4.10-001..014 → POCO_XIAOMI_RETEST_PACKAGE_3_READY
+(physical verdicts remain Owner-only; no forbidden token claimed).
+NEXT: Owner physical retest per OWNER_POCO_XIAOMI_RETEST_PACKAGE_3_GRAPH410.md.

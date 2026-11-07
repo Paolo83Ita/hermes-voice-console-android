@@ -254,3 +254,30 @@ Secret/device scan: 0 findings in working tree and full git history (scripts/sec
 - Owner gate UNCHANGED: `OWNER_POCO_RETEST_PENDING` on package 2
   (arm64, dbbdc429…b60cc). No physical claim. Prohibited tokens remain
   unclaimed.
+
+
+---
+
+## GRAPH 4.10 TRUTH (2026-11-07, supersedes the Graph 4.9 sections above semantically — history preserved)
+
+Mission: physical-product repair for the Owner findings P0-01..P0-11
+(POCO X6 Pro + Xiaomi 11 Lite 5G NE — `docs/receipts/OWNER_PHYSICAL_FINDINGS_GRAPH410.md`).
+Fresh read-back at mission start: local == remote tip `c18e313` (reported tip verified current).
+
+| Node | State |
+| --- | --- |
+| Response-language authority + localized catalog (§4/§5) | IMPLEMENTED — ResponseLocaleResolver + ResponseCatalog (43 cat × 5 locales, parity-tested) |
+| Visible text == TTS input (§6) | IMPLEMENTED + unit-pinned (MockTextToSpeechEngine.lastSpokenText) |
+| Voice selection/runtime truth (§7/§8) | IMPLEMENTED — VoiceSelectionAuthority (six-condition read-back) + VoiceRuntimeFactory (typed failures, files preserved, system-Italian fallback) |
+| Chat speech policy + speaker control (§10/§11/§12) | IMPLEMENTED — ChatSpeechOutputPolicy (persistent) + §11 state machine + TtsReadbackStage grader (Owner-verified never self-granted) |
+| Listening mode + continuous + echo (§14/§15/§16) | IMPLEMENTED — ListeningModePolicy + ContinuousListeningController + EchoFingerprintGuard (WAKE_WORD honestly UNQUALIFIED) |
+| Console hierarchy / Xiaomi layout / raw enums (§17–§26) | IMPLEMENTED — §18 1-primary+4-secondary hierarchy, §19 width classes, §20 responsive headers (11 screens), §21 Connection Studio rebuild, §22 ResponsiveActionGroup, §23 StateLabels (P0-09 table verbatim) |
+| Central Tower refoundation (§29–§35) | IMPLEMENTED — 10 layered WebP assets (ASSET_MANIFEST.json), ReforgedTowerVisual with 11 §34 states + §35 profiles, OracleCore retired from the Console |
+| Regression (§37) | unit 412/412 GREEN, lint 0 errors (abortOnError) |
+| APKs (§38) | versionName 0.3.3-alpha-graph4.10-owner-repair / versionCode 6 / label POCO XIAOMI OWNER REPAIR 3; arm64-v8a 116,561,845 B sha256 4ffefb80d4a51992… (preferred) / universal 246,208,674 B 97e6f8124d59bcbf… / x86_64 121,277,812 B 0312db163e39477e…; dex stamps verified (classes11+13) |
+| Owner retest package (§39/§40) | POCO_XIAOMI_RETEST_PACKAGE_3_READY — `docs/receipts/OWNER_POCO_XIAOMI_RETEST_PACKAGE_3_GRAPH410.md` |
+
+Forbidden tokens remain UNCLAIMED: POCO_RETEST_PASSED, ITALIAN_TTS_OWNER_VERIFIED,
+VOICE_SWITCHING_OWNER_VERIFIED, RESPONSIVE_UI_QUALIFIED, REAL_TOWER_PAIRING_PASSED,
+ITALIAN_VOICE_OWNER_VERIFIED (grader never self-grants), POCO_XIAOMI_…_RETEST_PASSED.
+Current terminal state: POCO_XIAOMI_RETEST_PACKAGE_3_READY (physical verdict = Owner-only).

@@ -83,3 +83,12 @@ graph3:
   e2e_trajectory: "5/30(+7 crashed) -> 14 -> 14 -> 17/30 passing"
   apk: { run: "41375246590", commit: 85cdc0e, sha256: 0639ae6ed50f3ec3a065625a40106125a6d103bdf8a639df826bb04b155cbc3a, size_bytes: 58782349 }
   updated: "2026-11-03"
+
+  - graph: "4.10"
+    title: "Owner physical product repair — chat language, voice runtime, chat audio, continuous listening, Xiaomi layout, central Tower"
+    entered_from: "OWNER_RETEST_FAILED_REPAIR_REQUIRED"
+    checkpoints: ["CP-G4.10-001","CP-G4.10-002","CP-G4.10-003","CP-G4.10-004","CP-G4.10-005","CP-G4.10-006","CP-G4.10-007","CP-G4.10-008","CP-G4.10-009","CP-G4.10-010","CP-G4.10-011","CP-G4.10-012","CP-G4.10-013","CP-G4.10-014"]
+    terminal_state: "POCO_XIAOMI_RETEST_PACKAGE_3_READY"
+    physical_gate: "POCO_XIAOMI_CHAT_VOICE_LISTENING_LAYOUT_AND_VISUAL_RETEST_PASSED (Owner-only)"
+    side_gates: ["VOICE_SWITCHING_OWNER_VERIFICATION_PENDING","OWNER_VISUAL_RETEST_PENDING","REAL_TOWER_PENDING_GRAPH_1_7"]
+    version: "0.3.3-alpha-graph4.10-owner-repair (versionCode 6, POCO XIAOMI OWNER REPAIR 3)"

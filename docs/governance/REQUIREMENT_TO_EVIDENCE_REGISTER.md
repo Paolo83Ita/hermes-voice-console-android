@@ -82,3 +82,13 @@ Test totals (physical, 2026-11-01): 33 `@Test` in 6 classes; 33 executed, 0 fail
 | Self-Test expansion | ST-52/ST-53; SelfTestCenterTest (53 definitions) | JVM-VERIFIED |
 | Regression + APKs | 335/335 unit, lint 0 errors; POCO_X6_PRO_OWNER_RETEST_PACKAGE_3 hashes | BUILD-VERIFIED |
 | Owner physical verdict | OWNER_POCO_RETEST_PENDING — no claim | PENDING (only the Owner may set POCO_RETEST_PASSED) |
+
+| GRAPH 4.10 §4/§5 (P0-01) | ResponseLocaleResolver + ResponseCatalog; driver/engine/bridge/coordinator/LLM consume the authority; Italian E2E driver tests | JVM tests (8+8+7+2) | IMPLEMENTED — PHYSICAL PENDING |
+| §6 coherence | visibleAssistantText == ttsInputText pinned via MockTextToSpeechEngine.lastSpokenText (Italian E2E + MANUAL playback tests) | JVM | IMPLEMENTED |
+| §7/§8 (P0-03) | VoiceSelectionAuthority six-condition read-back + VoiceRuntimeFactory typed pipeline | 8+6 JVM tests + Sanctum wiring | IMPLEMENTED — VOICE_SWITCHING_OWNER_VERIFICATION_PENDING |
+| §10/§11/§12 (P0-04/05) | ChatSpeechOutputPolicy persistence + speaker-control state machine + TtsReadbackStage (owner-verified never self-granted) | 6+6+2 JVM tests | IMPLEMENTED |
+| §14/§15/§16 (P0-06) | ListeningModePolicy + ContinuousListeningController (typed stop conditions, guard interval) + EchoFingerprintGuard (0.80 Jaccard / 8 s window) | 5+5+6 JVM tests | IMPLEMENTED — WAKE_WORD UNQUALIFIED |
+| §17-§26 (P0-07/08/09) | Parla labels; §19 width classes; §20 headers; §21 Studio rebuild; §22 action groups; §23 StateLabels table verbatim | 6 JVM contract tests + OWNER_XIAOMI_LAYOUT_REFERENCE.md | IMPLEMENTED — RESPONSIVE_UI_QUALIFIED UNCLAIMED |
+| §29-§35 (P0-10/11) | 10 layered assets + ASSET_MANIFEST.json + ReforgedTowerVisual (11 states, 3 profiles) | previews + manifest hashes | IMPLEMENTED — OWNER_VISUAL_RETEST_PENDING |
+| §37/§38 | 412/412 unit; lint 0 errors; v0.3.3-alpha-graph4.10-owner-repair / code 6 / label POCO XIAOMI OWNER REPAIR 3; 3 APKs hashed; dex stamps verified | this build | SHIPPED |
+| §39/§40 | POCO_XIAOMI_RETEST_PACKAGE_3_GRAPH410.md runbook (both devices) | receipt | POCO_XIAOMI_RETEST_PACKAGE_3_READY |
