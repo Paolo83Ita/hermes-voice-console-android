@@ -740,6 +740,46 @@ object SelfTestRegistry {
                     }
                 }
             },
+            def("ST-54", "Voice A/B comparison (Graph 4.11 Node 1)", SelfTestCategory.DIAGNOSTICS, setOf(SelfTestMode.STANDARD, SelfTestMode.FULL, SelfTestMode.VOICE_FOUNDATION_ONLY)) { s ->
+                val probe = s.voiceAbQualificationProbe
+                when {
+                    // JVM/emulator: no native synthesis and no audible audio —
+                    // a typed pending, never a simulated pass (ST-52 precedent).
+                    probe == null ->
+                        SelfTestState.QUALIFICATION_PENDING_DEVICE to
+                            "JVM/emulator runtime: the A/B audition cannot produce audio here. The physical path (voice A speaks the preview phrase → voice B speaks the SAME phrase → the Owner hears the difference) is qualified on the physical device."
+                    // The probe performs the REAL audition; it runs EXACTLY ONCE
+                    // and every branch reads the same read-back.
+                    else -> {
+                        val rb = probe()
+                        when {
+                            rb == null ->
+                                SelfTestState.SKIPPED_NOT_APPLICABLE to "the A/B audition did not produce a read-back this run."
+                            rb.voiceAId == null ->
+                                SelfTestState.BLOCKED_DEPENDENCY to
+                                    "no natural voice is ACTIVE. Install and activate a piper voice in Model Sanctum (Models and Voice), then re-run. The system Italian TTS route is active meanwhile."
+                            rb.voiceBId == null ->
+                                SelfTestState.BLOCKED_DEPENDENCY to
+                                    "only one voice is installed (${rb.voiceAId}). The A/B comparison needs a SECOND installed voice — download the other piper Italian voice in Model Sanctum, then re-run."
+                            rb.utteranceA != "COMPLETED" || rb.utteranceB != "COMPLETED" ->
+                                SelfTestState.FAIL to
+                                    ("the A/B audition did not complete on both legs — A=${rb.utteranceA}, B=${rb.utteranceB}" +
+                                        (rb.detail?.let { " — $it" } ?: "") +
+                                        ". Check the voice bundles on disk and re-run; the active voice fell back safely if the runtime failed.")
+                            !rb.identitiesDistinct ->
+                                SelfTestState.FAIL to
+                                    "both legs completed but the runtime reported the SAME voice identity (${rb.readBackAId}) — the voices cannot be proven distinct. This is a route-truth violation."
+                            !rb.authorityUnchanged ->
+                                SelfTestState.FAIL to
+                                    "the audition changed the selection authority state — the A/B probe must never touch the selected voice. Route-truth violation."
+                            else ->
+                                SelfTestState.PASS to
+                                    ("voice A (${rb.voiceAId}) and voice B (${rb.voiceBId}) both completed the same preview phrase with distinct runtime identities. " +
+                                        "The audible difference is confirmed by the OWNER in the physical retest (VOICE_SWITCHING_OWNER_VERIFICATION_PENDING until then).")
+                        }
+                    }
+                }
+            },
         )
     }
 

@@ -92,3 +92,10 @@ Test totals (physical, 2026-11-01): 33 `@Test` in 6 classes; 33 executed, 0 fail
 | §29-§35 (P0-10/11) | 10 layered assets + ASSET_MANIFEST.json + ReforgedTowerVisual (11 states, 3 profiles) | previews + manifest hashes | IMPLEMENTED — OWNER_VISUAL_RETEST_PENDING |
 | §37/§38 | 412/412 unit; lint 0 errors; v0.3.3-alpha-graph4.10-owner-repair / code 6 / label POCO XIAOMI OWNER REPAIR 3; 3 APKs hashed; dex stamps verified | this build | SHIPPED |
 | §39/§40 | POCO_XIAOMI_RETEST_PACKAGE_3_GRAPH410.md runbook (both devices) | receipt | POCO_XIAOMI_RETEST_PACKAGE_3_READY |
+
+| GRAPH 4.11 Node 1 — Voice A → play → Voice B → play → prove difference | ST-54 definition + AppGraph voiceAbQualification() (sequential real-engine legs, authority untouched, B unloaded) + 7 JVM decision tests | VOICE_SWITCHING_OWNER_VERIFICATION_PENDING (audible verdict Owner-only) |
+| GRAPH 4.11 Node 2 — 10 turni continui | ContinuousListeningControllerTest ten-turn loop test + ListeningModeAndEchoTest ten-turn echo-rejection test | physical 10-turn soak stays Owner-runbook (Package 4) |
+| GRAPH 4.11 Node 3 — nessuna risposta locale inglese | ResponseCatalogTest no-English-under-Italian sweep (46 categories) over the 4.10 producer tests | 422/422 unit GREEN |
+| GRAPH 4.11 Node 4 — Xiaomi responsive pass | ResponsiveLayoutContractTest (§19/§22/§23 + Xiaomi classification) VERIFIED, no regression | real screenshots remain Owner-capture (ledger) |
+| GRAPH 4.11 Node 5 — central Tower reconstruction from the Owner image | tower_refoundation_g411.py + ASSET_MANIFEST v2 (10/10 sha256) + re-rendered previews + receipts report update | OWNER_VISUAL_RETEST_PENDING |
+| GRAPH 4.11 Node 6 — Package 4, 0.3.4-alpha-graph4.11 o superiore | versionCode 7 / versionName 0.3.4-alpha-graph4.11 / label POCO XIAOMI OWNER PACKAGE 4; aapt2-verified; APKs hashed | OWNER_POCO_PACKAGE_4_GRAPH411.md runbook |

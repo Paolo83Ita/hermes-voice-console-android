@@ -94,4 +94,35 @@ class ResponseCatalogTest {
         assertEquals("Non posso farlo.", ResponseCatalog.text(ResponseCategory.DECLINE, "it"))
         assertEquals("I cannot do that.", ResponseCatalog.text(ResponseCategory.DECLINE, "en"))
     }
+
+    /**
+     * GRAPH 4.11 Node 3 (Owner: "Nessuna risposta locale inglese") — the
+     * catalog-level pin of the P0-01 repair: with the Italian locale active,
+     * EVERY category must produce the Italian text, never the English one.
+     * The single locale-neutral entry (TOWER_PROGRESS renders "Tower: %s" —
+     * the substituted progress text is produced localized upstream) is typed
+     * explicitly instead of silently skipped.
+     */
+    @Test
+    fun `no category answers English under the Italian locale`() {
+        val localeNeutral = setOf(ResponseCategory.TOWER_PROGRESS)
+        for (category in ResponseCategory.entries) {
+            // placeholder args: format entries (%s) format honestly; extra
+            // arguments are ignored by String.format
+            val italian = ResponseCatalog.text(category, "it", "x", "x", "x")
+            val english = ResponseCatalog.text(category, "en", "x", "x", "x")
+            assertTrue("category $category: the Italian text must not be blank", italian.isNotBlank())
+            if (category in localeNeutral) continue
+            assertTrue(
+                "category $category: Italian must differ from English (P0-01 defect class)",
+                italian != english,
+            )
+        }
+        // And the Italian text really is the Italian text: the identity
+        // response stays the Owner-mandated string under the resolver path.
+        assertEquals(
+            "Sono la console vocale di Hermes Tower. Gestisco localmente le funzioni della console, mentre Hermes Tower rimane l’autorità per le missioni e le operazioni complesse.",
+            ResponseCatalog.text(ResponseCategory.IDENTITY, "it"),
+        )
+    }
 }

@@ -244,6 +244,10 @@ class AppGraph(private val context: Context) {
                     loadedModelDir = voskFrameStt.loadedModelDir?.name,
                 )
             },
+            // GRAPH 4.11 Node 1 (ST-54): the REAL A/B voice audition — voice A
+            // (active) speaks, then voice B (the other installed voice) speaks
+            // the SAME phrase; the selection authority is never touched.
+            voiceAbQualificationProbe = { voiceAbQualification() },
         ),
         dispatcher = Dispatchers.Default,
     )
@@ -474,6 +478,112 @@ class AppGraph(private val context: Context) {
             }
         }
         return outcome
+    }
+
+    /**
+     * GRAPH 4.11 Node 1 (ST-54): the Owner's A/B voice audition — voice A (the
+     * ACTIVE natural voice) speaks the preview phrase, then the OTHER installed
+     * voice B speaks the SAME phrase, sequentially, on the REAL engines.
+     *
+     * Truth rules:
+     *  - the audition NEVER touches the selection authority (B is auditioned,
+     *    not selected) — the authority snapshot is compared byte-for-byte after;
+     *  - both legs must COMPLETE (synthesis + playback) for a proven result;
+     *  - distinctness is MEASURED at the identity level (two different runtime
+     *    read-backs); the AUDIBLE difference stays Owner-verified;
+     *  - voice B's engine is unloaded afterwards (memory hygiene on the
+     *    8 GB devices; B is never the route-active engine).
+     */
+    fun voiceAbQualification(): com.hermestower.voiceconsole.selftest.VoiceAbQualificationReadback {
+        val installed: (String) -> Boolean = { id ->
+            when (id) {
+                "org.piper.voice.it-riccardo-x-low" -> naturalTts.resolveVoiceDir() != null
+                "org.piper.voice.it-paola-medium" -> naturalTtsPaola.resolveVoiceDir() != null
+                else -> false
+            }
+        }
+        val voiceAId = activeNaturalVoice()
+        if (voiceAId == null) {
+            return com.hermestower.voiceconsole.selftest.VoiceAbQualificationReadback(
+                voiceAId = null, voiceBId = null, utteranceA = null, utteranceB = null,
+                readBackAId = null, readBackBId = null,
+                identitiesDistinct = false, authorityUnchanged = true,
+                detail = "no natural voice active",
+            )
+        }
+        val voiceBId = listOf("org.piper.voice.it-riccardo-x-low", "org.piper.voice.it-paola-medium")
+            .firstOrNull { it != voiceAId && installed(it) }
+        if (voiceBId == null) {
+            return com.hermestower.voiceconsole.selftest.VoiceAbQualificationReadback(
+                voiceAId = voiceAId, voiceBId = null, utteranceA = null, utteranceB = null,
+                readBackAId = null, readBackBId = null,
+                identitiesDistinct = false, authorityUnchanged = true,
+                detail = "no second installed voice for the comparison",
+            )
+        }
+        val authorityBefore = voiceSelectionAuthority.state.value
+        val seamA = voiceSeamFor(voiceAId)!!
+        val seamB = voiceSeamFor(voiceBId)!!
+        val phrase = VoiceRuntimeFactory.PREVIEW_PHRASE
+        var utteranceA = "SKIPPED"
+        var utteranceB = "SKIPPED"
+        var readBackA: String? = null
+        var readBackB: String? = null
+        var detail: String? = null
+
+        // Leg A — the ACTIVE voice (already loaded by the route; load() is idempotent).
+        val filesA = runCatching { seamA.resolveFiles() }.getOrNull()
+        if (filesA == null) {
+            utteranceA = "SYNTHESIS_FAILED"
+            detail = "voice A files missing on disk"
+        } else {
+            val loadError = runCatching { seamA.load() }.getOrElse { it.message ?: "voice A runtime init threw" }
+            if (loadError != null) {
+                utteranceA = "SYNTHESIS_FAILED"
+                detail = "voice A load failed: $loadError"
+            } else {
+                runCatching { seamA.speakTest(phrase) }
+                utteranceA = seamA.awaitUtteranceCompletion().name
+                readBackA = runCatching { seamA.readBackVoiceId() }.getOrNull()
+                if (utteranceA != "COMPLETED") detail = "voice A leg did not complete"
+            }
+        }
+
+        // Leg B — audition only, AFTER leg A completed (sequential, never overlapping).
+        if (utteranceA == "COMPLETED") {
+            val loadError = runCatching { seamB.load() }.getOrElse { it.message ?: "voice B runtime init threw" }
+            when {
+                loadError != null -> {
+                    utteranceB = "SYNTHESIS_FAILED"
+                    detail = "voice B load failed: $loadError"
+                }
+                else -> {
+                    runCatching { seamB.speakTest(phrase) }
+                    utteranceB = seamB.awaitUtteranceCompletion().name
+                    readBackB = runCatching { seamB.readBackVoiceId() }.getOrNull()
+                    if (utteranceB != "COMPLETED") detail = "voice B leg did not complete"
+                }
+            }
+            runCatching { seamB.interrupt() }
+            // B was never the route-active engine (A is) — release its native handle.
+            when (voiceBId) {
+                "org.piper.voice.it-riccardo-x-low" -> naturalTts.unload()
+                "org.piper.voice.it-paola-medium" -> naturalTtsPaola.unload()
+            }
+        }
+
+        return com.hermestower.voiceconsole.selftest.VoiceAbQualificationReadback(
+            voiceAId = voiceAId,
+            voiceBId = voiceBId,
+            utteranceA = utteranceA,
+            utteranceB = utteranceB,
+            readBackAId = readBackA,
+            readBackBId = readBackB,
+            identitiesDistinct = utteranceA == "COMPLETED" && utteranceB == "COMPLETED" &&
+                readBackA != null && readBackB != null && readBackA != readBackB,
+            authorityUnchanged = voiceSelectionAuthority.state.value == authorityBefore,
+            detail = detail,
+        )
     }
 
     /** Route truth: qualification state decides; a fresh process falls back to the registry read-back. */

@@ -99,3 +99,12 @@ QUALIFICATION_PENDING_DEVICE.
 ### D-G3-003 · PER_REGION_BURN_IN_SAFEGUARD
 - Five region drivers (frieze/core/seals/transcript/medallions), ≤4 dp, 25 s cadence,
   disabled by reduced motion or Owner switch. Replaces the whole-console V0.1 drift.
+
+## G4.11-D1 (2026-11-07) — Graph 4.11 runs ON TOP of the 4.10 authorities
+The Owner directive ("Do not expand architecture / no new abstractions / no Graph 5") is implemented as: the 4.10 authorities (ResponseLocaleResolver, VoiceSelectionAuthority, VoiceRuntimeFactory, ChatSpeechOutputPolicy, ListeningModePolicy, ResponsiveActionGroup, layered Tower) are PRESERVED; Graph 4.11 adds ONLY qualification evidence (ST-54, 10-turn pins, anti-English pin), measured Tower repairs, and the package bump. No abstraction was introduced; ST-54 follows the ST-51/52/53 probe pattern exactly.
+
+## G4.11-D2 (2026-11-07) — static Tower bands become stage-sized canvases
+The 4.10 tight-band canvases (sign 629×203, stairs 484×154, gate 291×342, foreground 629×32) rendered at the WRONG size/position under ReforgedTowerVisual's TopCenter/fillMaxWidth/Fit (all bands stacked at the stage top). Decision: re-stage every static band on the full 720×1653 canvas at its measured position (uniform scale S=1.61426 anchored on the manifest core) instead of adding Compose offsets — the assets become the placement truth, the code stays unchanged, and the core lands exactly on the code's (0.500, 0.403). portal/energy untouched (byte-identical).
+
+## G4.11-D3 (2026-11-07) — layer naming map (Node 5 list vs disk)
+The Node-5 layer list names `tower_gate`; the shipped asset is `tower_lower_gate` (4.10 name). Decision: keep the disk name (no churn, no rebuild of working assets) and record the mapping tower_lower_gate == tower_gate in the manifest + report. tower_energy remains the Canvas-driven static energy path (the 4.11 list omits it because motion is code-owned).

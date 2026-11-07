@@ -92,3 +92,20 @@ graph3:
     physical_gate: "POCO_XIAOMI_CHAT_VOICE_LISTENING_LAYOUT_AND_VISUAL_RETEST_PASSED (Owner-only)"
     side_gates: ["VOICE_SWITCHING_OWNER_VERIFICATION_PENDING","OWNER_VISUAL_RETEST_PENDING","REAL_TOWER_PENDING_GRAPH_1_7"]
     version: "0.3.3-alpha-graph4.10-owner-repair (versionCode 6, POCO XIAOMI OWNER REPAIR 3)"
+
+  graph_4_11:
+    title: "PHYSICAL EXPERIENCE COMPLETION"
+    directive: "no new architecture / no new governance systems / no new abstractions / no Graph 5 — physical product quality and user-visible behavior only"
+    nodes:
+      node_1: "VOICE SWITCHING QUALIFICATION — Voice A → play → Voice B → play → prove difference (ST-54)"
+      node_2: "CONTINUOUS LISTENING — 10 turni continui (loop + anti-echo pins)"
+      node_3: "ITALIAN CHAT — nessuna risposta locale inglese (46-category pin)"
+      node_4: "XIAOMI RESPONSIVE PASS — §19/§22/§23 authorities verified; Owner screenshots decide"
+      node_5: "CENTRAL TOWER RECONSTRUCTION — Owner image as composition authority; measured repairs; static bands stage-aligned"
+      node_6: "POCO OWNER PACKAGE 4 — 0.3.4-alpha-graph4.11 o superiore (versionCode 7)"
+    priorities: {P0: [node_1, node_2, node_3, node_4], P1: [node_5], P2: [graph_1_7_compatibility]}
+    checkpoints: ["CP-G4.11-001","CP-G4.11-002","CP-G4.11-003"]
+    terminal_state: "POCO_OWNER_PACKAGE_4_READY (pre-device); physical gates remain Owner-only"
+    physical_gate: "OWNER_VISUAL_RETEST_PENDING + VOICE_SWITCHING_OWNER_VERIFICATION_PENDING (Owner-only)"
+    side_gates: ["REAL_TOWER_PENDING_GRAPH_1_7"]
+    version: "0.3.4-alpha-graph4.11 (versionCode 7, POCO XIAOMI OWNER PACKAGE 4)"

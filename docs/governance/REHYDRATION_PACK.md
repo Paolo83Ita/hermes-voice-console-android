@@ -103,3 +103,9 @@ Same toolchain as Graph 1, re-verified in a fresh sandbox:
    DeviceHealthMonitor display guard); drive to green without weakening assertions.
 3. Packaging: cloud APK + SHA-256 + source package + terminal receipt.
 4. Owner decisions reserved: merge to main; physical Xiaomi qualification phase.
+
+## GRAPH 4.11 rehydration pointer (2026-11-07)
+- Read first: docs/governance/GRAPH411_FRESH_READBACK.md (authority at 5a567a3 + node mapping).
+- Tower truth: docs/receipts/CENTRAL_TOWER_VISUAL_REFOUNDATION_REPORT.md (Graph 4.11 update section) + docs/visual/ASSET_MANIFEST.json (manifestVersion graph-4.11-central-tower-refoundation-2) + scripts/tower_refoundation_g411.py (reproducible measure/build/preview).
+- Package 4: docs/receipts/OWNER_POCO_PACKAGE_4_GRAPH411.md (runbook; version 7 / 0.3.4-alpha-graph4.11).
+- Standing pending tokens: OWNER_VISUAL_RETEST_PENDING, VOICE_SWITCHING_OWNER_VERIFICATION_PENDING, REAL_TOWER_PENDING_GRAPH_1_7.

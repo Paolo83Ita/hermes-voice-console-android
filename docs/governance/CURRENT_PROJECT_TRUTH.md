@@ -281,3 +281,13 @@ Forbidden tokens remain UNCLAIMED: POCO_RETEST_PASSED, ITALIAN_TTS_OWNER_VERIFIE
 VOICE_SWITCHING_OWNER_VERIFIED, RESPONSIVE_UI_QUALIFIED, REAL_TOWER_PAIRING_PASSED,
 ITALIAN_VOICE_OWNER_VERIFIED (grader never self-grants), POCO_XIAOMI_…_RETEST_PASSED.
 Current terminal state: POCO_XIAOMI_RETEST_PACKAGE_3_READY (physical verdict = Owner-only).
+
+---
+
+# GRAPH 4.11 TRUTH (appended 2026-11-07; additive — supersedes the Package-3 "next action" only)
+
+- Directive: PHYSICAL EXPERIENCE COMPLETION — no new architecture, no new governance systems, no new abstractions, no Graph 5.
+- Branch: graph-4/real-voice-pairing-archive-e2e; tip at execution start 5a567a3 (local was 32 commits behind → ff-only, nothing discarded).
+- Nodes executed: 1 voice A/B qualification (ST-54 + AppGraph audition, authority untouched); 2 continuous listening 10-turn pins (loop + anti-echo); 3 no-English-under-Italian catalog pin; 4 Xiaomi responsive coverage VERIFIED (4.10 authorities stand); 5 central Tower MEASURED repairs (sign clip, arrow intrusions, static-band stage alignment — manifest graph-4.11-central-tower-refoundation-2, portal/energy byte-identical); 6 version 0.3.4-alpha-graph4.11 / code 7 / label POCO XIAOMI OWNER PACKAGE 4.
+- Verification at the commit: 422/422 unit tests GREEN (was 412; +10 new), lint 0 errors, secret scan 0 findings, local assembleDebug SUCCESS (universal 248,446,578 B / arm64 118,799,749 B sha256 501792715d… / x86_64 123,515,716 B — validation artifacts; the CI build of the pushed commit is the authoritative package).
+- Honest states: OWNER_VISUAL_RETEST_PENDING, VOICE_SWITCHING_OWNER_VERIFICATION_PENDING, physical passes Owner-only, REAL_TOWER_PENDING_GRAPH_1_7 (P2 next: Tower visual → Archive → Graph 1.7 pairing, per the Owner's own note).

@@ -104,4 +104,48 @@ class EchoFingerprintGuardTest {
         g.clear()
         assertFalse(g.isLikelyEcho("Buon giorno."))
     }
+
+    /**
+     * GRAPH 4.11 Node 2 (Owner: "10 turni continui"): across a 10-turn
+     * continuous session the console must NEVER transcribe its own spoken
+     * response, while genuine user phrases in the same window stay accepted
+     * and the window expiry releases the verbatim text honestly.
+     */
+    @Test
+    fun `ten consecutive turns reject every assistant echo and accept every user phrase`() {
+        val g = guard()
+        val spokenResponses = listOf(
+            "Benvenuto nella console vocale di Hermes Tower.",
+            "La connessione alla Tower è attiva e protetta.",
+            "Ho registrato la missione nell'archivio della Tower.",
+            "Lo stato della console è normale e la batteria è carica.",
+            "La modalità di ascolto continuo è attiva.",
+            "Il modello locale ha risposto senza rete.",
+            "La privacy è protetta: nessun audio lascia il dispositivo.",
+            "La voce selezionata è attiva e verificata.",
+            "Il profilo della Tower è stato salvato senza segreti.",
+            "Sessione completata: dieci turni senza eco.",
+        )
+        val userPhrases = listOf(
+            "qual è lo stato della connessione?",
+            "apri l'archivio delle missioni",
+            "prepara il rapporto di viaggio",
+            "quanta batteria rimane?",
+            "cambia la modalità di ascolto",
+            "che modello stai usando adesso?",
+            "attiva la privacy",
+            "quale voce stai parlando?",
+            "salva il profilo",
+            "termina la sessione",
+        )
+        for (turn in spokenResponses.indices) {
+            g.rememberSpoken(spokenResponses[turn])
+            now += 600L // the echoed transcript arrives inside the window
+            assertTrue("turn ${turn + 1}: the assistant echo must be rejected", g.isLikelyEcho(spokenResponses[turn]))
+            assertTrue("turn ${turn + 1}: a punctuation/case variant is still an echo", g.isLikelyEcho(spokenResponses[turn].uppercase()))
+            assertFalse("turn ${turn + 1}: the genuine user phrase must not be rejected", g.isLikelyEcho(userPhrases[turn]))
+            now += 9_000L // beyond the 8 s window the same text is honest input again
+            assertFalse("turn ${turn + 1}: outside the window the same text is not an echo", g.isLikelyEcho(spokenResponses[turn]))
+        }
+    }
 }

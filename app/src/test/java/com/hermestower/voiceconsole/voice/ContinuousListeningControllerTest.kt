@@ -116,4 +116,36 @@ class ContinuousListeningControllerTest {
         assertFalse(c.active.value)
         assertTrue(events.recent(20).any { it.detail.contains("AUDIO_FAILURE") })
     }
+
+    /**
+     * GRAPH 4.11 Node 2 (Owner: "10 turni continui"): ten full turn cycles —
+     * capture → activity → response → IDLE → 750 ms post-speech guard →
+     * resume — keep the session ALIVE with exactly one capture start per turn
+     * and NO stop condition firing (no timeout, no mute, no audio failure).
+     */
+    @Test
+    fun `ten consecutive turns keep the session alive without any stop condition`() = runTest {
+        val c = buildController(backgroundScope)
+        assertTrue(c.start("graph411-node2"))
+        assertEquals(1, captureStarted)
+        repeat(10) { turn ->
+            consoleState = ConsoleState.UNDERSTANDING_LOCAL
+            advanceTimeBy(250) // the supervision loop observes the activity
+            consoleState = ConsoleState.SPEAKING
+            advanceTimeBy(250) // the response is being spoken
+            assertTrue("turn ${turn + 1}: the session must stay active while speaking", c.active.value)
+            consoleState = ConsoleState.IDLE
+            advanceTimeBy(300) // inside the 750 ms post-speech guard
+            assertEquals("turn ${turn + 1}: capture must NOT resume before the guard elapses", 1 + turn, captureStarted)
+            advanceTimeBy(1000) // the guard elapses → capture resumes
+            assertEquals("turn ${turn + 1}: capture must resume after the guard", 2 + turn, captureStarted)
+        }
+        assertTrue("ten turns must complete without the session ending", c.active.value)
+        assertFalse(
+            "no stop condition may fire across the ten turns",
+            events.recent(50).any { it.detail.contains("session stop reason=") },
+        )
+        c.stop(ListeningModePolicy.StopReason.USER_STOP, "graph411-node2-complete")
+        assertFalse(c.active.value)
+    }
 }

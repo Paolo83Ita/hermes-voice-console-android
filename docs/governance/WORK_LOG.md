@@ -1704,3 +1704,15 @@ contracts pinned on the JVM; no test deleted, skipped or weakened.
 CHECKPOINT: CP-G4.10-001..014 → POCO_XIAOMI_RETEST_PACKAGE_3_READY
 (physical verdicts remain Owner-only; no forbidden token claimed).
 NEXT: Owner physical retest per OWNER_POCO_XIAOMI_RETEST_PACKAGE_3_GRAPH410.md.
+
+## GRAPH 4.11 — PHYSICAL EXPERIENCE COMPLETION (2026-11-07)
+
+- Fresh read-back: remote tip 5a567a3 (32 commits ahead) — ff-only sync; the complete 4.10 execution verified (Package 3 READY at 653ae0f).
+- Node 1: ST-54 "Voice A/B comparison" — real-engine audition (A speaks → B speaks the same phrase), selection authority byte-compared before/after, B's engine unloaded after; JVM decision tests (7) + honest PENDING on JVM.
+- Node 2: 10-turn loop test (guard/resume per turn, no stop condition) + 10-turn anti-echo test (echo rejected, user phrase accepted, window expiry honest).
+- Node 3: 46-category Italian anti-English pin (TOWER_PROGRESS typed locale-neutral).
+- Node 5: tower_refoundation_g411.py (measure/build/preview) — D1 sign clip, D2 sign-sliver+arrows, D2b mirror-clone annulus repair, D4 static bands re-staged on 720×1653; manifest v2; previews re-rendered (composite + comparison + 12 states).
+- Node 6: version 7 / 0.3.4-alpha-graph4.11 / POCO XIAOMI OWNER PACKAGE 4; OWNER_POCO_PACKAGE_4_GRAPH411.md runbook (POCO 25 min + Xiaomi 15 min matrices).
+- Verification: 422/422 unit GREEN, lint 0 errors, secret scan 0, local APKs hashed; CI read-back recorded after push.
+- CHECKPOINT: CP-G4.11-001..003 → POCO_OWNER_PACKAGE_4_READY (local validation) → CI package authoritative.
+NEXT: Owner installs the CI arm64 APK and runs the Package 4 runbook; remaining energy then moves to Tower visual verdict → Archive → Graph 1.7 pairing (Owner's own sequencing note).

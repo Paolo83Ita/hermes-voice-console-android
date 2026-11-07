@@ -67,3 +67,31 @@ The POCO/Xiaomi on-device screenshots will be appended to
 `OWNER_POCO_XIAOMI_RETEST_PACKAGE_3` by the Owner's physical pass.
 
 **Only the Owner accepts the final appearance — OWNER_VISUAL_RETEST_PENDING.**
+
+---
+
+# GRAPH 4.11 UPDATE (Node 5, CP-G4.11-002) — measured defect repair, 2026-11-07
+
+The Owner re-issued the composition authority ("Stop further procedural tower
+refinements. Use the Owner image as the composition authority..."). The
+Graph 4.11 audit MEASURED four defects in the 4.10 assets and repaired them
+(`scripts/tower_refoundation_g411.py`, persisted and reproducible):
+
+| ID | Measured defect | Repair |
+| --- | --- | --- |
+| G4.10-D1 | `tower_sign` clipped the H of "HERMES" and the M of "MULTI" (sourceBox [596,6,986,132] started inside the plaque — measured on a gridded crop) | plaque re-measured **[578,0,1018,166]**, blue-grey sky dropped, re-staged at stage rect (19,0,710,268) |
+| G4.10-D2a | `tower_rear` carried the sign's bottom text sliver ("M ORACLE NET") | sign zone cleared (stage y < 271; the DEEP AUDIT CORE banner preserved) |
+| G4.10-D2b | `tower_rear` + rings carried lateral arrow fragments (orange/green hue rule) AND a bronze-toned arrowhead crossing the annulus right side | hue scrub + edge scrub + **mirror-cloned clean annulus arc** over the arrowhead (ring-local 535..645,188..264) |
+| G4.10-D4 | the four static bands (sign/stairs/gate/foreground) were TIGHT canvases while `ReforgedTowerVisual` draws them TopCenter/fillMaxWidth/Fit — in the real app they rendered at the wrong size and position | **every static band re-staged on the full 720×1653 stage canvas** at its true position — no Compose change, the assets carry the placement |
+
+Core-alignment proof: stage x = (orig_x − 566)·S, y = orig_y·S with S = 1653/1024
+puts the manifest core (789,413) at (0.49997, 0.40332) of the stage — the code's
+exact ring center. `tower_portal` and `tower_energy` are byte-identical to 4.10.
+
+Manifest advanced to `graph-4.11-central-tower-refoundation-2` (all sha256
+recomputed, 10/10 matching). Previews re-rendered with the REAL Compose layout:
+`composite_idle.png`, `comparison_owner_vs_reforged.png`, 12 tower-scoped state
+previews. Layer naming map: `tower_lower_gate` == the Node-5 `tower_gate`.
+
+**Verdict unchanged: OWNER_VISUAL_RETEST_PENDING — only the Owner accepts the
+final appearance (Package 4 runbook, "Verifica visiva della Torre").**

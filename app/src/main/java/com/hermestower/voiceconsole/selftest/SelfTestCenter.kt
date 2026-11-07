@@ -94,6 +94,13 @@ data class SelfTestSubjects(
     // CP-G4.9-004 (ST-53): the local offline STT route read-back (Vosk frame
     // path vs the Android system recognizer).
     val localSttRouteProbe: (() -> LocalSttRouteReadback?)? = null,
+    // GRAPH 4.11 Node 1 (ST-54): the A/B voice qualification — the SAME preview
+    // phrase is spoken by the ACTIVE voice (A) and then by the OTHER installed
+    // voice (B), sequentially, through the real engines. The selection authority
+    // is never touched (B is auditioned, not selected). Null probe (JVM) degrades
+    // to QUALIFICATION_PENDING_DEVICE; null read-back means no natural voice is
+    // ACTIVE at all (BLOCKED_DEPENDENCY with the Sanctum repair path).
+    val voiceAbQualificationProbe: (() -> VoiceAbQualificationReadback?)? = null,
 )
 
 /** CP-G4.9-003 (ST-52): the honest snapshot of the spoken-output route. */
@@ -116,6 +123,33 @@ data class LocalSttRouteReadback(
     val offlineModelLoaded: Boolean,
     /** The loaded model directory name, when loaded. */
     val loadedModelDir: String? = null,
+)
+
+/**
+ * GRAPH 4.11 Node 1 (ST-54): the honest read-back of the A/B voice audition —
+ * the Owner's qualification shape "Voice A → play → Voice B → play → prove
+ * difference", executed on the real engines with the SAME preview phrase.
+ * Identity-level distinctness is MEASURED here (two different voice ids spoke
+ * to completion); the AUDIBLE difference remains Owner-verified only — the
+ * self-test never claims a physical verdict (VOICE_SWITCHING_OWNER_VERIFICATION_PENDING).
+ */
+data class VoiceAbQualificationReadback(
+    /** Voice A = the currently ACTIVE natural voice (may be null when none). */
+    val voiceAId: String?,
+    /** Voice B = the OTHER installed voice auditioned for contrast (null when absent). */
+    val voiceBId: String?,
+    /** VoiceRuntimeFactory.UtteranceResult name per leg: COMPLETED / SYNTHESIS_FAILED / PLAYBACK_FAILED / SKIPPED. */
+    val utteranceA: String?,
+    val utteranceB: String?,
+    /** Runtime identity read-back per leg (what the engine reported while speaking). */
+    val readBackAId: String?,
+    val readBackBId: String?,
+    /** The two legs completed with two DIFFERENT voice identities (measured, not heard). */
+    val identitiesDistinct: Boolean,
+    /** The selection authority state is byte-identical before/after the audition. */
+    val authorityUnchanged: Boolean,
+    /** Typed detail for failures (which leg failed and why). */
+    val detail: String? = null,
 )
 
 /**
