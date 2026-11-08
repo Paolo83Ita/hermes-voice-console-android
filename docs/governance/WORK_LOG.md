@@ -1762,3 +1762,18 @@ runbook OWNER_POCO_XIAOMI_RETEST_PACKAGE_5_GRAPH412.md).
 NEXT: CI read-back at the pushed tip; if the fleet turns the repairable classes green
 the crash-class evidence becomes cleanly attributable; Owner physical retest per the
 package 5 runbook.
+
+## 2026-11-08 — CP-G4.12-012: R-42b + R-45b from the 3169083 fleet verdict
+
+FINDING: run 42438234612 @ 3169083 — lane 1 boot-collapse (exit 224, zero
+instrumentation); lane 2 complete sample FAILED: R-43/R-44 HELD (0 findings each),
+R-42 advanced to "inject menu item not found" (popup compose race → R-42b
+gateClickByTextAwait bounded poll), R-45 persisted (the unpromoted entry is pushed
+inside the recreation window; static pin exhausted after source-level proof that no
+navigation version fixes the dispatch).
+ACTION: R-42b bounded presence-poll on the menu item (A2/B); R-45b debug-only
+HermesNav navigation-provenance diagnostics (pendingRoute effect + disk consume +
+RESUMED gate, drawer/hub navigate sites, onboarding storePendingRoute,
+MainActivity onCreate/onDestroy) — zero behavior change, zero release impact; the
+next sample carries the pusher evidence. Local: compile GREEN, unit 450/450.
+CHECKPOINT: CP-G4.12-012 → CI arbitrates; pre-device package state unchanged.

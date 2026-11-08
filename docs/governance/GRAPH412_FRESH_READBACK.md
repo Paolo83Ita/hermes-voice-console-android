@@ -161,3 +161,19 @@ remains the authoritative package (unchanged rule).
   POCO_XIAOMI_PHYSICAL_REPAIR_PACKAGE_READY remains governed by the runbook
   docs/receipts/OWNER_POCO_XIAOMI_RETEST_PACKAGE_5_GRAPH412.md (physical verdicts
   Owner-only).
+
+## 10. CP-G4.12-011/012 read-back (2026-11-08): the R-42..R-45 tip's fleet verdict
+
+- Push 23929f1..3169083 verified forward-only; main untouched (e7ab101); tree clean.
+- CI at 3169083: debug-build 42438234533 SUCCESS (compile gate + 450/450-equivalent
+  unit + artifacts); android-e2e 42438234612 — lane 1 boot-collapse (runner adb exit
+  224, zero instrumentation, the R-33/R-34 class), lane 2 complete sample (108 min)
+  E2E_VERDICT_FAILED; arbitration honest.
+- Repair verdicts (ledger "CP-G4.12-011 verdict at 3169083"): R-43 HELD (0 findings),
+  R-44 HELD (0 findings), R-42 ADVANCED (new typed message at the popup step →
+  R-42b bounded presence-poll executed), R-45 PERSISTED (the unpromoted entry is
+  pushed inside the recreation window; static analysis exhausted → R-45b debug-only
+  navigation-provenance diagnostics executed: HermesNav logs across every navigate
+  pusher + MainActivity lifecycle).
+- The pre-device terminal state POCO_XIAOMI_PHYSICAL_REPAIR_PACKAGE_READY remains
+  governed by the package-5 runbook (physical verdicts Owner-only).

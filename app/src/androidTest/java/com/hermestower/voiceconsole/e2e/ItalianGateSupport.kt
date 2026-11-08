@@ -683,3 +683,23 @@ fun HermesComposeRule.gateClickByText(text: String): Boolean {
     androidx.test.platform.app.InstrumentationRegistry.getInstrumentation().runOnMainSync { click() }
     return true
 }
+
+/**
+ * R-42b (run 42438234612 sample 2 @ 3169083 — the R-42 walk ADVANCED: the
+ * "Altre azioni" dispatch succeeded and the failure moved to the NEW typed
+ * message "inject menu item not found or without OnClick (it)"): after the
+ * more-actions dispatch the DropdownMenu composes in its own popup window on
+ * the main thread — the immediate fetch raced that composition on the starved
+ * fleet. Bounded presence-poll (250 ms cadence, 15 s cap) before the same
+ * R-12 direct dispatch; the typed failure text is unchanged in meaning and
+ * the dialog anchor still decides success. Nothing skipped or weakened.
+ */
+fun HermesComposeRule.gateClickByTextAwait(text: String, timeoutMs: Long = 15_000): Boolean {
+    val deadline = System.currentTimeMillis() + timeoutMs
+    while (System.currentTimeMillis() < deadline) {
+        if (gateClickByText(text)) return true
+        Thread.sleep(250)
+    }
+    return false
+}
+

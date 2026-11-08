@@ -195,6 +195,7 @@ fun AppNav(graph: AppGraph) {
                 navigation = { deferredRoute -> pendingRoute = deferredRoute },
                 pendingRoute = route,
                 storePendingRoute = { r ->
+                    navLog("onboarding completion: storePendingRoute=$r")
                     com.hermestower.voiceconsole.onboarding.OnboardingCompletion.setPendingRoute(appContext, r)
                 },
                 clearPendingRoute = {
@@ -228,9 +229,11 @@ fun AppNav(graph: AppGraph) {
             ?: com.hermestower.voiceconsole.onboarding.OnboardingCompletion.consumePendingRoute(appContext)
             ?: return@LaunchedEffect
         pendingRoute = null
+        navLog("pendingRoute effect: consumed route=$route host=${lifecycleOwner.lifecycle.currentState}")
         // §5: run the navigation only while RESUMED — a recreate in flight can
         // never catch a half-initialized back-stack entry.
         lifecycleOwner.lifecycle.withResumed {
+            navLog("pendingRoute effect: RESUMED gate passed, navigate($route)")
             navController.navigate(route) { launchSingleTop = true }
         }
     }
@@ -301,7 +304,7 @@ fun AppNav(graph: AppGraph) {
                         // CP-G4-017: selecting a destination closes the drawer
                         // (Material modal-drawer behavior; also keeps the real-frame
                         // CI path physically sound — the hub is never behind a scrim).
-                        primaryDestinations.forEach { route -> DrawerRow(route, currentRoute, m, compact = true) { scope.launch { drawerState.close() }; navController.navigate(route) { launchSingleTop = true } } }
+                        primaryDestinations.forEach { route -> DrawerRow(route, currentRoute, m, compact = true) { navLog("drawer row navigate route=$route"); scope.launch { drawerState.close() }; navController.navigate(route) { launchSingleTop = true } } }
                         HorizontalDivider(color = m.bronzeDeep, modifier = Modifier.padding(top = 8.dp))
 
                         // ---- FOOTER: version, mode, language (§11) ----
@@ -390,7 +393,7 @@ fun AppNav(graph: AppGraph) {
                 composable(AppRoutes.TOWER_STUDIO) { TowerStudioScreen(graph, onOpenScanner = { navController.navigate(AppRoutes.QR_SCANNER) { launchSingleTop = true } }) }
                 composable(AppRoutes.QR_SCANNER) { QrScannerScreen(graph, onBack = { navController.popBackStack() }) }
                 composable(AppRoutes.VOICE) { VoiceAudioScreen(graph) }
-                composable(AppRoutes.SETTINGS) { SettingsHubScreen(onOpen = { route -> navController.navigate(route) { launchSingleTop = true } }) }
+                composable(AppRoutes.SETTINGS) { SettingsHubScreen(onOpen = { route -> navLog("hub row navigate route=$route"); navController.navigate(route) { launchSingleTop = true } }) }
                 composable(AppRoutes.MODEL_MANAGER) { ModelManagerScreen(graph) }
                 composable(AppRoutes.INTELLIGENCE) { LocalIntelligenceScreen(graph) }
                 composable(AppRoutes.APPEARANCE) { AppearanceScreen(graph) }
@@ -448,5 +451,18 @@ private fun DrawerRow(
                 color = m.gold,
             )
         }
+    }
+}
+
+/**
+ * R-45b diagnostics (debug-only, additive): typed navigation provenance for the
+ * destroy-time `NavBackStackEntry INITIALIZED → DESTROYED` crash class. Every
+ * app-side pusher of a NavController.navigate() call logs its route here, so
+ * the next fleet sample carries the pusher evidence in the logcat artifact.
+ * Zero behavior change; the tag is HermesNav.
+ */
+internal fun navLog(message: String) {
+    if (com.hermestower.voiceconsole.BuildConfig.DEBUG) {
+        android.util.Log.i("HermesNav", message)
     }
 }

@@ -326,3 +326,41 @@ SDK 35 reinstalled in the recycled sandbox; one typed fix — `Rect.isUnspecifie
 explicit `Rect.Zero` comparison), unit battery 450/450, lint 0 errors / 84 warnings
 (all pre-existing main-source classifications, 0 androidTest findings), secret scan
 0 findings (tree + history). The e2e fleet arbitrates the repairs at the new tip.
+
+### CP-G4.12-011 verdict at 3169083 (run 42438234612, 2026-11-08) + repairs R-42b/R-45b
+
+Run 42438234612 @ 3169083 (the R-42..R-45 repair tip): debug-build 42438234533
+SUCCESS; e2e lane 1 died at the BOOT phase (runner adb exit 224 at 02:36:54, zero
+instrumentation — the known E2E_BLOCKED_EMULATOR_ENVIRONMENT boot-collapse class, the
+exact scenario the R-25 dual-lane design covers); lane 2 completed a full 108-min
+sample and printed E2E_VERDICT_FAILED.
+
+**Repair verdicts from lane 2's artifacts (evidence, not impression):**
+
+- **R-43 HELD** — zero "relaunch not observed" findings (pre-repair: 4 samples).
+- **R-44 HELD** — zero AppNotIdleException findings (pre-repair: 1 sample at the
+  unguarded recreate site).
+- **R-42 ADVANCED with a NEW typed message** — gate B passed the "Altre azioni"
+  dispatch and failed at `inject menu item not found or without OnClick (it)`: the
+  immediate semantics fetch raced the DropdownMenu's popup-window composition on the
+  starved fleet. Repair R-42b: bounded presence-poll (`gateClickByTextAwait`, 250 ms
+  cadence, 15 s cap) before the same direct dispatch; typed failure meaning
+  unchanged; dialog anchor still decides.
+- **R-45 (destroy-time INITIALIZED→DESTROYED crash) PERSISTED** — gates C/D/E/F
+  crashed (routes settings ×3 + model_manager, route-independent), regression
+  FreshInstall/ModelManager/SelfTest crashed, residual crashed; gate A's invocation
+  died mid-A2 (no typed result); B produced its typed result and the crash hit the
+  process around teardown. The navigation-settle did NOT prevent the class — the
+  unpromoted entry is pushed inside the recreation window itself, by a pusher that
+  static source analysis could not pin (the dispatch is proven unconditional through
+  navigation 2.10.2, so no upgrade path exists).
+
+**Repair R-45b (executed with this commit):** debug-only navigation-provenance
+diagnostics — every app-side navigate() pusher (pendingRoute effect with its
+disk-consume + RESUMED gate, drawer rows, hub rows), the onboarding
+storePendingRoute call, and MainActivity onCreate/onDestroy (instance identity +
+restoring + isFinishing) now log under the `HermesNav` tag in debug builds (zero
+release impact, zero behavior change). The next fleet sample carries the pusher
+evidence in the logcat artifact, converting the crash class from "unpinnable by
+static analysis" to "attributable by observation". No test, assertion or behavior
+changed.

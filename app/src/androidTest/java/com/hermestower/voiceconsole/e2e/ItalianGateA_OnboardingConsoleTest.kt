@@ -142,7 +142,9 @@ class ItalianGateA_OnboardingConsoleTest {
             check(compose.gateClickByText(ItalianGate.localizedString(R.string.mm_more_actions, "it"))) {
                 "more-actions control not found or without OnClick (it)"
             }
-            check(compose.gateClickByText(ItalianGate.localizedString(R.string.inject_cd, "it"))) {
+            // R-42b (run 42438234612 sample 2 @ 3169083): the immediate fetch raced
+            // the popup composition — bounded presence-poll before the dispatch.
+            check(compose.gateClickByTextAwait(ItalianGate.localizedString(R.string.inject_cd, "it"))) {
                 "inject menu item not found or without OnClick (it)"
             }
             compose.gateAwaitAnchor(ItalianGate.localizedString(R.string.cd_inject_title, "it"))

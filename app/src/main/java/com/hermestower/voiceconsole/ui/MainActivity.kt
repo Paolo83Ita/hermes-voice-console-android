@@ -30,6 +30,13 @@ class MainActivity : ComponentActivity() {
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
+        if (com.hermestower.voiceconsole.BuildConfig.DEBUG) {
+            android.util.Log.i(
+                "HermesNav",
+                "MainActivity onCreate instance=" + Integer.toHexString(System.identityHashCode(this)) +
+                    " restoring=" + (savedInstanceState != null),
+            )
+        }
         enableEdgeToEdge()
         // CP-G4-016 — CI_LIFECYCLE_PROFILE (OWNER_DECISION_E2E_RECOVERY): the test
         // harness (running in THIS process) sets the TEST_ONLY property before the
@@ -116,6 +123,17 @@ class MainActivity : ComponentActivity() {
                 AppNav(graph)
             }
         }
+    }
+
+    override fun onDestroy() {
+        if (com.hermestower.voiceconsole.BuildConfig.DEBUG) {
+            android.util.Log.i(
+                "HermesNav",
+                "MainActivity onDestroy instance=" + Integer.toHexString(System.identityHashCode(this)) +
+                    " isFinishing=" + isFinishing,
+            )
+        }
+        super.onDestroy()
     }
 
     companion object {
