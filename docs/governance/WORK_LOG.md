@@ -1801,3 +1801,14 @@ ACTION: R-48 — HermesNav begin/done bracketing of the gateActivateRow dispatch
 R-46b provenance extended to the fallback hub-anchor wait; compile GREEN.
 CHECKPOINT: CP-G4.12-015 → the next sample decides between foreign-node dispatch and
 navigation-side suppression.
+
+## 2026-11-08 — CP-G4.12-016: crash-family elimination holds ×4 + R-49 drawer-settle
+
+FINDING: run 42473996420 lane 1 @ dd5b3e2 — zero crashes (4th sample), ALL classes
+typed, VoiceFlow OK (6 tests) COMPLETELY; the route-log census + provenance pinned
+the anchor-failure mechanism: dispatches race the drawer's opening recomposition
+(failing = first activation after gateOpenDrawer; working = settled trees; the menu
+item missed through both arms with the same signature).
+ACTION: R-49 — gateOpenDrawer settles the drawer (close-anchor stable across two
+polls, 10 s bound, fail-open) before any row lookup; compile GREEN, unit 450/450.
+CHECKPOINT: CP-G4.12-016 → CI arbitrates at the new tip.

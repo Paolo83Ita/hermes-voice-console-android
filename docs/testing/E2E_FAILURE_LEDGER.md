@@ -474,3 +474,30 @@ the lookup is the defect; if the product log appears, the navigation itself is t
 defect). The fallback's 30 s hub-anchor wait now carries the same R-46b provenance
 enrichment (gate F's failure class). Harness-only; nothing deleted/skipped/weakened;
 compile GREEN locally.
+
+### CP-G4.12-016 verdict at dd5b3e2 (run 42473996420 lane 1, 2026-11-08) + R-49 drawer-settle
+
+Debug-build SUCCESS; e2e lane 2 = install-phase typed abort (zero instrumentation);
+lane 1 full honest sample: GATE_TALLY 0/6, REGRESSION_TALLY ok=3 (FreshInstall 5/4
+typed, ModelManager 5/2, SelfTest 3/3 typed, **VoiceFlow OK (6 tests) — the voice
+flow passes COMPLETELY for the first time since the Graph 4.10 console refoundation**,
+LifecycleProfile OK, Onboarding OK), residual 7/2 typed, ZERO Process-crashed for the
+FOURTH consecutive sample. E2E_VERDICT_FAILED honest.
+
+**The R-48 dispatch bracketing + the route-log census pinned the mechanism:** the
+tail window shows 11 product route logs (settings ×5, appearance ×2, self_test ×3,
+tower_studio ×1) — every logged dispatch WORKED (the hub composed 4 s after
+drawer→settings in one sequence) — while the failing segments' provenance says
+primaryRow=true with NO product route log. The failing dispatches are exactly the
+FIRST row activation after gateOpenDrawer; the successful ones sit on settled trees.
+Mechanism: the drawer's OPENING recomposition races the lookup — a node fetched
+mid-animation carries an action bound to a composition replaced before the dispatch
+lands; begin/done fire, the product lambda never runs. The inject menu item stayed
+not-found through both arms with the SAME signature (the Altre-azioni dispatch
+returned true, the menu never opened).
+
+Repair R-49 (harness-only): gateOpenDrawer now SETTLES the drawer before any row
+lookup — the close-drawer anchor stable across two consecutive polls (the R-45
+two-poll discipline), bounded 10 s, fail-open to the honest anchor decision. No test
+deleted, skipped or weakened; compile GREEN, unit 450/450 locally. The arbitration
+flow governs at the next tip.

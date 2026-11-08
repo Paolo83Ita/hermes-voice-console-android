@@ -361,6 +361,31 @@ fun HermesComposeRule.gateSwitchLocaleAndAwait(code: String, timeoutMs: Long = 1
 fun HermesComposeRule.gateOpenDrawer() {
     val openDesc = ItalianGate.localizedString(R.string.nav_open_drawer, "it")
     onNodeWithContentDescription(openDesc).performClick()
+    // R-49 (runs 42446655312 lane 1 @ a21d0b3-era through 42473996420 lane 1 @
+    // dd5b3e2 — the dispatch-true/effect-false signature, 3 samples): the
+    // OnClick dispatches that FAILED were exactly the FIRST row activations
+    // after gateOpenDrawer, while dispatches on settled trees (later segments,
+    // post-recreate settles) all worked and logged their product route. The
+    // drawer's OPENING recomposition races the lookup: a node fetched mid-
+    // animation carries an action bound to a composition that is replaced
+    // before the dispatch lands — begin/done fire, the product lambda never
+    // runs. Settle the drawer like every other composition boundary (the R-45
+    // two-poll stability discipline): the drawer anchor stable across two
+    // consecutive polls, bounded 10 s, before any row lookup.
+    val closeDesc = ItalianGate.localizedString(R.string.nav_close_drawer, "it")
+    val deadline = System.currentTimeMillis() + 10_000
+    var lastBounds: androidx.compose.ui.geometry.Rect? = null
+    while (System.currentTimeMillis() < deadline) {
+        val bounds = runCatching {
+            onAllNodesWithContentDescription(closeDesc, substring = true).fetchSemanticsNodes()
+                .firstOrNull()?.boundsInRoot
+        }.getOrDefault(null)
+        if (bounds != null && bounds == lastBounds) return
+        lastBounds = bounds
+        Thread.sleep(150)
+    }
+    // No stable proof within the bound: proceed — the destination anchor still
+    // decides success honestly.
 }
 
 /**
