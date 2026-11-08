@@ -364,3 +364,38 @@ release impact, zero behavior change). The next fleet sample carries the pusher
 evidence in the logcat artifact, converting the crash class from "unpinnable by
 static analysis" to "attributable by observation". No test, assertion or behavior
 changed.
+
+### R-46 — THE CRASH PUSHER PROVEN AND FIXED (run 42446655312 @ a21d05c, 2026-11-08)
+
+The R-45b HermesNav diagnostics delivered the pusher evidence in their FIRST sample:
+
+```
+05:58:20.154 16699 16718 I HermesNav: drawer row navigate route=settings
+              ^PID      ^TID — the drawer-row OnClick ran on the INSTRUMENTATION
+                          thread, not on main (main TID == PID 16699)
+```
+
+**Mechanism (source-proven end-to-end):** `gateActivateRowAccessible` /
+`gateNavigateTo`'s hub-row first arm / the regression suite's `activateAccessible`
+invoked the compose OnClick DIRECTLY on the instrumentation thread. The click
+handler calls `navController.navigate(route)` OFF-MAIN; the pushed NavBackStackEntry's
+lifecycle promotion never syncs with the main-thread host events; the entry stays
+INITIALIZED; the destroy dispatch (ReportFragment.onActivityPreDestroyed →
+NavController → entry.handleLifecycleEvent(ON_DESTROY)) throws INITIALIZED→DESTROYED
+and the process dies. The crash routes (settings ×4, model_manager) are EXACTLY the
+drawer/hub destinations these helpers dispatch — gate A/C/E/F: settings, D:
+model_manager, and the regression classes FreshInstall/ModelManager/SelfTest
+navigate through the SAME off-main `activateAccessible`.
+
+Run 42446655312 lane 1 (complete, honest): GATE_TALLY classes_ok=0 of 6 (A/B
+silently crashed, C/D/E/F shortMsg=Process crashed), REGRESSION_TALLY classes_ok=2
+residual_typed=3 failed=[VoiceFlow], E2E_VERDICT_FAILED. Lane 2 was still in flight
+at write time.
+
+**Repair R-46 (harness-only):** every semantics OnClick invocation now runs ON MAIN
+via `InstrumentationRegistry.runOnMainSync` — `gateActivateRowAccessible`
+(ItalianGateSupport ~455), `gateNavigateTo`'s hub-row first arm (~602, the redundant
+double-dispatch second arm folded), and `activateAccessible` (E2ECommon ~207). No
+test deleted, skipped or weakened; the destination/dialog anchors still decide. This
+is the mechanistically exact repair for the fleet's dominant crash class — the
+arbitration flow governs at the next tip.

@@ -452,7 +452,16 @@ fun HermesComposeRule.gateActivateRowAccessible(label: String): Boolean {
         }.getOrDefault(emptyList())
         val row = rows.firstOrNull() ?: continue
         val click = row.config[SemanticsActions.OnClick]?.action ?: continue
-        click()
+        // R-46 (run 42446655312 lane 1 @ a21d05c — the HermesNav diagnostics
+        // PROVED the pusher: 'drawer row navigate route=settings' logged from
+        // TID 16718 while the main thread is PID 16699): the semantics OnClick
+        // MUST be invoked on the MAIN thread. NavController.navigate() from the
+        // instrumentation thread pushes a back-stack entry whose lifecycle
+        // promotion never syncs with the main-thread host events — the entry
+        // stays INITIALIZED and the destroy dispatch crashes the process
+        // (INITIALIZED → DESTROYED, route = the dispatched row's destination:
+        // settings ×4, model_manager — EXACTLY the fleet's crash routes).
+        androidx.test.platform.app.InstrumentationRegistry.getInstrumentation().runOnMainSync { click() }
         return true
     }
     return false
@@ -586,9 +595,11 @@ fun HermesComposeRule.gateNavigateTo(labelRes: Int, anchor: String, timeoutMs: L
         if (hubRow != null) {
             val click = hubRow.config[SemanticsActions.OnClick]?.action
                 ?: error("settings-hub row '$label' has no OnClick (it)")
-            // R-37: the direct invocation FIRST (the cloud-proven regression
-            // mechanism); the runOnMainSync dispatch stays as the second arm.
-            val dispatched = runCatching { click() }.isSuccess || runCatching {
+            // R-46: the direct invocation is now ON MAIN (the off-main arm was
+            // the proven crash pusher — HermesNav thread evidence @ a21d05c);
+            // the redundant second arm is folded into it (the old code could
+            // dispatch TWICE: once off-main, then again on main).
+            val dispatched = runCatching {
                 androidx.test.platform.app.InstrumentationRegistry.getInstrumentation().runOnMainSync { click() }
             }.isSuccess
             check(dispatched) { "settings-hub row '$label' OnClick dispatch failed (it)" }

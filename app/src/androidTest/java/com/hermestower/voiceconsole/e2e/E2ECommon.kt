@@ -197,7 +197,14 @@ private fun HermesComposeRule.activateRowFrozen(label: String): Boolean {
 private fun activateAccessible(row: androidx.compose.ui.semantics.SemanticsNode, label: String): Boolean {
     val accessibleClick = row.config[SemanticsActions.OnClick]
     if (accessibleClick?.action != null) {
-        accessibleClick.action!!()
+        // R-46 (run 42446655312 lane 1 @ a21d05c — HermesNav thread evidence:
+        // the drawer-row OnClick ran on the instrumentation thread, its
+        // navigate() pushed an entry that never promoted, and the destroy
+        // dispatch crashed — settings/model_manager, exactly the regression
+        // crash routes). The semantics action runs ON MAIN, same contract as
+        // the Italian-gate helpers (ledger R-3).
+        androidx.test.platform.app.InstrumentationRegistry.getInstrumentation()
+            .runOnMainSync { accessibleClick.action!!() }
         return true
     }
     error("row '$label' has no accessible OnClick action")
