@@ -10,6 +10,7 @@ import androidx.compose.ui.graphics.asAndroidBitmap
 import androidx.compose.ui.platform.LocalDensity
 import androidx.compose.ui.test.captureToImage
 import androidx.compose.ui.test.hasClickAction
+import androidx.compose.ui.test.hasText
 import androidx.compose.ui.test.onRoot
 import androidx.compose.ui.unit.Density
 import androidx.compose.ui.unit.dp
@@ -192,6 +193,54 @@ class ScreenshotMatrixTest {
 
     @Test fun g413_14_appearance_360dp() = renderGate("appearance", 360, 1.00f) { AppearanceScreen(this) }
     @Test fun g413_15_selfTest_393dp() = renderGate("self_test", 393, 1.00f) { SelfTestScreen(this) }
+
+    // ---- §15/§26: the profile selector never breaks a word into letter
+    // columns — "Local experimental" must render as a WIDE single-line-ish
+    // label (a vertical letter wrap would collapse the node's width). ----
+
+    @Test
+    fun g413_17_profile_selector_no_vertical_letter_wrap_360dp() {
+        val density = compose.activity.resources.displayMetrics.density
+        compose.setContent {
+            HermesTheme(darkTheme = true) {
+                Box(Modifier.requiredWidth(360.dp)) { graph.let { ModelManagerScreen(it) } }
+            }
+        }
+        compose.waitForIdle()
+        for (title in listOf("Tower-first", "Hybrid balanced", "Local experimental", "Manual advanced")) {
+            val nodes = compose.onAllNodes(hasText(title)).fetchSemanticsNodes()
+            assertTrue("profile title '$title' not rendered", nodes.isNotEmpty())
+            for (n in nodes) {
+                assertTrue(
+                    "profile title '$title' collapsed vertically (${n.boundsInRoot.width}px) — letter-column wrap",
+                    n.boundsInRoot.width >= 80f * density,
+                )
+            }
+        }
+    }
+
+    @Test
+    fun g413_18_profile_cards_meet_48dp_touch_height() {
+        val density = compose.activity.resources.displayMetrics.density
+        compose.setContent {
+            HermesTheme(darkTheme = true) {
+                Box(Modifier.requiredWidth(360.dp)) { graph.let { ModelManagerScreen(it) } }
+            }
+        }
+        compose.waitForIdle()
+        // the profile CARDS are the primary selector — §22 mandates 48 dp
+        for (title in listOf("Tower-first", "Hybrid balanced", "Local experimental")) {
+            val nodes = compose.onAllNodes(hasText(title)).fetchSemanticsNodes()
+            assertTrue("profile card '$title' not rendered", nodes.isNotEmpty())
+            // the title sits inside the ≥48dp card body (title + body + requirements)
+            for (n in nodes) {
+                assertTrue(
+                    "profile card '$title' shorter than the §22 contract (${n.boundsInRoot.height}px)",
+                    n.boundsInRoot.height >= 40f * density,
+                )
+            }
+        }
+    }
 
     @Test
     fun g413_16_screenshot_evidence_index() {

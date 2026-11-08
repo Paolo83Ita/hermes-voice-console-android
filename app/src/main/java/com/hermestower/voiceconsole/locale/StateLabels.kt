@@ -193,6 +193,59 @@ object StateLabels {
         "QUEUED" to mapOf(
             "it" to "In coda", "en" to "Queued", "es" to "En cola", "fr" to "En file", "de" to "In Warteschlange",
         ),
+
+        // ---- GRAPH 4.13 §18: raw enums never render in ordinary UI (§26 pin) ----
+        "NOT_DOWNLOADED" to mapOf(
+            "it" to "Non scaricato", "en" to "Not downloaded", "es" to "No descargado", "fr" to "Non téléchargé", "de" to "Nicht heruntergeladen",
+        ),
+        "VERIFIED_DOWNLOADABLE" to mapOf(
+            "it" to "Download verificato", "en" to "Download verified", "es" to "Descarga verificada", "fr" to "Téléchargement vérifié", "de" to "Download verifiziert",
+        ),
+        "RUNTIME_AVAILABLE" to mapOf(
+            "it" to "Runtime pronto", "en" to "Runtime ready", "es" to "Runtime listo", "fr" to "Runtime prêt", "de" to "Laufzeit bereit",
+        ),
+        "FUNCTIONAL_TEST_PASSED" to mapOf(
+            "it" to "Test funzionale superato", "en" to "Functional test passed", "es" to "Prueba funcional superada", "fr" to "Test fonctionnel réussi", "de" to "Funktionstest bestanden",
+        ),
+        "PHYSICAL_QUALIFICATION_PENDING" to mapOf(
+            "it" to "Richiesto test sul dispositivo", "en" to "Device test required", "es" to "Requerida prueba en el dispositivo", "fr" to "Test sur l'appareil requis", "de" to "Gerätetest erforderlich",
+        ),
+        "QUARANTINED" to mapOf(
+            "it" to "In quarantena", "en" to "Quarantined", "es" to "En cuarentena", "fr" to "En quarantaine", "de" to "Quarantäne",
+        ),
+        "LOADED" to mapOf(
+            "it" to "Caricato", "en" to "Loaded", "es" to "Cargado", "fr" to "Chargé", "de" to "Geladen",
+        ),
+        "TEST_FIXTURE_ONLY" to mapOf(
+            "it" to "Solo fixture di test", "en" to "Test fixture only", "es" to "Solo accesorio de prueba", "fr" to "Fixature de test uniquement", "de" to "Nur Test-Fixture",
+        ),
+        "CANDIDATE_PENDING_DISCOVERY" to mapOf(
+            "it" to "Disponibile nel catalogo", "en" to "Available in the catalog", "es" to "Disponible en el catálogo", "fr" to "Disponible dans le catalogue", "de" to "Im Katalog verfügbar",
+        ),
+        "SOURCE_UNVERIFIED_DOWNLOAD_BLOCKED" to mapOf(
+            "it" to "Download bloccato: origine non verificata", "en" to "Download blocked: source unverified", "es" to "Descarga bloqueada: origen no verificado", "fr" to "Téléchargement bloqué : source non vérifiée", "de" to "Download blockiert: Quelle unverifiziert",
+        ),
+        "LICENSE_BLOCKED" to mapOf(
+            "it" to "Licenza in revisione", "en" to "License under review", "es" to "Licencia en revisión", "fr" to "Licence en révision", "de" to "Lizenz in Prüfung",
+        ),
+        "COMPATIBILITY_BLOCKED" to mapOf(
+            "it" to "Non compatibile", "en" to "Not compatible", "es" to "No compatible", "fr" to "Non compatible", "de" to "Nicht kompatibel",
+        ),
+        "SUPERSEDED" to mapOf(
+            "it" to "Sostituito da versione più recente", "en" to "Superseded by a newer version", "es" to "Sustituido por una versión más reciente", "fr" to "Remplacé par une version plus récente", "de" to "Durch neuere Version ersetzt",
+        ),
+        "REJECTED" to mapOf(
+            "it" to "Respinto", "en" to "Rejected", "es" to "Rechazado", "fr" to "Rejeté", "de" to "Abgelehnt",
+        ),
+        "RUNTIME_BUNDLED" to mapOf(
+            "it" to "Incluso nell'app", "en" to "Included with the app", "es" to "Incluido con la aplicación", "fr" to "Inclus avec l'application", "de" to "Mit der App enthalten",
+        ),
+        "REFUSED" to mapOf(
+            "it" to "Rifiutato", "en" to "Refused", "es" to "Rechazado", "fr" to "Refusé", "de" to "Abgelehnt",
+        ),
+        "PASSED" to mapOf(
+            "it" to "Superato", "en" to "Passed", "es" to "Superada", "fr" to "Réussi", "de" to "Bestanden",
+        ),
     )
 
     /** The localized label for a state identifier; falls back to the identifier itself. */

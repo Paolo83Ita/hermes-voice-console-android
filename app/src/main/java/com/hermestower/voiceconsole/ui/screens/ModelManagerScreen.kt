@@ -24,7 +24,10 @@ import androidx.compose.ui.platform.LocalClipboardManager
 import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.AnnotatedString
+import androidx.compose.ui.text.font.FontWeight
+import androidx.compose.ui.Alignment
 import androidx.compose.ui.unit.dp
+import androidx.compose.ui.unit.sp
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import com.hermestower.voiceconsole.app.AppGraph
 import com.hermestower.voiceconsole.R
@@ -113,47 +116,71 @@ fun ModelManagerScreen(graph: AppGraph) {
             color = c.textSecondary,
         )
 
-        // ---------- A. Recommended setup ----------
-        SectionCard(title = stringResource(R.string.mm_section_a)) {
+        // ---------- A. Recommended configuration (GRAPH 4.13 §14: compact
+        // two-column key-value rows; §25: device identifier stays in Advanced
+        // Diagnostics, the ordinary card shows the device CLASS) ----------
+        run {
             val resources = remember { graph.deviceResourceReader.read() }
-            Text(context.getString(R.string.mm_detected_device, resources.deviceModel, resources.androidVersion), style = HermesType.body, color = c.textPrimary)
-            Text(
-                context.getString(
-                    R.string.mm_resources_line,
-                    resources.supportedAbis.joinToString(),
-                    formatBytes(resources.availableRamBytes),
-                    formatBytes(resources.freeStorageBytes),
-                ),
-                style = HermesType.body, color = c.textPrimary,
+            val localLlmAvailable = remember(registryTick) {
+                graph.localLlmEngine.state.value == com.hermestower.voiceconsole.local.LocalLlmEngine.State.LOADED
+            }
+            RecommendedConfigurationCard(
+                deviceClass = com.hermestower.voiceconsole.models.DeviceClassLabel.resolve(resources.deviceModel),
+                androidVersion = resources.androidVersion.toString(),
+                architecture = resources.supportedAbis.joinToString(),
+                availableRam = formatBytes(resources.availableRamBytes),
+                freeStorage = formatBytes(resources.freeStorageBytes),
+                speechEngine = if (resources.ttsEnginePackages.isEmpty()) context.getString(R.string.mm_tts_none) else resources.ttsEnginePackages.first(),
+                network = if (resources.networkOnline) context.getString(R.string.mm_network_online) else context.getString(R.string.mm_network_offline),
+                currentProfile = appliedProfile.displayLabel,
+                recommendedProfile = selectedProfile.displayLabel,
             )
-            Text(
-                context.getString(
-                    R.string.mm_tts_engines,
-                    if (resources.ttsEnginePackages.isEmpty()) context.getString(R.string.mm_tts_none) else resources.ttsEnginePackages.joinToString(),
+            // ---------- §15/§16 vertical segmented profile selector ----------
+            ProfileSelector(
+                cards = listOf(
+                    ProfileCardData(
+                        profile = VoiceModelProfile.TOWER_FIRST,
+                        title = stringResource(R.string.mm_profile_tower_first_title),
+                        body = stringResource(R.string.mm_profile_tower_first_body),
+                        requirements = stringResource(R.string.mm_profile_req_tower),
+                        selected = selectedProfile == VoiceModelProfile.TOWER_FIRST,
+                        enabled = true,
+                    ),
+                    ProfileCardData(
+                        profile = VoiceModelProfile.HYBRID_BALANCED,
+                        title = stringResource(R.string.mm_profile_hybrid_title),
+                        body = stringResource(R.string.mm_profile_hybrid_body),
+                        requirements = stringResource(R.string.mm_profile_req_hybrid),
+                        selected = selectedProfile == VoiceModelProfile.HYBRID_BALANCED,
+                        enabled = true,
+                    ),
+                    ProfileCardData(
+                        profile = VoiceModelProfile.LOCAL_EXPERIMENTAL,
+                        title = stringResource(R.string.mm_profile_local_title),
+                        body = stringResource(R.string.mm_profile_local_body),
+                        requirements = stringResource(R.string.mm_profile_req_local),
+                        selected = selectedProfile == VoiceModelProfile.LOCAL_EXPERIMENTAL,
+                        enabled = localLlmAvailable,
+                        unavailableExplanation = if (!localLlmAvailable) stringResource(R.string.mm_profile_local_unavailable) else null,
+                    ),
+                    ProfileCardData(
+                        profile = VoiceModelProfile.MANUAL_ADVANCED,
+                        title = stringResource(R.string.mm_profile_advanced_title),
+                        body = stringResource(R.string.mm_profile_advanced_body),
+                        requirements = stringResource(R.string.mm_profile_req_hybrid),
+                        selected = selectedProfile == VoiceModelProfile.MANUAL_ADVANCED,
+                        enabled = true,
+                    ),
                 ),
-                style = HermesType.body, color = c.textPrimary,
+                onSelect = { profile ->
+                    selectedProfile = profile
+                    recommendation = graph.modelResolver.recommend(profile, resources, graph.modelCatalog)
+                },
             )
-            Text(
-                context.getString(
-                    R.string.mm_network,
-                    if (resources.networkOnline) context.getString(R.string.mm_network_online) else context.getString(R.string.mm_network_offline),
-                    if (resources.networkMetered) context.getString(R.string.mm_network_metered) else "",
-                ),
-                style = HermesType.body, color = c.textPrimary,
-            )
-            Text(context.getString(R.string.mm_current_profile, appliedProfile.displayLabel), style = HermesType.body, color = c.textPrimary)
-            Text(context.getString(R.string.mm_recommended_profile, selectedProfile.displayLabel), style = HermesType.body, color = c.textPrimary)
-            Row(horizontalArrangement = Arrangement.spacedBy(8.dp), modifier = Modifier.padding(top = 4.dp)) {
-                VoiceModelProfile.entries.forEach { profile ->
-                    HermesFilterChip(
-                        selected = selectedProfile == profile,
-                        onClick = {
-                            selectedProfile = profile
-                            recommendation = graph.modelResolver.recommend(profile, resources, graph.modelCatalog)
-                        },
-                        label = { Text(profile.displayLabel) },
-                    )
-                }
+            if (!localLlmAvailable && selectedProfile == VoiceModelProfile.LOCAL_EXPERIMENTAL) {
+                // §16: "Why unavailable" — a readable explanation, never dim-only
+                Text(stringResource(R.string.mm_profile_why_unavailable), style = HermesType.sectionLabel, color = c.textWarning)
+                Text(stringResource(R.string.mm_profile_local_unavailable), style = HermesType.bodySecondary, color = c.textSecondary)
             }
             val rec = recommendation
             if (rec != null) {
@@ -257,8 +284,8 @@ fun ModelManagerScreen(graph: AppGraph) {
             }
         }
 
-        // ---------- B. Installed voice components ----------
-        SectionCard(title = stringResource(R.string.mm_section_b)) {
+        // ---------- F. Installed components (GRAPH 4.13 §13; localized states) ----------
+        SectionCard(title = stringResource(R.string.mm_section_f2)) {
             val installed = graph.modelRegistry.snapshot().filter { it.state != "REMOVED" }
             if (installed.isEmpty()) {
                 Text(
@@ -271,14 +298,11 @@ fun ModelManagerScreen(graph: AppGraph) {
                 if (records.isNotEmpty()) {
                     Text(type.displayLabel, style = HermesType.sectionLabel, color = c.bronze)
                     records.forEach { record ->
-                        Text(
-                            context.getString(
-                                R.string.mm_component_line,
-                                record.displayName, record.version, record.state,
-                                if (record.active) context.getString(R.string.mm_active_suffix) else "",
-                            ),
-                            style = HermesType.body, color = c.textPrimary,
-                        )
+                        // §18: the state renders through StateLabels, never raw
+                        Row(horizontalArrangement = Arrangement.spacedBy(8.dp), verticalAlignment = Alignment.CenterVertically) {
+                            Text(record.displayName, style = HermesType.body, color = c.textPrimary, modifier = Modifier.weight(1f, fill = false))
+                            ModelStatePill(record.state)
+                        }
                         Text(
                             context.getString(
                                 R.string.mm_verified_line,
@@ -292,35 +316,88 @@ fun ModelManagerScreen(graph: AppGraph) {
             }
         }
 
-        // ---------- C. Available components ----------
-        SectionCard(title = stringResource(R.string.mm_section_c)) {
-            graph.modelCatalog.all().forEach { entry ->
+        // ---------- G. Updates or repairs (GRAPH 4.13 §13) ----------
+        SectionCard(title = stringResource(R.string.mm_section_g2)) {
+            val all = graph.modelCatalog.all()
+            val pending = all.filter { entry ->
+                val record = graph.modelRegistry.record(entry.identity)
+                val progress = progressById[entry.identity]?.value
+                (record != null && record.version != entry.version) ||
+                    record?.state in listOf("FAILED", "QUARANTINED", "DOWNLOAD_PAUSED") ||
+                    progress?.state in listOf(
+                        com.hermestower.voiceconsole.models.ModelInstallState.DOWNLOAD_PAUSED,
+                    )
+            }
+            if (pending.isEmpty()) {
+                Text(
+                    stringResource(R.string.mm_section_updates_none),
+                    style = HermesType.bodySecondary, color = c.textSecondary,
+                )
+            }
+            pending.forEach { entry ->
+                val record = graph.modelRegistry.record(entry.identity)
+                Row(horizontalArrangement = Arrangement.spacedBy(8.dp), verticalAlignment = Alignment.CenterVertically) {
+                    Text(entry.displayName, style = HermesType.body, color = c.textPrimary, modifier = Modifier.weight(1f, fill = false))
+                    ModelStatePill(record?.state ?: entry.state)
+                }
+                if (record != null && record.version != entry.version) {
+                    Text(
+                        context.getString(R.string.mm_update_available, record.version, entry.version),
+                        style = HermesType.body, color = c.textInfo,
+                    )
+                }
+            }
+        }
+
+        // ---------- B–E. Catalog by component family (GRAPH 4.13 §13):
+        // Voices / Speech recognition / Wake word and noise reduction /
+        // Optional local intelligence — no uninterrupted flat list ----------
+        listOf(
+            com.hermestower.voiceconsole.models.ModelComponentType.VOICE to R.string.mm_section_b2,
+            com.hermestower.voiceconsole.models.ModelComponentType.SPEECH_TO_TEXT to R.string.mm_section_c2,
+            com.hermestower.voiceconsole.models.ModelComponentType.WAKE_WORD to R.string.mm_section_d2,
+            com.hermestower.voiceconsole.models.ModelComponentType.VAD to R.string.mm_section_d2,
+            com.hermestower.voiceconsole.models.ModelComponentType.NOISE_SUPPRESSION to R.string.mm_section_d2,
+            com.hermestower.voiceconsole.models.ModelComponentType.LOCAL_LLM to R.string.mm_section_e2,
+            com.hermestower.voiceconsole.models.ModelComponentType.TTS_ENGINE to R.string.mm_section_c2,
+        ).distinctBy { it.first }.groupBy({ it.second }, { it.first }).forEach { (titleRes, types) ->
+            val familyEntries = graph.modelCatalog.all().filter { it.componentTypeEnum() in types }
+            if (familyEntries.isEmpty()) return@forEach
+            SectionCard(title = stringResource(titleRes)) {
+            familyEntries.forEach { entry ->
                 val progress = progressById[entry.identity]?.value
                 val record = graph.modelRegistry.record(entry.identity)
                 val isExpanded = expanded[entry.identity] == true
                 val updateAvailable = record != null && record.version != entry.version
 
-                Text(entry.displayName, style = HermesType.sectionLabel, color = c.bronze)
+                // ---- §17 card header: name + localized state pill ----
+                Row(horizontalArrangement = Arrangement.spacedBy(8.dp), verticalAlignment = Alignment.CenterVertically) {
+                    Text(
+                        entry.displayName,
+                        style = HermesType.sectionLabel.copy(fontWeight = FontWeight.SemiBold, fontSize = 15.sp),
+                        color = c.textPrimary,
+                        modifier = Modifier.weight(1f, fill = false),
+                    )
+                    ModelStatePill(record?.state ?: progress?.state?.name ?: entry.state)
+                }
+                // ---- §13: plain-language purpose (never catalog raw data) ----
+                val purposeRes = com.hermestower.voiceconsole.models.ComponentPurpose.stringRes(entry.componentTypeEnum())
+                Text(stringResource(purposeRes), style = HermesType.bodySecondary, color = c.textSecondary)
+                // ---- §20 collapsed card: size · RAM · language · runtime only ----
                 Text(
                     context.getString(
-                        R.string.mm_spec_line,
-                        entry.identity, entry.version, entry.provider, entry.license,
-                        formatBytes(entry.downloadSizeBytes), formatBytes(entry.installedSizeBytes),
-                        formatBytes(entry.ramEstimateBytes), entry.latencyClass,
-                        entry.languages.joinToString(),
-                        if (entry.italianSupported) context.getString(R.string.mm_it_yes) else context.getString(R.string.mm_it_no),
-                    ),
-                    style = HermesType.bodySecondary, color = c.textSecondary,
+                        R.string.mm_card_size,
+                    ) + " ${formatBytes(entry.downloadSizeBytes)}  ·  " +
+                        context.getString(R.string.mm_card_ram) + " ${formatBytes(entry.ramEstimateBytes)}  ·  " +
+                        context.getString(R.string.mm_card_language) + " " +
+                        (if (entry.italianSupported) "IT" else entry.languages.joinToString("/")),
+                    style = HermesType.bodySecondary,
+                    color = c.textTechnical,
                 )
                 Text(
-                    context.getString(
-                        R.string.mm_classification,
-                        entry.entryClassification,
-                        if (entry.optionalComponent) context.getString(R.string.mm_optional_suffix) else context.getString(R.string.mm_required_suffix),
-                        record?.state ?: entry.state,
-                        if (record?.active == true) context.getString(R.string.mm_active_suffix) else "",
-                    ),
-                    style = HermesType.bodySecondary, color = c.textSecondary,
+                    context.getString(R.string.mm_card_runtime) + ": " + (entry.runtimeRequirement
+                        ?: context.getString(R.string.mm_attr_install_status)),
+                    style = HermesType.bodySecondary, color = c.textTechnical,
                 )
                 if (updateAvailable) {
                     Text(
@@ -328,16 +405,26 @@ fun ModelManagerScreen(graph: AppGraph) {
                         style = HermesType.body, color = c.textInfo,
                     )
                 }
+                // ---- §19 typed compatibility verdict (never "false") ----
                 val rec = recommendation
                 val resolved = rec?.components?.firstOrNull { it.identity == entry.identity }
-                Text(
-                    context.getString(
-                        R.string.mm_compat_line,
-                        (resolved?.compatible ?: false).toString(),
-                        resolved?.incompatibilityReason?.let { context.getString(R.string.mm_incompat_paren, it) } ?: "",
-                    ),
-                    style = HermesType.bodySecondary, color = c.textSecondary,
+                val verdict = com.hermestower.voiceconsole.models.CompatVerdictResolver.resolve(
+                    entryClassification = entry.entryClassification,
+                    recordState = record?.state,
+                    active = record?.active,
+                    runtimeRequirement = entry.runtimeRequirement,
+                    compatible = resolved?.compatible,
+                    incompatibilityReason = resolved?.incompatibilityReason,
+                    progressState = progress?.state?.name,
                 )
+                Row(horizontalArrangement = Arrangement.spacedBy(6.dp), verticalAlignment = Alignment.CenterVertically) {
+                    Text(stringResource(R.string.mm_card_compatibility), style = com.hermestower.voiceconsole.ui.monumental.MonumentalType.sealSub, color = c.textTertiaryReadable)
+                    Text(
+                        compatVerdictLabel(verdict),
+                        style = HermesType.bodySecondary,
+                        color = compatVerdictColor(verdict, c),
+                    )
+                }
                 progress?.let {
                     if (it.state == ModelInstallState.DOWNLOADING || it.state == ModelInstallState.DOWNLOAD_PAUSED) {
                         Text(
@@ -454,74 +541,165 @@ fun ModelManagerScreen(graph: AppGraph) {
                     )
                 }
 
-                // ---------- D. Lifecycle actions (OWNER PHYSICAL RETEST §8: adaptive action layout) ----------
-                // The physical defect (PHYSICAL-FAIL-03): three FIXED horizontal Rows of up to 6
-                // TextButtons overflowed the POCO's ≈372 dp and clipped the Verify label. The
-                // adaptive layout: direct primary actions (Download/Install, Verify, Activate,
-                // Details — Details stays direct: the E2E Italian Gate D walk expands the sheet
-                // through it), everything else behind “More actions” (never clipped), ≥48 dp
-                // touch height, maxLines 2, centered text, wrap at constrained width.
+                // ---------- D. Lifecycle actions (§21 action semantics + §22 layout):
+                // ONE filled primary action that follows the real component
+                // state (ModelActionResolver); Details stays direct (the E2E
+                // Gate D walk expands the sheet through it); every other
+                // action lives behind "More actions" (never clipped);
+                // transfer actions are state-gated, never shown available. ----------
+                val uxPlan = com.hermestower.voiceconsole.models.ModelActionResolver.resolve(
+                    entryClassification = entry.entryClassification,
+                    recordState = record?.state,
+                    active = record?.active,
+                    progressState = progress?.state?.name,
+                    verdict = verdict,
+                )
                 AdaptiveActionsRow(
                     primary = listOf(
                         AdaptiveAction(
-                            key = "download",
-                            label = context.getString(R.string.mm_download),
-                            enabled = resolved?.downloadAllowed != false &&
-                                entry.entryClassification == "VERIFIED_DOWNLOADABLE" &&
-                                progress?.state != ModelInstallState.DOWNLOADING && !packRunning,
-                        ) {
-                            if (entry.identity == PROBE_IDENTITY) {
-                                // The only mock-served artifact: the deterministic test probe.
-                                val server = LocalTowerMockServer()
-                                val bytes = DeterministicTestArtifact.generate("hermes-test-artifact-v1", 4096)
-                                server.putArtifact("hermes-test-artifact-v1", LocalTowerMockServer.Artifact(bytes))
-                                graph.keyValueStore.putString("probe_server_port", server.port.toString())
-                                graph.modelDownloads.start(
-                                    entry.copy(sha256 = ModelSha256.ofBytes(bytes)),
-                                    "${server.baseUrl}/artifacts/hermes-test-artifact-v1",
-                                )
-                                statusNote = context.getString(R.string.mm_probe_started, server.port)
-                            } else {
-                                graph.modelDownloads.start(entry, entry.sourceUri)
-                                statusNote = context.getString(R.string.mm_download_started, entry.sourceUri)
-                            }
-                            registryTick++
-                        },
-                        AdaptiveAction(
-                            key = "verify",
-                            label = context.getString(R.string.mm_verify),
+                            key = "primary_${uxPlan.primary.name.lowercase()}",
+                            label = primaryActionLabel(uxPlan.primary),
                             emphasized = true,
+                            enabled = when (uxPlan.primary) {
+                                com.hermestower.voiceconsole.models.ModelPrimaryAction.DOWNLOAD ->
+                                    resolved?.downloadAllowed != false &&
+                                        entry.entryClassification == "VERIFIED_DOWNLOADABLE" &&
+                                        progress?.state != ModelInstallState.DOWNLOADING && !packRunning
+                                com.hermestower.voiceconsole.models.ModelPrimaryAction.INSTALL,
+                                com.hermestower.voiceconsole.models.ModelPrimaryAction.ACTIVATE,
+                                -> !packRunning
+                                else -> true
+                            },
                         ) {
-                            statusNote = if (graph.modelDownloads.verifiedExisting(entry)) context.getString(R.string.mm_hash_verified)
-                            else context.getString(R.string.mm_no_verified_file, entry.identity)
-                        },
-                        AdaptiveAction(
-                            key = "activate",
-                            label = context.getString(R.string.mm_activate),
-                            enabled = !packRunning,
-                        ) {
-                            val result = graph.modelActivation.activate(entry)
-                            if (result.success && entry.componentType == com.hermestower.voiceconsole.models.ModelComponentType.VOICE.name) {
-                                // GRAPH 4.10 §7/§8: registry activation alone is NOT
-                                // active — the six-condition runtime truth runs now.
-                                statusNote = context.getString(R.string.mm_voice_qualifying, entry.displayName)
-                                scope.launch {
-                                    val outcome = graph.qualifyVoiceRuntime(entry)
-                                    statusNote = when (outcome) {
-                                        is com.hermestower.voiceconsole.voice.VoiceRuntimeFactory.ActivationOutcome.Active ->
-                                            context.getString(R.string.mm_voice_active, entry.displayName)
-                                        is com.hermestower.voiceconsole.voice.VoiceRuntimeFactory.ActivationOutcome.Failed ->
-                                            context.getString(
-                                                R.string.mm_voice_runtime_failed,
-                                                entry.displayName,
-                                                outcome.typedReason.name,
-                                            )
+                            when (uxPlan.primary) {
+                                com.hermestower.voiceconsole.models.ModelPrimaryAction.DOWNLOAD -> {
+                                    if (entry.identity == PROBE_IDENTITY) {
+                                        // The only mock-served artifact: the deterministic test probe.
+                                        val server = LocalTowerMockServer()
+                                        val bytes = DeterministicTestArtifact.generate("hermes-test-artifact-v1", 4096)
+                                        server.putArtifact("hermes-test-artifact-v1", LocalTowerMockServer.Artifact(bytes))
+                                        graph.keyValueStore.putString("probe_server_port", server.port.toString())
+                                        graph.modelDownloads.start(
+                                            entry.copy(sha256 = ModelSha256.ofBytes(bytes)),
+                                            "${server.baseUrl}/artifacts/hermes-test-artifact-v1",
+                                        )
+                                        statusNote = context.getString(R.string.mm_probe_started, server.port)
+                                    } else {
+                                        graph.modelDownloads.start(entry, entry.sourceUri)
+                                        statusNote = context.getString(R.string.mm_download_started, entry.sourceUri)
                                     }
                                     registryTick++
                                 }
-                            } else {
-                                statusNote = context.getString(R.string.mm_activate_result, entry.identity, if (result.success) "ACTIVE" else "REFUSED", result.reason)
-                                registryTick++
+                                com.hermestower.voiceconsole.models.ModelPrimaryAction.VERIFY -> {
+                                    statusNote = if (graph.modelDownloads.verifiedExisting(entry)) context.getString(R.string.mm_hash_verified)
+                                    else context.getString(R.string.mm_no_verified_file, entry.identity)
+                                }
+                                com.hermestower.voiceconsole.models.ModelPrimaryAction.INSTALL -> {
+                                    val resources = graph.deviceResourceReader.read()
+                                    scope.launch {
+                                        if (graph.modelDownloads.verifiedExisting(entry)) {
+                                            val q = graph.modelQualification.qualify(entry)
+                                            val a = if (q.qualified) graph.modelActivation.activate(entry) else null
+                                            statusNote = context.getString(R.string.mm_already_verified, if (q.qualified) "PASSED" else "FAILED") +
+                                                (a?.let { context.getString(R.string.mm_activation_suffix, if (it.success) "ACTIVE" else "REFUSED: ${it.reason}") } ?: "")
+                                            registryTick++
+                                        } else {
+                                            val outcome = graph.modelPackInstaller.installComponent(entry, resources) { statusNote = it }
+                                            statusNote = context.getString(R.string.mm_install_result, entry.displayName, if (outcome.success) "COMPLETED" else "FAILED", outcome.reason)
+                                            registryTick++
+                                        }
+                                    }
+                                }
+                                com.hermestower.voiceconsole.models.ModelPrimaryAction.CHECK_RUNTIME -> {
+                                    val result = graph.modelQualification.qualify(entry)
+                                    statusNote = context.getString(R.string.mm_qualify_result, entry.identity, if (result.qualified) "PASSED" else "FAILED", result.checks.joinToString { "${it.name}=${it.passed}" })
+                                }
+                                com.hermestower.voiceconsole.models.ModelPrimaryAction.ACTIVATE -> {
+                                    val result = graph.modelActivation.activate(entry)
+                                    if (result.success && entry.componentType == com.hermestower.voiceconsole.models.ModelComponentType.VOICE.name) {
+                                        // GRAPH 4.10 §7/§8: registry activation alone is NOT
+                                        // active — the six-condition runtime truth runs now.
+                                        statusNote = context.getString(R.string.mm_voice_qualifying, entry.displayName)
+                                        scope.launch {
+                                            val outcome = graph.qualifyVoiceRuntime(entry)
+                                            statusNote = when (outcome) {
+                                                is com.hermestower.voiceconsole.voice.VoiceRuntimeFactory.ActivationOutcome.Active ->
+                                                    context.getString(R.string.mm_voice_active, entry.displayName)
+                                                is com.hermestower.voiceconsole.voice.VoiceRuntimeFactory.ActivationOutcome.Failed ->
+                                                    context.getString(
+                                                        R.string.mm_voice_runtime_failed,
+                                                        entry.displayName,
+                                                        outcome.typedReason.name,
+                                                    )
+                                            }
+                                            registryTick++
+                                        }
+                                    } else {
+                                        statusNote = context.getString(R.string.mm_activate_result, entry.identity, if (result.success) "ACTIVE" else "REFUSED", result.reason)
+                                        registryTick++
+                                    }
+                                }
+                                com.hermestower.voiceconsole.models.ModelPrimaryAction.RUN_FUNCTIONAL_TEST,
+                                com.hermestower.voiceconsole.models.ModelPrimaryAction.TEST,
+                                -> {
+                                    // the REAL deterministic test path by component type
+                                    when (entry.componentTypeEnum()) {
+                                        com.hermestower.voiceconsole.models.ModelComponentType.VOICE -> {
+                                            val phrase = "Benvenuto nella console vocale di Hermes Tower."
+                                            val engine = when (entry.identity) {
+                                                "org.piper.voice.it-riccardo-x-low" -> graph.naturalTts
+                                                "org.piper.voice.it-paola-medium" -> graph.naturalTtsPaola
+                                                else -> null
+                                            }
+                                            scope.launch {
+                                                if (engine != null && engine.resolveVoiceDir() != null) {
+                                                    engine.load()
+                                                    engine.interrupt()
+                                                    engine.speak(phrase)
+                                                    statusNote = context.getString(R.string.mm_sample_requested)
+                                                } else {
+                                                    statusNote = context.getString(R.string.mm_fixture_error_fmt, "voice bundle not installed")
+                                                }
+                                            }
+                                        }
+                                        com.hermestower.voiceconsole.models.ModelComponentType.SPEECH_TO_TEXT -> {
+                                            val runner = com.hermestower.voiceconsole.voice.SttFixtureTestRunner
+                                            val expected = "Benvenuto alla torre di Hermes, il canale vocale è pronto."
+                                            scope.launch {
+                                                val bytes = runCatching {
+                                                    context.assets.open("models/fixtures/fixture_benvenuto_torre_it.wav").use { it.readBytes() }
+                                                }.getOrNull()
+                                                if (bytes == null) {
+                                                    statusNote = context.getString(R.string.mm_fixture_error_fmt, "fixture asset missing")
+                                                } else {
+                                                    val r = runner.run(graph.voskFrameStt, bytes)
+                                                    statusNote = when {
+                                                        !r.success -> context.getString(R.string.mm_fixture_error_fmt, r.error ?: "no transcript")
+                                                        else -> context.getString(R.string.mm_fixture_transcript_fmt, r.transcript ?: "") +
+                                                            "  " + context.getString(R.string.mm_fixture_expected_fmt, expected)
+                                                    }
+                                                }
+                                            }
+                                        }
+                                        else -> expanded[entry.identity] = !isExpanded
+                                    }
+                                }
+                                com.hermestower.voiceconsole.models.ModelPrimaryAction.REPAIR -> {
+                                    if (graph.modelDownloads.verifiedExisting(entry)) {
+                                        statusNote = context.getString(R.string.mm_repair_ok, entry.displayName)
+                                    } else {
+                                        graph.modelDownloads.cancel(entry.identity)
+                                        graph.modelDownloads.start(entry, entry.sourceUri)
+                                        statusNote = context.getString(R.string.mm_repair_needed, entry.displayName)
+                                    }
+                                    registryTick++
+                                }
+                                com.hermestower.voiceconsole.models.ModelPrimaryAction.REVIEW_ISSUE -> {
+                                    expanded[entry.identity] = true
+                                }
+                                com.hermestower.voiceconsole.models.ModelPrimaryAction.DETAILS_ONLY -> {
+                                    expanded[entry.identity] = !isExpanded
+                                }
                             }
                         },
                         AdaptiveAction(
@@ -532,10 +710,18 @@ fun ModelManagerScreen(graph: AppGraph) {
                         },
                     ),
                     secondary = listOf(
-                        AdaptiveAction(key = "pause", label = context.getString(R.string.mm_pause)) {
+                        AdaptiveAction(
+                            key = "pause",
+                            label = context.getString(R.string.mm_pause),
+                            enabled = progress?.state == ModelInstallState.DOWNLOADING,
+                        ) {
                             graph.modelDownloads.pause(entry.identity); statusNote = context.getString(R.string.mm_download_paused, entry.identity)
                         },
-                        AdaptiveAction(key = "resume", label = context.getString(R.string.mm_resume)) {
+                        AdaptiveAction(
+                            key = "resume",
+                            label = context.getString(R.string.mm_resume),
+                            enabled = progress?.state == ModelInstallState.DOWNLOAD_PAUSED,
+                        ) {
                             if (entry.identity == PROBE_IDENTITY) {
                                 val port = graph.keyValueStore.getString("probe_server_port")?.toIntOrNull()
                                 if (port != null) {
@@ -550,87 +736,16 @@ fun ModelManagerScreen(graph: AppGraph) {
                                 statusNote = context.getString(R.string.mm_download_resumed_source, entry.identity)
                             }
                         },
-                        AdaptiveAction(key = "cancel", label = context.getString(R.string.mm_cancel)) {
-                            graph.modelDownloads.cancel(entry.identity); statusNote = context.getString(R.string.mm_download_cancelled, entry.identity)
-                        },
                         AdaptiveAction(
-                            key = "install",
-                            label = context.getString(R.string.mm_install),
-                            enabled = !packRunning,
+                            key = "cancel",
+                            label = context.getString(R.string.mm_cancel),
+                            enabled = progress?.state == ModelInstallState.DOWNLOADING || progress?.state == ModelInstallState.DOWNLOAD_PAUSED,
                         ) {
-                            val resources = graph.deviceResourceReader.read()
-                            scope.launch {
-                                if (graph.modelDownloads.verifiedExisting(entry)) {
-                                    val q = graph.modelQualification.qualify(entry)
-                                    val a = if (q.qualified) graph.modelActivation.activate(entry) else null
-                                    statusNote = context.getString(R.string.mm_already_verified, if (q.qualified) "PASSED" else "FAILED") +
-                                        (a?.let { context.getString(R.string.mm_activation_suffix, if (it.success) "ACTIVE" else "REFUSED: ${it.reason}") } ?: "")
-                                    registryTick++
-                                } else {
-                                    val outcome = graph.modelPackInstaller.installComponent(entry, resources) { statusNote = it }
-                                    statusNote = context.getString(R.string.mm_install_result, entry.displayName, if (outcome.success) "COMPLETED" else "FAILED", outcome.reason)
-                                    registryTick++
-                                }
-                            }
+                            graph.modelDownloads.cancel(entry.identity); statusNote = context.getString(R.string.mm_download_cancelled, entry.identity)
                         },
                         AdaptiveAction(key = "qualify", label = context.getString(R.string.mm_qualify)) {
                             val result = graph.modelQualification.qualify(entry)
                             statusNote = context.getString(R.string.mm_qualify_result, entry.identity, if (result.qualified) "PASSED" else "FAILED", result.checks.joinToString { "${it.name}=${it.passed}" })
-                        },
-                        // CP-G4.9-004: REAL deterministic Italian fixture test —
-                        // the bundled 16 kHz speech WAV (the verified mission
-                        // phrase, spoken by the same verified piper voice) is
-                        // fed through the offline vosk recognizer; the shown
-                        // transcript is what the ENGINE produced, next to the
-                        // expected phrase. No microphone, no network.
-                        AdaptiveAction(
-                            key = "test_stt_fixture",
-                            label = context.getString(R.string.mm_test),
-                            enabled = entry.componentType == "SPEECH_TO_TEXT",
-                        ) {
-                            val runner = com.hermestower.voiceconsole.voice.SttFixtureTestRunner
-                            val expected = "Benvenuto alla torre di Hermes, il canale vocale è pronto."
-                            scope.launch {
-                                val bytes = runCatching {
-                                    context.assets.open("models/fixtures/fixture_benvenuto_torre_it.wav").use { it.readBytes() }
-                                }.getOrNull()
-                                if (bytes == null) {
-                                    statusNote = context.getString(R.string.mm_fixture_error_fmt, "fixture asset missing")
-                                } else {
-                                    val r = runner.run(graph.voskFrameStt, bytes)
-                                    statusNote = when {
-                                        !r.success -> context.getString(R.string.mm_fixture_error_fmt, r.error ?: "no transcript")
-                                        else -> context.getString(R.string.mm_fixture_transcript_fmt, r.transcript ?: "") +
-                                            "  " + context.getString(R.string.mm_fixture_expected_fmt, expected)
-                                    }
-                                }
-                            }
-                        },
-                        // CP-G4.9-003: HEAR SAMPLE — the natural piper voice
-                        // speaks the real preview phrase through the activated
-                        // route (the system engine stays the fallback when the
-                        // voice is not active; both are REAL audio paths).
-                        AdaptiveAction(
-                            key = "hear_sample",
-                            label = context.getString(R.string.mm_hear_sample),
-                            enabled = entry.componentType == "VOICE",
-                        ) {
-                            val phrase = "Benvenuto nella console vocale di Hermes Tower."
-                            val engine = when (entry.identity) {
-                                "org.piper.voice.it-riccardo-x-low" -> graph.naturalTts
-                                "org.piper.voice.it-paola-medium" -> graph.naturalTtsPaola
-                                else -> null
-                            }
-                            scope.launch {
-                                if (engine != null && engine.resolveVoiceDir() != null) {
-                                    engine.load()
-                                    engine.interrupt()
-                                    engine.speak(phrase)
-                                    statusNote = context.getString(R.string.mm_sample_requested)
-                                } else {
-                                    statusNote = context.getString(R.string.mm_fixture_error_fmt, "voice bundle not installed")
-                                }
-                            }
                         },
                         AdaptiveAction(key = "deactivate", label = context.getString(R.string.mm_deactivate)) {
                             val result = graph.modelActivation.deactivate(entry)
@@ -659,20 +774,6 @@ fun ModelManagerScreen(graph: AppGraph) {
                             registryTick++
                         },
                         AdaptiveAction(
-                            key = "repair",
-                            label = context.getString(R.string.mm_repair),
-                            enabled = entry.identity != PROBE_IDENTITY && !packRunning,
-                        ) {
-                            if (graph.modelDownloads.verifiedExisting(entry)) {
-                                statusNote = context.getString(R.string.mm_repair_ok, entry.displayName)
-                            } else {
-                                graph.modelDownloads.cancel(entry.identity)
-                                graph.modelDownloads.start(entry, entry.sourceUri)
-                                statusNote = context.getString(R.string.mm_repair_needed, entry.displayName)
-                            }
-                            registryTick++
-                        },
-                        AdaptiveAction(
                             key = "update",
                             label = context.getString(R.string.mm_update),
                             enabled = updateAvailable && !packRunning,
@@ -688,8 +789,12 @@ fun ModelManagerScreen(graph: AppGraph) {
                     moreActionsLabel = context.getString(R.string.mm_more_actions),
                 )
             }
+            }
+        }
 
-            if (diagnosticsOpen.value) {
+        // ---------- §20 technical details: storage roots + receipts ----------
+        if (diagnosticsOpen.value) {
+            SectionCard(title = stringResource(R.string.mm_tech_details)) {
                 Text(stringResource(R.string.mm_diag_roots), style = HermesType.sectionLabel, color = c.bronze)
                 graph.modelStorage.rootsUsage().forEach { (root, bytes) ->
                     Text(context.getString(R.string.mm_root_line, root, formatBytes(bytes)), style = HermesType.bodySecondary, color = c.textSecondary)
