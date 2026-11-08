@@ -1,0 +1,196 @@
+{
+ "stage": [
+  1000,
+  1375
+ ],
+ "layers": [
+  "tower_architecture_rear",
+  "tower_plinth",
+  "tower_stairs",
+  "tower_lower_gate",
+  "tower_heavy_pylons",
+  "tower_entablature",
+  "tower_crown_sign",
+  "tower_oracle_outer",
+  "tower_oracle_middle",
+  "tower_oracle_inner",
+  "tower_portal",
+  "tower_energy",
+  "tower_state_overlay"
+ ],
+ "mech_layers": [
+  "tower_energy",
+  "tower_oracle_inner",
+  "tower_oracle_middle",
+  "tower_oracle_outer",
+  "tower_portal"
+ ],
+ "mech_box_stage": 476,
+ "core_center_stage": [
+  500,
+  640
+ ],
+ "tiers": {
+  "low": {
+   "stage_w": 460,
+   "mech_box": 218,
+   "decoded_mb": 9.8
+  },
+  "balanced": {
+   "stage_w": 680,
+   "mech_box": 323,
+   "decoded_mb": 21.4
+  },
+  "high": {
+   "stage_w": 1000,
+   "mech_box": 476,
+   "decoded_mb": 46.3
+  }
+ },
+ "candidates": {
+  "A": {
+   "dir": "/home/z/my-project/hermes-voice-console-android/docs/visual/tower413/candidate_a",
+   "bytes": {
+    "low/tower_architecture_rear": 3268,
+    "low/tower_plinth": 2532,
+    "low/tower_stairs": 2434,
+    "low/tower_lower_gate": 6286,
+    "low/tower_heavy_pylons": 5666,
+    "low/tower_entablature": 6540,
+    "low/tower_crown_sign": 9800,
+    "low/tower_oracle_outer": 14326,
+    "low/tower_oracle_middle": 7418,
+    "low/tower_oracle_inner": 5782,
+    "low/tower_portal": 3478,
+    "low/tower_energy": 544,
+    "low/tower_state_overlay": 640,
+    "balanced/tower_architecture_rear": 4738,
+    "balanced/tower_plinth": 3360,
+    "balanced/tower_stairs": 3794,
+    "balanced/tower_lower_gate": 8724,
+    "balanced/tower_heavy_pylons": 7134,
+    "balanced/tower_entablature": 8912,
+    "balanced/tower_crown_sign": 14586,
+    "balanced/tower_oracle_outer": 23092,
+    "balanced/tower_oracle_middle": 10932,
+    "balanced/tower_oracle_inner": 8762,
+    "balanced/tower_portal": 5076,
+    "balanced/tower_energy": 852,
+    "balanced/tower_state_overlay": 1284,
+    "high/tower_architecture_rear": 5248,
+    "high/tower_plinth": 4212,
+    "high/tower_stairs": 4514,
+    "high/tower_lower_gate": 7072,
+    "high/tower_heavy_pylons": 7204,
+    "high/tower_entablature": 9300,
+    "high/tower_crown_sign": 15248,
+    "high/tower_oracle_outer": 12474,
+    "high/tower_oracle_middle": 8538,
+    "high/tower_oracle_inner": 5212,
+    "high/tower_portal": 5026,
+    "high/tower_energy": 1154,
+    "high/tower_state_overlay": 2626
+   },
+   "core_center_stage": [
+    500,
+    640
+   ]
+  },
+  "B": {
+   "dir": "/home/z/my-project/hermes-voice-console-android/docs/visual/tower413/candidate_b",
+   "bytes": {
+    "low/tower_architecture_rear": 3734,
+    "low/tower_plinth": 3512,
+    "low/tower_stairs": 2282,
+    "low/tower_lower_gate": 4356,
+    "low/tower_heavy_pylons": 4156,
+    "low/tower_entablature": 5752,
+    "low/tower_crown_sign": 7856,
+    "low/tower_oracle_outer": 13212,
+    "low/tower_oracle_middle": 8042,
+    "low/tower_oracle_inner": 5166,
+    "low/tower_portal": 3308,
+    "low/tower_energy": 458,
+    "low/tower_state_overlay": 640,
+    "balanced/tower_architecture_rear": 5534,
+    "balanced/tower_plinth": 4758,
+    "balanced/tower_stairs": 3704,
+    "balanced/tower_lower_gate": 6540,
+    "balanced/tower_heavy_pylons": 5938,
+    "balanced/tower_entablature": 8374,
+    "balanced/tower_crown_sign": 12730,
+    "balanced/tower_oracle_outer": 20294,
+    "balanced/tower_oracle_middle": 11924,
+    "balanced/tower_oracle_inner": 7626,
+    "balanced/tower_portal": 4936,
+    "balanced/tower_energy": 612,
+    "balanced/tower_state_overlay": 1284,
+    "high/tower_architecture_rear": 5586,
+    "high/tower_plinth": 5174,
+    "high/tower_stairs": 4556,
+    "high/tower_lower_gate": 6354,
+    "high/tower_heavy_pylons": 6766,
+    "high/tower_entablature": 8886,
+    "high/tower_crown_sign": 14154,
+    "high/tower_oracle_outer": 15800,
+    "high/tower_oracle_middle": 10210,
+    "high/tower_oracle_inner": 5502,
+    "high/tower_portal": 4644,
+    "high/tower_energy": 726,
+    "high/tower_state_overlay": 2626
+   },
+   "core_center_stage": [
+    500,
+    640
+   ]
+  },
+  "C": {
+   "dir": "/home/z/my-project/hermes-voice-console-android/docs/visual/tower413/candidate_c",
+   "bytes": {
+    "low/tower_architecture_rear": 1584,
+    "low/tower_plinth": 2328,
+    "low/tower_stairs": 2420,
+    "low/tower_lower_gate": 4390,
+    "low/tower_heavy_pylons": 4122,
+    "low/tower_entablature": 3102,
+    "low/tower_crown_sign": 8386,
+    "low/tower_oracle_outer": 16294,
+    "low/tower_oracle_middle": 7432,
+    "low/tower_oracle_inner": 5628,
+    "low/tower_portal": 3146,
+    "low/tower_energy": 426,
+    "low/tower_state_overlay": 640,
+    "balanced/tower_architecture_rear": 2560,
+    "balanced/tower_plinth": 3092,
+    "balanced/tower_stairs": 3980,
+    "balanced/tower_lower_gate": 6198,
+    "balanced/tower_heavy_pylons": 5598,
+    "balanced/tower_entablature": 4518,
+    "balanced/tower_crown_sign": 12616,
+    "balanced/tower_oracle_outer": 25518,
+    "balanced/tower_oracle_middle": 10948,
+    "balanced/tower_oracle_inner": 8290,
+    "balanced/tower_portal": 4750,
+    "balanced/tower_energy": 544,
+    "balanced/tower_state_overlay": 1284,
+    "high/tower_architecture_rear": 3746,
+    "high/tower_plinth": 3748,
+    "high/tower_stairs": 4620,
+    "high/tower_lower_gate": 5494,
+    "high/tower_heavy_pylons": 6544,
+    "high/tower_entablature": 5060,
+    "high/tower_crown_sign": 14078,
+    "high/tower_oracle_outer": 14016,
+    "high/tower_oracle_middle": 7610,
+    "high/tower_oracle_inner": 5194,
+    "high/tower_portal": 4064,
+    "high/tower_energy": 666,
+    "high/tower_state_overlay": 2626
+   },
+   "core_center_stage": [
+    500,
+    620
+   ]
+  }
+ }
+}

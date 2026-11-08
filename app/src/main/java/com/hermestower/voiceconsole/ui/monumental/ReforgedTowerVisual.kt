@@ -33,7 +33,6 @@ import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.platform.LocalDensity
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.unit.IntOffset
-import androidx.compose.ui.unit.IntSize
 import com.hermestower.voiceconsole.R
 import com.hermestower.voiceconsole.core.state.ConsoleState
 import androidx.compose.ui.geometry.Offset
@@ -42,31 +41,78 @@ import kotlinx.coroutines.withContext
 import kotlin.math.roundToInt
 
 /**
- * GRAPH 4.12 §26–§34 — NEW ORIGINAL CENTRAL TOWER (Owner image rejected the
- * previous cutout-derived set; PHYS-FAIL-03; CENTRAL_TOWER_ASSET_RECONSTRUCTION_FAIL).
+ * GRAPH 4.13 §29–§41 — MONUMENTAL ORACLE CITADEL (the Graph 4.12 Tower is
+ * OWNER-REJECTED: CENTRAL_TOWER_GRAPH412_VISUAL_OWNER_REJECTED; the refounded
+ * Tower is candidate A of docs/visual/tower413/ — selected for Owner-reference
+ * fidelity first, then mobile readability).
  *
- * The shipped layers are ORIGINAL vector-drawn compositions (candidate A,
- * docs/visual/tower412/ASSET_MANIFEST.json) on ONE normalized stage
- * (1000×1375), designed from the start for transparency, symmetry, animation,
- * compact scaling, OLED safety and the LOW/BALANCED/HIGH budgets (§32).
+ * §36 LAYER CONTRACT (one normalized stage, 1000×1375; the mechanism layers
+ * are cropped to the oracle box, stage bounds recorded in ASSET_MANIFEST.json):
  *
- * §24 STAGED DECODE: the first Console frame decodes ONLY the five static
- * architecture layers; the five animated mechanism layers (outer/middle/
- * inner/portal/energy) decode asynchronously right after — the first frame
- * never pays the full twelve-layer decode.
+ *   z1  tower_architecture_rear   static   solid central body mass
+ *   z2  tower_plinth              static   three-tier foundation (bottom-integrated)
+ *   z3  tower_stairs              static   broad flaring flight
+ *   z4  tower_lower_gate          static   arched gateway + its own order
+ *   z5  tower_heavy_pylons        static   SOLID flanking masses, capitals+bases
+ *   z6  tower_entablature         static   heavy stacked cornice + engraved frieze
+ *   z7  tower_crown_sign          static   INTEGRATED aedicula sign (never floating)
+ *   z8  tower_oracle_outer        rotate   outer bronze ring band (42% width)
+ *   z9  tower_oracle_middle       rotate   middle engraved ring
+ *   z10 tower_oracle_inner        rotate   inner bezel + gold marks
+ *   z11 tower_portal              static   cyan glass + sigil (alpha breathing)
+ *   z12 tower_energy              static   spine + gate glow (alpha per state)
+ *   z13 tower_state_overlay       —        empty; state truth stays Canvas-side
  *
- * §31 ANIMATION CONTRACT (per state):
- *   IDLE            slow outer motion, subtle portal breathing;
- *   LISTENING       incoming energy, open input gate;
- *   TRANSCRIBING    sequential ring pulses (phase-offset breathing);
- *   PROCESSING      differentiated mechanisms (three distinct rates/directions);
- *   SPEAKING        audio-amplitude response on the portal;
- *   CONTINUOUS      stable low-energy listening state;
- *   PRIVACY MUTED   input gate closed, red-bronze privacy seal;
- *   CHAT MUTED      output channel dimmed, microphone unaffected;
- *   DISCONNECTED    remote conduit off, local portal available;
- *   ERROR           controlled amber state, never flashing.
+ * §24 STAGED DECODE: the first frame decodes ONLY the eight static layers;
+ * the five mechanism layers decode asynchronously right after.
+ *
+ * §40 PERFORMANCE PROFILES:
+ *   LOW      the `towerl_*` asset tier (≈10 MB decoded), rings STATIC,
+ *            portal breathing + state alphas kept (cheap), no particles;
+ *   BALANCED the full-resolution tier (≈22 MB decoded), full §39 animation;
+ *   HIGH     optional (never default; thermal governor may demote).
+ * Architecture and composition are IDENTICAL across tiers (§40: never degrade
+ * the visual architecture to meet the budget — only resolution differs).
+ *
+ * §31 ANIMATION CONTRACT (per state, unchanged from the 4.12 truth):
+ *   IDLE slow outer motion; LISTENING incoming energy; TRANSCRIBING sequential
+ *   ring pulses; PROCESSING differentiated mechanisms; SPEAKING portal responds
+ *   to audio amplitude; CONTINUOUS persistent low-energy state; PRIVACY MUTED
+ *   closed input gate; CHAT MUTED dimmed output; DISCONNECTED conduit off;
+ *   ERROR controlled amber fracture, never flashing.
  */
+object TowerLayerContract {
+    /** Static architecture layers in z-order (first-frame decode set). */
+    val STATIC_BALANCED = intArrayOf(
+        R.drawable.tower_architecture_rear,
+        R.drawable.tower_plinth,
+        R.drawable.tower_stairs,
+        R.drawable.tower_lower_gate,
+        R.drawable.tower_heavy_pylons,
+        R.drawable.tower_entablature,
+        R.drawable.tower_crown_sign,
+        R.drawable.tower_state_overlay,
+    )
+    val STATIC_LOW = intArrayOf(
+        R.drawable.towerl_tower_architecture_rear,
+        R.drawable.towerl_tower_plinth,
+        R.drawable.towerl_tower_stairs,
+        R.drawable.towerl_tower_lower_gate,
+        R.drawable.towerl_tower_heavy_pylons,
+        R.drawable.towerl_tower_entablature,
+        R.drawable.towerl_tower_crown_sign,
+        R.drawable.towerl_tower_state_overlay,
+    )
+
+    /** Oracle mechanism box, in stage units of 1000 width. */
+    const val MECH_BOX_STAGE = 476
+    /** Oracle core center in stage coordinates. */
+    const val CORE_CX_STAGE = 500
+    const val CORE_CY_STAGE = 640
+    const val STAGE_W = 1000
+    const val STAGE_H = 1375
+}
+
 @Composable
 fun ReforgedTowerVisual(
     state: ConsoleState,
@@ -81,50 +127,37 @@ fun ReforgedTowerVisual(
     val low = quality == VisualQuality.LOW
     val frozen = reducedMotion || low
 
-    // ---- §24 stage 1: static architecture (first frame) ----
-    val rear = painterResource(R.drawable.tower_structure_rear)
-    val sign = painterResource(R.drawable.tower_sign)
-    val columns = painterResource(R.drawable.tower_columns)
-    val gate = painterResource(R.drawable.tower_lower_gateway)
-    val stairs = painterResource(R.drawable.tower_stairs_plinth)
-    val foreground = painterResource(R.drawable.tower_foreground)
+    // ---- §24 stage 1: static architecture (first frame, tier-aware) ----
+    val staticIds = if (low) TowerLayerContract.STATIC_LOW else TowerLayerContract.STATIC_BALANCED
+    val staticPainters = staticIds.map { painterResource(it) }
 
     // ---- §24 stage 2: animated mechanisms decode AFTER the first frame ----
     val context = LocalContext.current
     var mech by remember { mutableStateOf<TowerMechanismBitmaps?>(null) }
-    LaunchedEffect(Unit) {
-        mech = withContext(Dispatchers.IO) { TowerMechanismBitmaps.decode(context) }
+    LaunchedEffect(quality) {
+        mech = withContext(Dispatchers.IO) { TowerMechanismBitmaps.decode(context, low) }
     }
 
     BoxWithConstraints(modifier) {
         val density = LocalDensity.current
-        // stage proportions: 1000 x 1375
         val stageW = maxWidth
-        val stageH = stageW * (1375f / 1000f)
+        val stageH = stageW * (TowerLayerContract.STAGE_H.toFloat() / TowerLayerContract.STAGE_W)
         val stageHp = with(density) { stageH.toPx() }
         val stageWp = with(density) { stageW.toPx() }
 
-        // static stack (stage-wide, exact proportions)
-        Image(rear, contentDescription = null, contentScale = ContentScale.FillWidth,
-            modifier = Modifier.align(Alignment.TopCenter).fillMaxWidth())
-        Image(sign, contentDescription = null, contentScale = ContentScale.FillWidth,
-            modifier = Modifier.align(Alignment.TopCenter).fillMaxWidth())
-        Image(columns, contentDescription = null, contentScale = ContentScale.FillWidth,
-            modifier = Modifier.align(Alignment.TopCenter).fillMaxWidth())
-        Image(gate, contentDescription = null, contentScale = ContentScale.FillWidth,
-            modifier = Modifier.align(Alignment.TopCenter).fillMaxWidth())
-        Image(stairs, contentDescription = null, contentScale = ContentScale.FillWidth,
-            modifier = Modifier.align(Alignment.TopCenter).fillMaxWidth())
-        Image(foreground, contentDescription = null, contentScale = ContentScale.FillWidth,
-            modifier = Modifier.align(Alignment.TopCenter).fillMaxWidth())
+        staticPainters.forEach { painter ->
+            Image(painter, contentDescription = null, contentScale = ContentScale.FillWidth,
+                modifier = Modifier.align(Alignment.TopCenter).fillMaxWidth())
+        }
 
-        // oracle center: (0.5, 700/1375) of the stage; mechanism box 544/1000 wide
-        val mechSize = stageW * (544f / 1000f)
+        // §36 oracle box: cropped mech layers centered on the stage core center
+        val mechSize = stageW * (TowerLayerContract.MECH_BOX_STAGE.toFloat() / TowerLayerContract.STAGE_W)
         val mechSizePx = with(density) { mechSize.toPx() }
         val mechX = ((stageWp - mechSizePx) / 2f).roundToInt()
-        val mechY = (stageHp * (700f / 1375f) - mechSizePx / 2f).roundToInt()
+        val mechY = (stageHp * (TowerLayerContract.CORE_CY_STAGE.toFloat() / TowerLayerContract.STAGE_H) - mechSizePx / 2f).roundToInt()
 
-        // §31 rotation rates (differentiated per state)
+        // §31 rotation rates (differentiated per state). LOW profile: rings
+        // STATIC (§40 reduced ring animation) — architecture never degrades.
         val outerAngle = if (frozen) 0f else infiniteAngle(
             when (state) {
                 ConsoleState.TOWER_PROCESSING -> 22_000
@@ -140,13 +173,13 @@ fun ReforgedTowerVisual(
                 else -> -64_000
             },
         )
-        val innerAngle = if (frozen) 0f else infiniteAngle(
-            when (state) {
-                ConsoleState.UNDERSTANDING_LOCAL -> 20_000
-                ConsoleState.TOWER_PROCESSING -> 34_000
-                else -> 48_000
-            },
-        )
+        // LOW keeps ONE slow ring alive (reduced — not zero — ring animation)
+        val innerRate = if (low) 110_000 else when (state) {
+            ConsoleState.UNDERSTANDING_LOCAL -> 20_000
+            ConsoleState.TOWER_PROCESSING -> 34_000
+            else -> 48_000
+        }
+        val innerAngle = if (reducedMotion) 0f else infiniteAngle(innerRate)
         val breathing = if (frozen) 0f else infiniteBreath()
 
         // §31 portal behavior
@@ -174,32 +207,32 @@ fun ReforgedTowerVisual(
 
         val m = mech
         if (m != null) {
-            Image(m.energy.asImageBitmap(), contentDescription = null, contentScale = ContentScale.FillWidth,
+            Image(m.energy.asImageBitmap(), contentDescription = null, contentScale = ContentScale.FillBounds,
                 modifier = Modifier
                     .align(Alignment.TopStart)
                     .offset { IntOffset(mechX, mechY) }
                     .size(mechSize)
                     .alpha(energyAlpha))
-            Image(m.outer.asImageBitmap(), contentDescription = null, contentScale = ContentScale.FillWidth,
+            Image(m.outer.asImageBitmap(), contentDescription = null, contentScale = ContentScale.FillBounds,
                 modifier = Modifier
                     .align(Alignment.TopStart)
                     .offset { IntOffset(mechX, mechY) }
                     .size(mechSize)
                     .graphicsLayer { rotationZ = outerAngle })
-            Image(m.middle.asImageBitmap(), contentDescription = null, contentScale = ContentScale.FillWidth,
+            Image(m.middle.asImageBitmap(), contentDescription = null, contentScale = ContentScale.FillBounds,
                 modifier = Modifier
                     .align(Alignment.TopStart)
                     .offset { IntOffset(mechX, mechY) }
                     .size(mechSize)
                     .graphicsLayer { rotationZ = middleAngle })
-            Image(m.inner.asImageBitmap(), contentDescription = null, contentScale = ContentScale.FillWidth,
+            Image(m.inner.asImageBitmap(), contentDescription = null, contentScale = ContentScale.FillBounds,
                 colorFilter = if (innerGold) ColorFilter.tint(Color(0x66FFC866)) else null,
                 modifier = Modifier
                     .align(Alignment.TopStart)
                     .offset { IntOffset(mechX, mechY) }
                     .size(mechSize)
                     .graphicsLayer { rotationZ = innerAngle })
-            Image(m.portal.asImageBitmap(), contentDescription = null, contentScale = ContentScale.FillWidth,
+            Image(m.portal.asImageBitmap(), contentDescription = null, contentScale = ContentScale.FillBounds,
                 modifier = Modifier
                     .align(Alignment.TopStart)
                     .offset { IntOffset(mechX, mechY) }
@@ -231,16 +264,26 @@ class TowerMechanismBitmaps private constructor(
     val energy: android.graphics.Bitmap,
 ) {
     companion object {
-        fun decode(context: android.content.Context): TowerMechanismBitmaps {
+        fun decode(context: android.content.Context, low: Boolean): TowerMechanismBitmaps {
             fun d(id: Int): android.graphics.Bitmap =
                 android.graphics.BitmapFactory.decodeResource(context.resources, id)
-            return TowerMechanismBitmaps(
-                outer = d(R.drawable.tower_outer_mechanism),
-                middle = d(R.drawable.tower_middle_mechanism),
-                inner = d(R.drawable.tower_inner_mechanism),
-                portal = d(R.drawable.tower_portal),
-                energy = d(R.drawable.tower_energy_paths),
-            )
+            return if (low) {
+                TowerMechanismBitmaps(
+                    outer = d(R.drawable.towerl_tower_oracle_outer),
+                    middle = d(R.drawable.towerl_tower_oracle_middle),
+                    inner = d(R.drawable.towerl_tower_oracle_inner),
+                    portal = d(R.drawable.towerl_tower_portal),
+                    energy = d(R.drawable.towerl_tower_energy),
+                )
+            } else {
+                TowerMechanismBitmaps(
+                    outer = d(R.drawable.tower_oracle_outer),
+                    middle = d(R.drawable.tower_oracle_middle),
+                    inner = d(R.drawable.tower_oracle_inner),
+                    portal = d(R.drawable.tower_portal),
+                    energy = d(R.drawable.tower_energy),
+                )
+            }
         }
     }
 }
@@ -287,12 +330,12 @@ private fun TowerStateOverlays(
     val fractureAlpha = if (error) 0.55f + 0.2f * breathing else 0f
     Canvas(modifier) {
         val w = size.width
-        val h = size.width * (1375f / 1000f) // stage-proportional overlay space
-        val core = Offset(w * 0.5f, h * (700f / 1375f))
+        val h = size.width * (TowerLayerContract.STAGE_H.toFloat() / TowerLayerContract.STAGE_W)
+        val core = Offset(w * 0.5f, h * (TowerLayerContract.CORE_CY_STAGE.toFloat() / TowerLayerContract.STAGE_H))
 
         // PRIVACY MUTED: input gate closed + red-bronze seal at the gateway.
         if (privacyMuted) {
-            val gate = Offset(w * 0.5f, h * (1120f / 1375f))
+            val gate = Offset(w * 0.5f, h * (1150f / TowerLayerContract.STAGE_H))
             drawCircle(Color(0xCCB3452B), radius = w * 0.055f, center = gate)
             drawCircle(Color(0xFFFFD9C2).copy(alpha = 0.9f), radius = w * 0.02f, center = gate)
         }

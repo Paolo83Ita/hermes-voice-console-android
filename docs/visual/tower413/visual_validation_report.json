@@ -1,0 +1,25 @@
+{
+ "gates": {
+  "A": [],
+  "B": [],
+  "C": []
+ },
+ "memory": {
+  "low": {
+   "stage_w": 460,
+   "mech_box": 218,
+   "decoded_mb": 9.8
+  },
+  "balanced": {
+   "stage_w": 680,
+   "mech_box": 323,
+   "decoded_mb": 21.4
+  },
+  "high": {
+   "stage_w": 1000,
+   "mech_box": 476,
+   "decoded_mb": 46.3
+  }
+ },
+ "pass": true
+}
