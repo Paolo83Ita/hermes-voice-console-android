@@ -33,6 +33,8 @@ import com.hermestower.voiceconsole.ui.components.BadgeFlowRow
 import com.hermestower.voiceconsole.ui.theme.HermesType
 import com.hermestower.voiceconsole.ui.theme.hermesColors
 import kotlinx.coroutines.launch
+import com.hermestower.voiceconsole.ui.components.HermesFilledButton
+import com.hermestower.voiceconsole.ui.components.HermesOutlinedField
 
 /**
  * S3 Connection (FR-23): endpoint placeholder, pairing state, transport mode,
@@ -65,7 +67,7 @@ fun ConnectionScreen(graph: AppGraph, onOpenStudio: () -> Unit = {}) {
         }
 
         SectionCard(title = stringResource(Res.string.connection_endpoint_card)) {
-            OutlinedTextField(
+            HermesOutlinedField(
                 value = endpointDraft,
                 onValueChange = { endpointDraft = it },
                 label = { Text(stringResource(Res.string.connection_endpoint_field)) },
@@ -75,14 +77,14 @@ fun ConnectionScreen(graph: AppGraph, onOpenStudio: () -> Unit = {}) {
             Text(
                 stringResource(Res.string.connection_endpoint_note),
                 style = HermesType.bodySecondary,
-                color = c.inkSecondary,
+                color = c.textSecondary,
             )
         }
 
         SectionCard(title = stringResource(Res.string.connection_transport_card)) {
             BadgeFlowRow(horizontalSpacing = 8.dp) {
-                TruthBadge(stringResource(Res.string.connection_badge_mock), c.ok)
-                TruthBadge(stringResource(Res.string.connection_badge_adapter), c.inkSecondary)
+                TruthBadge(stringResource(Res.string.connection_badge_mock), c.textSuccess)
+                TruthBadge(stringResource(Res.string.connection_badge_adapter), c.textSecondary)
             }
             BadgeFlowRow(horizontalSpacing = 8.dp) {
                 TruthBadge(
@@ -92,28 +94,28 @@ fun ConnectionScreen(graph: AppGraph, onOpenStudio: () -> Unit = {}) {
                         ConnectionStatus.TlsStatus.FAILED -> "FAILED"
                         ConnectionStatus.TlsStatus.UNKNOWN -> "UNKNOWN"
                     },
-                    c.warn,
+                    c.textWarning,
                 )
             }
             Text(
                 stringResource(Res.string.connection_endpoint_label_fmt, connection.endpointLabel),
                 style = HermesType.bodySecondary,
-                color = c.inkSecondary,
+                color = c.textSecondary,
             )
         }
 
         SectionCard(title = stringResource(Res.string.connection_pairing_card)) {
-            TruthBadge(stringResource(Res.string.connection_badge_not_paired), c.warn)
+            TruthBadge(stringResource(Res.string.connection_badge_not_paired), c.textWarning)
             Text(
                 stringResource(Res.string.connection_pairing_note),
                 style = HermesType.bodySecondary,
-                color = c.inkSecondary,
+                color = c.textSecondary,
             )
         }
 
         SectionCard(title = stringResource(Res.string.connection_tests_card)) {
             BadgeFlowRow(horizontalSpacing = 8.dp) {
-                Button(
+                HermesFilledButton(
                     onClick = {
                         testing = true
                         testResult = null
@@ -143,19 +145,19 @@ fun ConnectionScreen(graph: AppGraph, onOpenStudio: () -> Unit = {}) {
                     )
                 }
             }
-            testResult?.let { Text(it, style = HermesType.body, color = c.ink) }
+            testResult?.let { Text(it, style = HermesType.body, color = c.textPrimary) }
             Text(
                 stringResource(
                     Res.string.connection_last_handshake_fmt,
                     connection.lastHandshakeAt ?: stringResource(Res.string.connection_handshake_none),
                 ),
                 style = HermesType.bodySecondary,
-                color = c.inkSecondary,
+                color = c.textSecondary,
             )
             Text(
                 stringResource(Res.string.connection_status_fmt, connection.status.name.lowercase()),
                 style = HermesType.bodySecondary,
-                color = c.inkSecondary,
+                color = c.textSecondary,
             )
         }
 
@@ -163,7 +165,7 @@ fun ConnectionScreen(graph: AppGraph, onOpenStudio: () -> Unit = {}) {
             Text(
                 stringResource(Res.string.connection_nosecrets_note),
                 style = HermesType.bodySecondary,
-                color = c.inkSecondary,
+                color = c.textSecondary,
             )
         }
     }

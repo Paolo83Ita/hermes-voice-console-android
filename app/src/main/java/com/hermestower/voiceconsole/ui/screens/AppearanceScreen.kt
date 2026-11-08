@@ -87,13 +87,13 @@ fun AppearanceScreen(graph: AppGraph) {
                     VisualQuality.HIGH -> stringResource(Res.string.appearance_quality_high)
                 },
                 style = HermesType.bodySecondary,
-                color = c.inkSecondary,
+                color = c.textSecondary,
                 modifier = Modifier.padding(top = 6.dp),
             )
             Text(
                 stringResource(Res.string.appearance_thermal_policy),
                 style = HermesType.bodySecondary,
-                color = m.inkDim,
+                color = c.textTertiaryReadable,
             )
         }
 
@@ -115,7 +115,7 @@ fun AppearanceScreen(graph: AppGraph) {
             Text(
                 stringResource(Res.string.appearance_theme_note),
                 style = HermesType.bodySecondary,
-                color = c.inkSecondary,
+                color = c.textSecondary,
             )
         }
 
@@ -123,7 +123,7 @@ fun AppearanceScreen(graph: AppGraph) {
             Text(
                 stringResource(Res.string.appearance_idle_dimming, "%.0f".format(settings.brightnessScrim * 100)),
                 style = HermesType.body,
-                color = c.ink,
+                color = c.textPrimary,
             )
             Slider(
                 value = settings.brightnessScrim,
@@ -133,7 +133,7 @@ fun AppearanceScreen(graph: AppGraph) {
             Text(
                 stringResource(Res.string.appearance_dimming_note),
                 style = HermesType.bodySecondary,
-                color = c.inkSecondary,
+                color = c.textSecondary,
             )
         }
 
@@ -141,7 +141,7 @@ fun AppearanceScreen(graph: AppGraph) {
             Text(
                 stringResource(Res.string.appearance_animation_intensity, "%.0f".format(settings.animationIntensity * 100)),
                 style = HermesType.body,
-                color = c.ink,
+                color = c.textPrimary,
             )
             Slider(
                 value = settings.animationIntensity,
@@ -157,7 +157,7 @@ fun AppearanceScreen(graph: AppGraph) {
             Text(
                 stringResource(Res.string.appearance_reduced_motion_note),
                 style = HermesType.bodySecondary,
-                color = c.inkSecondary,
+                color = c.textSecondary,
             )
         }
 
@@ -171,7 +171,7 @@ fun AppearanceScreen(graph: AppGraph) {
             Text(
                 stringResource(Res.string.appearance_burn_in_note),
                 style = HermesType.bodySecondary,
-                color = c.inkSecondary,
+                color = c.textSecondary,
             )
             SettingRow(
                 label = stringResource(Res.string.appearance_keep_screen_on),
@@ -185,7 +185,7 @@ fun AppearanceScreen(graph: AppGraph) {
             Text(
                 stringResource(Res.string.language_note),
                 style = HermesType.bodySecondary,
-                color = c.inkSecondary,
+                color = c.textSecondary,
             )
             val context = LocalContext.current
             var currentLang by remember { mutableStateOf(AppLanguage.stored(context)) }
@@ -230,11 +230,11 @@ fun AppearanceScreen(graph: AppGraph) {
         }
 
         SectionCard(title = stringResource(Res.string.appearance_kiosk)) {
-            TruthBadge(stringResource(Res.string.truth_controlled_capability), c.inkSecondary)
+            TruthBadge(stringResource(Res.string.truth_controlled_capability), c.textSecondary)
             Text(
                 stringResource(Res.string.appearance_kiosk_note),
                 style = HermesType.bodySecondary,
-                color = c.inkSecondary,
+                color = c.textSecondary,
             )
         }
     }

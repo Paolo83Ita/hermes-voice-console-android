@@ -45,6 +45,8 @@ import com.hermestower.voiceconsole.ui.components.MeanderBand
 import com.hermestower.voiceconsole.ui.theme.HermesType
 import com.hermestower.voiceconsole.ui.theme.hermesColors
 import kotlinx.coroutines.launch
+import com.hermestower.voiceconsole.ui.components.HermesFilledButton
+import com.hermestower.voiceconsole.ui.components.HermesFilterChip
 
 internal fun formatBytes(bytes: Long): String = when {
     bytes >= 1L shl 30 -> "%.1f GB".format(bytes.toDouble() / (1L shl 30))
@@ -108,13 +110,13 @@ fun ModelManagerScreen(graph: AppGraph) {
         Text(
             stringResource(R.string.mm_intro),
             style = HermesType.bodySecondary,
-            color = c.inkSecondary,
+            color = c.textSecondary,
         )
 
         // ---------- A. Recommended setup ----------
         SectionCard(title = stringResource(R.string.mm_section_a)) {
             val resources = remember { graph.deviceResourceReader.read() }
-            Text(context.getString(R.string.mm_detected_device, resources.deviceModel, resources.androidVersion), style = HermesType.body, color = c.ink)
+            Text(context.getString(R.string.mm_detected_device, resources.deviceModel, resources.androidVersion), style = HermesType.body, color = c.textPrimary)
             Text(
                 context.getString(
                     R.string.mm_resources_line,
@@ -122,14 +124,14 @@ fun ModelManagerScreen(graph: AppGraph) {
                     formatBytes(resources.availableRamBytes),
                     formatBytes(resources.freeStorageBytes),
                 ),
-                style = HermesType.body, color = c.ink,
+                style = HermesType.body, color = c.textPrimary,
             )
             Text(
                 context.getString(
                     R.string.mm_tts_engines,
                     if (resources.ttsEnginePackages.isEmpty()) context.getString(R.string.mm_tts_none) else resources.ttsEnginePackages.joinToString(),
                 ),
-                style = HermesType.body, color = c.ink,
+                style = HermesType.body, color = c.textPrimary,
             )
             Text(
                 context.getString(
@@ -137,13 +139,13 @@ fun ModelManagerScreen(graph: AppGraph) {
                     if (resources.networkOnline) context.getString(R.string.mm_network_online) else context.getString(R.string.mm_network_offline),
                     if (resources.networkMetered) context.getString(R.string.mm_network_metered) else "",
                 ),
-                style = HermesType.body, color = c.ink,
+                style = HermesType.body, color = c.textPrimary,
             )
-            Text(context.getString(R.string.mm_current_profile, appliedProfile.displayLabel), style = HermesType.body, color = c.ink)
-            Text(context.getString(R.string.mm_recommended_profile, selectedProfile.displayLabel), style = HermesType.body, color = c.ink)
+            Text(context.getString(R.string.mm_current_profile, appliedProfile.displayLabel), style = HermesType.body, color = c.textPrimary)
+            Text(context.getString(R.string.mm_recommended_profile, selectedProfile.displayLabel), style = HermesType.body, color = c.textPrimary)
             Row(horizontalArrangement = Arrangement.spacedBy(8.dp), modifier = Modifier.padding(top = 4.dp)) {
                 VoiceModelProfile.entries.forEach { profile ->
-                    FilterChip(
+                    HermesFilterChip(
                         selected = selectedProfile == profile,
                         onClick = {
                             selectedProfile = profile
@@ -155,7 +157,7 @@ fun ModelManagerScreen(graph: AppGraph) {
             }
             val rec = recommendation
             if (rec != null) {
-                Text(context.getString(R.string.mm_compat_summary, rec.routeSummary), style = HermesType.body, color = c.ink)
+                Text(context.getString(R.string.mm_compat_summary, rec.routeSummary), style = HermesType.body, color = c.textPrimary)
                 Text(
                     context.getString(
                         R.string.mm_expected_footprint,
@@ -164,16 +166,16 @@ fun ModelManagerScreen(graph: AppGraph) {
                         formatBytes(rec.ramEstimateLowBytes),
                         formatBytes(rec.ramEstimateHighBytes),
                     ),
-                    style = HermesType.body, color = c.ink,
+                    style = HermesType.body, color = c.textPrimary,
                 )
-                rec.warnings.forEach { Text("⚠ $it", style = HermesType.bodySecondary, color = c.warn) }
-                Button(onClick = {
+                rec.warnings.forEach { Text("⚠ $it", style = HermesType.bodySecondary, color = c.textWarning) }
+                HermesFilledButton(onClick = {
                     graph.keyValueStore.putString("voice_profile", rec.profile)
                     appliedProfile = VoiceModelProfile.entries.first { it.name == rec.profile }
                     statusNote = context.getString(R.string.mm_applied_note, rec.profile)
                 }) { Text(stringResource(R.string.mm_apply_recommended)) }
             } else {
-                Text(stringResource(R.string.mm_select_mode_hint), style = HermesType.bodySecondary, color = c.inkSecondary)
+                Text(stringResource(R.string.mm_select_mode_hint), style = HermesType.bodySecondary, color = c.textSecondary)
             }
         }
 
@@ -187,10 +189,10 @@ fun ModelManagerScreen(graph: AppGraph) {
             if (included.isEmpty()) {
                 Text(
                     stringResource(R.string.mm_pack_nothing_needed),
-                    style = HermesType.bodySecondary, color = c.inkSecondary,
+                    style = HermesType.bodySecondary, color = c.textSecondary,
                 )
             } else {
-                Text(context.getString(R.string.mm_will_install, included.size), style = HermesType.body, color = c.ink)
+                Text(context.getString(R.string.mm_will_install, included.size), style = HermesType.body, color = c.textPrimary)
                 included.forEach { item ->
                     Text(
                         context.getString(
@@ -199,18 +201,18 @@ fun ModelManagerScreen(graph: AppGraph) {
                             item.entry?.version ?: "",
                             formatBytes(item.entry?.downloadSizeBytes ?: 0),
                         ),
-                        style = HermesType.body, color = c.ink,
+                        style = HermesType.body, color = c.textPrimary,
                     )
                 }
             }
             plan.items.filter { it.role == "BUNDLED_RUNTIME" }.forEach {
-                Text("• ${it.entry?.displayName} — ${it.reason}", style = HermesType.bodySecondary, color = c.inkSecondary)
+                Text("• ${it.entry?.displayName} — ${it.reason}", style = HermesType.bodySecondary, color = c.textSecondary)
             }
             plan.items.filter { it.role == "ALREADY_INSTALLED" }.forEach {
-                Text("• ${it.entry?.displayName} — ${it.reason}", style = HermesType.bodySecondary, color = c.inkSecondary)
+                Text("• ${it.entry?.displayName} — ${it.reason}", style = HermesType.bodySecondary, color = c.textSecondary)
             }
             summary.blockedItems.forEach { (name, reason) ->
-                Text("⚠ $name — $reason", style = HermesType.bodySecondary, color = c.warn)
+                Text("⚠ $name — $reason", style = HermesType.bodySecondary, color = c.textWarning)
             }
             Text(
                 context.getString(
@@ -219,7 +221,7 @@ fun ModelManagerScreen(graph: AppGraph) {
                     formatBytes(summary.totalInstalledBytes),
                     formatBytes(summary.peakTempBytes),
                 ),
-                style = HermesType.body, color = c.ink,
+                style = HermesType.body, color = c.textPrimary,
             )
             Text(
                 context.getString(
@@ -227,21 +229,21 @@ fun ModelManagerScreen(graph: AppGraph) {
                     formatBytes(summary.reserveBytes),
                     formatBytes(summary.minimumFreeRequiredBytes),
                 ),
-                style = HermesType.body, color = c.ink,
+                style = HermesType.body, color = c.textPrimary,
             )
-            Text(context.getString(R.string.mm_expected_duration, summary.durationRangeText), style = HermesType.body, color = c.ink)
-            Text(summary.wifiAdvice, style = HermesType.bodySecondary, color = c.inkSecondary)
-            Text(summary.chargingAdvice, style = HermesType.bodySecondary, color = c.inkSecondary)
-            Text(summary.thermalAdvice, style = HermesType.bodySecondary, color = c.inkSecondary)
-            Text(context.getString(R.string.mm_licenses, summary.licenses.joinToString()), style = HermesType.bodySecondary, color = c.inkSecondary)
+            Text(context.getString(R.string.mm_expected_duration, summary.durationRangeText), style = HermesType.body, color = c.textPrimary)
+            Text(summary.wifiAdvice, style = HermesType.bodySecondary, color = c.textSecondary)
+            Text(summary.chargingAdvice, style = HermesType.bodySecondary, color = c.textSecondary)
+            Text(summary.thermalAdvice, style = HermesType.bodySecondary, color = c.textSecondary)
+            Text(context.getString(R.string.mm_licenses, summary.licenses.joinToString()), style = HermesType.bodySecondary, color = c.textSecondary)
             if (summary.optionalItems.isNotEmpty()) {
                 Text(
                     context.getString(R.string.mm_optional_note, summary.optionalItems.joinToString()),
-                    style = HermesType.bodySecondary, color = c.inkSecondary,
+                    style = HermesType.bodySecondary, color = c.textSecondary,
                 )
             }
             Row(horizontalArrangement = Arrangement.spacedBy(8.dp), modifier = Modifier.padding(top = 4.dp)) {
-                Button(
+                HermesFilledButton(
                     enabled = !packRunning && included.isNotEmpty(),
                     onClick = { packConfirmOpen = true },
                 ) { Text(stringResource(R.string.mm_install_pack)) }
@@ -249,7 +251,7 @@ fun ModelManagerScreen(graph: AppGraph) {
             if (packEvents.isNotEmpty()) {
                 Column(Modifier.padding(top = 4.dp)) {
                     packEvents.takeLast(4).forEach {
-                        Text(it, style = HermesType.bodySecondary, color = c.energy)
+                        Text(it, style = HermesType.bodySecondary, color = c.textInfo)
                     }
                 }
             }
@@ -261,7 +263,7 @@ fun ModelManagerScreen(graph: AppGraph) {
             if (installed.isEmpty()) {
                 Text(
                     stringResource(R.string.mm_nothing_installed),
-                    style = HermesType.bodySecondary, color = c.inkSecondary,
+                    style = HermesType.bodySecondary, color = c.textSecondary,
                 )
             }
             com.hermestower.voiceconsole.models.ModelComponentType.entries.forEach { type ->
@@ -275,7 +277,7 @@ fun ModelManagerScreen(graph: AppGraph) {
                                 record.displayName, record.version, record.state,
                                 if (record.active) context.getString(R.string.mm_active_suffix) else "",
                             ),
-                            style = HermesType.body, color = c.ink,
+                            style = HermesType.body, color = c.textPrimary,
                         )
                         Text(
                             context.getString(
@@ -283,7 +285,7 @@ fun ModelManagerScreen(graph: AppGraph) {
                                 record.lastVerificationAt ?: context.getString(R.string.mm_never),
                                 record.lastQualificationAt ?: context.getString(R.string.mm_never),
                             ),
-                            style = HermesType.bodySecondary, color = c.inkSecondary,
+                            style = HermesType.bodySecondary, color = c.textSecondary,
                         )
                     }
                 }
@@ -308,7 +310,7 @@ fun ModelManagerScreen(graph: AppGraph) {
                         entry.languages.joinToString(),
                         if (entry.italianSupported) context.getString(R.string.mm_it_yes) else context.getString(R.string.mm_it_no),
                     ),
-                    style = HermesType.bodySecondary, color = c.inkSecondary,
+                    style = HermesType.bodySecondary, color = c.textSecondary,
                 )
                 Text(
                     context.getString(
@@ -318,12 +320,12 @@ fun ModelManagerScreen(graph: AppGraph) {
                         record?.state ?: entry.state,
                         if (record?.active == true) context.getString(R.string.mm_active_suffix) else "",
                     ),
-                    style = HermesType.bodySecondary, color = c.inkSecondary,
+                    style = HermesType.bodySecondary, color = c.textSecondary,
                 )
                 if (updateAvailable) {
                     Text(
                         context.getString(R.string.mm_update_available, record?.version ?: "", entry.version),
-                        style = HermesType.body, color = c.energy,
+                        style = HermesType.body, color = c.textInfo,
                     )
                 }
                 val rec = recommendation
@@ -334,7 +336,7 @@ fun ModelManagerScreen(graph: AppGraph) {
                         (resolved?.compatible ?: false).toString(),
                         resolved?.incompatibilityReason?.let { context.getString(R.string.mm_incompat_paren, it) } ?: "",
                     ),
-                    style = HermesType.bodySecondary, color = c.inkSecondary,
+                    style = HermesType.bodySecondary, color = c.textSecondary,
                 )
                 progress?.let {
                     if (it.state == ModelInstallState.DOWNLOADING || it.state == ModelInstallState.DOWNLOAD_PAUSED) {
@@ -343,10 +345,10 @@ fun ModelManagerScreen(graph: AppGraph) {
                                 R.string.mm_download_progress,
                                 it.state.displayLabel, it.bytesDownloaded, it.totalBytes, (it.fraction * 100).toInt(),
                             ),
-                            style = HermesType.body, color = c.ink,
+                            style = HermesType.body, color = c.textPrimary,
                         )
                     }
-                    it.error?.let { err -> Text(context.getString(R.string.mm_last_download_event, err), style = HermesType.bodySecondary, color = c.warn) }
+                    it.error?.let { err -> Text(context.getString(R.string.mm_last_download_event, err), style = HermesType.bodySecondary, color = c.textWarning) }
                 }
 
                 if (isExpanded) {
@@ -373,7 +375,7 @@ fun ModelManagerScreen(graph: AppGraph) {
                     AttributeLine(stringResource(R.string.mm_attr_runtime_req), entry.runtimeRequirement ?: context.getString(R.string.mm_na))
                     AttributeLine(stringResource(R.string.mm_attr_provenance), entry.provenanceNote ?: context.getString(R.string.mm_provenance_unverified))
                     AttributeLine(stringResource(R.string.mm_attr_sha256), entry.sha256)
-                    entry.knownLimitations.forEach { Text("• $it", style = HermesType.bodySecondary, color = c.inkSecondary) }
+                    entry.knownLimitations.forEach { Text("• $it", style = HermesType.bodySecondary, color = c.textSecondary) }
 
                     // ---- GRAPH 4 FINAL §12: REAL, physically clickable links. ----
                     // The open action validates first (directive pre-conditions);
@@ -690,7 +692,7 @@ fun ModelManagerScreen(graph: AppGraph) {
             if (diagnosticsOpen.value) {
                 Text(stringResource(R.string.mm_diag_roots), style = HermesType.sectionLabel, color = c.bronze)
                 graph.modelStorage.rootsUsage().forEach { (root, bytes) ->
-                    Text(context.getString(R.string.mm_root_line, root, formatBytes(bytes)), style = HermesType.bodySecondary, color = c.inkSecondary)
+                    Text(context.getString(R.string.mm_root_line, root, formatBytes(bytes)), style = HermesType.bodySecondary, color = c.textSecondary)
                 }
                 val receipts = com.hermestower.voiceconsole.models.ReceiptWriter.listReceipts(graph.modelStorage.receiptsDir())
                 Text(
@@ -699,7 +701,7 @@ fun ModelManagerScreen(graph: AppGraph) {
                         if (receipts.isEmpty()) context.getString(R.string.mm_receipts_none)
                         else context.getString(R.string.mm_receipts_some, receipts.size, receipts.last()),
                     ),
-                    style = HermesType.bodySecondary, color = c.inkSecondary,
+                    style = HermesType.bodySecondary, color = c.textSecondary,
                 )
             }
         }
@@ -710,9 +712,9 @@ fun ModelManagerScreen(graph: AppGraph) {
             var bundledRunning by remember { mutableStateOf(false) }
             Text(
                 stringResource(R.string.mm_bundled_explainer),
-                style = HermesType.bodySecondary, color = c.inkSecondary,
+                style = HermesType.bodySecondary, color = c.textSecondary,
             )
-            Button(
+            HermesFilledButton(
                 enabled = !bundledRunning,
                 onClick = {
                     bundledRunning = true
@@ -734,14 +736,14 @@ fun ModelManagerScreen(graph: AppGraph) {
                     }
                 },
             ) { Text(if (bundledRunning) stringResource(R.string.mm_delivering) else stringResource(R.string.mm_install_bundled)) }
-            bundledReport.forEach { Text(it, style = HermesType.bodySecondary, color = c.inkSecondary) }
+            bundledReport.forEach { Text(it, style = HermesType.bodySecondary, color = c.textSecondary) }
         }
 
         // ---------- E. Modes ----------
         SectionCard(title = stringResource(R.string.mm_section_e)) {
             Text(
                 stringResource(R.string.mm_modes_text),
-                style = HermesType.body, color = c.ink,
+                style = HermesType.body, color = c.textPrimary,
             )
         }
 
@@ -749,12 +751,12 @@ fun ModelManagerScreen(graph: AppGraph) {
         SectionCard(title = stringResource(R.string.mm_section_f)) {
             Text(
                 stringResource(R.string.mm_fallback_text),
-                style = HermesType.body, color = c.ink,
+                style = HermesType.body, color = c.textPrimary,
             )
         }
 
         statusNote?.let {
-            Text(context.getString(R.string.mm_status_prefix, it), style = HermesType.body, color = c.energy)
+            Text(context.getString(R.string.mm_status_prefix, it), style = HermesType.body, color = c.textInfo)
         }
     }
 
@@ -815,7 +817,7 @@ private fun AttributeLine(label: String, value: String) {
     Text(
         "$label: $value",
         style = HermesType.bodySecondary,
-        color = c.inkSecondary,
+        color = c.textSecondary,
     )
 }
 

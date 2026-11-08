@@ -209,6 +209,7 @@ fun AppNav(graph: AppGraph) {
         return
     }
     val m = monumentalColors
+    val c = hermesColors // GRAPH 4.13 §6: theme-aware semantic shell authority
     val navController = rememberNavController()
     val drawerState = rememberDrawerState(DrawerValue.Closed)
     val backStack by navController.currentBackStackEntryAsState()
@@ -329,7 +330,11 @@ fun AppNav(graph: AppGraph) {
         Column(
             Modifier
                 .fillMaxSize()
-                .background(m.obsidianDeep)
+                // GRAPH 4.13 §6: the shell is THEME-AWARE (obsidian identity in
+                // dark, marble base in light) so marble-mode prose never renders
+                // on the wrong surface; the Console route paints its own
+                // monumental obsidian stage (identity preserved, D-009).
+                .background(c.surfaceBase)
                 // CP-G4-012a (Owner field report): with edge-to-edge enabled the
                 // content drew UNDER the system status bar (clock/signal) and the
                 // gesture bar. safeDrawing keeps the full-bleed obsidian background
@@ -342,7 +347,8 @@ fun AppNav(graph: AppGraph) {
                 Column(
                     Modifier
                         .fillMaxWidth()
-                        .background(Brush.verticalGradient(listOf(Color(0xFF0A0E16), m.obsidianDeep))),
+                        // GRAPH 4.13 §6: theme-aware top-bar host (was hard-coded 0xFF0A0E16).
+                        .background(Brush.verticalGradient(listOf(c.surfaceRaised, c.surfaceBase))),
                 ) {
                     Row(
                         Modifier

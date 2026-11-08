@@ -51,6 +51,7 @@ import com.hermestower.voiceconsole.ui.theme.HermesType
 import com.hermestower.voiceconsole.ui.theme.hermesColors
 import kotlinx.coroutines.launch
 import kotlin.coroutines.resume
+import com.hermestower.voiceconsole.ui.components.HermesFilledButton
 
 /**
  * GRAPH 4 CP-G4-010 wave 2 (G4-C09 wave 2): in-app QR pairing scanner.
@@ -107,7 +108,7 @@ fun QrScannerScreen(graph: AppGraph, onBack: () -> Unit) {
         MeanderBand(colors = hermesColors, modifier = Modifier.padding(top = 6.dp))
         Text(
             stringResource(com.hermestower.voiceconsole.R.string.qr_intro),
-            style = HermesType.bodySecondary, color = c.inkSecondary,
+            style = HermesType.bodySecondary, color = c.textSecondary,
         )
 
         // capture the delegated value once: smart cast is impossible on a delegated
@@ -117,15 +118,15 @@ fun QrScannerScreen(graph: AppGraph, onBack: () -> Unit) {
             !hasPermission -> SectionCard(title = stringResource(com.hermestower.voiceconsole.R.string.qr_permission_card)) {
                 Text(
                     stringResource(com.hermestower.voiceconsole.R.string.qr_permission_note),
-                    style = HermesType.bodySecondary, color = c.inkSecondary,
+                    style = HermesType.bodySecondary, color = c.textSecondary,
                 )
                 if (permissionDenied) {
                     Text(
                         stringResource(com.hermestower.voiceconsole.R.string.qr_permission_refused),
-                        style = HermesType.body, color = c.energy,
+                        style = HermesType.body, color = c.textInfo,
                     )
                 }
-                Button(onClick = { permissionLauncher.launch(Manifest.permission.CAMERA) }) {
+                HermesFilledButton(onClick = { permissionLauncher.launch(Manifest.permission.CAMERA) }) {
                     Text(stringResource(com.hermestower.voiceconsole.R.string.qr_grant_button))
                 }
             }
@@ -133,7 +134,7 @@ fun QrScannerScreen(graph: AppGraph, onBack: () -> Unit) {
             cameraFailure != null -> SectionCard(title = stringResource(com.hermestower.voiceconsole.R.string.qr_unavailable_card)) {
                 Text(
                     stringResource(com.hermestower.voiceconsole.R.string.qr_unavailable_note, cameraFailure),
-                    style = HermesType.body, color = c.energy,
+                    style = HermesType.body, color = c.textInfo,
                 )
             }
 
@@ -194,17 +195,17 @@ fun QrScannerScreen(graph: AppGraph, onBack: () -> Unit) {
                         is QrPairingScanFlow.ScanState.Idle, is QrPairingScanFlow.ScanState.Scanning ->
                             Text(
                                 stringResource(com.hermestower.voiceconsole.R.string.qr_looking_fmt, scanFlow.framesAnalyzed),
-                                style = HermesType.bodySecondary, color = c.inkSecondary,
+                                style = HermesType.bodySecondary, color = c.textSecondary,
                             )
 
                         is QrPairingScanFlow.ScanState.Rejected -> {
                             Text(
                                 stringResource(com.hermestower.voiceconsole.R.string.qr_refused_fmt, s.reject.kind, s.reject.detail),
-                                style = HermesType.body, color = c.energy,
+                                style = HermesType.body, color = c.textInfo,
                             )
                             Text(
                                 stringResource(com.hermestower.voiceconsole.R.string.qr_refused_note),
-                                style = HermesType.bodySecondary, color = c.inkSecondary,
+                                style = HermesType.bodySecondary, color = c.textSecondary,
                             )
                             TextButton(onClick = {
                                 scanFlow.reset()
@@ -213,13 +214,13 @@ fun QrScannerScreen(graph: AppGraph, onBack: () -> Unit) {
                         }
 
                         is QrPairingScanFlow.ScanState.Detected -> {
-                            Text(stringResource(com.hermestower.voiceconsole.R.string.qr_accepted), style = HermesType.body, color = c.ink)
-                            Text(s.summary, style = HermesType.bodySecondary, color = c.inkSecondary)
+                            Text(stringResource(com.hermestower.voiceconsole.R.string.qr_accepted), style = HermesType.body, color = c.textPrimary)
+                            Text(s.summary, style = HermesType.bodySecondary, color = c.textSecondary)
                             Text(
                                 stringResource(com.hermestower.voiceconsole.R.string.qr_mock_note),
-                                style = HermesType.bodySecondary, color = c.inkSecondary,
+                                style = HermesType.bodySecondary, color = c.textSecondary,
                             )
-                            Button(
+                            HermesFilledButton(
                                 onClick = {
                                     scope.launch {
                                         pairingLine = context.getString(com.hermestower.voiceconsole.R.string.qr_pairing_progress)
@@ -233,7 +234,7 @@ fun QrScannerScreen(graph: AppGraph, onBack: () -> Unit) {
                                     }
                                 },
                             ) { Text(stringResource(com.hermestower.voiceconsole.R.string.qr_pair_button)) }
-                            pairingLine?.let { Text(it, style = HermesType.body, color = c.energy) }
+                            pairingLine?.let { Text(it, style = HermesType.body, color = c.textInfo) }
                         }
                     }
                 }
@@ -243,7 +244,7 @@ fun QrScannerScreen(graph: AppGraph, onBack: () -> Unit) {
         TextButton(onClick = onBack) { Text(stringResource(com.hermestower.voiceconsole.R.string.qr_back)) }
         Text(
             stringResource(com.hermestower.voiceconsole.R.string.qr_replay_note),
-            style = HermesType.bodySecondary, color = c.inkSecondary,
+            style = HermesType.bodySecondary, color = c.textSecondary,
         )
     }
 }

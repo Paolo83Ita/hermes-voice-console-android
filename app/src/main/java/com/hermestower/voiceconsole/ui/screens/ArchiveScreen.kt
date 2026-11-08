@@ -37,6 +37,7 @@ import com.hermestower.voiceconsole.ui.monumental.MonumentalType
 import com.hermestower.voiceconsole.ui.monumental.monumentalColors
 import com.hermestower.voiceconsole.ui.theme.HermesType
 import com.hermestower.voiceconsole.ui.theme.hermesColors
+import com.hermestower.voiceconsole.ui.components.HermesOutlinedField
 
 /**
  * GRAPH 4 CP-G4-011 (Owner §14): TOWER ARCHIVE — "Archive Chamber".
@@ -62,7 +63,7 @@ fun ArchiveScreen(archive: MockTowerArchive) {
         ResponsiveScreenHeader(title = stringResource(Res.string.archive_title))
         MeanderBand(colors = hermesColors, modifier = Modifier.padding(top = 6.dp))
         Text(stringResource(Res.string.archive_subtitle), style = MonumentalType.sealSub, color = m.gold)
-        TruthBadge(stringResource(Res.string.archive_simulated_badge), c.inkSecondary)
+        TruthBadge(stringResource(Res.string.archive_simulated_badge), c.textSecondary)
 
         TabRow(selectedTabIndex = tab) {
             listOf(
@@ -78,7 +79,7 @@ fun ArchiveScreen(archive: MockTowerArchive) {
             }
         }
 
-        androidx.compose.material3.OutlinedTextField(
+        HermesOutlinedField(
             value = search,
             onValueChange = { search = it },
             modifier = Modifier.fillMaxWidth(),

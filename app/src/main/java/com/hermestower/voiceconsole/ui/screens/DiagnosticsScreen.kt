@@ -35,6 +35,7 @@ import com.hermestower.voiceconsole.ui.theme.HermesType
 import com.hermestower.voiceconsole.ui.theme.hermesColors
 import com.hermestower.voiceconsole.app.BuildIdentity
 import kotlinx.coroutines.launch
+import com.hermestower.voiceconsole.ui.components.HermesFilledButton
 
 /**
  * S7 Diagnostics (FR-36): real device facts, service truth, connection/audio tests,
@@ -68,23 +69,23 @@ fun DiagnosticsScreen(graph: AppGraph, onOpenStudio: () -> Unit = {}, onOpenSelf
         SectionCard(title = stringResource(Res.string.diag_device_card)) {
             // DeviceHealth fields are nullable — the platform may not expose them;
             // the localized 'unavailable' fallback keeps the honest-rendering rule.
-            Text(stringResource(Res.string.diag_manufacturer_fmt, healthState.manufacturer ?: stringResource(Res.string.diag_unavailable)), style = HermesType.body, color = c.ink)
-            Text(stringResource(Res.string.diag_model_fmt, healthState.model ?: stringResource(Res.string.diag_unavailable)), style = HermesType.body, color = c.ink)
-            Text(stringResource(Res.string.diag_android_fmt, healthState.androidRelease ?: stringResource(Res.string.diag_unavailable), healthState.sdkInt ?: -1), style = HermesType.body, color = c.ink)
+            Text(stringResource(Res.string.diag_manufacturer_fmt, healthState.manufacturer ?: stringResource(Res.string.diag_unavailable)), style = HermesType.body, color = c.textPrimary)
+            Text(stringResource(Res.string.diag_model_fmt, healthState.model ?: stringResource(Res.string.diag_unavailable)), style = HermesType.body, color = c.textPrimary)
+            Text(stringResource(Res.string.diag_android_fmt, healthState.androidRelease ?: stringResource(Res.string.diag_unavailable), healthState.sdkInt ?: -1), style = HermesType.body, color = c.textPrimary)
             Text(
                 stringResource(
                     Res.string.diag_memory_fmt,
                     healthState.memoryTotalMb ?: stringResource(Res.string.diag_unavailable),
                     healthState.memoryAvailableMb ?: stringResource(Res.string.diag_unavailable),
                 ),
-                style = HermesType.body, color = c.ink,
+                style = HermesType.body, color = c.textPrimary,
             )
             Text(
                 stringResource(
                     Res.string.diag_storage_fmt,
                     healthState.storageFreeGb?.let { "%.1f".format(it) } ?: stringResource(Res.string.diag_unavailable),
                 ),
-                style = HermesType.body, color = c.ink,
+                style = HermesType.body, color = c.textPrimary,
             )
             Text(
                 stringResource(
@@ -92,7 +93,7 @@ fun DiagnosticsScreen(graph: AppGraph, onOpenStudio: () -> Unit = {}, onOpenSelf
                     healthState.batteryTemperatureC?.let { "%.1f".format(it) } ?: stringResource(Res.string.diag_unavailable),
                     healthState.isCharging ?: stringResource(Res.string.diag_unavailable),
                 ),
-                style = HermesType.body, color = c.ink,
+                style = HermesType.body, color = c.textPrimary,
             )
             Text(
                 stringResource(
@@ -100,12 +101,12 @@ fun DiagnosticsScreen(graph: AppGraph, onOpenStudio: () -> Unit = {}, onOpenSelf
                     healthState.refreshRateHz?.let { "%.0f".format(it) } ?: stringResource(Res.string.diag_unavailable),
                     healthState.thermalStatus ?: stringResource(Res.string.diag_unavailable),
                 ),
-                style = HermesType.body, color = c.ink,
+                style = HermesType.body, color = c.textPrimary,
             )
             Text(
                 stringResource(Res.string.diag_unavailable_note),
                 style = HermesType.bodySecondary,
-                color = c.inkSecondary,
+                color = c.textSecondary,
             )
         }
 
@@ -114,15 +115,15 @@ fun DiagnosticsScreen(graph: AppGraph, onOpenStudio: () -> Unit = {}, onOpenSelf
         SectionCard(title = stringResource(Res.string.diag_runtime_card)) {
             Text(
                 stringResource(Res.string.diag_stt_engine_fmt, graph.activeRuntimeReadback.sttActiveEngine),
-                style = HermesType.body, color = c.ink,
+                style = HermesType.body, color = c.textPrimary,
             )
             Text(
                 stringResource(Res.string.diag_stt_frame_fmt, graph.activeRuntimeReadback.sttFrameState),
-                style = HermesType.body, color = c.ink,
+                style = HermesType.body, color = c.textPrimary,
             )
             Text(
                 stringResource(Res.string.diag_tts_engine_fmt, graph.activeRuntimeReadback.ttsActiveEngine),
-                style = HermesType.body, color = c.ink,
+                style = HermesType.body, color = c.textPrimary,
             )
             // OWNER PHYSICAL FEEDBACK 3: the ACTIVE voice read-back — the device
             // itself answers the root-cause questions (active voice, its locale,
@@ -133,7 +134,7 @@ fun DiagnosticsScreen(graph: AppGraph, onOpenStudio: () -> Unit = {}, onOpenSelf
                     graph.activeRuntimeReadback.ttsVoiceReadback
                         ?: stringResource(Res.string.diag_unavailable),
                 ),
-                style = HermesType.body, color = c.ink,
+                style = HermesType.body, color = c.textPrimary,
             )
             Text(
                 stringResource(
@@ -141,37 +142,37 @@ fun DiagnosticsScreen(graph: AppGraph, onOpenStudio: () -> Unit = {}, onOpenSelf
                     graph.activeRuntimeReadback.ttsVoiceLocale
                         ?: stringResource(Res.string.diag_unavailable),
                 ),
-                style = HermesType.body, color = c.ink,
+                style = HermesType.body, color = c.textPrimary,
             )
             Text(
                 stringResource(Res.string.diag_llm_state_fmt, graph.activeRuntimeReadback.llmState),
-                style = HermesType.body, color = c.ink,
+                style = HermesType.body, color = c.textPrimary,
             )
             Text(
                 stringResource(Res.string.diag_onnx_fmt, graph.activeRuntimeReadback.onnxRuntime),
-                style = HermesType.body, color = c.ink,
+                style = HermesType.body, color = c.textPrimary,
             )
             Text(
                 stringResource(Res.string.diag_runtime_note),
                 style = HermesType.bodySecondary,
-                color = c.inkSecondary,
+                color = c.textSecondary,
             )
         }
 
         SectionCard(title = stringResource(Res.string.diag_service_card)) {
             BadgeFlowRow(horizontalSpacing = 8.dp) {
-                TruthBadge(stringResource(Res.string.diag_service_badge), c.warn)
+                TruthBadge(stringResource(Res.string.diag_service_badge), c.textWarning)
             }
             Text(
                 stringResource(Res.string.diag_service_note),
                 style = HermesType.bodySecondary,
-                color = c.inkSecondary,
+                color = c.textSecondary,
             )
         }
 
         SectionCard(title = stringResource(Res.string.diag_tests_card)) {
             BadgeFlowRow(horizontalSpacing = 8.dp) {
-                Button(onClick = {
+                HermesFilledButton(onClick = {
                     scope.launch {
                         testResult = when (val r = graph.bridge.handshake()) {
                             is com.hermestower.voiceconsole.domain.BridgeResult.Success ->
@@ -185,11 +186,11 @@ fun DiagnosticsScreen(graph: AppGraph, onOpenStudio: () -> Unit = {}, onOpenSelf
                     testResult = context.getString(Res.string.diag_audio_unavailable)
                 }) { Text(stringResource(Res.string.diag_run_audio)) }
             }
-            testResult?.let { Text(it, style = HermesType.body, color = c.ink) }
+            testResult?.let { Text(it, style = HermesType.body, color = c.textPrimary) }
             Text(
                 stringResource(Res.string.diag_bridge_endpoint_fmt, connection.value.endpointLabel, connection.value.status.name.lowercase()),
                 style = HermesType.bodySecondary,
-                color = c.inkSecondary,
+                color = c.textSecondary,
             )
         }
 
@@ -209,24 +210,24 @@ fun DiagnosticsScreen(graph: AppGraph, onOpenStudio: () -> Unit = {}, onOpenSelf
             Text(
                 stringResource(Res.string.diag_sim_note),
                 style = HermesType.bodySecondary,
-                color = c.inkSecondary,
+                color = c.textSecondary,
             )
         }
 
         SectionCard(title = stringResource(Res.string.diag_export_card)) {
-            Button(onClick = { report = graph.diagnostics.exportRedactedReport() }) { Text(stringResource(Res.string.diag_generate)) }
+            HermesFilledButton(onClick = { report = graph.diagnostics.exportRedactedReport() }) { Text(stringResource(Res.string.diag_generate)) }
             report?.let {
                 Text(
                     it.take(1200) + if (it.length > 1200) " …" else "",
                     style = HermesType.bodySecondary,
-                    color = c.inkSecondary,
+                    color = c.textSecondary,
                 )
                 TextButton(onClick = { clipboard.setText(AnnotatedString(it)) }) { Text(stringResource(Res.string.diag_copy_full)) }
             }
             Text(
                 stringResource(Res.string.diag_redaction_note),
                 style = HermesType.bodySecondary,
-                color = c.inkSecondary,
+                color = c.textSecondary,
             )
             // OWNER PHYSICAL RETEST §1: the secret-clean diagnostic receipt —
             // build identity + TTS call-path telemetry, copy-ready for the Owner.
@@ -242,7 +243,7 @@ fun DiagnosticsScreen(graph: AppGraph, onOpenStudio: () -> Unit = {}, onOpenSelf
         Text(
             BuildIdentity.footerLine(injected, measured),
             style = HermesType.bodySecondary,
-            color = c.inkSecondary,
+            color = c.textSecondary,
             textAlign = androidx.compose.ui.text.style.TextAlign.Center,
             modifier = Modifier.fillMaxWidth(),
         )

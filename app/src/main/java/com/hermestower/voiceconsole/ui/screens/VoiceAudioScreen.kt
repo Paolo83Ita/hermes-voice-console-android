@@ -40,6 +40,8 @@ import com.hermestower.voiceconsole.voice.ListeningModePolicy
 import com.hermestower.voiceconsole.voice.SpeechProfile
 import com.hermestower.voiceconsole.voice.TtsSpeakGate
 import com.hermestower.voiceconsole.voice.TtsState
+import com.hermestower.voiceconsole.ui.components.HermesFilterChip
+import com.hermestower.voiceconsole.ui.components.HermesSwitch
 
 /**
  * S4 Voice & Audio (FR-33): truthful voice-engine status, the OWNER PHYSICAL
@@ -107,7 +109,7 @@ fun VoiceAudioScreen(graph: AppGraph) {
                     Text(
                         stringResource(labelRes),
                         style = HermesType.body,
-                        color = c.ink,
+                        color = c.textPrimary,
                         modifier = Modifier.padding(start = 8.dp),
                     )
                 }
@@ -116,14 +118,14 @@ fun VoiceAudioScreen(graph: AppGraph) {
                 Text(
                     stringResource(Res.string.wake_word_unavailable),
                     style = HermesType.bodySecondary,
-                    color = c.energy,
+                    color = c.textInfo,
                 )
             }
             if (listening.mode == ListeningModePolicy.Mode.CONTINUOUS_WHILE_SCREEN_ACTIVE) {
                 Text(
                     stringResource(Res.string.listening_mode_title) + ": " + stringResource(Res.string.session_limit_15),
                     style = HermesType.bodySecondary,
-                    color = c.inkSecondary,
+                    color = c.textSecondary,
                     modifier = Modifier.padding(top = 4.dp),
                 )
                 Row(horizontalArrangement = Arrangement.spacedBy(6.dp)) {
@@ -134,7 +136,7 @@ fun VoiceAudioScreen(graph: AppGraph) {
                             30 -> Res.string.session_limit_30
                             else -> Res.string.session_limit_open
                         }
-                        androidx.compose.material3.FilterChip(
+                        HermesFilterChip(
                             selected = listening.sessionLimitMinutes == minutes,
                             onClick = { graph.listeningModePolicy.setSessionLimit(minutes, "voice-audio settings") },
                             label = { Text(stringResource(label), style = HermesType.bodySecondary) },
@@ -147,31 +149,31 @@ fun VoiceAudioScreen(graph: AppGraph) {
         SectionCard(title = stringResource(Res.string.voice_wake_card)) {
             BadgeFlowRow(horizontalSpacing = 8.dp) {
                 TruthBadge(stringResource(Res.string.voice_provider_fmt, graph.wakeWordEngine.phrase.uppercase()), c.gold)
-                TruthBadge(stringResource(Res.string.voice_engine_fmt, wakeState.value.name), c.inkSecondary)
+                TruthBadge(stringResource(Res.string.voice_engine_fmt, wakeState.value.name), c.textSecondary)
             }
             Text(
                 stringResource(Res.string.voice_wake_note),
                 style = HermesType.bodySecondary,
-                color = c.inkSecondary,
+                color = c.textSecondary,
             )
         }
 
         SectionCard(title = stringResource(Res.string.voice_vad_card)) {
-            TruthBadge(stringResource(Res.string.voice_engine_fmt, vadState.value.name), c.inkSecondary)
+            TruthBadge(stringResource(Res.string.voice_engine_fmt, vadState.value.name), c.textSecondary)
             Text(
                 stringResource(Res.string.voice_vad_note),
                 style = HermesType.bodySecondary,
-                color = c.inkSecondary,
+                color = c.textSecondary,
             )
         }
 
         SectionCard(title = stringResource(Res.string.voice_stt_card)) {
-            TruthBadge(stringResource(Res.string.voice_engine_fmt, sttState.value.name), c.inkSecondary)
-            TruthBadge(stringResource(Res.string.voice_v01_path), c.warn)
+            TruthBadge(stringResource(Res.string.voice_engine_fmt, sttState.value.name), c.textSecondary)
+            TruthBadge(stringResource(Res.string.voice_v01_path), c.textWarning)
             Text(
                 stringResource(Res.string.voice_stt_note),
                 style = HermesType.bodySecondary,
-                color = c.inkSecondary,
+                color = c.textSecondary,
             )
         }
 
@@ -181,17 +183,17 @@ fun VoiceAudioScreen(graph: AppGraph) {
                     TtsState.READY,
                     TtsState.SPEAKING,
                     TtsState.SYNTHESIZING,
-                    -> TruthBadge(stringResource(Res.string.voice_tts_active), c.ok)
+                    -> TruthBadge(stringResource(Res.string.voice_tts_active), c.textSuccess)
                     TtsState.TEXT_ONLY_SAFE_DEGRADED ->
-                        TruthBadge(stringResource(Res.string.voice_tts_text_only), c.warn)
-                    else -> TruthBadge(stringResource(Res.string.voice_tts_unavailable), c.warn)
+                        TruthBadge(stringResource(Res.string.voice_tts_text_only), c.textWarning)
+                    else -> TruthBadge(stringResource(Res.string.voice_tts_unavailable), c.textWarning)
                 }
-                TruthBadge(stringResource(Res.string.voice_engine_fmt, ttsState.value.state.name), c.inkSecondary)
+                TruthBadge(stringResource(Res.string.voice_engine_fmt, ttsState.value.state.name), c.textSecondary)
             }
             Text(
                 stringResource(Res.string.voice_speed_fmt, "%.2f".format(settings.speakingRate)),
                 style = HermesType.body,
-                color = c.ink,
+                color = c.textPrimary,
             )
             Slider(
                 value = settings.speakingRate,
@@ -206,7 +208,7 @@ fun VoiceAudioScreen(graph: AppGraph) {
             Text(
                 stringResource(Res.string.voice_tts_note),
                 style = HermesType.bodySecondary,
-                color = c.inkSecondary,
+                color = c.textSecondary,
             )
         }
 
@@ -216,16 +218,16 @@ fun VoiceAudioScreen(graph: AppGraph) {
         // typed and the device-side repairs are one tap away.
         ttsState.value.speakBlocked?.let { block ->
             SectionCard(title = stringResource(Res.string.voice_blocked_card)) {
-                TruthBadge(block.token, c.warn)
+                TruthBadge(block.token, c.textWarning)
                 Text(
                     stringResource(Res.string.voice_blocked_message),
                     style = HermesType.body,
-                    color = c.ink,
+                    color = c.textPrimary,
                 )
                 Text(
                     stringResource(Res.string.voice_blocked_text_visible),
                     style = HermesType.bodySecondary,
-                    color = c.inkSecondary,
+                    color = c.textSecondary,
                 )
                 BadgeFlowRow(horizontalSpacing = 8.dp) {
                     TextButton(onClick = { openSystemTtsSettings(context) }) {
@@ -244,7 +246,7 @@ fun VoiceAudioScreen(graph: AppGraph) {
             Text(
                 stringResource(Res.string.voice_profile_speed_row, "%.2f".format(settings.speakingRate)),
                 style = HermesType.body,
-                color = c.ink,
+                color = c.textPrimary,
             )
             BadgeFlowRow(horizontalSpacing = 6.dp) {
                 PresetButton(stringResource(Res.string.voice_preset_slower)) {
@@ -262,7 +264,7 @@ fun VoiceAudioScreen(graph: AppGraph) {
             Text(
                 stringResource(Res.string.voice_profile_pitch_row, "%.2f".format(settings.speechPitch)),
                 style = HermesType.body,
-                color = c.ink,
+                color = c.textPrimary,
             )
             BadgeFlowRow(horizontalSpacing = 6.dp) {
                 PresetButton(stringResource(Res.string.voice_preset_lower)) {
@@ -285,7 +287,7 @@ fun VoiceAudioScreen(graph: AppGraph) {
                 Text(
                     stringResource(Res.string.voice_profile_advanced_speed),
                     style = HermesType.bodySecondary,
-                    color = c.inkSecondary,
+                    color = c.textSecondary,
                 )
                 Slider(
                     value = settings.speakingRate,
@@ -300,7 +302,7 @@ fun VoiceAudioScreen(graph: AppGraph) {
                 Text(
                     stringResource(Res.string.voice_profile_advanced_pitch),
                     style = HermesType.bodySecondary,
-                    color = c.inkSecondary,
+                    color = c.textSecondary,
                 )
                 Slider(
                     value = settings.speechPitch,
@@ -323,7 +325,7 @@ fun VoiceAudioScreen(graph: AppGraph) {
             Text(
                 stringResource(Res.string.voice_profile_preview_phrase),
                 style = HermesType.bodySecondary,
-                color = c.inkSecondary,
+                color = c.textSecondary,
             )
             BadgeFlowRow(horizontalSpacing = 8.dp) {
                 TextButton(onClick = {
@@ -333,7 +335,7 @@ fun VoiceAudioScreen(graph: AppGraph) {
             Text(
                 stringResource(Res.string.voice_profile_persist_note),
                 style = HermesType.bodySecondary,
-                color = c.inkSecondary,
+                color = c.textSecondary,
             )
         }
 
@@ -351,7 +353,7 @@ fun VoiceAudioScreen(graph: AppGraph) {
             DiagRow(stringResource(Res.string.voice_diag_pitch), "%.2f".format(rr.ttsSpeechPitch))
             DiagRow(stringResource(Res.string.voice_diag_last_negotiation), rr.ttsLastNegotiationStatus)
             rb?.detail?.let {
-                Text(it, style = HermesType.bodySecondary, color = c.inkSecondary)
+                Text(it, style = HermesType.bodySecondary, color = c.textSecondary)
             }
             BadgeFlowRow(horizontalSpacing = 6.dp) {
                 TextButton(onClick = {
@@ -378,12 +380,12 @@ fun VoiceAudioScreen(graph: AppGraph) {
                 is TtsSpeakGate.Verdict.Allow -> Text(
                     stringResource(Res.string.voice_diag_gate_allow),
                     style = HermesType.bodySecondary,
-                    color = c.ok,
+                    color = c.textSuccess,
                 )
                 is TtsSpeakGate.Verdict.Block -> Text(
                     stringResource(Res.string.voice_diag_gate_block, verdict.reason.name),
                     style = HermesType.bodySecondary,
-                    color = c.warn,
+                    color = c.textWarning,
                 )
             }
         }
@@ -397,15 +399,15 @@ fun VoiceAudioScreen(graph: AppGraph) {
                 Text(
                     stringResource(Res.string.diag_unavailable),
                     style = HermesType.bodySecondary,
-                    color = c.inkSecondary,
+                    color = c.textSecondary,
                 )
             } else {
                 BadgeFlowRow(horizontalSpacing = 8.dp) {
-                    TruthBadge(rb.status.name, if (rb.isItalianAudible) c.ok else c.warn)
+                    TruthBadge(rb.status.name, if (rb.isItalianAudible) c.textSuccess else c.textWarning)
                     rb.activeVoiceName?.let {
                         TruthBadge(
                             stringResource(Res.string.voice_italian_voice_fmt, it),
-                            c.inkSecondary,
+                            c.textSecondary,
                         )
                     }
                     rb.inventory?.let { inv ->
@@ -415,7 +417,7 @@ fun VoiceAudioScreen(graph: AppGraph) {
                                 inv.italianVoices,
                                 inv.offlineItalianVoices,
                             ),
-                            c.inkSecondary,
+                            c.textSecondary,
                         )
                     }
                 }
@@ -425,13 +427,13 @@ fun VoiceAudioScreen(graph: AppGraph) {
                         rb.activeVoiceLocaleTag ?: rb.activeLanguageTag ?: "?",
                     ),
                     style = HermesType.body,
-                    color = c.ink,
+                    color = c.textPrimary,
                 )
                 rb.detail?.let {
                     Text(
                         it,
                         style = HermesType.bodySecondary,
-                        color = c.inkSecondary,
+                        color = c.textSecondary,
                     )
                 }
                 if (rb.status.requiresUserAction) {
@@ -443,7 +445,7 @@ fun VoiceAudioScreen(graph: AppGraph) {
             Text(
                 stringResource(Res.string.voice_italian_note),
                 style = HermesType.bodySecondary,
-                color = c.inkSecondary,
+                color = c.textSecondary,
             )
         }
 
@@ -463,7 +465,7 @@ fun VoiceAudioScreen(graph: AppGraph) {
             Text(
                 stringResource(Res.string.voice_capture_note),
                 style = HermesType.bodySecondary,
-                color = c.inkSecondary,
+                color = c.textSecondary,
             )
         }
     }
@@ -490,13 +492,13 @@ private fun DiagRow(label: String, value: String?) {
         Text(
             label,
             style = HermesType.bodySecondary,
-            color = hermesColors.inkSecondary,
+            color = hermesColors.textSecondary,
             modifier = Modifier.weight(1.1f),
         )
         Text(
             value ?: stringResource(Res.string.diag_unavailable),
             style = HermesType.body,
-            color = hermesColors.ink,
+            color = hermesColors.textPrimary,
             modifier = Modifier.weight(1.9f),
         )
     }
@@ -556,7 +558,7 @@ internal fun SettingRow(
         horizontalArrangement = Arrangement.SpaceBetween,
         verticalAlignment = androidx.compose.ui.Alignment.CenterVertically,
     ) {
-        Text(label, style = HermesType.body, color = c.ink, modifier = Modifier.weight(1f))
-        Switch(checked = checked, onCheckedChange = null, enabled = enabled)
+        Text(label, style = HermesType.body, color = c.textPrimary, modifier = Modifier.weight(1f))
+        HermesSwitch(checked = checked, onCheckedChange = null, enabled = enabled)
     }
 }

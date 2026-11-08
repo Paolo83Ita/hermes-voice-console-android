@@ -45,6 +45,9 @@ import com.hermestower.voiceconsole.ui.components.consoleWindowWidthClass
 import com.hermestower.voiceconsole.ui.theme.HermesType
 import com.hermestower.voiceconsole.ui.theme.hermesColors
 import kotlinx.coroutines.launch
+import com.hermestower.voiceconsole.ui.components.HermesFilterChip
+import com.hermestower.voiceconsole.ui.components.HermesOutlinedField
+import com.hermestower.voiceconsole.ui.components.HermesSwitch
 
 /**
  * Settings → Hermes Tower Connection (GRAPH 2 §7). Basic fields always visible,
@@ -135,16 +138,16 @@ fun TowerStudioScreen(graph: AppGraph, onOpenScanner: (() -> Unit)? = null) {
             .verticalScroll(rememberScrollState()),
         verticalArrangement = Arrangement.spacedBy(12.dp),
     ) {
-        Text(stringResource(R.string.ts_title), style = HermesType.screenTitle, color = c.ink, maxLines = 2)
+        Text(stringResource(R.string.ts_title), style = HermesType.screenTitle, color = c.textPrimary, maxLines = 2)
         MeanderBand(colors = hermesColors, modifier = Modifier.padding(top = 6.dp))
         Text(
             stringResource(R.string.ts_intro),
-            style = HermesType.bodySecondary, color = c.inkSecondary,
+            style = HermesType.bodySecondary, color = c.textSecondary,
         )
 
         SectionCard(title = stringResource(R.string.ts_section_basic)) {
-            OutlinedTextField(name, onValueChange = { name = it }, label = { Text(stringResource(R.string.ts_field_connection_name)) }, modifier = Modifier.fillMaxWidth())
-            OutlinedTextField(
+            HermesOutlinedField(name, onValueChange = { name = it }, label = { Text(stringResource(R.string.ts_field_connection_name)) }, modifier = Modifier.fillMaxWidth())
+            HermesOutlinedField(
                 baseUrl, onValueChange = { baseUrl = it },
                 label = { Text(stringResource(R.string.ts_field_tower_address)) },
                 modifier = Modifier.fillMaxWidth(), enabled = mode != TransportMode.MOCK_SIMULATOR,
@@ -152,12 +155,12 @@ fun TowerStudioScreen(graph: AppGraph, onOpenScanner: (() -> Unit)? = null) {
             Text(stringResource(R.string.ts_label_connection_method), style = HermesType.sectionLabel, color = c.bronze)
             Row(horizontalArrangement = Arrangement.spacedBy(6.dp)) {
                 TransportMode.entries.take(3).forEach { m ->
-                    FilterChip(selected = mode == m, onClick = { mode = m }, label = { Text(m.displayLabel) })
+                    HermesFilterChip(selected = mode == m, onClick = { mode = m }, label = { Text(m.displayLabel) })
                 }
             }
             Row(horizontalArrangement = Arrangement.spacedBy(6.dp)) {
                 TransportMode.entries.drop(3).forEach { m ->
-                    FilterChip(selected = mode == m, onClick = { mode = m }, label = { Text(m.displayLabel) })
+                    HermesFilterChip(selected = mode == m, onClick = { mode = m }, label = { Text(m.displayLabel) })
                 }
             }
             Text(
@@ -166,25 +169,25 @@ fun TowerStudioScreen(graph: AppGraph, onOpenScanner: (() -> Unit)? = null) {
                     TransportMode.TAILSCALE_PRIVATE -> stringResource(R.string.ts_mode_tailscale_hint)
                     else -> stringResource(R.string.ts_mode_https_hint)
                 },
-                style = HermesType.bodySecondary, color = c.inkSecondary,
+                style = HermesType.bodySecondary, color = c.textSecondary,
             )
-            OutlinedTextField(
+            HermesOutlinedField(
                 secret, onValueChange = { secret = it },
                 label = { Text(stringResource(R.string.ts_field_secret)) },
                 visualTransformation = PasswordVisualTransformation(),
                 modifier = Modifier.fillMaxWidth(), enabled = mode != TransportMode.MOCK_SIMULATOR,
             )
-            OutlinedTextField(userRef, onValueChange = { userRef = it }, label = { Text(stringResource(R.string.ts_field_user_ref)) }, modifier = Modifier.fillMaxWidth())
-            OutlinedTextField(deviceAlias, onValueChange = { deviceAlias = it }, label = { Text(stringResource(R.string.ts_field_device_alias)) }, modifier = Modifier.fillMaxWidth())
-            OutlinedTextField(defaultMode, onValueChange = { defaultMode = it }, label = { Text(stringResource(R.string.ts_field_default_mode)) }, modifier = Modifier.fillMaxWidth())
-            OutlinedTextField(language, onValueChange = { language = it }, label = { Text(stringResource(R.string.ts_field_language)) }, modifier = Modifier.fillMaxWidth())
+            HermesOutlinedField(userRef, onValueChange = { userRef = it }, label = { Text(stringResource(R.string.ts_field_user_ref)) }, modifier = Modifier.fillMaxWidth())
+            HermesOutlinedField(deviceAlias, onValueChange = { deviceAlias = it }, label = { Text(stringResource(R.string.ts_field_device_alias)) }, modifier = Modifier.fillMaxWidth())
+            HermesOutlinedField(defaultMode, onValueChange = { defaultMode = it }, label = { Text(stringResource(R.string.ts_field_default_mode)) }, modifier = Modifier.fillMaxWidth())
+            HermesOutlinedField(language, onValueChange = { language = it }, label = { Text(stringResource(R.string.ts_field_language)) }, modifier = Modifier.fillMaxWidth())
             Row(horizontalArrangement = Arrangement.spacedBy(12.dp)) {
-                Switch(checked = autoConnect, onCheckedChange = { autoConnect = it })
-                Text(stringResource(R.string.ts_switch_autoconnect), style = HermesType.body, color = c.ink)
+                HermesSwitch(checked = autoConnect, onCheckedChange = { autoConnect = it })
+                Text(stringResource(R.string.ts_switch_autoconnect), style = HermesType.body, color = c.textPrimary)
             }
             Row(horizontalArrangement = Arrangement.spacedBy(12.dp)) {
-                Switch(checked = useTailscale, onCheckedChange = { useTailscale = it })
-                Text(stringResource(R.string.ts_switch_tailscale), style = HermesType.body, color = c.ink)
+                HermesSwitch(checked = useTailscale, onCheckedChange = { useTailscale = it })
+                Text(stringResource(R.string.ts_switch_tailscale), style = HermesType.body, color = c.textPrimary)
             }
         }
 
@@ -193,26 +196,26 @@ fun TowerStudioScreen(graph: AppGraph, onOpenScanner: (() -> Unit)? = null) {
                 Text(if (advanced) stringResource(R.string.ts_hide_advanced) else stringResource(R.string.ts_show_advanced))
             }
             if (advanced) {
-                OutlinedTextField(restBasePath, onValueChange = { restBasePath = it }, label = { Text(stringResource(R.string.ts_field_rest_path)) }, modifier = Modifier.fillMaxWidth())
-                OutlinedTextField(webSocketPath, onValueChange = { webSocketPath = it }, label = { Text(stringResource(R.string.ts_field_ws_path)) }, modifier = Modifier.fillMaxWidth())
-                OutlinedTextField(protocolVersion, onValueChange = { protocolVersion = it }, label = { Text(stringResource(R.string.ts_field_protocol_version)) }, modifier = Modifier.fillMaxWidth())
-                OutlinedTextField(requestTimeout, onValueChange = { requestTimeout = it }, label = { Text(stringResource(R.string.ts_field_request_timeout)) }, modifier = Modifier.fillMaxWidth())
-                OutlinedTextField(streamingTimeout, onValueChange = { streamingTimeout = it }, label = { Text(stringResource(R.string.ts_field_streaming_timeout)) }, modifier = Modifier.fillMaxWidth())
-                OutlinedTextField(retryCount, onValueChange = { retryCount = it }, label = { Text(stringResource(R.string.ts_field_retry_count)) }, modifier = Modifier.fillMaxWidth())
-                OutlinedTextField(queuedPolicy, onValueChange = { queuedPolicy = it }, label = { Text(stringResource(R.string.ts_field_queue_policy)) }, modifier = Modifier.fillMaxWidth())
-                OutlinedTextField(routingThreshold, onValueChange = { routingThreshold = it }, label = { Text(stringResource(R.string.ts_field_routing_threshold)) }, modifier = Modifier.fillMaxWidth())
-                OutlinedTextField(verbosity, onValueChange = { verbosity = it }, label = { Text(stringResource(R.string.ts_field_verbosity)) }, modifier = Modifier.fillMaxWidth())
+                HermesOutlinedField(restBasePath, onValueChange = { restBasePath = it }, label = { Text(stringResource(R.string.ts_field_rest_path)) }, modifier = Modifier.fillMaxWidth())
+                HermesOutlinedField(webSocketPath, onValueChange = { webSocketPath = it }, label = { Text(stringResource(R.string.ts_field_ws_path)) }, modifier = Modifier.fillMaxWidth())
+                HermesOutlinedField(protocolVersion, onValueChange = { protocolVersion = it }, label = { Text(stringResource(R.string.ts_field_protocol_version)) }, modifier = Modifier.fillMaxWidth())
+                HermesOutlinedField(requestTimeout, onValueChange = { requestTimeout = it }, label = { Text(stringResource(R.string.ts_field_request_timeout)) }, modifier = Modifier.fillMaxWidth())
+                HermesOutlinedField(streamingTimeout, onValueChange = { streamingTimeout = it }, label = { Text(stringResource(R.string.ts_field_streaming_timeout)) }, modifier = Modifier.fillMaxWidth())
+                HermesOutlinedField(retryCount, onValueChange = { retryCount = it }, label = { Text(stringResource(R.string.ts_field_retry_count)) }, modifier = Modifier.fillMaxWidth())
+                HermesOutlinedField(queuedPolicy, onValueChange = { queuedPolicy = it }, label = { Text(stringResource(R.string.ts_field_queue_policy)) }, modifier = Modifier.fillMaxWidth())
+                HermesOutlinedField(routingThreshold, onValueChange = { routingThreshold = it }, label = { Text(stringResource(R.string.ts_field_routing_threshold)) }, modifier = Modifier.fillMaxWidth())
+                HermesOutlinedField(verbosity, onValueChange = { verbosity = it }, label = { Text(stringResource(R.string.ts_field_verbosity)) }, modifier = Modifier.fillMaxWidth())
                 Row(horizontalArrangement = Arrangement.spacedBy(12.dp)) {
-                    Switch(checked = consequentialConfirm, onCheckedChange = { consequentialConfirm = it })
-                    Text(stringResource(R.string.ts_switch_consequential), style = HermesType.body, color = c.ink)
+                    HermesSwitch(checked = consequentialConfirm, onCheckedChange = { consequentialConfirm = it })
+                    Text(stringResource(R.string.ts_switch_consequential), style = HermesType.body, color = c.textPrimary)
                 }
                 Text(stringResource(R.string.ts_label_cert_behavior), style = HermesType.sectionLabel, color = c.bronze)
                 Row(horizontalArrangement = Arrangement.spacedBy(6.dp)) {
-                    FilterChip(selected = certPolicy == "SYSTEM", onClick = { certPolicy = "SYSTEM" }, label = { Text(stringResource(R.string.ts_cert_system)) })
-                    FilterChip(selected = certPolicy == "PINNED", onClick = { certPolicy = "PINNED" }, label = { Text(stringResource(R.string.ts_cert_pinned)) })
+                    HermesFilterChip(selected = certPolicy == "SYSTEM", onClick = { certPolicy = "SYSTEM" }, label = { Text(stringResource(R.string.ts_cert_system)) })
+                    HermesFilterChip(selected = certPolicy == "PINNED", onClick = { certPolicy = "PINNED" }, label = { Text(stringResource(R.string.ts_cert_pinned)) })
                 }
                 if (certPolicy == "PINNED") {
-                    OutlinedTextField(pinnedFingerprint, onValueChange = { pinnedFingerprint = it }, label = { Text(stringResource(R.string.ts_field_pinned_fp)) }, modifier = Modifier.fillMaxWidth())
+                    HermesOutlinedField(pinnedFingerprint, onValueChange = { pinnedFingerprint = it }, label = { Text(stringResource(R.string.ts_field_pinned_fp)) }, modifier = Modifier.fillMaxWidth())
                 }
             }
         }
@@ -367,32 +370,32 @@ fun TowerStudioScreen(graph: AppGraph, onOpenScanner: (() -> Unit)? = null) {
             SectionCard(title = stringResource(R.string.ts_section_last_test)) {
                 // §23: the outcome is localized — raw English enum values never
                 // appear in ordinary UI.
-                Text(context.getString(R.string.ts_msg_outcome, StateLabels.label(r.outcome.name, uiLocale)), style = HermesType.body, color = c.ink)
+                Text(context.getString(R.string.ts_msg_outcome, StateLabels.label(r.outcome.name, uiLocale)), style = HermesType.body, color = c.textPrimary)
                 Text(
                     context.getString(
                         R.string.ts_msg_dns_line,
                         r.dnsResolved, r.transportConnected, r.tlsStatus, r.handshakeStatus,
                     ),
-                    style = HermesType.bodySecondary, color = c.inkSecondary,
+                    style = HermesType.bodySecondary, color = c.textSecondary,
                 )
                 Text(
                     context.getString(
                         R.string.ts_msg_proto_line,
                         r.protocolCompatible, r.authenticationStatus, r.towerAccepted,
                     ),
-                    style = HermesType.bodySecondary, color = c.inkSecondary,
+                    style = HermesType.bodySecondary, color = c.textSecondary,
                 )
                 Text(
                     context.getString(
                         R.string.ts_msg_latency_line,
                         r.latencyMs ?: context.getString(R.string.mm_na), r.streamingCapability, r.testedAt,
                     ),
-                    style = HermesType.bodySecondary, color = c.inkSecondary,
+                    style = HermesType.bodySecondary, color = c.textSecondary,
                 )
             }
         }
 
-        Text(message, style = HermesType.body, color = c.energy)
+        Text(message, style = HermesType.body, color = c.textInfo)
         }
     }
 }

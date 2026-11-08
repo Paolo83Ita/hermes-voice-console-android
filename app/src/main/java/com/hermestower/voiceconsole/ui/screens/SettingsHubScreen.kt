@@ -61,12 +61,12 @@ fun SettingsHubScreen(
             .padding(16.dp),
         verticalArrangement = Arrangement.spacedBy(12.dp),
     ) {
-        Text(stringResource(R.string.settings_title), style = HermesType.screenTitle, color = c.ink)
+        Text(stringResource(R.string.settings_title), style = HermesType.screenTitle, color = c.textPrimary)
         MeanderBand(colors = hermesColors, modifier = Modifier.padding(top = 6.dp))
         Text(
             stringResource(R.string.settings_subtitle),
             style = HermesType.bodySecondary,
-            color = c.inkSecondary,
+            color = c.textSecondary,
         )
 
         // ---- GENERAL ----
@@ -168,7 +168,7 @@ fun SettingsHubScreen(
         Text(
             stringResource(R.string.settings_note_advanced),
             style = MonumentalType.sealSub,
-            color = m.inkDim,
+            color = c.textTertiaryReadable,
             modifier = Modifier.padding(bottom = 16.dp),
         )
     }
@@ -200,7 +200,7 @@ private fun SettingsRow(
                 .padding(start = 12.dp, end = 8.dp),
         ) {
             Text(label, style = HermesType.body)
-            Text(sub, style = HermesType.bodySecondary, color = hermesColors.inkSecondary)
+            Text(sub, style = HermesType.bodySecondary, color = hermesColors.textSecondary)
         }
     }
 }

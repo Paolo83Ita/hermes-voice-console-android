@@ -33,6 +33,7 @@ import com.hermestower.voiceconsole.ui.components.MeanderBand
 import com.hermestower.voiceconsole.ui.components.TruthBadge
 import com.hermestower.voiceconsole.ui.theme.HermesType
 import com.hermestower.voiceconsole.ui.theme.hermesColors
+import com.hermestower.voiceconsole.ui.components.HermesFilledButton
 
 /**
  * S8 About & Safety (FR-37): component versions, licenses, privacy explanation,
@@ -103,7 +104,7 @@ fun AboutSafetyScreen(graph: AppGraph) {
             Text(
                 stringResource(Res.string.about_build_note),
                 style = HermesType.bodySecondary,
-                color = c.inkSecondary,
+                color = c.textSecondary,
             )
             Row(horizontalArrangement = Arrangement.spacedBy(8.dp)) {
                 TextButton(onClick = {
@@ -129,7 +130,7 @@ fun AboutSafetyScreen(graph: AppGraph) {
                     com.hermestower.voiceconsole.BuildConfig.VERSION_CODE,
                 ),
                 style = HermesType.body,
-                color = c.ink,
+                color = c.textPrimary,
             )
             TruthBadge(stringResource(Res.string.about_badge_foundation), c.gold)
         }
@@ -142,11 +143,11 @@ fun AboutSafetyScreen(graph: AppGraph) {
                 "Kotlinx Coroutines 1.9.0 / Serialization 1.7.3 — Apache-2.0",
                 "JUnit 4.13.2 (tests) — EPL-1.0",
             )
-            components.forEach { Text(it, style = HermesType.body, color = c.ink) }
+            components.forEach { Text(it, style = HermesType.body, color = c.textPrimary) }
             Text(
                 stringResource(Res.string.about_licenses_note),
                 style = HermesType.bodySecondary,
-                color = c.inkSecondary,
+                color = c.textSecondary,
             )
         }
 
@@ -154,12 +155,12 @@ fun AboutSafetyScreen(graph: AppGraph) {
             Text(
                 stringResource(Res.string.about_privacy_note),
                 style = HermesType.body,
-                color = c.ink,
+                color = c.textPrimary,
             )
             Text(
                 stringResource(Res.string.about_privacy_note_v03),
                 style = HermesType.bodySecondary,
-                color = c.inkSecondary,
+                color = c.textSecondary,
             )
         }
 
@@ -174,15 +175,15 @@ fun AboutSafetyScreen(graph: AppGraph) {
                 Res.string.about_limit_language,
                 Res.string.about_limit_build,
             )
-            limits.forEach { Text("• " + stringResource(it), style = HermesType.body, color = c.ink) }
+            limits.forEach { Text("• " + stringResource(it), style = HermesType.body, color = c.textPrimary) }
         }
 
         SectionCard(title = stringResource(Res.string.about_danger_card)) {
-            Button(onClick = { confirmReset = true }) { Text(stringResource(Res.string.about_reset_button)) }
+            HermesFilledButton(onClick = { confirmReset = true }) { Text(stringResource(Res.string.about_reset_button)) }
             Text(
                 stringResource(Res.string.about_reset_note),
                 style = HermesType.bodySecondary,
-                color = c.inkSecondary,
+                color = c.textSecondary,
             )
         }
     }
@@ -193,7 +194,7 @@ fun AboutSafetyScreen(graph: AppGraph) {
             title = { Text(stringResource(Res.string.about_reset_dialog_title)) },
             text = { Text(stringResource(Res.string.about_reset_dialog_text)) },
             confirmButton = {
-                Button(onClick = {
+                HermesFilledButton(onClick = {
                     graph.store.resetLocalData()
                     graph.settingsRepository.clear()
                     graph.store.updateSettings { graph.settingsRepository.load() }
@@ -217,14 +218,14 @@ private fun BuildIdentityRow(label: String, value: String) {
         Text(
             label,
             style = HermesType.bodySecondary,
-            color = hermesColors.inkSecondary,
+            color = hermesColors.textSecondary,
             modifier = Modifier.weight(1.1f),
         )
         SelectionContainer {
             Text(
                 value,
                 style = HermesType.body,
-                color = hermesColors.ink,
+                color = hermesColors.textPrimary,
                 modifier = Modifier.weight(1.9f),
             )
         }

@@ -40,6 +40,9 @@ import com.hermestower.voiceconsole.ui.components.BadgeFlowRow
 import com.hermestower.voiceconsole.ui.theme.HermesType
 import com.hermestower.voiceconsole.ui.theme.hermesColors
 import kotlinx.coroutines.launch
+import com.hermestower.voiceconsole.ui.components.HermesFilledButton
+import com.hermestower.voiceconsole.ui.components.HermesFilterChip
+import com.hermestower.voiceconsole.ui.components.HermesOutlinedButton
 
 /**
  * GRAPH 4 directive §6 — SIMPLE ONBOARDING (first launch only).
@@ -95,7 +98,7 @@ fun OnboardingScreen(graph: AppGraph, onFinish: (pendingRoute: String?) -> Unit)
             .padding(20.dp),
         verticalArrangement = Arrangement.spacedBy(14.dp),
     ) {
-        Text(stringResource(R.string.ob_title), style = HermesType.screenTitle, color = c.ink)
+        Text(stringResource(R.string.ob_title), style = HermesType.screenTitle, color = c.textPrimary)
         MeanderBand(colors = hermesColors, modifier = Modifier.padding(top = 2.dp))
         Text(
             stringResource(R.string.ob_step_of_fmt, step + 1, 6),
@@ -106,9 +109,9 @@ fun OnboardingScreen(graph: AppGraph, onFinish: (pendingRoute: String?) -> Unit)
             // ---- STEP 1: language ----
             0 -> {
                 SectionCard(title = stringResource(R.string.ob_s1_title)) {
-                    Text(stringResource(R.string.ob_s1_body), style = HermesType.body, color = c.ink)
+                    Text(stringResource(R.string.ob_s1_body), style = HermesType.body, color = c.textPrimary)
                     Row(horizontalArrangement = Arrangement.spacedBy(8.dp), modifier = Modifier.padding(top = 8.dp)) {
-                        FilterChip(
+                        HermesFilterChip(
                             selected = AppLanguage.stored(context) == AppLanguage.FOLLOW_SYSTEM,
                             onClick = {
                                 // GRAPH 4.12 §5: the single sanctioned path — no
@@ -126,7 +129,7 @@ fun OnboardingScreen(graph: AppGraph, onFinish: (pendingRoute: String?) -> Unit)
                     BadgeFlowRow(horizontalSpacing = 8.dp) {
                         listOf("it" to "Italiano", "en" to "English", "es" to "Español", "fr" to "Français", "de" to "Deutsch")
                             .forEach { (code, label) ->
-                                FilterChip(
+                                HermesFilterChip(
                                     selected = AppLanguage.stored(context) == code,
                                     onClick = {
                                         // GRAPH 4.12 §5: single sanctioned path.
@@ -145,19 +148,19 @@ fun OnboardingScreen(graph: AppGraph, onFinish: (pendingRoute: String?) -> Unit)
             // ---- STEP 2: Tower connect ----
             1 -> {
                 SectionCard(title = stringResource(R.string.ob_s2_title)) {
-                    Text(stringResource(R.string.ob_s2_body), style = HermesType.body, color = c.ink)
+                    Text(stringResource(R.string.ob_s2_body), style = HermesType.body, color = c.textPrimary)
                     Row(horizontalArrangement = Arrangement.spacedBy(8.dp), modifier = Modifier.padding(top = 8.dp)) {
-                        OutlinedButton(onClick = { towerChoiceQr = true; step = 2 }) {
+                        HermesOutlinedButton(onClick = { towerChoiceQr = true; step = 2 }) {
                             Text(stringResource(R.string.ob_s2_scan_qr))
                         }
-                        OutlinedButton(onClick = { towerChoiceQr = false; step = 2 }) {
+                        HermesOutlinedButton(onClick = { towerChoiceQr = false; step = 2 }) {
                             Text(stringResource(R.string.ob_s2_simulation))
                         }
                     }
                     Text(
                         if (towerChoiceQr) stringResource(R.string.ob_s2_chosen_qr)
                         else stringResource(R.string.ob_s2_chosen_sim),
-                        style = HermesType.bodySecondary, color = c.inkSecondary,
+                        style = HermesType.bodySecondary, color = c.textSecondary,
                     )
                 }
             }
@@ -168,24 +171,24 @@ fun OnboardingScreen(graph: AppGraph, onFinish: (pendingRoute: String?) -> Unit)
                 val plan = remember { graph.modelPackInstaller.plan(VoiceModelProfile.HYBRID_BALANCED, resources, graph.modelCatalog) }
                 val summary = remember { graph.modelPackInstaller.summarize(plan, resources) }
                 SectionCard(title = stringResource(R.string.ob_s3_title)) {
-                    Text(stringResource(R.string.ob_s3_body), style = HermesType.body, color = c.ink)
+                    Text(stringResource(R.string.ob_s3_body), style = HermesType.body, color = c.textPrimary)
                     Text(
                         stringResource(
                             R.string.ob_s3_summary_fmt,
                             plan.includedItems.size,
                             formatBytes(summary.totalDownloadBytes),
                         ),
-                        style = HermesType.body, color = c.ink,
+                        style = HermesType.body, color = c.textPrimary,
                     )
                     plan.includedItems.forEach { item ->
                         Text(
                             "• ${item.entry?.displayName ?: item.componentType}",
-                            style = HermesType.bodySecondary, color = c.inkSecondary,
+                            style = HermesType.bodySecondary, color = c.textSecondary,
                         )
                     }
-                    Text(stringResource(R.string.ob_s3_no_account_needed), style = HermesType.bodySecondary, color = c.inkSecondary)
+                    Text(stringResource(R.string.ob_s3_no_account_needed), style = HermesType.bodySecondary, color = c.textSecondary)
                     if (plan.includedItems.isNotEmpty()) {
-                        Button(
+                        HermesFilledButton(
                             enabled = !packRunning,
                             onClick = {
                                 packRunning = true
@@ -205,7 +208,7 @@ fun OnboardingScreen(graph: AppGraph, onFinish: (pendingRoute: String?) -> Unit)
                         ) { Text(stringResource(R.string.ob_s3_install)) }
                     }
                     packEvents.takeLast(3).forEach {
-                        Text(it, style = HermesType.bodySecondary, color = c.energy)
+                        Text(it, style = HermesType.bodySecondary, color = c.textInfo)
                     }
                 }
                 OnboardingContinue(onContinue = { step = 3 })
@@ -214,12 +217,12 @@ fun OnboardingScreen(graph: AppGraph, onFinish: (pendingRoute: String?) -> Unit)
             // ---- STEP 4: optional local LLM ----
             3 -> {
                 SectionCard(title = stringResource(R.string.ob_s4_title)) {
-                    Text(stringResource(R.string.ob_s4_body), style = HermesType.body, color = c.ink)
+                    Text(stringResource(R.string.ob_s4_body), style = HermesType.body, color = c.textPrimary)
                     Row(horizontalArrangement = Arrangement.spacedBy(8.dp), modifier = Modifier.padding(top = 8.dp)) {
-                        Button(onClick = { openModelsAfter = false; step = 4 }) {
+                        HermesFilledButton(onClick = { openModelsAfter = false; step = 4 }) {
                             Text(stringResource(R.string.ob_s4_not_now))
                         }
-                        OutlinedButton(onClick = { openModelsAfter = true; step = 4 }) {
+                        HermesOutlinedButton(onClick = { openModelsAfter = true; step = 4 }) {
                             Text(stringResource(R.string.ob_s4_choose_model))
                         }
                     }
@@ -229,8 +232,8 @@ fun OnboardingScreen(graph: AppGraph, onFinish: (pendingRoute: String?) -> Unit)
             // ---- STEP 5: voice test ----
             4 -> {
                 SectionCard(title = stringResource(R.string.ob_s5_title)) {
-                    Text(stringResource(R.string.ob_s5_body), style = HermesType.body, color = c.ink)
-                    Button(
+                    Text(stringResource(R.string.ob_s5_body), style = HermesType.body, color = c.textPrimary)
+                    HermesFilledButton(
                         enabled = !selfTestRunning,
                         onClick = { graph.selfTestCenter.run(SelfTestMode.VOICE_FOUNDATION_ONLY) },
                     ) { Text(stringResource(R.string.ob_s5_run)) }
@@ -239,9 +242,9 @@ fun OnboardingScreen(graph: AppGraph, onFinish: (pendingRoute: String?) -> Unit)
                         val passed = done.count { it.state == SelfTestState.PASS }
                         Text(
                             stringResource(R.string.ob_s5_result_fmt, passed, done.size),
-                            style = HermesType.body, color = c.ink,
+                            style = HermesType.body, color = c.textPrimary,
                         )
-                        Text(stringResource(R.string.ob_s5_honest_note), style = HermesType.bodySecondary, color = c.inkSecondary)
+                        Text(stringResource(R.string.ob_s5_honest_note), style = HermesType.bodySecondary, color = c.textSecondary)
                     }
                 }
                 OnboardingContinue(onContinue = { step = 5 })
@@ -250,9 +253,9 @@ fun OnboardingScreen(graph: AppGraph, onFinish: (pendingRoute: String?) -> Unit)
             // ---- STEP 6: finish ----
             else -> {
                 SectionCard(title = stringResource(R.string.ob_s6_title)) {
-                    Text(stringResource(R.string.ob_s6_body), style = HermesType.body, color = c.ink)
+                    Text(stringResource(R.string.ob_s6_body), style = HermesType.body, color = c.textPrimary)
                 }
-                Button(onClick = {
+                HermesFilledButton(onClick = {
                     onFinish(if (openModelsAfter) com.hermestower.voiceconsole.ui.AppRoutes.MODEL_MANAGER else null)
                 }) { Text(stringResource(R.string.ob_s6_finish)) }
             }

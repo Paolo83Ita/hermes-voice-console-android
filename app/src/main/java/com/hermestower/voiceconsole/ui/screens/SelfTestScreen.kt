@@ -30,6 +30,7 @@ import com.hermestower.voiceconsole.ui.components.SectionCard
 import com.hermestower.voiceconsole.ui.components.MeanderBand
 import com.hermestower.voiceconsole.ui.theme.HermesType
 import com.hermestower.voiceconsole.ui.theme.hermesColors
+import com.hermestower.voiceconsole.ui.components.HermesFilledButton
 
 /**
  * Diagnostics → Self-Test Center (GRAPH 2 §11): five modes, typed results with
@@ -58,12 +59,12 @@ fun SelfTestScreen(graph: AppGraph) {
         MeanderBand(colors = hermesColors, modifier = Modifier.padding(top = 6.dp))
         Text(
             stringResource(com.hermestower.voiceconsole.R.string.st_intro),
-            style = HermesType.bodySecondary, color = c.inkSecondary,
+            style = HermesType.bodySecondary, color = c.textSecondary,
         )
 
         SectionCard(title = stringResource(com.hermestower.voiceconsole.R.string.st_run_card)) {
             Row(horizontalArrangement = Arrangement.spacedBy(6.dp)) {
-                Button(enabled = !running, onClick = { note = null; center.run(SelfTestMode.QUICK) }) { Text(stringResource(com.hermestower.voiceconsole.R.string.st_run_quick)) }
+                HermesFilledButton(enabled = !running, onClick = { note = null; center.run(SelfTestMode.QUICK) }) { Text(stringResource(com.hermestower.voiceconsole.R.string.st_run_quick)) }
                 TextButton(enabled = !running, onClick = { note = null; center.run(SelfTestMode.STANDARD) }) { Text(stringResource(com.hermestower.voiceconsole.R.string.st_run_standard)) }
                 TextButton(enabled = !running, onClick = { note = null; center.run(SelfTestMode.FULL) }) { Text(stringResource(com.hermestower.voiceconsole.R.string.st_run_full)) }
             }
@@ -87,13 +88,13 @@ fun SelfTestScreen(graph: AppGraph) {
                     note = context.getString(com.hermestower.voiceconsole.R.string.st_note_summary)
                 }) { Text(stringResource(com.hermestower.voiceconsole.R.string.st_copy_summary)) }
             }
-            if (running) Text(stringResource(com.hermestower.voiceconsole.R.string.st_running_fmt, current ?: "…"), style = HermesType.body, color = c.energy)
-            note?.let { Text(it, style = HermesType.bodySecondary, color = c.inkSecondary) }
+            if (running) Text(stringResource(com.hermestower.voiceconsole.R.string.st_running_fmt, current ?: "…"), style = HermesType.body, color = c.textInfo)
+            note?.let { Text(it, style = HermesType.bodySecondary, color = c.textSecondary) }
         }
 
         SectionCard(title = stringResource(com.hermestower.voiceconsole.R.string.st_results_card)) {
             if (results.isEmpty()) {
-                Text(stringResource(com.hermestower.voiceconsole.R.string.st_none_yet), style = HermesType.bodySecondary, color = c.inkSecondary)
+                Text(stringResource(com.hermestower.voiceconsole.R.string.st_none_yet), style = HermesType.bodySecondary, color = c.textSecondary)
             }
             results.toSortedMap().forEach { (id, result) ->
                 val stateLabel = when (result.state) {
@@ -105,20 +106,20 @@ fun SelfTestScreen(graph: AppGraph) {
                     SelfTestState.BLOCKED_DEPENDENCY -> "BLOCKED"
                     SelfTestState.QUALIFICATION_PENDING_DEVICE -> "PENDING DEVICE"
                 }
-                Text("$id — ${result.testName}", style = HermesType.body, color = c.ink)
+                Text("$id — ${result.testName}", style = HermesType.body, color = c.textPrimary)
                 Text(
                     "$stateLabel · ${result.durationMs} ms · ${result.evidence}",
                     style = HermesType.bodySecondary,
                     color = when (result.state) {
-                        SelfTestState.PASS -> c.inkSecondary
-                        SelfTestState.FAIL -> c.warn
-                        else -> c.inkSecondary
+                        SelfTestState.PASS -> c.textSecondary
+                        SelfTestState.FAIL -> c.textWarning
+                        else -> c.textSecondary
                     },
                 )
-                result.repairSuggestion?.let { Text(stringResource(com.hermestower.voiceconsole.R.string.st_repair_fmt, it), style = HermesType.bodySecondary, color = c.inkSecondary) }
+                result.repairSuggestion?.let { Text(stringResource(com.hermestower.voiceconsole.R.string.st_repair_fmt, it), style = HermesType.bodySecondary, color = c.textSecondary) }
             }
             if (results.isNotEmpty()) {
-                Text(center.summary(), style = HermesType.body, color = c.ink)
+                Text(center.summary(), style = HermesType.body, color = c.textPrimary)
             }
         }
     }

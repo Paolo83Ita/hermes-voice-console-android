@@ -33,6 +33,7 @@ import com.hermestower.voiceconsole.ui.components.TruthBadge
 import com.hermestower.voiceconsole.ui.components.BadgeFlowRow
 import com.hermestower.voiceconsole.ui.theme.HermesType
 import com.hermestower.voiceconsole.ui.theme.hermesColors
+import com.hermestower.voiceconsole.ui.components.HermesFilledButton
 
 /**
  * S2 Conversation History (FR-16/17): LOCAL vs TOWER attribution, delivery state,
@@ -70,7 +71,7 @@ fun HistoryScreen(graph: AppGraph) {
                 Text(
                     stringResource(com.hermestower.voiceconsole.R.string.history_empty),
                     style = HermesType.bodySecondary,
-                    color = c.inkSecondary,
+                    color = c.textSecondary,
                 )
             }
         }
@@ -96,7 +97,7 @@ fun HistoryScreen(graph: AppGraph) {
         Text(
             stringResource(com.hermestower.voiceconsole.R.string.history_retention_note),
             style = HermesType.bodySecondary,
-            color = c.inkSecondary,
+            color = c.textSecondary,
         )
     }
 
@@ -106,7 +107,7 @@ fun HistoryScreen(graph: AppGraph) {
             title = { Text(stringResource(com.hermestower.voiceconsole.R.string.history_clear_dialog_title)) },
             text = { Text(stringResource(com.hermestower.voiceconsole.R.string.history_clear_dialog_text)) },
             confirmButton = {
-                Button(onClick = {
+                HermesFilledButton(onClick = {
                     graph.store.resetLocalData()
                     confirmClear = false
                 }) { Text(stringResource(com.hermestower.voiceconsole.R.string.common_clear)) }
@@ -137,29 +138,29 @@ private fun TurnRow(turn: ConversationTurn, onRetry: () -> Unit) {
     }
     val whoColor = when {
         turn.role == ConversationTurn.Role.OWNER -> c.bronze
-        turn.source == ConversationTurn.Source.TOWER -> c.energy
-        else -> c.ok
+        turn.source == ConversationTurn.Source.TOWER -> c.textInfo
+        else -> c.textSuccess
     }
     SectionCard(title = "#${turn.id} · $who") {
-        Text(turn.text, style = HermesType.body, color = c.ink)
+        Text(turn.text, style = HermesType.body, color = c.textPrimary)
         BadgeFlowRow(horizontalSpacing = 6.dp) {
             TruthBadge(
                 text = com.hermestower.voiceconsole.locale.StateLabels.label(turn.source.name, com.hermestower.voiceconsole.locale.AppLanguage.effectiveTag(context)),
-                color = if (turn.source == ConversationTurn.Source.TOWER) c.energy else c.ok,
+                color = if (turn.source == ConversationTurn.Source.TOWER) c.textInfo else c.textSuccess,
             )
             TruthBadge(
                 text = com.hermestower.voiceconsole.locale.StateLabels.label(turn.delivery.name, com.hermestower.voiceconsole.locale.AppLanguage.effectiveTag(context)),
                 color = when (turn.delivery) {
-                    ConversationTurn.Delivery.DELIVERED -> c.ok
-                    ConversationTurn.Delivery.PENDING -> c.inkSecondary
-                    ConversationTurn.Delivery.QUEUED -> c.warn
-                    ConversationTurn.Delivery.FAILED -> c.danger
+                    ConversationTurn.Delivery.DELIVERED -> c.textSuccess
+                    ConversationTurn.Delivery.PENDING -> c.textSecondary
+                    ConversationTurn.Delivery.QUEUED -> c.textWarning
+                    ConversationTurn.Delivery.FAILED -> c.textError
                 },
             )
-            if (turn.consequential) TruthBadge("CONSEQUENTIAL", c.warn)
+            if (turn.consequential) TruthBadge("CONSEQUENTIAL", c.textWarning)
             turn.receiptRef?.let { TruthBadge(it, c.gold) }
         }
-        turn.note?.let { Text(it, style = HermesType.bodySecondary, color = c.inkSecondary) }
+        turn.note?.let { Text(it, style = HermesType.bodySecondary, color = c.textSecondary) }
         // Retry only when safe (FR-16): failed or queued, non-consequential turns.
         val retryable = !turn.consequential &&
             (turn.delivery == ConversationTurn.Delivery.FAILED || turn.delivery == ConversationTurn.Delivery.QUEUED)

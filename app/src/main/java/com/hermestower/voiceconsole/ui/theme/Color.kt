@@ -49,6 +49,13 @@ val ObsidianError = Color(0xFFF87171)
 /**
  * Identity colors beyond the Material scheme: the Tower's materials and energy.
  * UI reads these through hermesColors() so the theme swap never forks components.
+ *
+ * GRAPH 4.13 §6: the SEMANTIC COLOR AUTHORITY lives here too — 25 typed tokens
+ * (text/icon/surface/outline) resolved per theme. All ordinary prose, icons,
+ * interactive surfaces and outlines MUST consume these; raw Color literals in
+ * ordinary screen components are banned (decoration-only, documented).
+ * §5 disabled contract: disabled label ≥3.0 with ≥2 cues (color+border+fill);
+ * enabled informative text never renders in disabled colors.
  */
 @Immutable
 data class HermesColors(
@@ -69,6 +76,32 @@ data class HermesColors(
     val warn: Color,
     val danger: Color,
     val onAccent: Color,
+    // ---- GRAPH 4.13 §6 semantic authority ----
+    val textPrimary: Color,
+    val textSecondary: Color,
+    val textTertiaryReadable: Color,
+    val textDisabled: Color,
+    val textOnAccent: Color,
+    val textOnSelected: Color,
+    val textTechnical: Color,
+    val textSuccess: Color,
+    val textWarning: Color,
+    val textError: Color,
+    val textInfo: Color,
+    val iconPrimary: Color,
+    val iconSecondary: Color,
+    val iconDisabled: Color,
+    val iconOnAccent: Color,
+    val surfaceBase: Color,
+    val surfaceRaised: Color,
+    val surfaceInteractive: Color,
+    val surfaceSelected: Color,
+    val surfaceDisabled: Color,
+    val surfaceError: Color,
+    val outlinePrimary: Color,
+    val outlineSecondary: Color,
+    val outlineFocus: Color,
+    val outlineDisabled: Color,
 )
 
 val MarbleLightColors = HermesColors(
@@ -79,6 +112,32 @@ val MarbleLightColors = HermesColors(
     stone = MarbleStone, stoneAlt = MarbleStoneShade,
     ok = MarbleOk, warn = MarbleWarn, danger = MarbleError,
     onAccent = Color(0xFFFFF8EC),
+    // §6 semantics — measured on the marble surfaces that host the text
+    textPrimary = Color(0xFF201E19),
+    textSecondary = Color(0xFF5A554A),
+    textTertiaryReadable = Color(0xFF6B655A),
+    textDisabled = Color(0xFF857E70),
+    textOnAccent = Color(0xFFFFF8EC),
+    textOnSelected = Color(0xFF3F2F14),
+    textTechnical = Color(0xFF6B655A),
+    textSuccess = Color(0xFF276B4D),
+    textWarning = Color(0xFF8A5210),
+    textError = Color(0xFFB3261E),
+    textInfo = Color(0xFF0C6478),
+    iconPrimary = Color(0xFF7A5C2E),
+    iconSecondary = Color(0xFF7A5C2E),
+    iconDisabled = Color(0xFF857E70),
+    iconOnAccent = Color(0xFFFFF8EC),
+    surfaceBase = MarbleBackground,
+    surfaceRaised = MarbleSurface,
+    surfaceInteractive = MarbleSurfaceVariant,
+    surfaceSelected = Color(0xFFE8D9BC),
+    surfaceDisabled = MarbleSurfaceVariant,
+    surfaceError = Color(0xFFF6E3E1),
+    outlinePrimary = MarbleOutline,
+    outlineSecondary = MarbleStoneShade,
+    outlineFocus = MarbleBronze,
+    outlineDisabled = MarbleStone,
 )
 
 val ObsidianNightColors = HermesColors(
@@ -89,6 +148,33 @@ val ObsidianNightColors = HermesColors(
     stone = ObsidianStone, stoneAlt = ObsidianStoneLight,
     ok = ObsidianOk, warn = ObsidianWarn, danger = ObsidianError,
     onAccent = Color(0xFF120C04),
+    // §6 semantics — §7 anchors (warm ivory / light taupe / readable technical gray),
+    // measured ≥4.5 (text), ≥3.0 (icons/focus/disabled) on every obsidian surface
+    textPrimary = Color(0xFFE8E1D5),
+    textSecondary = Color(0xFFBEB5A6),
+    textTertiaryReadable = Color(0xFFAAA69F),
+    textDisabled = Color(0xFF9A9488),
+    textOnAccent = Color(0xFF120C04),
+    textOnSelected = Color(0xFFF0D9A0),
+    textTechnical = Color(0xFFAAA69F),
+    textSuccess = Color(0xFF34D399),
+    textWarning = Color(0xFFF59E0B),
+    textError = Color(0xFFF87171),
+    textInfo = Color(0xFF22D3EE),
+    iconPrimary = Color(0xFFD4A24E),
+    iconSecondary = Color(0xFFB98C4A),
+    iconDisabled = Color(0xFF9A9488),
+    iconOnAccent = Color(0xFF120C04),
+    surfaceBase = ObsidianBackground,
+    surfaceRaised = Color(0xFF131824),
+    surfaceInteractive = ObsidianSurfaceVariant,
+    surfaceSelected = Color(0xFF2C261B),
+    surfaceDisabled = Color(0xFF2D2E32),
+    surfaceError = Color(0xFF2A0B09),
+    outlinePrimary = Color(0xFF8A6A38),
+    outlineSecondary = Color(0xFF3E2F18),
+    outlineFocus = Color(0xFFD9B36A),
+    outlineDisabled = Color(0xFF4A453C),
 )
 
 fun marbleMaterialScheme(): ColorScheme = lightColorScheme(
