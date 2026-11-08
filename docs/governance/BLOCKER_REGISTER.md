@@ -15,3 +15,8 @@ Resolved during Graph 1 (for the record):
 | R-0001 | Gradle wrapper jar/scripts missing from Foundation scaffold | Wrapper generated with Gradle 8.9, committed (G-007) |
 | R-0002 | 44 main-source + 9 test-source compile errors; 7 test failures | Repaired locally, tests 33/33 green (G-001..G-005) |
 | R-0003 | Sandbox Java 21 was JRE-only (no jlink) | Standalone Temurin JDK 17 installed (G-002) |
+
+No new blocker in Graph 4.13. Standing deferred items unchanged (B-0001
+physical qualification runbook now = OWNER_POCO_XIAOMI_RETEST_PACKAGE_6_GRAPH413.md;
+B-0003 real Tower API still V0.4). OWNER_VISUAL_RETEST_PENDING is a
+pending OWNER ACTION, not an executor blocker.

@@ -110,3 +110,22 @@ surfaces).
   an ordinary user surface.
 - State after this report: contrast repaired in code; the physical verdict
   stays Owner-only.
+
+---
+
+# GRAPH 4.13 ADDENDUM (2026-11-09)
+
+The 4.12 tables above are TOKEN-PAIR audits. The Owner's continued
+APP_WIDE_TEXT_CONTRAST_FAIL led to the RENDERED-SURFACE audit of Graph 4.13:
+`APP_WIDE_RENDERED_CONTRAST_AUDIT_GRAPH413.md` (WCAG 2.x on the code's real
+surface stacks). Two defect classes were found and repaired:
+
+1. Compose M3 default disabled labels measured 1.43:1 (FilledButton) and
+   2.09:1 (FilterChip) on obsidian → replaced by the §5 wrappers
+   (textDisabled ≥3.0 + fill + border cues).
+2. Marble-Light prose measured 1.16–3.12:1 because the app shell stayed
+   obsidian in both themes → theme-aware shell + marble semantic palette.
+
+The live semantic authority (25 tokens × 2 palettes) is measured 50 rows /
+0 FAIL in BOTH themes and pinned by `SemanticContrastAuthorityTest`
+(thresholds: text ≥4.5, critical ≥4.5, icon/focus/disabled ≥3.0).

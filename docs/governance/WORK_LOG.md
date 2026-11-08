@@ -1812,3 +1812,81 @@ item missed through both arms with the same signature).
 ACTION: R-49 — gateOpenDrawer settles the drawer (close-anchor stable across two
 polls, 10 s bound, fail-open) before any row lookup; compile GREEN, unit 450/450.
 CHECKPOINT: CP-G4.12-016 → CI arbitrates at the new tip.
+
+## 2026-11-09 — CP-G4.13-001: fresh read-back + Owner physical evidence (Block 1)
+
+FINDING: fetched; local was behind 42 → ff-only afefd3d → 4b8bfb2 (remote
+tip, CP-G4.12-016 R-49); tree clean; CI at tip run 42481808334 SUCCESS,
+android-e2e run 42481808264 both lanes E2E_VERDICT_FAILED typed (standing
+R-42..R-49 harness line; crash family stays eliminated); narrative APK SHA
+cf630af…eda80d7 bound to Package 4 identity (NOT a current-value authority).
+ACTION: GRAPH413_FRESH_READBACK.md + OWNER_PHYSICAL_FINDINGS_GRAPH413.md
+(4 preliminary physical PASS preserved; 6 open visual/accessibility failures
+registered; scope freeze recorded).
+CHECKPOINT: CP-G4.13-001.
+
+## 2026-11-09 — CP-G4.13-002/003: rendered contrast audit + semantic authority
+
+FINDING: source-parsed WCAG audit on the code's REAL surface stacks — 82
+rows / 11 FAIL pre-repair: Compose M3 default disabled labels 1.43:1
+(FilledButton) and 2.09:1 (FilterChip) on obsidian (§5 violation); Marble
+prose on the always-obsidian shell 1.16–3.12:1 app-wide (the Owner's
+APP_WIDE_TEXT_CONTRAST_FAIL root).
+ACTION: 25-token §6 semantic authority in HermesColors (two measured
+palettes; §7 anchors ivory E8E1D5 / taupe BEB5A6 / technical AAA69F;
+obsidian preserved, never whitened); theme-aware app shell; chrome re-based
+on semantics; §5 control wrappers (buttons/chips/switches/fields) wired in
+12 screens; screens' prose migrated to semantics (Console identity stage
+untouched); LIVE audit 50 rows / 0 FAIL both themes;
+SemanticContrastAuthorityTest pins every pair.
+CHECKPOINT: CP-G4.13-002/003 (62767b3).
+
+## 2026-11-09 — CP-G4.13-004: screenshot foundation + preservation gates
+
+ACTION: ScreenshotMatrixTest (16 captures at 360/393/411/600dp × font
+1.0/1.3/1.5 with blank-render + clipping gates; CI channel
+E2E_CLASS_FILTER) + PhysicalPassPreservationTest (Interrompi labels/state
+map, CONTINUOUS mode, QR flow surface, Italian catalog completeness).
+CHECKPOINT: CP-G4.13-004 (9ab2fa3).
+
+## 2026-11-09 — CP-G4.13-005..008: Model Library rebuild (Block 2)
+
+FINDING: Owner defects — readability, one-row profile forcing with vertical
+letter wrap, raw enums, "Compatibilità: false", ambiguous action hierarchy,
+repeated Altre-azioni noise, raw device identifier.
+ACTION: presentation-only rebuild over the unchanged model authority —
+§13 sections A–G; §14 compact config card (device CLASS via DeviceClassLabel,
+§25); §15/§16 vertical segmented profile cards + honest Local-experimental
+"Why unavailable"; §17–§23 model cards (localized state pills, purpose line,
+size·RAM·language·runtime collapse, §19 typed CompatVerdict 13 kinds,
+§21 ModelActionResolver ONE filled primary per state with the real bodies
+preserved, transfer actions state-gated); §18 StateLabels +16 keys ×5
+locales; §26 pins ModelUxSemanticsTest; 26 dead keys removed;
+MODEL_LIBRARY_BEFORE_AFTER_GRAPH413.md.
+CHECKPOINT: CP-G4.13-005/006/007 (7e0abc7) + CP-G4.13-008 (bd0f5af).
+
+## 2026-11-09 — CP-G4.13-009..011: Central Tower refoundation (Block 3)
+
+FINDING: CENTRAL_TOWER_GRAPH412_VISUAL_OWNER_REJECTED (flat scaffold, thin
+columns, detached sign, small core, empty upper area).
+ACTION: three original candidates (A citadel / B mechanical / C mobile) on
+ONE §36 13-layer stage via gen_g413_tower.py; three resolution tiers
+(LOW ≈9.8MB ≤12, BALANCED ≈21.4MB ≤24, HIGH optional); §37 defect gates ALL
+PASS (verify_g413_tower.py); independent visual comparison → A selected
+(Owner-reference fidelity first); 4.12 assets retired; ReforgedTowerVisual
+rewritten (tier-aware staged decode, §39 state truth verbatim, LOW reduced-
+not-zero ring animation, §38 keyboard collapse preserved); render pack +
+INTEGRATION_MANIFEST.json (SHA-256 per asset).
+CHECKPOINT: CP-G4.13-009/010/011 (d104f53).
+
+## 2026-11-09 — CP-G4.13-012/013: regression + version + APKs + packages
+
+ACTION: final regression (unit 472/472, lint 0 err/82 warnings all
+classified — BELOW the 84 baseline, 0 newly introduced; secret scan 0);
+version 0.3.6-alpha-graph4.13-visual-accessibility / code 9 / label OWNER
+VISUAL ACCESSIBILITY PACKAGE 6; arm64/universal/x86_64 APKs hashed;
+OWNER_TOWER_VISUAL_PACKAGE_GRAPH413.md +
+OWNER_POCO_XIAOMI_RETEST_PACKAGE_6_GRAPH413.md; governance convergence.
+CHECKPOINT: CP-G4.13-012/013 (9d4f3d0) → push + fresh read-back.
+NEXT: CI arbitration at the tip; Owner physical retest per Package 6
+(OWNER_VISUAL_RETEST_PENDING — the terminal physical state stays Owner-only).

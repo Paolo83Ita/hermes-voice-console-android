@@ -355,3 +355,48 @@ Current terminal state: POCO_XIAOMI_RETEST_PACKAGE_3_READY (physical verdict = O
 - Forbidden tokens remain UNCLAIMED (grader never self-grants):
   POCO_XIAOMI_…_RETEST_PASSED, ITALIAN_TTS_OWNER_VERIFIED,
   VOICE_SWITCHING_OWNER_VERIFIED, RESPONSIVE_UI_QUALIFIED, REAL_TOWER_PAIRING_PASSED.
+
+---
+
+# GRAPH 4.13 TRUTH (appended 2026-11-09; additive)
+
+- Branch: graph-4/real-voice-pairing-archive-e2e. Fresh read-back at
+  CP-G4.13-001: local was behind 42 → ff-only to 4b8bfb2 (remote tip,
+  CP-G4.12-016 R-49). main untouched; no force-push; tree clean.
+- Implementation boundary reached: **GRAPH413_OWNER_VISUAL_ACCESSIBILITY_PACKAGE_READY**
+  (this commit chain: 19eb7e2 read-back+findings → 62767b3 audit+semantic
+  authority → 9ab2fa3 screenshot+preservation gates → 7e0abc7 Model Library →
+  bd0f5af before/after pack → d104f53 Tower refoundation → 9d4f3d0 version/APKs).
+- Physical PASS preservation (preliminary, Owner-granted): Italian response,
+  continuous listening, unified Interrompi, QR scanner open — preserved and
+  regression-gated (PhysicalPassPreservationTest); no architecture added
+  around them.
+- Contrast: APP_WIDE_RENDERED_CONTRAST_AUDIT_GRAPH413.{json,md} — PRE-REPAIR
+  evidence 82 rows / 11 FAIL (M3 default disabled labels 1.43–2.09:1;
+  Marble-mode prose on the always-obsidian shell 1.16–3.12:1); LIVE semantic
+  authority 50 rows / 0 FAIL in BOTH themes; 25-token §6 authority in
+  HermesColors (two measured palettes, §7 anchors); §5 disabled contract via
+  Hermes control wrappers; pinned by SemanticContrastAuthorityTest.
+- Model Library: §13–§27 presentation rebuild over the UNCHANGED model
+  authority (no second registry); sections A–G; vertical profile cards with
+  honest Local-experimental state; typed compatibility verdicts; ONE filled
+  primary action per card (§21); raw enums eliminated (StateLabels +16 keys
+  ×5 locales, parity-tested); device CLASS label in ordinary UI (§25).
+- Tower: CENTRAL_TOWER_GRAPH412_VISUAL_OWNER_REJECTED → retired from res;
+  MONUMENTAL ORACLE CITADEL (candidate A of A/B/C, §36 13-layer contract,
+  ONE 1000×1375 stage) integrated with LOW (≈9.8MB)/BALANCED (≈21.4MB)
+  asset tiers, §37 defect gates ALL PASS, §39 state truth preserved,
+  §24 staged decode retained, §38 keyboard collapse preserved.
+- Tests: unit **472/472** GREEN (450 baseline + 4 semantic-contrast pins +
+  7 physical-pass gates + 11 model-UX pins, minus… net as measured);
+  lint **0 errors / 82 warnings** (below the 84 baseline; every warning
+  classified; 0 newly introduced); secret scan 0 (tree+history);
+  compileDebugAndroidTestKotlin GREEN (screenshot matrix + visual gates).
+- Version: **0.3.6-alpha-graph4.13-visual-accessibility / versionCode 9**,
+  label OWNER VISUAL ACCESSIBILITY PACKAGE 6; three validation APKs hashed
+  (arm64 3b79b7c6…bcaa, universal da8a0ee1…1662, x86_64 a2e3cea8…d21c).
+- Explicitly NOT true yet: E2E green (the R-42..R-49 harness-anchor line
+  continues; crash family stays eliminated); physical visual retest —
+  **OWNER_VISUAL_RETEST_PENDING**; the terminal physical state
+  OWNER_VISUAL_ACCESSIBILITY_AND_MODEL_LIBRARY_RETEST_PASSED is
+  OWNER-ONLY and is NOT granted.

@@ -99,3 +99,14 @@ Test totals (physical, 2026-11-01): 33 `@Test` in 6 classes; 33 executed, 0 fail
 | GRAPH 4.11 Node 4 — Xiaomi responsive pass | ResponsiveLayoutContractTest (§19/§22/§23 + Xiaomi classification) VERIFIED, no regression | real screenshots remain Owner-capture (ledger) |
 | GRAPH 4.11 Node 5 — central Tower reconstruction from the Owner image | tower_refoundation_g411.py + ASSET_MANIFEST v2 (10/10 sha256) + re-rendered previews + receipts report update | OWNER_VISUAL_RETEST_PENDING |
 | GRAPH 4.11 Node 6 — Package 4, 0.3.4-alpha-graph4.11 o superiore | versionCode 7 / versionName 0.3.4-alpha-graph4.11 / label POCO XIAOMI OWNER PACKAGE 4; aapt2-verified; APKs hashed | OWNER_POCO_PACKAGE_4_GRAPH411.md runbook |
+
+| G4.13 §4–§7 app-wide accessibility audit + semantic authority | APP_WIDE_RENDERED_CONTRAST_AUDIT_GRAPH413.{json,md}; SemanticContrastAuthorityTest; LIVE 50 rows / 0 FAIL both themes | 62767b3 |
+| G4.13 §5 disabled-state contract | Hermes control wrappers (Chrome.kt) + textDisabled/surfaceDisabled pins ≥3.0 + multi-cue rendering | 62767b3 |
+| G4.13 §9 automated screenshot testing | ScreenshotMatrixTest (16 captures, gates) via E2E_CLASS_FILTER channel | 9ab2fa3 |
+| G4.13 §10 physical PASS preservation | PhysicalPassPreservationTest (Interrompi/continuous/QR/Italian) | 9ab2fa3 |
+| G4.13 §12–§27 Model Library rebuild | ModelManagerScreen + ModelUxComponents + ModelUxSemantics + ModelUxSemanticsTest; MODEL_LIBRARY_BEFORE_AFTER_GRAPH413.md | 7e0abc7, bd0f5af |
+| G4.13 §29–§41 Tower refoundation | docs/visual/tower413/ (candidates, gates ALL PASS, INTEGRATION_MANIFEST, renders); ReforgedTowerVisual; OWNER_TOWER_VISUAL_PACKAGE_GRAPH413.md | d104f53 |
+| G4.13 §42 physical retest package | OWNER_POCO_XIAOMI_RETEST_PACKAGE_6_GRAPH413.md + hashed APKs | 9d4f3d0 |
+| G4.13 §44 version + APKs | 0.3.6-alpha-graph4.13-visual-accessibility / code 9; arm64 3b79b7c6…, universal da8a0ee1…, x86_64 a2e3cea8… | 9d4f3d0 |
+| G4.13 §43 warning classification | LINT_WARNING_CLASSIFICATION.md addendum (0 errors / 82 warnings; 0 newly introduced) | 9d4f3d0 |
+| G4.13 §46 terminality | GRAPH413_OWNER_VISUAL_ACCESSIBILITY_PACKAGE_READY reached; OWNER_VISUAL_RETEST_PENDING (physical grant Owner-only) | this convergence |

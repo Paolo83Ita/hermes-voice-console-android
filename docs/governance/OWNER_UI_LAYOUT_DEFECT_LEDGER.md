@@ -197,3 +197,19 @@ Device: POCO X6 PRO — 6.67", 2712×1220 px, ~446 dpi → canonical width ≈ 3
 | Root-cause hypothesis | `ICON_SEMANTIC_COLLISION`: pre-repair, the privacy-mute medallion renders `Icons.Filled.Mic` when NOT muted and the push-to-talk medallion renders `Icons.Filled.Mic` when idle — two adjacent controls with the SAME symbol; the stop-speaking medallion ALSO renders `Icons.Filled.Stop`, the same symbol as the listening push-to-talk. Three controls share two symbols |
 | Fix | distinct visual vocabulary: push-to-talk = Mic (idle) / waveform (listening) labeled "Parla"/"Interrompi ascolto"; privacy mute = MicOff in a red-bronze seal with persistent "Microfono disattivato" text when engaged; stop-speaking = VolumeUp/waveform labeled "Interrompi voce" (never a microphone icon for TTS playback); unique contentDescriptions + stateDescription per control |
 | Verification status | REPAIRED_IN_CODE (ConsoleControlSemantics; unit-tested uniqueness in every state; physical re-check next cycle) — MICROPHONE_CONTROL_SEMANTICS_REPORT.md |
+
+## GRAPH 4.13 (2026-11-09) — Owner visual findings → disposition
+
+| Owner finding (§3/§0) | Repair | State |
+| --- | --- | --- |
+| device info almost black on dark panel | semantic tokens on theme-aware shell/panels; measured ≥13.65:1 primary | REPAIRED (audited + pinned) |
+| profile buttons forced into one row; "Local experimental" vertical wrap | §15 vertical segmented cards; g413_17 width gate | REPAIRED (gate wired) |
+| config card excessive empty space | §14 compact 9-row key-value card | REPAIRED |
+| low-contrast gray metadata | textTechnical ≥4.5:1 measured | REPAIRED |
+| raw enum values in UI | StateLabels rendering + §26 parity pin | REPAIRED (test-pinned) |
+| "Compatibilità: false" without reason | §19 typed CompatVerdict 13 kinds | REPAIRED (test-pinned) |
+| action buttons ambiguous / Verify prominent wrongly | §21 resolver: one filled primary per state | REPAIRED (test-pinned) |
+| repeated "Altre azioni" noise | single More-actions overflow per card | REPAIRED |
+| Tower rejected (flat scaffold, detached sign, small core, empty top) | §29–§41 refoundation (candidate A), gates ALL PASS | REPLACED — Owner retest pending |
+| Marble Light unreadable (audited) | theme-aware shell + marble semantic palette | REPAIRED (audited + pinned) |
+| M3 disabled labels <3:1 (audited) | §5 wrappers + disabled tokens ≥3.0 with cues | REPAIRED (audited + pinned) |
