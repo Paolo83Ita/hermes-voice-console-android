@@ -17,10 +17,11 @@ android {
         applicationId = "com.hermestower.voiceconsole"
         minSdk = 30
         targetSdk = 35
-        // GRAPH 4.12 (§36): the PHYSICAL REPAIR 4 build MUST exceed the shipped
-        // 0.3.4-alpha-graph4.11 / versionCode 7 (POCO OWNER PACKAGE 4).
-        versionCode = 8
-        versionName = "0.3.5-alpha-graph4.12-physical-repair"
+        // GRAPH 4.13 (§44): OWNER VISUAL ACCESSIBILITY PACKAGE 6 MUST exceed
+        // 0.3.5-alpha-graph4.12-physical-repair / versionCode 8 (the fresh
+        // remote-tip identity at CP-G4.13-001).
+        versionCode = 9
+        versionName = "0.3.6-alpha-graph4.13-visual-accessibility"
         testInstrumentationRunner = "androidx.test.runner.AndroidJUnitRunner"
 
         // OWNER PHYSICAL RETEST §1 (build provenance): authoritative build
@@ -42,7 +43,7 @@ android {
         buildConfigField("String", "BUILD_TIMESTAMP_ISO8601", "\"$buildStamp\"")
         buildConfigField("String", "BUILD_WORKFLOW_RUN_ID", "\"$ciRun\"")
         buildConfigField("String", "BUILD_WORKFLOW_REF", "\"$ciRef\"")
-        buildConfigField("String", "BUILD_LABEL", "\"${project.findProperty("hermes.buildLabel") ?: "POCO XIAOMI OWNER PACKAGE 4"}\"")
+        buildConfigField("String", "BUILD_LABEL", "\"${project.findProperty("hermes.buildLabel") ?: "OWNER VISUAL ACCESSIBILITY PACKAGE 6"}\"")
     }
 
     // GRAPH 4 FINAL §20: DUAL APK OUTPUT — the UNIVERSAL debug APK keeps every
