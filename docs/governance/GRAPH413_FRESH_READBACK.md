@@ -101,3 +101,21 @@ architecture.
 CP-G4.13-002 — app-wide rendered contrast audit (`APP_WIDE_RENDERED_CONTRAST_AUDIT_GRAPH413.{json,md}`),
 then CP-G4.13-003 semantic color authority repair, CP-G4.13-004 screenshot test
 foundation, then Block 2 / Block 3 in the §47 execution order.
+
+## 7. Deployment read-back (post-push, 2026-11-09)
+
+- Pushed `4b8bfb2..e4774eb` (8 commits, forward-only; ls-remote tip =
+  `e4774eb4d23a1f2f34611811c00c425266c37b63` = local HEAD; tree clean 0;
+  main untouched; no force-push; no history rewrite).
+- CI at the new tip: `android-debug-build` run **42531340581 completed
+  SUCCESS** — artifacts: debug-apk bundle (1,711,110 zip-B), lint report,
+  test results; JUnit XML independently parsed: **472 tests / 0 failures /
+  0 errors** — CI-side verification of the Graph 4.13 suite at the tip.
+- `android-e2e` run **42531340604** in flight at write time (dual-lane
+  emulator fleet; the standing typed R-42..R-49 line arbitrates
+  autonomously — missing evidence is NOT success; its verdict is recorded
+  by the standing verification loop without a blocking claim here).
+- State at convergence: **GRAPH413_OWNER_VISUAL_ACCESSIBILITY_PACKAGE_READY**
+  with `OWNER_VISUAL_RETEST_PENDING`; the physical terminal state
+  `OWNER_VISUAL_ACCESSIBILITY_AND_MODEL_LIBRARY_RETEST_PASSED` remains
+  Owner-only and is NOT claimed.
