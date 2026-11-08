@@ -1735,3 +1735,30 @@ NEXT: Owner installs the CI arm64 APK and runs the Package 4 runbook; remaining 
 8. Regression 450/450 GREEN; lint 0 errors; secret scan 0 findings.
 9. APKs built locally (validation): universal/arm64/x86_64 @ versionCode 8.
 10. Retest package 5 runbook written; governance appended additively.
+
+## 2026-11-08 — GRAPH 4.12 CONTINUATION: close-out E2E verdict + typed repairs R-42..R-45 (CP-G4.12-011)
+
+FINDING: fresh read-back at resume — remote tip 23929f1 (36 commits beyond the local
+snapshot), ff-only advance, no live executor processes in the backend; the close-out's
+in-flight android-e2e run 42420686751 (@ 979e5ef) TERMINAL FAILURE and the close-out-push
+run 42421301291 (@ 23929f1) FAILURE — all four lanes E2E_VERDICT_FAILED; lane artifacts
+downloaded (4 × results + verdicts) and classified: 12 findings → 4 typed classes
+(R-42 inject drift product-proven in ConsoleScreen.kt §18 DropdownMenu; R-43 45 s
+relaunch tolerance ×4 samples; R-44 60 s master-idling policy at the recreate call
+site; R-45 the destroy-time INITIALIZED→DESTROYED crash — dominant, regression classes
+included). Recovery path (c) navigation-upgrade CLOSED with source evidence (2.8.5 AND
+2.10.2 latest dispatch ON_DESTROY unconditionally; Google sibling = intended behavior).
+ACTION: harness-only typed repairs — gateClickByText + REAL "Altre azioni → menu item"
+inject walk (A2/B); relaunch tolerance 45 s→120 s (typed message unchanged); per-attempt
+240 s policy re-apply in gateRecreateSteadily; bounded gateSettleNavigationBeforeRecreate
+(30 s cap, two-poll stability proof) before every drawer-anchored locale recreation.
+No test deleted, skipped or weakened; no app product code changed; no assertion touched.
+Local verification (Temurin 17 + SDK 35 reinstalled in the recycled sandbox): compile
+GREEN, unit 450/450, lint 0 errors / 84 warnings (pre-existing classifications),
+secret scan 0 findings (tree + history).
+CHECKPOINT: CP-G4.12-011 → CI arbitrates at the new tip; pre-device state
+POCO_XIAOMI_PHYSICAL_REPAIR_PACKAGE_READY unchanged (physical verdicts Owner-only,
+runbook OWNER_POCO_XIAOMI_RETEST_PACKAGE_5_GRAPH412.md).
+NEXT: CI read-back at the pushed tip; if the fleet turns the repairable classes green
+the crash-class evidence becomes cleanly attributable; Owner physical retest per the
+package 5 runbook.

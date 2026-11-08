@@ -221,6 +221,16 @@ fun HermesComposeRule.gateEnsureBaseline() {
 fun HermesComposeRule.gateRecreateSteadily() {
     val backoffsMs = longArrayOf(10_000, 30_000)
     for (attempt in backoffsMs.indices) {
+        // R-44 (run 42420686751 sample 1 @ 979e5ef): gate A1 threw
+        // AppNotIdleException "Looped for 1 iterations over 60 SECONDS" although
+        // gateEnsureBaseline had raised the master/idling policies to 240 s —
+        // the raise does not reliably govern every ActivityScenario.recreate()
+        // call site on the starved fleet. Co-locate the raise with the call:
+        // re-apply it before EVERY attempt (idempotent, zero-cost, fresh policy
+        // instances each time). The recreate must still SUCCEED for the REAL
+        // walk; only the idle tolerance changes (R-7/R-16 evidence precedent).
+        IdlingPolicies.setMasterPolicyTimeout(240, TimeUnit.SECONDS)
+        IdlingPolicies.setIdlingResourceTimeout(240, TimeUnit.SECONDS)
         try {
             activityRule.scenario.recreate()
             return
@@ -229,11 +239,61 @@ fun HermesComposeRule.gateRecreateSteadily() {
         }
     }
     // Third and last attempt: its failure is the honest typed outcome.
+    IdlingPolicies.setMasterPolicyTimeout(240, TimeUnit.SECONDS)
+    IdlingPolicies.setIdlingResourceTimeout(240, TimeUnit.SECONDS)
     activityRule.scenario.recreate()
 }
 
-/** NAVIGATION DEFECT R-1: never recreate() while a locale relaunch is in flight. */
-fun HermesComposeRule.gateSwitchLocaleAndAwait(code: String, timeoutMs: Long = 45_000) {
+/**
+ * R-45 (runs 42420686751 + 42421301291 @ 979e5ef/23929f1 — the destroy-time
+ * INITIALIZED→DESTROYED crash class): an entry pushed by a navigation whose
+ * promotion never completed stays INITIALIZED; the destroy dispatch
+ * (ReportFragment.onActivityPreDestroyed → NavController lifecycleObserver →
+ * entry.handleLifecycleEvent(ON_DESTROY)) then crashes the process. The
+ * library dispatch is UNCONDITIONAL through navigation 2.10.2 (latest stable,
+ * source-verified: navigation-runtime NavControllerImpl.kt line ~151) and
+ * Google holds the sibling family as intended behavior — so the harness must
+ * not trigger a recreation while a navigation transition is still in flight.
+ * This typed bounded settle waits until the CURRENT composition is stable
+ * (the drawer anchor — either locale — or the root bounds unchanged across
+ * two consecutive polls) BEFORE AppLanguage.apply triggers the system
+ * recreation. Bounded 30 s; never fails the walk by itself — if the settle
+ * cannot prove stability the REAL relaunch await below still decides, with
+ * its unchanged typed error. Nothing is skipped or weakened.
+ */
+fun HermesComposeRule.gateSettleNavigationBeforeRecreate() {
+    val enDesc = ItalianGate.localizedString(R.string.nav_open_drawer, "en")
+    val itDesc = ItalianGate.localizedString(R.string.nav_open_drawer, "it")
+    val deadline = System.currentTimeMillis() + 30_000
+    var lastAnchorBounds: androidx.compose.ui.geometry.Rect? = null
+    var lastRootBounds: androidx.compose.ui.geometry.Rect? = null
+    while (System.currentTimeMillis() < deadline) {
+        val root = gateRootBounds()
+        val anchorBounds = runCatching {
+            (onAllNodesWithContentDescription(enDesc, substring = true).fetchSemanticsNodes() +
+                onAllNodesWithContentDescription(itDesc, substring = true).fetchSemanticsNodes())
+                .firstOrNull()?.boundsInRoot
+        }.getOrDefault(null)
+        val anchorStable = anchorBounds != null && anchorBounds == lastAnchorBounds
+        val rootStable = anchorBounds == null && root != androidx.compose.ui.geometry.Rect.Zero && root == lastRootBounds
+        if (anchorStable || rootStable) return
+        lastAnchorBounds = anchorBounds
+        lastRootBounds = root
+        Thread.sleep(250)
+    }
+    // 30 s without a stable proof: proceed — the REAL relaunch await decides.
+}
+
+/**
+ * NAVIGATION DEFECT R-1: never recreate() while a locale relaunch is in flight.
+ * R-43 (runs 42420686751 + 42421301291 @ 979e5ef/23929f1 — 4 typed samples:
+ * gates C/D/F "relaunch not observed within 45000 ms"): the 45 s relaunch
+ * window measured on healthier fleets cannot absorb the starved fleet's
+ * recreate+settle physics — the SAME runs measured 550–600 s per gate-class
+ * invocation. Tolerance raised to 120 s (R-7/R-16 evidence precedent); the
+ * typed failure message and anchor check are UNCHANGED.
+ */
+fun HermesComposeRule.gateSwitchLocaleAndAwait(code: String, timeoutMs: Long = 120_000) {
     val ctx = InstrumentationRegistry.getInstrumentation().targetContext
     val wizardVisible = runCatching {
         onAllNodesWithText(
@@ -249,6 +309,11 @@ fun HermesComposeRule.gateSwitchLocaleAndAwait(code: String, timeoutMs: Long = 4
         ItalianGate.localizedString(R.string.ob_title, code)
     } else {
         ItalianGate.localizedString(R.string.nav_open_drawer, code)
+    }
+    if (!wizardVisible) {
+        // R-45: the drawer-anchored variant recreates while the product's
+        // navigation may still be settling — run the typed settle first.
+        gateSettleNavigationBeforeRecreate()
     }
     AppLanguage.apply(ctx, code)
     val deadline = System.currentTimeMillis() + timeoutMs
@@ -592,6 +657,26 @@ fun HermesComposeRule.gateLeaveScannerBack(expectedReturnAnchor: String) {
 fun HermesComposeRule.gateClickByContentDescription(desc: String): Boolean {
     val node = runCatching {
         onAllNodesWithContentDescription(desc, substring = true).fetchSemanticsNodes()
+            .firstOrNull { it.config[SemanticsActions.OnClick]?.action != null }
+    }.getOrNull() ?: return false
+    val click = node.config[SemanticsActions.OnClick]?.action ?: return false
+    androidx.test.platform.app.InstrumentationRegistry.getInstrumentation().runOnMainSync { click() }
+    return true
+}
+
+/**
+ * R-42 (runs 42420686751 + 42421301291 @ 979e5ef/23929f1 — 3 typed samples
+ * "inject control not found or without OnClick (it)"): the Graph 4.10 §18
+ * console hierarchy moved the inject action INSIDE the "Altre azioni"
+ * DropdownMenu — inject_cd is now the menu item's VISIBLE TEXT (not a
+ * contentDescription) and the item exists in the semantics tree only while
+ * the menu is expanded. The text twin of gateClickByContentDescription:
+ * find the node carrying BOTH the text and an OnClick and invoke the action
+ * on the main thread (R-3/R-12 direct-dispatch physics, unchanged).
+ */
+fun HermesComposeRule.gateClickByText(text: String): Boolean {
+    val node = runCatching {
+        onAllNodesWithText(text, substring = true, ignoreCase = true).fetchSemanticsNodes()
             .firstOrNull { it.config[SemanticsActions.OnClick]?.action != null }
     }.getOrNull() ?: return false
     val click = node.config[SemanticsActions.OnClick]?.action ?: return false

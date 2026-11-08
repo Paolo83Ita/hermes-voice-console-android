@@ -256,3 +256,73 @@ runs b0be658/5319da3/543bc2d:
 - TEST-A dispatch @ 3893e88 died BEFORE the script in the runner's own setup (boot
   915,901 ms then Broken pipe (32) on `settings put system screen_off_timeout`, runner
   abort exit 224, zero instrumentation) — E2E_BLOCKED_EMULATOR_ENVIRONMENT.
+
+### GRAPH 4.12 close-out read-back — the in-flight run's terminal verdict + post-repair evidence (2026-11-08)
+
+The Graph 4.12 close-out (commit 23929f1) recorded CI android-e2e run 42420686751
+(@ 979e5ef) as "in flight"; this continuation read its TERMINAL state plus the
+close-out-push run 42421301291 (@ 23929f1 — docs-only delta, same test code):
+
+| Run | Lane | Duration | VERDICT.txt | Gates | Evidence |
+| --- | --- | --- | --- | --- | --- |
+| 42420686751 | sample 1 | 122 min | E2E_VERDICT_FAILED | A: 2 run/2 fail; B: 1/1; C–F: process crashed | artifacts 13597142163 (301 KB) |
+| 42420686751 | sample 2 | 133 min | E2E_VERDICT_FAILED | A: inject; C–E: crashed; F: 45 s relaunch | artifacts 13596919417 |
+| 42421301291 | lane 1 | 126 min | E2E_VERDICT_FAILED | B: inject; C–F: crashed | artifacts 13596979269 |
+| 42421301291 | lane 2 | 145 min | E2E_VERDICT_FAILED | C/D/F: 45 s relaunch; E: crashed | artifacts 13598610316 |
+
+Regression half: E2EOnboardingTest **OK (1 test)** in run 42420686751 sample 1 (the
+REAL six-step wizard walk advances — the A1 step-2-anchor sample in the same lane is
+fleet variance); E2EFreshInstallTest / E2EModelManagerTest / E2ESelfTestTest crashed
+in ALL FOUR lanes with the destroy-time signature.
+
+**Typed failure classes from the lane artifacts (12 findings → 4 classes):**
+
+1. **R-42 — inject-control drift (3 samples + product-code proof).** A2/B fail with
+   `inject control not found or without OnClick (it)`. Root cause PROVEN in product
+   code: the Graph 4.10 §18 console hierarchy moved the inject action INSIDE the
+   "Altre azioni" DropdownMenu (ConsoleScreen.kt ~line 645–660) — `inject_cd` is the
+   menu item's VISIBLE TEXT, not a contentDescription, and the item composes only
+   while the menu is expanded. The R-12 `gateClickByContentDescription` lookup can
+   never match. Repair: the walk follows the REAL product path — `gateClickByText`
+   (text twin of R-12, same OnClick direct-dispatch physics) on "Altre azioni"
+   (`mm_more_actions`), then on the menu item text (`inject_cd`); the dialog anchor
+   (`cd_inject_title`) still decides success. No test deleted, skipped or weakened.
+2. **R-43 — locale-relaunch tolerance (4 samples).** Gates C/D/F:
+   `locale 'it' relaunch not observed within 45000 ms (anchor: 'Apri il pannello di
+   navigazione')` at the class-start switch — the SAME runs measured 550–600 s per
+   gate-class invocation, so the 45 s window cannot absorb the starved fleet's
+   recreate+settle physics. Tolerance raised 45 s → 120 s (R-7/R-16 evidence
+   precedent); the typed message and anchor check unchanged.
+3. **R-44 — 60 s master-idling policy at the recreate call site (1 sample).** A1
+   threw `AppNotIdleException … over 60 SECONDS` although `gateEnsureBaseline`
+   raises the policies to 240 s (R-16) — the raise does not reliably govern every
+   `ActivityScenario.recreate()` call site on the starved fleet. Repair: re-apply
+   the 240 s raise before EVERY attempt inside `gateRecreateSteadily()` (co-located,
+   idempotent; recreate must still succeed; nothing weakened).
+4. **R-45 — destroy-time INITIALIZED→DESTROYED crash (the dominant class).** Same
+   signature as the ledger's long-standing family, now killing gates C/D/E/F AND
+   regression classes FreshInstall/ModelManager/SelfTest across all four lanes,
+   route-independent (settings / model_manager), fired at the en-restore recreate or
+   class teardown. NEW decisive evidence: the Graph 4.12 §5 app-side repairs (atomic
+   onboarding completion, RESUMED-gated navigate, single sanctioned recreation
+   scheduler) did NOT eliminate the emulator-side class. **Recovery path (c)
+   ("navigation-compose upgrade") is CLOSED with source evidence**: the destroy
+   dispatch is UNCONDITIONAL in navigation 2.8.5 (NavBackStackEntry.updateState →
+   `lifecycle.currentState = hostLifecycleState` regardless of INITIALIZED) AND in
+   navigation 2.10.2 — the latest stable (navigation-runtime sources,
+   NavControllerImpl.kt line ~151, `entry.handleLifecycleEvent(event)` for every
+   entry; NavBackStackEntry.kt updateState identical) — and Google holds the sibling
+   family (issuetracker 347169610) as **intended behavior** ("the app is doing
+   something that is keeping the entry from being created"). Executable repair: the
+   harness must not trigger a recreation while a navigation transition is in flight —
+   new typed bounded `gateSettleNavigationBeforeRecreate()` (30 s cap; drawer anchor
+   in either locale or non-zero root bounds stable across two consecutive polls)
+   runs BEFORE `AppLanguage.apply` in the drawer-anchored variant of
+   `gateSwitchLocaleAndAwait`; its failure never fails the walk — the REAL relaunch
+   await still decides with its unchanged typed error.
+
+Local verification at the repair tip: app + androidTest compile GREEN (Temurin 17 +
+SDK 35 reinstalled in the recycled sandbox; one typed fix — `Rect.isUnspecified` →
+explicit `Rect.Zero` comparison), unit battery 450/450, lint 0 errors / 84 warnings
+(all pre-existing main-source classifications, 0 androidTest findings), secret scan
+0 findings (tree + history). The e2e fleet arbitrates the repairs at the new tip.

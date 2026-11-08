@@ -128,3 +128,36 @@ remains the authoritative package (unchanged rule).
 - Terminal pre-device state reached: **POCO_XIAOMI_PHYSICAL_REPAIR_PACKAGE_READY**.
   Physical verdicts remain Owner-only (runbook:
   docs/receipts/OWNER_POCO_XIAOMI_RETEST_PACKAGE_5_GRAPH412.md).
+
+## 9. Continuation read-back (2026-11-08): the close-out's in-flight E2E resolved + typed repairs R-42..R-45
+
+- Fresh remote tip at resume: **23929f1** (close-out) — local fast-forwarded from
+  afefd3d (the Graph 4.12 execution had advanced 36 commits beyond this file's §1
+  snapshot); tree clean; main untouched (e7ab101); no force-push.
+- No executor processes were alive in the backend (fresh sandbox: no gradle, no
+  emulator, no instrumentation). The only live executions were the two CI pairs at
+  979e5ef/23929f1, now TERMINAL: debug-build 42420686766 + 42421301278 SUCCESS
+  (SHA-stamped artifacts); android-e2e **42420686751 + 42421301291 FAILURE** — all
+  four lanes printed E2E_VERDICT_FAILED (157-byte VERDICT.txt artifacts read).
+- Lane evidence downloaded and classified (ledger addendum "GRAPH 4.12 close-out
+  read-back"): 12 findings → 4 typed classes — R-42 inject-control drift (product-
+  proven: the §18 "Altre azioni" DropdownMenu), R-43 45 s relaunch tolerance,
+  R-44 60 s master-idling policy at the recreate call site, R-45 the destroy-time
+  INITIALIZED→DESTROYED crash (dominant; regression classes included).
+- **Recovery path (c) CLOSED with source evidence**: navigation 2.8.5 AND 2.10.2
+  (latest stable) dispatch ON_DESTROY to back-stack entries unconditionally
+  (source-verified from Google Maven sources jars); Google holds the sibling family
+  as intended behavior — an upgrade cannot fix the class; the harness must keep
+  navigation out of the recreation window.
+- Executed typed repairs (harness-only; no test deleted, skipped or weakened;
+  app product code untouched): `gateClickByText` + the REAL "Altre azioni → menu
+  item" inject walk (A2/B); relaunch tolerance 45 s→120 s; per-attempt 240 s policy
+  re-apply in `gateRecreateSteadily`; bounded `gateSettleNavigationBeforeRecreate`
+  before every drawer-anchored locale recreation.
+- Local verification at the repair tip: compile GREEN (JDK 17 + SDK 35 reinstalled),
+  unit 450/450, lint 0 errors / 84 warnings (pre-existing classifications),
+  secret scan 0 findings.
+- The CI fleet arbitrates at the new tip; the pre-device terminal state
+  POCO_XIAOMI_PHYSICAL_REPAIR_PACKAGE_READY remains governed by the runbook
+  docs/receipts/OWNER_POCO_XIAOMI_RETEST_PACKAGE_5_GRAPH412.md (physical verdicts
+  Owner-only).

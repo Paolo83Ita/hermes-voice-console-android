@@ -130,9 +130,20 @@ class ItalianGateA_OnboardingConsoleTest {
             // R-12: direct semantics-action dispatch (R-3 physics) — the gesture
             // click on the medallion row did not compose the dialog on the
             // software emulator (run 41890040629).
-            val injectDesc = ItalianGate.localizedString(R.string.inject_cd, "it")
-            check(compose.gateClickByContentDescription(injectDesc)) {
-                "inject control not found or without OnClick (it)"
+            // R-42 (runs 42420686751 + 42421301291 @ 979e5ef/23929f1 — dump +
+            // product-code-proven): the Graph 4.10 §18 console hierarchy moved
+            // the inject action INSIDE the "Altre azioni" DropdownMenu
+            // (ConsoleScreen.kt) — inject_cd is the menu item's VISIBLE TEXT,
+            // not a contentDescription, and the item composes only when the
+            // menu is expanded. The walk follows the REAL product path:
+            // "Altre azioni" → menu item (text) → the dialog. The dialog
+            // anchor (cd_inject_title) STILL decides success — a click that
+            // does not open the dialog fails the anchor honestly.
+            check(compose.gateClickByText(ItalianGate.localizedString(R.string.mm_more_actions, "it"))) {
+                "more-actions control not found or without OnClick (it)"
+            }
+            check(compose.gateClickByText(ItalianGate.localizedString(R.string.inject_cd, "it"))) {
+                "inject menu item not found or without OnClick (it)"
             }
             compose.gateAwaitAnchor(ItalianGate.localizedString(R.string.cd_inject_title, "it"))
             violations += compose.gateCollectViolations("Console inject dialog", pool)
