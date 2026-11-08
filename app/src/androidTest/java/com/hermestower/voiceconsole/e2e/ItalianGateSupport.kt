@@ -504,7 +504,14 @@ fun HermesComposeRule.gateActivateRow(label: String): Boolean {
         return gateActivateRowAccessible(label) || gateTapLabeledRow(label)
     }
     val click = row.config[SemanticsActions.OnClick]?.action ?: return false
+    // R-48 observability (the "dispatch returned true but the destination never
+    // composed" class — gates C/D/E/F @ 282aa0a, provenance primaryRow=true):
+    // the harness must be able to PROVE whether the dispatched lambda actually
+    // executed (the product's DrawerRow lambda logs route=<x> under HermesNav).
+    // begin/done bracket the runOnMainSync dispatch.
+    android.util.Log.i("HermesNav", "gateActivateRow dispatch begin label=$label")
     androidx.test.platform.app.InstrumentationRegistry.getInstrumentation().runOnMainSync { click() }
+    android.util.Log.i("HermesNav", "gateActivateRow dispatch done label=$label")
     return true
 }
 
@@ -593,7 +600,21 @@ fun HermesComposeRule.gateNavigateTo(labelRes: Int, anchor: String, timeoutMs: L
         // section's engine_row contains "Modelli e voce"), so the await could
         // pass while the hub was never proven. The fallback now awaits the
         // Settings hub TITLE (the hub identity), then looks the row up.
-        gateAwaitAnchor(ItalianGate.localizedString(R.string.settings_title, "it"), timeoutMs = 30_000)
+        try {
+            gateAwaitAnchor(ItalianGate.localizedString(R.string.settings_title, "it"), timeoutMs = 30_000)
+        } catch (e: IllegalStateException) {
+            // R-48: the fallback's hub-anchor wait gets the same provenance
+            // treatment as the final one (gate F's failure class).
+            android.util.Log.i(
+                "HermesNav",
+                "gateNavigateTo HUB anchor failed: primaryRow=$primaryRowFired " +
+                    "accessibleRow=$accessibleRowFired hubRow=$hubRowFired",
+            )
+            error(
+                "${e.message} [R-46b dispatch provenance: primaryRow=$primaryRowFired " +
+                    "accessibleRow=$accessibleRowFired hubRow=$hubRowFired (hub-anchor wait)]",
+            )
+        }
         // R-21: the lookup tries the merged tree first, then the UNMERGED tree
         // (a clickable whose label lives in a non-merged child is still the real
         // control); both lookups are matcher-only — nothing weakened.

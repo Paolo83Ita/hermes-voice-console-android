@@ -445,3 +445,32 @@ residual=3 failed=1, E2E_VERDICT_FAILED.
 All repairs harness-only; no test deleted, skipped or weakened; local verification
 at the repair tip: compile GREEN (one typed fix — UiObject2.click() returns Unit),
 unit 450/450. The arbitration flow governs at the next tip.
+
+### CP-G4.12-015 verdict at 282aa0a (run 42466531206 lane 1, 2026-11-08) + R-48 observability
+
+Debug-build SUCCESS at 282aa0a; e2e lane 1 full sample (125 min): GATE_TALLY 0/6,
+REGRESSION_TALLY ok=2 residual=3 failed=1 (FreshInstall 5/4 typed, ModelManager 5/2,
+SelfTest 3/3, VoiceFlow 6/1 — ALL typed, ZERO crashes for the third consecutive
+sample; residual 7/2 typed), E2E_VERDICT_FAILED. **The R-46 crash-family elimination
+holds on every sample.**
+
+The R-46b provenance delivered the next attribution step: D and E's anchor failures
+carry `primaryRow=true accessibleRow=false hubRow=false` — the drawer-row dispatch
+RETURNED TRUE (runOnMainSync executed) yet the destination never composed and the
+product's own `drawer row navigate route=<x>` HermesNav line is absent for those
+segments — while the segments where the HermesNav line IS present (settings ×5,
+appearance ×2, self_test ×3, tower_studio ×1 across the window) all advanced and the
+hub rows composed (the hub→appearance dispatch fired 4 s after the drawer→settings
+one). The inject menu item ALSO remained not-found through BOTH the compose fetch
+AND the UiDevice cross-window arm — consistent with the same
+"dispatch-true, effect-false" signature (the "Altre azioni" dispatch returned true
+but the menu never opened).
+
+Repair R-48 (observability completion — the pattern that pinned the crash class):
+gateActivateRow's dispatch is now bracketed by HermesNav begin/done logs, so the next
+sample PROVES whether the dispatched lambda executed (if begin/done appear without
+the product's route=<x> log, the dispatched action was a foreign node's OnClick and
+the lookup is the defect; if the product log appears, the navigation itself is the
+defect). The fallback's 30 s hub-anchor wait now carries the same R-46b provenance
+enrichment (gate F's failure class). Harness-only; nothing deleted/skipped/weakened;
+compile GREEN locally.

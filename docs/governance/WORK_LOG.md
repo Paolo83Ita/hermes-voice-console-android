@@ -1789,3 +1789,15 @@ rule construction), the popup-window menu item (→ R-42c UiDevice cross-window 
 ACTION: three harness-only repairs; compile GREEN (UiObject2.click() Unit fix), unit
 450/450; no test deleted/skipped/weakened.
 CHECKPOINT: CP-G4.12-014 → CI arbitrates at the new tip.
+
+## 2026-11-08 — CP-G4.12-015: the crash-family elimination HOLDS + R-48 dispatch observability
+
+FINDING: run 42466531206 lane 1 @ 282aa0a — zero Process-crashed (3rd consecutive
+sample), every class typed; the provenance shows dispatch-true/effect-false on the
+drawer-row segments that fail (primaryRow=true, no product route log, destination
+never composed) versus dispatch-true/effect-true where the HermesNav route log exists;
+the popup menu item missed through both arms (menu never opened — same signature).
+ACTION: R-48 — HermesNav begin/done bracketing of the gateActivateRow dispatch +
+R-46b provenance extended to the fallback hub-anchor wait; compile GREEN.
+CHECKPOINT: CP-G4.12-015 → the next sample decides between foreign-node dispatch and
+navigation-side suppression.
