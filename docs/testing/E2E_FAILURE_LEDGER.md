@@ -399,3 +399,49 @@ double-dispatch second arm folded), and `activateAccessible` (E2ECommon ~207). N
 test deleted, skipped or weakened; the destination/dialog anchors still decide. This
 is the mechanistically exact repair for the fleet's dominant crash class — the
 arbitration flow governs at the next tip.
+
+### R-46 VERDICT at 6bb9d4c (run 42454316277, 2026-11-08) — the crash family is ELIMINATED + repairs R-42c/R-46b/R-47
+
+Run 42454316277 @ 6bb9d4c (the R-46 tip): debug-build 42454316255 SUCCESS; e2e lane 2
+died at the install phase after an 18.4-minute boot (R-17 gate OK, then `adb install`
+failed inside its 900 s bound amid ColorBuffer errors — typed
+E2E_BLOCKED_EMULATOR_ENVIRONMENT, zero instrumentation, no verdict relevance); lane 1
+completed a FULL honest sample (153 min): GATE_TALLY 0/6, REGRESSION_TALLY ok=2
+residual=3 failed=1, E2E_VERDICT_FAILED.
+
+**R-46 verdict (evidence): the off-main-dispatch crash family is GONE.**
+
+- ZERO `shortMsg=Process crashed` anywhere in the lane (pre-repair: 5–9 per run).
+- Gates C/D/E/F: TYPED results (no crash) for the first time since the segmented
+  model; regression FreshInstall/ModelManager/SelfTest/VoiceFlow: typed failures,
+  NO crash; the residual E2EAppearancePersistenceTest RAN COMPLETELY for the first
+  time in the node's history (7 tests, 2 typed failures — it crashed at #3 for five
+  consecutive runs before).
+- The HermesNav diagnostics PROVE the dispatches now run on main: every
+  drawer/hub navigate line carries TID == PID (7337/7337), and the navigations
+  genuinely fire (drawer→settings, hub→appearance, drawer→tower_studio logged).
+
+**Remaining typed classes at this tip (all honest, all repairable):**
+
+1. Gates C/D/E/F: "no anchor of [Impostazioni]/[MODEL SANCTUM]" waits with the
+   console+open-drawer dump — the dispatch-arm provenance was not yet recorded in
+   the typed failure (the logcat tail truncates earlier classes). Repair R-46b: the
+   gateNavigateTo anchor-wait failure now carries the dispatch provenance
+   (primaryRow/accessibleRow/hubRow booleans) INTO the gate file + a HermesNav log.
+2. Gate B: AppNotIdleException "over 60 SECONDS ... MAIN_LOOPER_HAS_IDLED" — the
+   ActivityScenarioRule LAUNCH reads the DEFAULT 60 s master policy (the launch
+   happens inside the rule, BEFORE the test's @Before raise — the R-44/R-16 raises
+   cannot govern it). Repair R-47: the raise co-located at the EARLIEST point — the
+   hermesComposeRule() factory, before the rule's launch.
+3. Gate B (second sample): "inject menu item not found or without OnClick (it)"
+   AFTER the 15 s poll — the M3 DropdownMenu composes in its own POPUP WINDOW the
+   compose-rule fetch cannot traverse on device. Repair R-42c: cross-window
+   UiDevice arm (uiautomator 2.3.0, already in the androidTest catalog) — real tap
+   through the accessibility tree; the compose fetch stays the first arm; the
+   dialog anchor still decides.
+4. Gate A1: the step-2 anchor fleet-variance sample (E2EOnboardingTest regression
+   OK in the same run — the wizard advances; no product defect).
+
+All repairs harness-only; no test deleted, skipped or weakened; local verification
+at the repair tip: compile GREEN (one typed fix — UiObject2.click() returns Unit),
+unit 450/450. The arbitration flow governs at the next tip.

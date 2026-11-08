@@ -1777,3 +1777,15 @@ RESUMED gate, drawer/hub navigate sites, onboarding storePendingRoute,
 MainActivity onCreate/onDestroy) — zero behavior change, zero release impact; the
 next sample carries the pusher evidence. Local: compile GREEN, unit 450/450.
 CHECKPOINT: CP-G4.12-012 → CI arbitrates; pre-device package state unchanged.
+
+## 2026-11-08 — CP-G4.12-014: R-46 verdict + R-42c/R-46b/R-47
+
+FINDING: run 42454316277 @ 6bb9d4c — lane 2 install-phase typed abort; lane 1 full
+sample with ZERO Process-crashed (the R-46 off-main-dispatch repair eliminated the
+entire crash family: gates typed, regression no crashes, residual complete for the
+first time); HermesNav proves main-thread dispatches. Remaining: anchor-wait failures
+without dispatch provenance (→ R-46b), the launch-time 60 s policy leak (→ R-47 at
+rule construction), the popup-window menu item (→ R-42c UiDevice cross-window arm).
+ACTION: three harness-only repairs; compile GREEN (UiObject2.click() Unit fix), unit
+450/450; no test deleted/skipped/weakened.
+CHECKPOINT: CP-G4.12-014 → CI arbitrates at the new tip.

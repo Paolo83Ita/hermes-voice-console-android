@@ -144,7 +144,13 @@ class ItalianGateA_OnboardingConsoleTest {
             }
             // R-42b (run 42438234612 sample 2 @ 3169083): the immediate fetch raced
             // the popup composition — bounded presence-poll before the dispatch.
-            check(compose.gateClickByTextAwait(ItalianGate.localizedString(R.string.inject_cd, "it"))) {
+            // R-42c (run 42454316277 lane 1 @ 6bb9d4c): the M3 DropdownMenu lives in
+            // its own popup window the compose-rule fetch cannot traverse — the
+            // cross-window UiDevice arm taps the item through the accessibility
+            // tree; the dialog anchor still decides success.
+            check(
+                compose.gateClickTextAcrossWindows(ItalianGate.localizedString(R.string.inject_cd, "it")),
+            ) {
                 "inject menu item not found or without OnClick (it)"
             }
             compose.gateAwaitAnchor(ItalianGate.localizedString(R.string.cd_inject_title, "it"))

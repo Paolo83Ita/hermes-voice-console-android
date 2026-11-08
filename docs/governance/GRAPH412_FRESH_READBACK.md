@@ -177,3 +177,16 @@ remains the authoritative package (unchanged rule).
   pusher + MainActivity lifecycle).
 - The pre-device terminal state POCO_XIAOMI_PHYSICAL_REPAIR_PACKAGE_READY remains
   governed by the package-5 runbook (physical verdicts Owner-only).
+
+## 11. CP-G4.12-013/014 read-back (2026-11-08): the crash family ELIMINATED
+
+- Push a21d05c..6bb9d4c (R-46) verified forward-only; main untouched (e7ab101).
+- CI at 6bb9d4c: debug-build 42454316255 SUCCESS; e2e 42454316277 — lane 2 install-phase
+  typed abort (18.4 min boot, ColorBuffer; zero instrumentation), lane 1 FULL sample:
+  **ZERO Process-crashed anywhere** (pre-repair: 5–9 per run); gates C/D/E/F typed;
+  the residual class ran COMPLETELY for the first time (7 tests, 2 typed failures);
+  HermesNav diagnostics prove all dispatches on main (TID == PID).
+- Remaining typed classes → repairs shipped in one commit: R-46b (dispatch provenance
+  into the gate files), R-47 (240 s policy at rule construction — the launch's onIdle
+  read the default 60 s), R-42c (cross-window UiDevice tap for the popup menu item).
+- Arbitration governs at the next tip.

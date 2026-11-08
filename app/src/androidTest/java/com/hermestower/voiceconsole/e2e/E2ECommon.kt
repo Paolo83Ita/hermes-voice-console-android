@@ -55,6 +55,18 @@ val ciLifecycleProfileRequested: Boolean = run {
 fun hermesComposeRule(): HermesComposeRule {
     val profileRequested = ciLifecycleProfileRequested
     check(!profileRequested || System.getProperty(MainActivity.CI_LIFECYCLE_PROFILE_PROPERTY) == "true")
+    // R-47 (run 42454316277 lane 1 @ 6bb9d4c — gate B AppNotIdleException "over 60
+    // SECONDS" at an espresso idle sync although gateEnsureBaseline raises the
+    // policies to 240 s in @Before): ActivityScenarioRule LAUNCHES the activity
+    // inside the rule — BEFORE the test's @Before runs — and the launch's own
+    // Espresso.onIdle() reads the DEFAULT 60 s master policy. Under the starved
+    // fleet the launch-time AsyncTask drain can exceed 60 s. Co-locate the R-16
+    // raise with the EARLIEST possible point: rule construction (this factory
+    // runs before the rule's @Before launch), so every launch/recreate idle sync
+    // reads the raised policy. Same tolerance, same evidence precedent (R-7/R-16);
+    // nothing is skipped or weakened.
+    androidx.test.espresso.IdlingPolicies.setMasterPolicyTimeout(240, java.util.concurrent.TimeUnit.SECONDS)
+    androidx.test.espresso.IdlingPolicies.setIdlingResourceTimeout(240, java.util.concurrent.TimeUnit.SECONDS)
     // GRAPH 4 directive §6: the suite tests the CONSOLE product path — preset the
     // onboarding-done flag so the first-launch wizard does not cover the
     // documented anchors. E2EOnboardingTest explicitly clears it to exercise the

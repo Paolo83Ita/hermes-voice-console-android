@@ -567,14 +567,27 @@ fun HermesComposeRule.gateNavigate(labelRes: Int, anchorRes: Int, timeoutMs: Lon
 /** Same product path with a LITERAL anchor (invariant identities: HERMES, MODEL SANCTUM). */
 fun HermesComposeRule.gateNavigateTo(labelRes: Int, anchor: String, timeoutMs: Long = 60_000) {
     val label = ItalianGate.localizedString(labelRes, "it")
+    // R-46b observability: the anchor-failure class (gates C/D/E/F @ 6bb9d4c —
+    // typed "no anchor" waits with the console still composed) needs the
+    // dispatch provenance IN the typed failure: which arm fired. The log
+    // carries it for the logcat artifact; the enriched error carries it into
+    // the gate file (per-class evidence, immune to logcat-tail truncation).
+    var primaryRowFired = false
+    var accessibleRowFired = false
+    var hubRowFired = false
     gateOpenDrawer()
     // R-37: the gate's own activation first, then the CLOUD-PROVEN accessible
-    // dispatch from the regression suite (same matcher + direct OnClick call —
+    // dispatch from the regression suite (same matcher + OnClick dispatch —
     // E2EModelManagerTest green on this fleet in every sample). The hub
     // fallback below is unchanged; the destination anchor still decides.
-    if (!gateActivateRow(label) && !gateActivateRowAccessible(label)) {
+    if (gateActivateRow(label)) {
+        primaryRowFired = true
+    } else if (gateActivateRowAccessible(label)) {
+        accessibleRowFired = true
+    } else {
         val settingsLabel = ItalianGate.localizedString(R.string.dest_settings, "it")
         check(gateActivateRow(settingsLabel)) { "Settings row missing from drawer (it)" }
+        primaryRowFired = true
         // R-21 (run 41990077345 @ e89d014): the fallback used to await the ROW
         // label itself — but hub body text can contain the same words (the VOICE
         // section's engine_row contains "Modelli e voce"), so the await could
@@ -603,10 +616,12 @@ fun HermesComposeRule.gateNavigateTo(labelRes: Int, anchor: String, timeoutMs: L
                 androidx.test.platform.app.InstrumentationRegistry.getInstrumentation().runOnMainSync { click() }
             }.isSuccess
             check(dispatched) { "settings-hub row '$label' OnClick dispatch failed (it)" }
+            hubRowFired = true
         } else if (gateActivateRowAccessible(label)) {
             // R-37: the proven accessible dispatch found a clickable node the
             // OnClick-filtered onAllNodesWithText lookup missed (the matcher
             // difference: hasText matches ContentDescription-carrying rows too).
+            accessibleRowFired = true
         } else {
             // R-26 + R-35 + R-40: the last-mile fallback is the REAL user path —
             // ONE physical tap at the center of the ON-SCREEN node whose text
@@ -619,9 +634,24 @@ fun HermesComposeRule.gateNavigateTo(labelRes: Int, anchor: String, timeoutMs: L
                 "settings-hub row '$label' not found (it); visible texts: " +
                     gateVisibleTexts().take(40)
             }
+            hubRowFired = true
         }
     }
-    gateAwaitAnchor(anchor, timeoutMs = timeoutMs)
+    try {
+        gateAwaitAnchor(anchor, timeoutMs = timeoutMs)
+    } catch (e: IllegalStateException) {
+        // R-46b: the provenance rides INTO the gate file (per-class evidence,
+        // immune to logcat-tail truncation) — which dispatch arm fired.
+        android.util.Log.i(
+            "HermesNav",
+            "gateNavigateTo anchor '$anchor' failed: primaryRow=$primaryRowFired " +
+                "accessibleRow=$accessibleRowFired hubRow=$hubRowFired",
+        )
+        error(
+            "${e.message} [R-46b dispatch provenance: primaryRow=$primaryRowFired " +
+                "accessibleRow=$accessibleRowFired hubRow=$hubRowFired]",
+        )
+    }
     // R-10 (run 41868118783, gate C hang): the unconditional waitForIdle here
     // waited on the infinite Oracle Core animation and consumed the whole gate
     // invocation budget (runCatching catches exceptions, NOT hangs). Replaced
@@ -712,5 +742,33 @@ fun HermesComposeRule.gateClickByTextAwait(text: String, timeoutMs: Long = 15_00
         Thread.sleep(250)
     }
     return false
+}
+
+/**
+ * R-42c (run 42454316277 lane 1 @ 6bb9d4c — gate B still failed the menu-item
+ * step after the R-42b 15 s poll: "inject menu item not found or without OnClick
+ * (it)"): the M3 DropdownMenu composes in its own POPUP WINDOW, which the
+ * compose test rule's semantics fetch does not traverse on device — polling
+ * longer cannot see it. The cross-window REAL user path: the item IS visible
+ * to the accessibility tree (UiDevice sees every window), so dispatch a real
+ * tap at the item's bounds via UiDevice. First arm unchanged (the compose
+ * fetch wins whenever the popup shares the window); the dialog anchor
+ * (cd_inject_title) still decides success — a tap that does not open the
+ * dialog fails the anchor honestly. Nothing skipped or weakened.
+ */
+fun HermesComposeRule.gateClickTextAcrossWindows(text: String, timeoutMs: Long = 15_000): Boolean {
+    if (gateClickByTextAwait(text, timeoutMs)) return true
+    return runCatching {
+        val device = androidx.test.uiautomator.UiDevice.getInstance(
+            androidx.test.platform.app.InstrumentationRegistry.getInstrumentation(),
+        )
+        val item = device.findObject(androidx.test.uiautomator.By.text(text))
+        if (item != null) {
+            item.click()
+            true
+        } else {
+            false
+        }
+    }.getOrDefault(false)
 }
 
