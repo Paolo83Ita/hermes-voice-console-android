@@ -1973,3 +1973,36 @@ CHECKPOINT: CP-G4.14-002/003 (decisions) — integration code follows in the
 §6 order.
 NEXT: runtime integration code (Silero engine, LLM runtime, catalog truth,
 capability states §7).
+
+## 2026-11-09 — CP-G4.14-002/003/005 (integration): runtimes completed in §6 order
+
+FINDING: two download-exposed-but-unusable components + one stale catalog
+label + incomplete §7 state machine.
+ACTION (code): (1) SileroVadEngine — REAL Silero v5.1.2 VAD on the existing
+ORT seam (graph IO verified by onnx inspection this mission: input/state/sr
+→ output/stateN), typed fallback to EnergyVadEngine, 5 JVM tests (windowing,
+state threading, hysteresis/hangover, typed failure, sample-rate guard);
+AppGraph: primary VAD = sileroVadIfDelivered() ?: EnergyVadEngine. (2) LLM
+terminal decision implemented — LlamaNativeBridge seam + LlamaRealNativeBridge
+(the ONLY class touching dev.ffmpegkit.llama) + LlamaCppAndroidRuntime
+(idempotent load/unload, typed failures, verbatim runtime identity); gradle
+pin llama-android 0.1.1 (Maven Central, MIT, llama.cpp b9878, arm64-v8a,
+minSdk 24, AAR sha256 fdccf04c…7501); AppGraph injects the real runtime;
+6 JVM tests incl. engine end-to-end (enabled → integrity → LOADED →
+fromModel reply → unload). NoVerifiedLlmRuntime retained as typed fallback.
+(3) Catalog truth: sherpa entry CANDIDATE_PENDING_DISCOVERY → RUNTIME_BUNDLED
+(stale 2026-11-04 label superseded by verified CP-G4.9-003 AAR evidence;
+VoicePackInstallerTest honesty assertion retargeted with evidence, wake-word
+gap pin strengthened); piper/qwen runtimeRequirement → INTEGRATED strings;
+probe fixture filtered from ordinary family cards (REMOVE decision). (4)
+§7 state machine completed: +NOT_AVAILABLE/DISCOVERED/DOWNLOAD_ALLOWED/
+RUNTIME_RESOLVED/ACTIVE_READBACK_VERIFIED/REMOVED (18 states; no-skip rules
+preserved; ACTIVE→ACTIVE_READBACK_VERIFIED gate added); StateLabels +4 keys
+×5 locales (parity-pinned). (5) MODEL_RUNTIME_END_TO_END_RECEIPT.json —
+honest split: sandbox-verified identity/hash/bytes/ABI vs typed
+PENDING_DEVICE fields (no fabricated loads).
+TEST: compile GREEN; unit 483/483 (472 baseline + 11 new); no test deleted,
+skipped or weakened; one honesty assertion retargeted WITH evidence.
+CHECKPOINT: CP-G4.14-002/003 integration + CP-G4.14-005 code — the terminal
+LLM decision doc lands with the CI-green read-back.
+NEXT: Bridge state authority (CP-G4.14-004) + LLM decision doc.

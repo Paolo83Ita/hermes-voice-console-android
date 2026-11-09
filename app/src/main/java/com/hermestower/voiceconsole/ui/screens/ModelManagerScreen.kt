@@ -361,7 +361,12 @@ fun ModelManagerScreen(graph: AppGraph) {
             com.hermestower.voiceconsole.models.ModelComponentType.LOCAL_LLM to R.string.mm_section_e2,
             com.hermestower.voiceconsole.models.ModelComponentType.TTS_ENGINE to R.string.mm_section_c2,
         ).distinctBy { it.first }.groupBy({ it.second }, { it.first }).forEach { (titleRes, types) ->
-            val familyEntries = graph.modelCatalog.all().filter { it.componentTypeEnum() in types }
+            // GRAPH 4.14 §5 (REMOVE decision): the deterministic probe fixture is
+            // pipeline-qualification evidence, never an ordinary product card —
+            // it stays reachable through the Diagnostics probe flow by identity.
+            val familyEntries = graph.modelCatalog.all()
+                .filter { it.componentTypeEnum() in types }
+                .filter { it.entryClassification != "TEST_FIXTURE_ONLY" }
             if (familyEntries.isEmpty()) return@forEach
             SectionCard(title = stringResource(titleRes)) {
             familyEntries.forEach { entry ->

@@ -20,6 +20,10 @@ voskAndroid = "0.3.75"
 # session: arm64-v8a/armv7/x86/x86_64 JNI + OfflineTts API, minSdk 21, Apache-2.0;
 # AAR sha256 ad052d51309f2d4caa688fe2394192e844223d7a861eae974429563df9416c7e).
 sherpaOnnx = "v1.12.24"
+# GRAPH 4.14 §9 (CP-G4.14-005): verified Android llama.cpp runtime — Maven Central,
+# MIT, llama.cpp b9878 (submodule 2da6686), arm64-v8a JNI, minSdk 24. AAR inspected
+# in-sandbox: sha256 fdccf04c77de470004d7e54679bb918074ee9dbf31ea75af8c014d19c31e7501.
+llamaAndroid = "0.1.1"
 junit = "4.13.2"
 androidxTestExtJunit = "1.2.1"
 androidxTestRunner = "1.6.2"
@@ -51,6 +55,7 @@ camera-view = { group = "androidx.camera", name = "camera-view", version.ref = "
 mlkit-barcode-scanning = { group = "com.google.mlkit", name = "barcode-scanning", version.ref = "mlkitBarcode" }
 vosk-android = { group = "com.alphacephei", name = "vosk-android", version.ref = "voskAndroid" }
 sherpa-onnx = { group = "com.github.k2-fsa", name = "sherpa-onnx", version.ref = "sherpaOnnx" }
+llama-android = { group = "dev.ffmpegkit-maintained", name = "llama-android", version.ref = "llamaAndroid" }
 junit = { group = "junit", name = "junit", version.ref = "junit" }
 androidx-test-ext-junit = { group = "androidx.test.ext", name = "junit", version.ref = "androidxTestExtJunit" }
 androidx-test-runner = { group = "androidx.test", name = "runner", version.ref = "androidxTestRunner" }

@@ -1,6 +1,6 @@
 {
  "manifestVersion": "2.0.0",
- "generatedFor": "Xiaomi 11 Lite 5G NE (2109119DG) — Graph 4 verified catalog",
+ "generatedFor": "Xiaomi 11 Lite 5G NE (2109119DG) \u2014 Graph 4 verified catalog",
  "generatedAt": "2026-11-02",
  "verificationEvidence": "docs/models/SOURCE_AND_LICENSE_REGISTRY.md",
  "entries": [
@@ -35,7 +35,7 @@
    "italianSupported": false,
    "knownLimitations": [
     "Not a model: deterministic probe fixture used to qualify the download pipeline.",
-    "TEST_FIXTURE_ONLY — must remain clearly separated from production components."
+    "TEST_FIXTURE_ONLY \u2014 must remain clearly separated from production components."
    ],
    "entryClassification": "TEST_FIXTURE_ONLY",
    "upstreamRepo": "Paolo83Ita/hermes-voice-console-android (deterministic fixture)",
@@ -150,7 +150,7 @@
    ],
    "italianSupported": false,
    "knownLimitations": [
-    "English wake phrase — used ONLY to qualify the wake-word pipeline end to end.",
+    "English wake phrase \u2014 used ONLY to qualify the wake-word pipeline end to end.",
     "The production Italian 'Hermes' wake phrase requires a custom-trained model (see org.hermestower.wakeword.hermes-it).",
     "Wake-word activation stays disabled until false-accept/false-reject testing passes on the Xiaomi."
    ],
@@ -191,7 +191,7 @@
    "italianSupported": true,
    "knownLimitations": [
     "No verified downloadable source exists yet: a custom openWakeWord model for the Italian 'Hermes' phrase must be trained and false-accept/false-reject tested.",
-    "SOURCE_UNVERIFIED_DOWNLOAD_BLOCKED — download is refused until a verified source replaces this entry."
+    "SOURCE_UNVERIFIED_DOWNLOAD_BLOCKED \u2014 download is refused until a verified source replaces this entry."
    ],
    "entryClassification": "CANDIDATE_PENDING_DISCOVERY",
    "upstreamRepo": null,
@@ -275,7 +275,7 @@
    "upstreamRepo": "https://github.com/Xiaobin-Rong/gtcrn",
    "revisionBinding": "sherpa-onnx release tag speech-enhancement-models (asset pinned by sha256)",
    "licenseUrl": "https://github.com/Xiaobin-Rong/gtcrn",
-   "runtimeRequirement": "onnxruntime-android 1.20.0 (Gradle) — INTEGRATED (GtcrnDenoiserEngine, real ORT inference)",
+   "runtimeRequirement": "onnxruntime-android 1.20.0 (Gradle) \u2014 INTEGRATED (GtcrnDenoiserEngine, real ORT inference)",
    "provenanceNote": "Downloaded and SHA-256-verified 2026-11-02 (535,638 bytes); upstream license read from the Xiaobin-Rong/gtcrn GitHub API (MIT).",
    "recommended": false,
    "optionalComponent": true
@@ -315,7 +315,7 @@
    "upstreamRepo": "https://github.com/alphacep/vosk-api",
    "revisionBinding": "model small-it-0.22 (frozen archive URL on alphacephei.com)",
    "licenseUrl": "https://github.com/alphacep/vosk-api/blob/master/LICENSE",
-   "runtimeRequirement": "com.alphacephei:vosk-android:0.3.75 (Gradle, Maven Central) — INTEGRATED (Graph 4 FINAL §14)",
+   "runtimeRequirement": "com.alphacephei:vosk-android:0.3.75 (Gradle, Maven Central) \u2014 INTEGRATED (Graph 4 FINAL \u00a714)",
    "provenanceNote": "Downloaded from alphacephei.com and SHA-256-verified 2026-11-02 (49,665,141 bytes). Runtime integrated as of Graph 4 FINAL: vosk-android 0.3.75 consumes this model from filesDir/models/stt/vosk-small-it.",
    "recommended": true,
    "optionalComponent": false
@@ -353,19 +353,19 @@
     "Code runtime, not a downloadable model: ships inside the APK via the pinned Gradle dependency (RUNTIME_BUNDLED).",
     "Coordinate com.github.k2-fsa:sherpa-onnx:v1.12.24 (JitPack, immutable tag build); a newer v2.x line exists and stays un-adopted (pinning policy)."
    ],
-   "entryClassification": "CANDIDATE_PENDING_DISCOVERY",
+   "entryClassification": "RUNTIME_BUNDLED",
    "upstreamRepo": "https://github.com/k2-fsa/sherpa-onnx",
    "revisionBinding": "jitpack:com.github.k2-fsa:sherpa-onnx:v1.12.24",
    "licenseUrl": "https://github.com/k2-fsa/sherpa-onnx/blob/master/LICENSE",
-   "runtimeRequirement": "com.github.k2-fsa:sherpa-onnx:v1.12.24 — INTEGRATED (CP-G4.9-003); AAR sha256 ad052d51309f2d4caa688fe2394192e844223d7a861eae974429563df9416c7e",
-   "provenanceNote": "VERIFIED INTEGRATION (Graph 4.9 CP-G4.9-003, 2026-11-07): the sherpa-onnx Android AAR v1.12.24 was downloaded from JitPack this session, inspected (classes.jar with OfflineTts API; jni/{arm64-v8a,armeabi-v7a,x86,x86_64} native libraries; minSdk 21 <= project minSdk 30) and pinned via the Gradle version catalog. The spoken route is voice/SherpaOnnxTtsEngine behind TtsRouteSwitch; the Android system engine stays the mandatory fallback. The piper Italian voices (riccardo-x-low sha256 8ad07915...7021, paola-medium sha256 7541f757...16b4) were download-verified against this catalog the same session.",
+   "runtimeRequirement": "com.github.k2-fsa:sherpa-onnx:v1.12.24 \u2014 INTEGRATED (CP-G4.9-003); AAR sha256 ad052d51309f2d4caa688fe2394192e844223d7a861eae974429563df9416c7e",
+   "provenanceNote": "VERIFIED BUNDLED RUNTIME (CP-G4.9-003, 2026-11-07; re-affirmed CP-G4.14-002/003): the sherpa-onnx Android AAR v1.12.24 was downloaded from JitPack, inspected (classes.jar OfflineTts API; jni/{arm64-v8a,armeabi-v7a,x86,x86_64}; minSdk 21 <= project minSdk 30) and pinned via the Gradle version catalog. The spoken route is voice/SherpaOnnxTtsEngine behind TtsRouteSwitch; the Android system engine stays the mandatory fallback. The piper Italian voices (riccardo-x-low sha256 8ad07915...7021, paola-medium sha256 7541f757...16b4) are download-verified against this catalog and spoken through this runtime.",
    "recommended": true,
    "optionalComponent": false
   },
   {
    "componentType": "VOICE",
    "identity": "org.piper.voice.it-riccardo-x-low",
-   "displayName": "Piper Italian voice — Riccardo (x-low)",
+   "displayName": "Piper Italian voice \u2014 Riccardo (x-low)",
    "version": "1.0.0",
    "sourceUri": "https://github.com/k2-fsa/sherpa-onnx/releases/download/tts-models/vits-piper-it_IT-riccardo-x_low.tar.bz2",
    "provider": "Piper voices (rhasspy) via sherpa-onnx",
@@ -398,7 +398,7 @@
    "upstreamRepo": "https://github.com/rhasspy/piper-voices",
    "revisionBinding": "sherpa-onnx release tag tts-models (asset pinned by sha256)",
    "licenseUrl": "https://github.com/rhasspy/piper-voices/blob/master/LICENSE",
-   "runtimeRequirement": "sherpa-onnx TTS runtime — PENDING INTEGRATION (active path today: Android system TTS)",
+   "runtimeRequirement": "com.github.k2-fsa:sherpa-onnx:v1.12.24 (JitPack) \u2014 INTEGRATED (CP-G4.9-003; re-affirmed CP-G4.14-002/003)",
    "provenanceNote": "Downloaded from the k2-fsa/sherpa-onnx tts-models release and SHA-256-verified 2026-11-02 (26,496,614 bytes).",
    "recommended": true,
    "optionalComponent": false
@@ -406,7 +406,7 @@
   {
    "componentType": "VOICE",
    "identity": "org.piper.voice.it-paola-medium",
-   "displayName": "Piper Italian voice — Paola (medium)",
+   "displayName": "Piper Italian voice \u2014 Paola (medium)",
    "version": "1.0.0",
    "sourceUri": "https://github.com/k2-fsa/sherpa-onnx/releases/download/tts-models/vits-piper-it_IT-paola-medium.tar.bz2",
    "provider": "Piper voices (rhasspy) via sherpa-onnx",
@@ -437,7 +437,7 @@
    "upstreamRepo": "https://github.com/rhasspy/piper-voices",
    "revisionBinding": "sherpa-onnx release tag tts-models (asset pinned by sha256)",
    "licenseUrl": "https://github.com/rhasspy/piper-voices/blob/master/LICENSE",
-   "runtimeRequirement": "sherpa-onnx TTS runtime — PENDING INTEGRATION (active path today: Android system TTS)",
+   "runtimeRequirement": "com.github.k2-fsa:sherpa-onnx:v1.12.24 (JitPack) \u2014 INTEGRATED (CP-G4.9-003; re-affirmed CP-G4.14-002/003)",
    "provenanceNote": "Downloaded from the k2-fsa/sherpa-onnx tts-models release and SHA-256-verified 2026-11-02 (67,221,173 bytes).",
    "recommended": false,
    "optionalComponent": true
@@ -448,7 +448,7 @@
    "displayName": "Qwen2.5 0.5B Instruct (GGUF q5_k_m)",
    "version": "q5_k_m@9217f5db",
    "sourceUri": "https://huggingface.co/Qwen/Qwen2.5-0.5B-Instruct-GGUF/resolve/9217f5db79a29953eb74d5343926648285ec7e67/qwen2.5-0.5b-instruct-q5_k_m.gguf",
-   "provider": "Qwen (Alibaba) — Qwen2.5 series",
+   "provider": "Qwen (Alibaba) \u2014 Qwen2.5 series",
    "license": "Apache-2.0",
    "licenseApproved": true,
    "format": "gguf",
@@ -472,14 +472,14 @@
     "OPTIONAL: the console is fully usable without it (TOWER_FIRST/HYBRID routing; never auto-loaded at startup).",
     "Permitted local uses: greetings, filler, command cleanup, intent normalization, help, status explanation, short offline answers.",
     "FORBIDDEN: Tower mission planning, consequential execution, Tower-state authority, claiming Tower work.",
-    "RUNTIME UNAVAILABLE: no verified llama.cpp Android runtime is integrated yet — activation stays blocked (typed RUNTIME_UNAVAILABLE) until the NODE 4 adapter binds a verified runtime.",
+    "RUNTIME INTEGRATED (CP-G4.14-005): llama.cpp b9878 via llama-android 0.1.1 (Maven Central, MIT, arm64-v8a, minSdk 24; AAR sha256 fdccf04c...7501 inspected). On-device functional test + physical qualification still pending (typed RUNTIME_RESOLVED -> RUNTIME_AVAILABLE ladder).",
     "SHA-256 read from the Hugging Face LFS metadata for the pinned commit 9217f5db79a29953eb74d5343926648285ec7e67 (revision-bound URL)."
    ],
    "entryClassification": "VERIFIED_DOWNLOADABLE",
    "upstreamRepo": "https://huggingface.co/Qwen/Qwen2.5-0.5B-Instruct-GGUF",
    "revisionBinding": "commit 9217f5db79a29953eb74d5343926648285ec7e67",
    "licenseUrl": "https://huggingface.co/Qwen/Qwen2.5-0.5B-Instruct-GGUF/blob/9217f5db79a29953eb74d5343926648285ec7e67/LICENSE",
-   "runtimeRequirement": "llama.cpp Android runtime — CANDIDATE_PENDING_DISCOVERY",
+   "runtimeRequirement": "dev.ffmpegkit-maintained:llama-android:0.1.1 (Maven Central, llama.cpp b9878, arm64-v8a, MIT) \u2014 INTEGRATED (CP-G4.14-005)",
    "provenanceNote": "Size + SHA-256 verified from the Hugging Face model API (LFS oid) for the pinned commit on 2026-11-02; asset not downloaded in full in the sandbox.",
    "recommended": false,
    "optionalComponent": true

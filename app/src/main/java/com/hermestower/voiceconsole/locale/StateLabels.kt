@@ -204,6 +204,19 @@ object StateLabels {
         "RUNTIME_AVAILABLE" to mapOf(
             "it" to "Runtime pronto", "en" to "Runtime ready", "es" to "Runtime listo", "fr" to "Runtime prêt", "de" to "Laufzeit bereit",
         ),
+        // ---- GRAPH 4.14 §7: completed capability-ladder states ----
+        "NOT_AVAILABLE" to mapOf(
+            "it" to "Non disponibile", "en" to "Not available", "es" to "No disponible", "fr" to "Indisponible", "de" to "Nicht verfügbar",
+        ),
+        "DOWNLOAD_ALLOWED" to mapOf(
+            "it" to "Download consentito", "en" to "Download allowed", "es" to "Descarga permitida", "fr" to "Téléchargement autorisé", "de" to "Download erlaubt",
+        ),
+        "RUNTIME_RESOLVED" to mapOf(
+            "it" to "Runtime verificato", "en" to "Runtime resolved", "es" to "Runtime resuelto", "fr" to "Runtime résolu", "de" to "Laufzeit gebunden",
+        ),
+        "ACTIVE_READBACK_VERIFIED" to mapOf(
+            "it" to "Attivo e verificato", "en" to "Active and verified", "es" to "Activo y verificado", "fr" to "Actif et vérifié", "de" to "Aktiv und verifiziert",
+        ),
         "FUNCTIONAL_TEST_PASSED" to mapOf(
             "it" to "Test funzionale superato", "en" to "Functional test passed", "es" to "Prueba funcional superada", "fr" to "Test fonctionnel réussi", "de" to "Funktionstest bestanden",
         ),

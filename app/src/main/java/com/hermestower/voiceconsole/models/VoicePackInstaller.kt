@@ -96,16 +96,23 @@ class DefaultVoicePackInstaller(
             items += classify(entry, resources)
         }
 
-        // 2. Required types not covered by a recommended entry: honest gap item.
+        // 2. Required types not covered by a recommended entry: honest item that
+        // reflects the candidate's REAL classification (GRAPH 4.14: a verified
+        // bundled runtime is BUNDLED_RUNTIME — nothing to download; a type whose
+        // verified production source does not exist stays a typed honest gap).
         policy.required.filter { it.name !in coveredTypes }.forEach { type ->
             val candidates = catalog.ofComponent(type)
-            val entry = candidates.firstOrNull { it.entryClassification != "TEST_FIXTURE_ONLY" }
+            val entry = candidates.firstOrNull { it.entryClassification == "RUNTIME_BUNDLED" }
+                ?: candidates.firstOrNull { it.entryClassification != "TEST_FIXTURE_ONLY" }
+            val bundled = entry != null && entry.entryClassification == "RUNTIME_BUNDLED"
             items += PackItem(
                 entry = entry,
                 componentType = type.name,
-                role = if (entry == null) "BLOCKED_NO_VERIFIED_SOURCE" else "BLOCKED_NO_VERIFIED_SOURCE",
+                role = if (bundled) "BUNDLED_RUNTIME" else "BLOCKED_NO_VERIFIED_SOURCE",
                 included = false,
-                reason = if (entry == null) {
+                reason = if (bundled) {
+                    "Engine is bundled with the application build (Gradle) — no download required."
+                } else if (entry == null) {
                     "No ${type.displayLabel} entry exists in the catalog yet — awaiting a verified production source."
                 } else {
                     "Required for the minimal pack, but classification is ${entry.entryClassification}: " +

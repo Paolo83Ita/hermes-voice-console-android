@@ -130,6 +130,11 @@ dependencies {
     // piper vits Italian voices (riccardo-x-low / paola-medium) are delivered
     // through the Model Sanctum and spoken through voice/SherpaOnnxTtsEngine.
     implementation(libs.sherpa.onnx)
+    // GRAPH 4.14 §9 (CP-G4.14-005): VERIFIED LOCAL LLM runtime — llama.cpp
+    // b9878 prebuilt AAR from Maven Central (MIT, arm64-v8a, minSdk 24; AAR
+    // sha256 fdccf04c…7501 inspected this session). Consumes the catalog's
+    // pinned Qwen2.5-0.5B GGUF through local/LlamaCppAndroidRuntime.
+    implementation(libs.llama.android)
     // CP-G4-010 wave 2: in-app QR pairing scanner — CameraX capture pipeline +
     // ML Kit bundled on-device barcode scanning (no Play Services dependency).
     // Versions pinned in DEPENDENCY_PINNING.md with license verification.

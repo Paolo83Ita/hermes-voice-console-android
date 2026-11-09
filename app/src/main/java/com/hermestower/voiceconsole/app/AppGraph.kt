@@ -145,6 +145,21 @@ class AppGraph(
         activation = modelActivation,
     )
 
+    /**
+     * GRAPH 4.14 §6 — REAL Silero VAD from the installed artifact (primary VAD).
+     * Falls back to the EnergyVadEngine baseline (typed, honest) until the model
+     * is installed AND ACTIVE — never a fabricated detection.
+     */
+    fun sileroVadIfDelivered(): com.hermestower.voiceconsole.voice.VadEngine? {
+        val entry = modelCatalog.find("org.silero.vad.v5") ?: return null
+        val file = modelStorage.installedFile(entry) ?: return null
+        val record = modelRegistry.record(entry.identity)
+        if (record == null || record.state != com.hermestower.voiceconsole.models.ModelInstallState.ACTIVE.name) return null
+        return com.hermestower.voiceconsole.voice.SileroVadEngine(
+            com.hermestower.voiceconsole.voice.onnx.OrtOnnxRunner(file.toString()),
+        )
+    }
+
     /** Denoiser runtime from the REAL installed gtcrn artifact (null until delivered). */
     fun gtcrnDenoiserIfDelivered(): com.hermestower.voiceconsole.voice.GtcrnDenoiserEngine? {
         val entry = modelCatalog.find("org.gtcrn.speech-enhancement.simple") ?: return null
@@ -322,12 +337,15 @@ class AppGraph(
         appLanguageTag = { com.hermestower.voiceconsole.locale.AppLanguage.effectiveTag(context) },
     )
 
-    // GRAPH 4.6 §6: OPTIONAL LOCAL LLM — one verified candidate (catalog identity
-    // org.qwen.qwen2.5-0.5b-instruct.q5-k-m: Qwen2.5-0.5B-Instruct GGUF q5_k_m,
-    // Apache-2.0, revision-bound HF source, known SHA-256 + size), DEFAULT DISABLED
-    // via ConsoleSettings.localLlmEnabled. The runtime seam is NoVerifiedLlmRuntime:
-    // generation stays typed-blocked (LLM_RUNTIME_PENDING_VERIFIED_SOURCE) until a
-    // verified Android llama.cpp runtime is adopted — the engine never invents text.
+    // GRAPH 4.6 §6 + GRAPH 4.14 §9: OPTIONAL LOCAL LLM — one verified candidate
+    // (catalog identity org.qwen.qwen2.5-0.5b-instruct.q5-k-m: Qwen2.5-0.5B-Instruct
+    // GGUF q5_k_m, Apache-2.0, revision-bound HF source, known SHA-256 + size),
+    // DEFAULT DISABLED via ConsoleSettings.localLlmEnabled. CP-G4.14-005: the
+    // runtime seam is now the VERIFIED llama.cpp AAR (llama-android 0.1.1, Maven
+    // Central, MIT, arm64-v8a, llama.cpp b9878 — AAR sha256 inspected this
+    // mission) consuming the EXISTING pinned GGUF. NoVerifiedLlmRuntime stays
+    // the typed fallback inside the engine's failure paths — the engine never
+    // invents text and never claims Tower authority.
     val localLlmEngine = run {
         val qwen = modelCatalog.all().first { it.identity == "org.qwen.qwen2.5-0.5b-instruct.q5-k-m" }
         com.hermestower.voiceconsole.local.LocalLlmEngine(
@@ -336,6 +354,9 @@ class AppGraph(
             expectedSizeBytes = qwen.downloadSizeBytes,
             enabledProvider = { store.settings.value.localLlmEnabled },
             localeTagProvider = { responseLocaleResolver.resolve().tag },
+            runtime = com.hermestower.voiceconsole.local.LlamaCppAndroidRuntime(
+                com.hermestower.voiceconsole.local.LlamaRealNativeBridge(),
+            ),
         )
     }
 
@@ -775,9 +796,13 @@ class AppGraph(
     // the Self-Test Center; its Tower executor is honestly unavailable until
     // the TowerGraph 1.7 contract exists (no invented endpoints).
     val router = RuleBasedIntentRouter()
+    // GRAPH 4.14 §6: primary VAD = REAL Silero engine when the verified model is
+    // installed and ACTIVE; otherwise the typed EnergyVadEngine baseline. The
+    // controller contract is unchanged — isSpeech(frame) stays synchronous.
+    val voiceVad = sileroVadIfDelivered() ?: EnergyVadEngine()
     val voiceController = VoicePipelineController(
         sourceFactory = { AudioRecordFrameSource(micHandleFactory, permissionGranted = micPermissionGranted) },
-        vad = EnergyVadEngine(),
+        vad = voiceVad,
         stt = voskFrameStt,
         tts = voiceTts,
         router = router,

@@ -133,28 +133,31 @@ class VoicePackInstallerTest {
         assertFalse("local LLM must never be packed", included.any { it.startsWith("org.qwen.") })
         assertFalse("alternative voice stays optional", included.contains("org.piper.voice.it-paola-medium"))
         assertFalse("denoiser stays optional", included.contains("org.gtcrn.speech-enhancement.simple"))
-        // GRAPH 4 FINAL §13 HONESTY CORRECTION (2026-11-04): the sherpa-onnx TTS
-        // runtime was previously mislabeled RUNTIME_BUNDLED ("pinned in gradle")
-        // while NO such gradle dependency exists — the catalog now types it
-        // CANDIDATE_PENDING_DISCOVERY and the plan must NOT present it as a
-        // bundled component. The ACTIVE TTS path is the Android system engine.
+        // GRAPH 4.14 CP-G4.14-003 HONESTY CONVERGENCE (2026-11-09): the sherpa-onnx
+        // TTS runtime IS a verified bundled runtime since CP-G4.9-003 (the Gradle
+        // dependency com.github.k2-fsa:sherpa-onnx:v1.12.24 exists and the AAR was
+        // downloaded, inspected and SHA-256-pinned: ad052d51…6c7e). The old
+        // 2026-11-04 correction (then-honest "no gradle dep exists") is superseded
+        // by verified reality: the catalog now types it RUNTIME_BUNDLED and the
+        // plan MUST present it as BUNDLED_RUNTIME — while the genuinely
+        // unverified source (the Italian wake word) keeps the honest-gap role.
         val bundled = plan.items.filter { it.role == "BUNDLED_RUNTIME" }
         assertTrue(
-            "the sherpa-onnx runtime must NOT be presented as bundled (no gradle dep exists)",
-            bundled.none { it.entry?.identity == "org.sherpa-onnx.tts.runtime" },
+            "the sherpa-onnx runtime must be presented as bundled (verified AAR since CP-G4.9-003)",
+            bundled.any { it.entry?.identity == "org.sherpa-onnx.tts.runtime" },
         )
-        // The pending runtime still appears as an honest gap, never silently dropped:
-        val pendingRuntime = plan.items.filter {
-            it.entry?.identity == "org.sherpa-onnx.tts.runtime" &&
-                it.role == "BLOCKED_NO_VERIFIED_SOURCE"
+        // The honest wake-word gap: the WAKE_WORD required type has no verified
+        // production source (the custom Italian model does not exist upstream) —
+        // the plan carries a typed BLOCKED_NO_VERIFIED_SOURCE item and NEVER
+        // offers the unverified placeholder for download.
+        val wakeGap = plan.items.filter {
+            it.componentType == "WAKE_WORD" && it.role == "BLOCKED_NO_VERIFIED_SOURCE"
         }
-        assertTrue(
-            "the pending TTS runtime must appear as an honest gap (not bundled, not packed)",
-            pendingRuntime.isNotEmpty(),
-        )
-        // Honest wake-word gap: required type with no verified production source.
-        val wakeGap = plan.items.filter { it.role == "BLOCKED_NO_VERIFIED_SOURCE" }
         assertTrue("the custom Italian wake word must appear as an honest gap", wakeGap.isNotEmpty())
+        assertFalse(
+            "the unverified Italian wake placeholder must never be offered for download",
+            wakeGap.any { it.entry?.identity == "org.hermestower.wakeword.hermes-it" && it.included },
+        )
     }
 
     @Test
