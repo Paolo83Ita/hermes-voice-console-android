@@ -1890,3 +1890,42 @@ OWNER_POCO_XIAOMI_RETEST_PACKAGE_6_GRAPH413.md; governance convergence.
 CHECKPOINT: CP-G4.13-012/013 (9d4f3d0) → push + fresh read-back.
 NEXT: CI arbitration at the tip; Owner physical retest per Package 6
 (OWNER_VISUAL_RETEST_PENDING — the terminal physical state stays Owner-only).
+
+## 2026-11-09 — CP-G4.13-015: CI arbitration persistence at the tip (completed in-flight runs)
+
+FINDING: continuation session re-opened on a recycled sandbox (zero active
+processes/worktrees/builds; git worktree list = the single main checkout).
+Fresh fetch: local was behind 51 → ff-only afefd3d → 20a6cb3 (remote tip,
+CP-G4.13-014 read-back); tree clean; main untouched. The two e2e runs
+recorded "in flight" at CP-G4.13-014 have COMPLETED: run 42531340604
+(e4774eb) and run 42531971947 (20a6cb3) — BOTH LANES E2E_VERDICT_FAILED,
+arbitration job failed honestly (no lane printed E2E_VERDICT_PASSED);
+per-lane results artifacts exist in all four lanes (no silent fleet death;
+verdict evidence empty = the failure-evidence bundler had nothing beyond
+the typed gate outputs, which are present in the results artifacts).
+DECISIVE CLASSIFICATION (no 4.13-attributed regression): gate signatures
+at both post-implementation tips are IDENTICAL to the pre-4.13-implementation
+baseline 4b8bfb2 (run 42481808264) — A1 onboarding anchor "Connetti a
+Hermes Tower" 60 s timeout (step-1 texts visible); A2/B "inject menu item
+not found or without OnClick (it)" (R-42/R-42b family); D "MODEL SANCTUM"
+anchor 60 s; E/F "Impostazioni" anchor (R-49 drawer-settle family); B
+lane-1 AppNotIdle MAIN_LOOPER 240 s (R-43/R-44 idling family). The
+residual line (7 tests / 2 failures: e2e_40_recreateActivity_stateRestored
+AssertionError + e2e_43_44_clearSensitiveValues_metadataRemains condition
+not met) is byte-identical across ALL FOUR sampled runs including the
+pre-4.13 baseline. Zero Process-crashed signatures anywhere → the R-46
+crash-family elimination HOLDS. The whole e2e line remains the standing
+typed R-42..R-49 harness family that PREDATES every 4.13 implementation
+commit.
+TIP BUILD (20a6cb3, run 42531971944): SUCCESS — JUnit XML independently
+re-parsed from the CI artifact (64 suites): 472/472, 0 failures, 0 errors,
+0 skipped; lint report + debug APK artifacts present.
+ACTION: this ledger entry + CHECKPOINT_INDEX row + CURRENT_PROJECT_TRUTH
+G4.13-block arbitration line. No app code changed; no test touched;
+verdicts recorded verbatim.
+CHECKPOINT: CP-G4.13-015 → push + fresh read-back.
+NEXT: no dependency-released executor node remains — the only open gate is
+the Owner physical retest per OWNER_POCO_XIAOMI_RETEST_PACKAGE_6_GRAPH413.md
+(OWNER_VISUAL_RETEST_PENDING; the terminal physical state
+OWNER_VISUAL_ACCESSIBILITY_AND_MODEL_LIBRARY_RETEST_PASSED stays Owner-only
+and is NOT self-granted).

@@ -400,3 +400,11 @@ Current terminal state: POCO_XIAOMI_RETEST_PACKAGE_3_READY (physical verdict = O
   **OWNER_VISUAL_RETEST_PENDING**; the terminal physical state
   OWNER_VISUAL_ACCESSIBILITY_AND_MODEL_LIBRARY_RETEST_PASSED is
   OWNER-ONLY and is NOT granted.
+- CI arbitration COMPLETE (CP-G4.13-015): the e2e runs recorded in flight
+  at CP-G4.13-014 finished 42531340604 (e4774eb) + 42531971947 (20a6cb3),
+  BOTH LANES E2E_VERDICT_FAILED — gate signatures IDENTICAL to the
+  pre-4.13 baseline 4b8bfb2 and residual failures byte-identical across
+  all four sampled runs → **no 4.13-attributed e2e regression** (standing
+  typed R-42..R-49 harness family, predates 4.13; zero Process-crashed).
+  Tip build run 42531971944 SUCCESS, JUnit independently re-parsed
+  472/472 (0 failed, 0 errors, 0 skipped).
