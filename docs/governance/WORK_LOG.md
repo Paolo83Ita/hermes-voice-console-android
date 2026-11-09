@@ -1929,3 +1929,25 @@ the Owner physical retest per OWNER_POCO_XIAOMI_RETEST_PACKAGE_6_GRAPH413.md
 (OWNER_VISUAL_RETEST_PENDING; the terminal physical state
 OWNER_VISUAL_ACCESSIBILITY_AND_MODEL_LIBRARY_RETEST_PASSED stays Owner-only
 and is NOT self-granted).
+
+## 2026-11-09 — CP-G4.14-001: fresh read-back + Owner 4.14 physical findings
+
+FINDING: continuation on a recycled sandbox (zero active processes, single
+worktree); local was behind 53 → ff-only afefd3d → 17090bb (remote tip,
+CP-G4.13-015b); tree clean; main untouched. CI at the tip: build run
+42571197175 SUCCESS; e2e runs 42571034445/42571197180 both lanes
+E2E_VERDICT_FAILED — standing typed R-42..R-49 family re-verified at
+17090bb (A1 anchor signature + residual 7/2, zero crashes). Owner verdict
+received: OWNER_RUNTIME_THEME_VISUAL_REPAIR_REQUIRED with findings F-01..F-08
+(runtime missing, unusable download actions, Mock "BRIDGE OK" cyan
+misleading, Marble not applied to Console, Marble contrast, Tower rejected
+flat/weak/static, reference central Tower authorized). Code truth confirmed:
+runtime seams REAL for vosk/sherpa/ORT chain; NoVerifiedLlmRuntime the only
+unimplemented runtime; no MOCK/REAL bridge mode enum; LocalMonumentalColors
+pinned obsidian (Theme.kt:35) blocks Marble on Console; reference image
+1536×1024 PNG 3,685,783 bytes.
+ACTION: GRAPH414_FRESH_READBACK.md (full §1 checklist incl. runtime catalog
+truth table, state machines, voice authorities, bridge/theme/Tower surfaces,
+scope freeze). Scope: 5 programs only; 4 preliminary physical PASS preserved.
+CHECKPOINT: CP-G4.14-001.
+NEXT: CP-G4.14-002 runtime requirement matrix.
