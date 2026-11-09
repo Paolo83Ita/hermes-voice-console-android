@@ -179,3 +179,4 @@ Graph 4 checkpoints (branch graph-4/real-voice-pairing-archive-e2e, from ca8980b
 
 | CP-G4.14-001 | Fresh read-back (behind 53 → ff 17090bb) + Owner 4.14 findings (OWNER_RUNTIME_THEME_VISUAL_REPAIR_REQUIRED, F-01..F-08) + runtime truth inventory | GRAPH414_FRESH_READBACK.md | CI 42571197175 SUCCESS; e2e standing family verified | (this commit) |
 | CP-G4.14-002/003 | Runtime matrix (12 entries × 27 fields) + §5 terminal decisions + llama-android AAR in-sandbox verification | ANDROID_RUNTIME_REQUIREMENT_MATRIX.{json,md} | JSON valid; AAR SHA-256 verified | (this commit) |
+| CP-G4.14-004 | Bridge state authority + truthful indicator (SIMULAZIONE amber in mock) + §12 truth panel | BRIDGE_STATE_AUTHORITY_REPORT.md, BridgeModeAuthority.kt | 491/491 unit local | (this commit) |

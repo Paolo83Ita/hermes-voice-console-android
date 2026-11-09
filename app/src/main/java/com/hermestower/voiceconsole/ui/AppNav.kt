@@ -67,6 +67,8 @@ import androidx.navigation.compose.composable
 import androidx.navigation.compose.currentBackStackEntryAsState
 import androidx.navigation.compose.rememberNavController
 import com.hermestower.voiceconsole.app.AppGraph
+import com.hermestower.voiceconsole.ui.components.dotColor
+import com.hermestower.voiceconsole.ui.components.labelRes
 import com.hermestower.voiceconsole.ui.monumental.MonumentalType
 import com.hermestower.voiceconsole.ui.monumental.monumentalColors
 import com.hermestower.voiceconsole.ui.screens.AboutSafetyScreen
@@ -280,20 +282,22 @@ fun AppNav(graph: AppGraph) {
                             Modifier.padding(top = 6.dp),
                             verticalAlignment = Alignment.CenterVertically,
                         ) {
+                            // GRAPH 4.14 §11: the drawer dot consumes the same
+                            // BridgeModeAuthority as the Console (mock = amber).
+                            val bridgeTruth = com.hermestower.voiceconsole.domain.BridgeModeAuthority.resolve(connection)
                             Box(
                                 Modifier
                                     .size(8.dp)
                                     .background(
-                                        when (connection.status) {
-                                            com.hermestower.voiceconsole.core.state.ConnectionStatus.BridgeStatus.CONNECTED -> m.cyanCore
-                                            com.hermestower.voiceconsole.core.state.ConnectionStatus.BridgeStatus.CONNECTING -> m.amber
-                                            else -> m.redBronze
-                                        },
+                                        bridgeTruth.role.dotColor(m),
                                         androidx.compose.foundation.shape.CircleShape,
                                     ),
                             )
                             Text(
-                                "  " + stringResource(com.hermestower.voiceconsole.R.string.nav_bridge_state, connection.status.name.lowercase()),
+                                "  " + stringResource(
+                                    com.hermestower.voiceconsole.R.string.nav_bridge_state,
+                                    stringResource(bridgeTruth.role.labelRes()),
+                                ),
                                 style = MonumentalType.sealSub,
                                 color = m.inkSecondary,
                             )

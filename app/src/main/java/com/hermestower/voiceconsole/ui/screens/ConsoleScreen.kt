@@ -77,6 +77,9 @@ import com.hermestower.voiceconsole.core.state.ConnectionStatus
 import com.hermestower.voiceconsole.ui.components.MeanderBand
 import com.hermestower.voiceconsole.ui.components.ModeChip
 import com.hermestower.voiceconsole.ui.components.StatusPill
+import com.hermestower.voiceconsole.ui.components.descRes
+import com.hermestower.voiceconsole.ui.components.dotColor
+import com.hermestower.voiceconsole.ui.components.labelRes
 import com.hermestower.voiceconsole.ui.monumental.BurnInRegion
 import com.hermestower.voiceconsole.ui.monumental.MonumentalColors
 import com.hermestower.voiceconsole.ui.monumental.MonumentalType
@@ -120,6 +123,8 @@ fun ConsoleScreen(
     var showDialog by remember { mutableStateOf(false) }
     var injectText by remember { mutableStateOf("") }
     var moreActions by remember { mutableStateOf(false) }
+    // GRAPH 4.14 §12: the bridge indicator opens the compact truth panel.
+    var showBridgeTruth by remember { mutableStateOf(false) }
 
     // ---- GRAPH 4 G4-C03: real microphone path (Owner delta §5) ----
     val micState by graph.voiceCoordinator.micState.collectAsStateWithLifecycle()
@@ -221,19 +226,15 @@ fun ConsoleScreen(
                     horizontalArrangement = Arrangement.spacedBy(6.dp, Alignment.CenterHorizontally),
                     verticalAlignment = Alignment.CenterVertically,
                 ) {
+                    // GRAPH 4.14 §10/§11: the indicator consumes the BridgeModeAuthority.
+                    // Mock mode renders SIMULAZIONE on amber/bronze — NEVER the cyan
+                    // connected treatment (FINDING-03 repair). Tap opens the truth panel.
+                    val bridgeTruth = com.hermestower.voiceconsole.domain.BridgeModeAuthority.resolve(connection)
                     StatusPill(
-                        label = when (connection.status) {
-                            ConnectionStatus.BridgeStatus.CONNECTED -> stringResource(com.hermestower.voiceconsole.R.string.pill_connected)
-                            ConnectionStatus.BridgeStatus.CONNECTING -> stringResource(com.hermestower.voiceconsole.R.string.pill_connecting)
-                            ConnectionStatus.BridgeStatus.DISCONNECTED -> stringResource(com.hermestower.voiceconsole.R.string.pill_offline)
-                            ConnectionStatus.BridgeStatus.UNCONFIGURED -> stringResource(com.hermestower.voiceconsole.R.string.pill_mock)
-                        },
-                        dotColor = when (connection.status) {
-                            ConnectionStatus.BridgeStatus.CONNECTED -> m.cyanCore
-                            ConnectionStatus.BridgeStatus.CONNECTING -> m.amber
-                            else -> m.redBronze
-                        },
-                        description = stringResource(com.hermestower.voiceconsole.R.string.desc_bridge_fmt, connection.status.name.lowercase(), connection.endpointLabel),
+                        label = stringResource(bridgeTruth.role.labelRes()),
+                        dotColor = bridgeTruth.role.dotColor(m),
+                        description = stringResource(bridgeTruth.role.descRes()),
+                        onClick = { showBridgeTruth = true },
                     )
                     if (queueCount > 0) {
                         StatusPill(
@@ -774,10 +775,71 @@ fun ConsoleScreen(
             dismissButton = { TextButton(onClick = { showDialog = false }) { Text(stringResource(R.string.cd_cancel)) } },
         )
     }
+
+    // ---- GRAPH 4.14 §12: compact bridge truth panel (no endpoint secrets) ----
+    if (showBridgeTruth) {
+        val bridgeTruth = com.hermestower.voiceconsole.domain.BridgeModeAuthority.resolve(connection)
+        val formatter = java.time.format.DateTimeFormatter.ofPattern("HH:mm:ss")
+        val lastCheck = bridgeTruth.lastSuccessfulCheck?.atZone(java.time.ZoneId.systemDefault())?.toLocalDateTime()?.format(formatter)
+            ?: stringResource(R.string.bridge_truth_never)
+        AlertDialog(
+            onDismissRequest = { showBridgeTruth = false },
+            title = { Text(stringResource(R.string.bridge_truth_title)) },
+            text = {
+                Column(verticalArrangement = Arrangement.spacedBy(6.dp)) {
+                    if (bridgeTruth.isMock) {
+                        Text(
+                            stringResource(R.string.bridge_truth_mock_note),
+                            style = MonumentalType.body,
+                            color = m.amber,
+                        )
+                    }
+                    BridgeTruthRow(stringResource(R.string.bridge_truth_mode), stringResource(bridgeTruth.role.labelRes()))
+                    BridgeTruthRow(stringResource(R.string.bridge_truth_endpoint), bridgeTruth.endpointClass)
+                    BridgeTruthRow(stringResource(R.string.bridge_truth_transport), bridgeTruth.transportState.name.lowercase())
+                    BridgeTruthRow(
+                        stringResource(R.string.bridge_truth_auth),
+                        when (bridgeTruth.authenticated) {
+                            true -> stringResource(R.string.bridge_truth_yes)
+                            false -> stringResource(R.string.bridge_truth_no)
+                            null -> stringResource(R.string.bridge_truth_na)
+                        },
+                    )
+                    BridgeTruthRow(
+                        stringResource(R.string.bridge_truth_session),
+                        when (bridgeTruth.sessionEstablished) {
+                            true -> stringResource(R.string.bridge_truth_yes)
+                            false -> stringResource(R.string.bridge_truth_no)
+                            null -> stringResource(R.string.bridge_truth_na)
+                        },
+                    )
+                    BridgeTruthRow(
+                        stringResource(R.string.bridge_truth_negotiation),
+                        if (bridgeTruth.capabilityNegotiated) stringResource(R.string.bridge_truth_yes)
+                        else stringResource(R.string.bridge_truth_pending),
+                    )
+                    BridgeTruthRow(stringResource(R.string.bridge_truth_last_check), lastCheck)
+                    BridgeTruthRow(stringResource(R.string.bridge_truth_limitation), bridgeTruth.typedLimitation ?: "—")
+                }
+            },
+            confirmButton = {
+                TextButton(onClick = { showBridgeTruth = false }) { Text(stringResource(R.string.cd_cancel)) }
+            },
+        )
+    }
 }
 
 private const val MAX_CHAT_CHARS = 2000
 private const val CHAT_COUNTER_THRESHOLD = 1600
+
+@Composable
+private fun BridgeTruthRow(label: String, value: String) {
+    val c = hermesColors
+    Row(horizontalArrangement = Arrangement.spacedBy(8.dp)) {
+        Text(label, style = MonumentalType.bodySecondary, color = c.textSecondary)
+        Text(value, style = MonumentalType.body, color = c.textPrimary)
+    }
+}
 
 @Composable
 private fun MedallionDisc(

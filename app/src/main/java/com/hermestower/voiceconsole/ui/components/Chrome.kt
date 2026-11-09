@@ -9,6 +9,7 @@ import androidx.compose.material3.TextFieldDefaults
 
 import androidx.compose.foundation.background
 import androidx.compose.foundation.border
+import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
@@ -31,6 +32,7 @@ import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.semantics.contentDescription
 import androidx.compose.ui.semantics.semantics
 import androidx.compose.ui.unit.dp
+import com.hermestower.voiceconsole.ui.monumental.MonumentalColors
 import com.hermestower.voiceconsole.ui.monumental.MonumentalType
 import com.hermestower.voiceconsole.ui.monumental.monumentalColors
 import com.hermestower.voiceconsole.ui.theme.hermesColors
@@ -41,17 +43,51 @@ import com.hermestower.voiceconsole.ui.theme.hermesColors
  * preserved so every Graph 2 screen converges visually without functional change.
  */
 
-/** Engraved status seal (was: status pill with truth dot). */
+/** GRAPH 4.14 §11: indicator role → localized label resource. */
+fun com.hermestower.voiceconsole.domain.BridgeIndicatorRole.labelRes(): Int = when (this) {
+    com.hermestower.voiceconsole.domain.BridgeIndicatorRole.MOCK -> com.hermestower.voiceconsole.R.string.bridge_pill_mock
+    com.hermestower.voiceconsole.domain.BridgeIndicatorRole.LOCAL_READY -> com.hermestower.voiceconsole.R.string.bridge_pill_local_ready
+    com.hermestower.voiceconsole.domain.BridgeIndicatorRole.REACHABLE -> com.hermestower.voiceconsole.R.string.bridge_pill_reachable
+    com.hermestower.voiceconsole.domain.BridgeIndicatorRole.CONNECTED -> com.hermestower.voiceconsole.R.string.bridge_pill_connected
+    com.hermestower.voiceconsole.domain.BridgeIndicatorRole.OPERATIVE -> com.hermestower.voiceconsole.R.string.bridge_pill_operative
+    com.hermestower.voiceconsole.domain.BridgeIndicatorRole.DISCONNECTED -> com.hermestower.voiceconsole.R.string.bridge_pill_disconnected
+    com.hermestower.voiceconsole.domain.BridgeIndicatorRole.ERROR -> com.hermestower.voiceconsole.R.string.bridge_pill_error
+}
+
+/** GRAPH 4.14 §11: indicator role → truthful color token (amber mock, cyan real, gray down, red error). */
+fun com.hermestower.voiceconsole.domain.BridgeIndicatorRole.dotColor(m: MonumentalColors): Color = when (this) {
+    com.hermestower.voiceconsole.domain.BridgeIndicatorRole.MOCK -> m.amber
+    com.hermestower.voiceconsole.domain.BridgeIndicatorRole.LOCAL_READY -> m.bronzeLight
+    com.hermestower.voiceconsole.domain.BridgeIndicatorRole.REACHABLE -> m.amber
+    com.hermestower.voiceconsole.domain.BridgeIndicatorRole.CONNECTED -> m.cyanCore
+    com.hermestower.voiceconsole.domain.BridgeIndicatorRole.OPERATIVE -> m.cyanCore
+    com.hermestower.voiceconsole.domain.BridgeIndicatorRole.DISCONNECTED -> m.inkSecondary
+    com.hermestower.voiceconsole.domain.BridgeIndicatorRole.ERROR -> m.redBronze
+}
+
+/** GRAPH 4.14 §11: indicator role → accessibility description. */
+fun com.hermestower.voiceconsole.domain.BridgeIndicatorRole.descRes(): Int = when (this) {
+    com.hermestower.voiceconsole.domain.BridgeIndicatorRole.MOCK -> com.hermestower.voiceconsole.R.string.desc_bridge_mock
+    else -> com.hermestower.voiceconsole.R.string.desc_bridge_local
+}
+
+/** Engraved status seal (was: status pill with truth dot). GRAPH 4.14 §12: optional tap → truth panel. */
 @Composable
 fun StatusPill(
     label: String,
     dotColor: Color,
     modifier: Modifier = Modifier,
     description: String = label,
+    onClick: (() -> Unit)? = null,
 ) {
     val c = hermesColors // GRAPH 4.13 §6: semantic surfaces/text (theme-aware)
     Surface(
-        modifier = modifier.semantics { contentDescription = description },
+        modifier = modifier
+            .semantics { contentDescription = description }
+            .then(
+                if (onClick != null) Modifier.clickable(onClickLabel = description) { onClick() }
+                else Modifier,
+            ),
         shape = RoundedCornerShape(6.dp),
         color = c.surfaceInteractive,
         border = androidx.compose.foundation.BorderStroke(1.5.dp, dotColor.copy(alpha = 0.75f)),

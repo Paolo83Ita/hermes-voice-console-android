@@ -2006,3 +2006,24 @@ skipped or weakened; one honesty assertion retargeted WITH evidence.
 CHECKPOINT: CP-G4.14-002/003 integration + CP-G4.14-005 code — the terminal
 LLM decision doc lands with the CI-green read-back.
 NEXT: Bridge state authority (CP-G4.14-004) + LLM decision doc.
+
+## 2026-11-09 — CP-G4.14-004: bridge state authority + truthful indicator
+
+FINDING: FINDING-03 confirmed — pill_connected "BRIDGE OK" + cyan dot rendered
+on ANY CONNECTED, reachable purely by the MockTowerBridge handshake; drawer
+dot same mapping; no MOCK/REAL mode truth anywhere.
+ACTION: BridgeModeAuthority (§10 modes MOCK/LOCAL/REAL_TRANSPORT/AUTH/SESSION/
+NEGOTIATION/DISCONNECTED/FAILED; §11 role table SIMULAZIONE amber in mock —
+NEVER cyan; BRIDGE LOCALE PRONTO cyan-gray; TOWER RAGGIUNGIBILE amber;
+TOWER CONNESSA cyan; TOWER OPERATIVA cyan+verified; TOWER DISCONNESSA gray;
+ERRORE BRIDGE red) consumed by the Console pill AND the drawer dot (one truth,
+two surfaces); StatusPill tap → §12 truth panel (mode, endpoint CLASS — never
+secrets, transport, auth, session, negotiation, last successful check, typed
+limitation + the fixed Mock sentence, ×5 locales); BRIDGE_STATE_AUTHORITY_REPORT.md.
+TEST: BridgeModeAuthorityTest 8 tests (mock-never-cyan across 4 statuses,
+real session, reachable-unauth, LOCAL_READY, negotiation pending, last-check);
+unit 491/491 GREEN local. Scope freeze honored — no pairing expansion; the
+authority READS existing truth only.
+CHECKPOINT: CP-G4.14-004.
+NEXT: LLM terminal decision doc (CP-G4.14-005 closure) at CI-green read-back;
+then theme convergence (CP-G4.14-006).
