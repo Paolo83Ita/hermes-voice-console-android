@@ -363,10 +363,13 @@ object SelfTestRegistry {
             // ---------- model manager (30..40) ----------
             def("ST-30", "Model catalog loading", SelfTestCategory.MODELS, setOf(SelfTestMode.QUICK, SelfTestMode.STANDARD, SelfTestMode.FULL, SelfTestMode.VOICE_FOUNDATION_ONLY)) { s ->
                 val entries = s.catalog.all()
-                if (entries.size >= 8 && s.catalog.manifestVersion() == "1.0.0") {
-                    SelfTestState.PASS to "${entries.size} catalog entries; manifest 1.0.0."
+                // GRAPH 4.14 CP-G4.14-002: the catalog manifest upgraded to 2.0.0
+                // (runtimeRequirement fields + 12 entries; the probe fixture stays
+                // catalog-hidden). The old "1.0.0" pin was the pre-4.14 contract.
+                if (entries.size >= 8 && s.catalog.manifestVersion() == "2.0.0") {
+                    SelfTestState.PASS to "${entries.size} catalog entries; manifest 2.0.0 (runtime-requirement schema)."
                 } else {
-                    SelfTestState.FAIL to "catalog incomplete: ${entries.size} entries."
+                    SelfTestState.FAIL to "catalog contract mismatch: ${entries.size} entries, manifest ${s.catalog.manifestVersion()} (expected ≥8 entries, manifest 2.0.0)."
                 }
             },
             def("ST-31", "Voice-pack recommendation", SelfTestCategory.MODELS, setOf(SelfTestMode.QUICK, SelfTestMode.STANDARD, SelfTestMode.FULL, SelfTestMode.VOICE_FOUNDATION_ONLY)) { s ->
@@ -375,8 +378,12 @@ object SelfTestRegistry {
                 val llmTower = towerFirst.components.first { it.componentType == ModelComponentType.LOCAL_LLM.name }
                 val llmHybrid = hybrid.components.first { it.componentType == ModelComponentType.LOCAL_LLM.name }
                 val probe = hybrid.components.first { it.identity == PROBE_ID }
-                if (llmTower.route == "TOWER" && llmHybrid.route == "LOCAL" && probe.downloadAllowed && hybrid.requiresExplicitConfirmation) {
-                    SelfTestState.PASS to "recommendation deterministic; TOWER_FIRST routes LLM to Tower, HYBRID keeps it local; probe downloadable; confirmation required."
+                // GRAPH 4.14 §5 terminal decision REMOVE_MISLEADING_ENTRY: the probe
+                // fixture is hidden from ordinary cards and its download is BLOCKED
+                // (SOURCE_UNVERIFIED_DOWNLOAD_BLOCKED). The old "probe downloadable"
+                // pin asserted the pre-4.14 contract.
+                if (llmTower.route == "TOWER" && llmHybrid.route == "LOCAL" && !probe.downloadAllowed && hybrid.requiresExplicitConfirmation) {
+                    SelfTestState.PASS to "recommendation deterministic; TOWER_FIRST routes LLM to Tower, HYBRID keeps it local; probe download BLOCKED (misleading-entry decision); confirmation required."
                 } else {
                     SelfTestState.FAIL to "recommendation unexpected (tower=${llmTower.route}, hybrid=${llmHybrid.route}, probe=${probe.downloadAllowed})."
                 }
