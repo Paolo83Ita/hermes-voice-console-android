@@ -2155,3 +2155,24 @@ convergence.
 - C08: governance convergence (this block, truth, registers, rehydration) +
   push + cloud qualification arbitration (verdict recorded in the deployment
   read-back).
+
+- C09/C10: cloud qualification waves. Wave 1 @ eed00d5: build SUCCESS (artifacts
+  parsed: 496/0 == local; lint 0/73 = 72 + 1 env-only classified OldTargetApi;
+  3 APKs aapt2-verified; APK content = same 596 entries, ≤128 B dex stamps,
+  size delta = ZIP variance). E2E 42619128215: lane 2 typed install abort
+  (EMULATOR_INFRASTRUCTURE), lane 1 full honest sample E2E_VERDICT_FAILED —
+  arbitrated vs the pre-4.14 baseline 17090bb: gates C/D/F GREEN for the first
+  time in the sampled line; the failure set is baseline-identical (STANDING);
+  ONE 4.14-attributed defect found (ST-30/31 stale expectations → e2e_31_33)
+  → REPAIRED (shipped-contract pins: manifest 2.0.0 + blocked probe + JVM
+  fixture upgraded + typed-state FAIL-only semantics with the 61-battery pin).
+  E2EBridgeTruthTest added to the default regression list.
+  Wave 2 @ 1d3adb9: build SUCCESS (496/0; lint 0/73). E2E 42642866873: BOTH
+  lanes full samples — e2e_31_33/e2e_32 GREEN on BOTH lanes (typed repairs
+  fleet-verified); standing set unchanged (gates A1/B/E, FreshInstall,
+  ModelManager, e2e_34, residual 2, ST-49 — the latter PROVEN baseline-
+  identical from the baseline artifact); BridgeTruth's first fleet run exposed
+  a test-selector defect (onFirstNodeWithText substring matched the drawer's
+  plain Text row) → hardened to clickFirstClickable (hasClickAction required).
+  VERDICT stayed E2E_VERDICT_FAILED honestly (standing failures remain — no
+  falsified green). The historical harness campaign is NOT restarted.

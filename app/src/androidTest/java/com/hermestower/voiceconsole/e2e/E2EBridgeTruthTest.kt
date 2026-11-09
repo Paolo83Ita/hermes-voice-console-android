@@ -1,7 +1,6 @@
 package com.hermestower.voiceconsole.e2e
 
 import androidx.compose.ui.test.onAllNodesWithText
-import androidx.compose.ui.test.performClick
 import androidx.test.filters.LargeTest
 import com.hermestower.voiceconsole.domain.BridgeModeAuthority
 import org.junit.Assert.assertEquals
@@ -63,11 +62,15 @@ class E2EBridgeTruthTest {
         }
 
         // 4. Tap the pill (REAL UI action) → the truth panel opens.
+        // clickFirstClickable requires hasText AND hasClickAction: the console
+        // StatusPill carries the onClick (GRAPH 4.14 §12); the drawer's bridge
+        // row is a plain Text node (substring match but NOT clickable) — the
+        // click-selector must not land there.
         val label = mockLabelRes().first { label ->
             compose.onAllNodesWithText(label, substring = false).fetchSemanticsNodes().isNotEmpty()
         }
-        compose.onFirstNodeWithText(label).performClick()
-        compose.waitUntil(10_000) {
+        compose.clickFirstClickable(label)
+        compose.waitUntil(15_000) {
             val titles = listOf("Bridge truth", "Verità del bridge")
             titles.any { t ->
                 compose.onAllNodesWithText(t, substring = false).fetchSemanticsNodes().isNotEmpty()
