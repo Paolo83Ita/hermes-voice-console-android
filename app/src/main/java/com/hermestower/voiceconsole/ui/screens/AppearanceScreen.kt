@@ -67,7 +67,8 @@ fun AppearanceScreen(graph: AppGraph) {
     ) {
         ResponsiveScreenHeader(title = stringResource(Res.string.appearance_title))
         MeanderBand(colors = hermesColors, modifier = Modifier.padding(top = 6.dp))
-        Text(stringResource(Res.string.appearance_subtitle), style = MonumentalType.sealSub, color = m.gold)
+        // GRAPH 4.14 §20: the subtitle uses the theme-aware gold (≥4.5:1 in both themes).
+        Text(stringResource(Res.string.appearance_subtitle), style = MonumentalType.sealSub, color = c.gold)
 
         SectionCard(title = stringResource(Res.string.appearance_quality_card)) {
             Row(horizontalArrangement = Arrangement.spacedBy(8.dp)) {
@@ -100,13 +101,13 @@ fun AppearanceScreen(graph: AppGraph) {
         SectionCard(title = stringResource(Res.string.appearance_theme)) {
             Row(horizontalArrangement = Arrangement.spacedBy(8.dp)) {
                 ThemeSwatch(
-                    label = "MARBLE LIGHT",
+                    label = stringResource(Res.string.app_theme_marble),
                     selected = !settings.darkTheme,
                     colors = MarbleLightColors,
                     onClick = { graph.store.updateSettings { s -> s.copy(darkTheme = false) } },
                 )
                 ThemeSwatch(
-                    label = "OBSIDIAN NIGHT",
+                    label = stringResource(Res.string.app_theme_obsidian),
                     selected = settings.darkTheme,
                     colors = ObsidianNightColors,
                     onClick = { graph.store.updateSettings { s -> s.copy(darkTheme = true) } },

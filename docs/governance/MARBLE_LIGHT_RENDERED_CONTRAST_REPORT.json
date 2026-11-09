@@ -1,0 +1,434 @@
+{
+ "report": "GRAPH 4.14 \u00a719 \u2014 Marble Light rendered contrast",
+ "method": "WCAG 2.x relative luminance on the SHIPPED token values (MonumentalMarble + MarbleLightColors); identical formula to the ThemeAuthorityTest pins",
+ "thresholds": {
+  "normalText": 4.5,
+  "largeText": 3.0,
+  "icons": 3.0,
+  "interactiveBorders": 3.0,
+  "disabled": 3.0
+ },
+ "rows": [
+  {
+   "surface": "stageBase",
+   "surfaceArgb": "0xFFF1EBDD",
+   "foreground": "ink",
+   "foregroundArgb": "0xFF241F14",
+   "kind": "text",
+   "threshold": 4.5,
+   "ratio": 13.79,
+   "verdict": "PASS"
+  },
+  {
+   "surface": "stageBase",
+   "surfaceArgb": "0xFFF1EBDD",
+   "foreground": "inkSecondary",
+   "foregroundArgb": "0xFF554E3E",
+   "kind": "text",
+   "threshold": 4.5,
+   "ratio": 6.94,
+   "verdict": "PASS"
+  },
+  {
+   "surface": "stageBase",
+   "surfaceArgb": "0xFFF1EBDD",
+   "foreground": "inkDim",
+   "foregroundArgb": "0xFF665E4C",
+   "kind": "text",
+   "threshold": 4.5,
+   "ratio": 5.4,
+   "verdict": "PASS"
+  },
+  {
+   "surface": "stageBase",
+   "surfaceArgb": "0xFFF1EBDD",
+   "foreground": "amber (SIMULAZIONE dot)",
+   "foregroundArgb": "0xFF7E4A00",
+   "kind": "icon",
+   "threshold": 3.0,
+   "ratio": 6.16,
+   "verdict": "PASS"
+  },
+  {
+   "surface": "stageBase",
+   "surfaceArgb": "0xFFF1EBDD",
+   "foreground": "cyanCore (connected dot)",
+   "foregroundArgb": "0xFF0085A8",
+   "kind": "icon",
+   "threshold": 3.0,
+   "ratio": 3.59,
+   "verdict": "PASS"
+  },
+  {
+   "surface": "stageBase",
+   "surfaceArgb": "0xFFF1EBDD",
+   "foreground": "redBronze (seal/error icon)",
+   "foregroundArgb": "0xFF9E3A22",
+   "kind": "icon",
+   "threshold": 3.0,
+   "ratio": 5.73,
+   "verdict": "PASS"
+  },
+  {
+   "surface": "stage",
+   "surfaceArgb": "0xFFEAE3D2",
+   "foreground": "ink",
+   "foregroundArgb": "0xFF241F14",
+   "kind": "text",
+   "threshold": 4.5,
+   "ratio": 12.81,
+   "verdict": "PASS"
+  },
+  {
+   "surface": "stage",
+   "surfaceArgb": "0xFFEAE3D2",
+   "foreground": "inkSecondary",
+   "foregroundArgb": "0xFF554E3E",
+   "kind": "text",
+   "threshold": 4.5,
+   "ratio": 6.45,
+   "verdict": "PASS"
+  },
+  {
+   "surface": "stage",
+   "surfaceArgb": "0xFFEAE3D2",
+   "foreground": "inkDim",
+   "foregroundArgb": "0xFF665E4C",
+   "kind": "text",
+   "threshold": 4.5,
+   "ratio": 5.02,
+   "verdict": "PASS"
+  },
+  {
+   "surface": "stage",
+   "surfaceArgb": "0xFFEAE3D2",
+   "foreground": "amber (SIMULAZIONE dot)",
+   "foregroundArgb": "0xFF7E4A00",
+   "kind": "icon",
+   "threshold": 3.0,
+   "ratio": 5.73,
+   "verdict": "PASS"
+  },
+  {
+   "surface": "stage",
+   "surfaceArgb": "0xFFEAE3D2",
+   "foreground": "cyanCore (connected dot)",
+   "foregroundArgb": "0xFF0085A8",
+   "kind": "icon",
+   "threshold": 3.0,
+   "ratio": 3.34,
+   "verdict": "PASS"
+  },
+  {
+   "surface": "stage",
+   "surfaceArgb": "0xFFEAE3D2",
+   "foreground": "redBronze (seal/error icon)",
+   "foregroundArgb": "0xFF9E3A22",
+   "kind": "icon",
+   "threshold": 3.0,
+   "ratio": 5.33,
+   "verdict": "PASS"
+  },
+  {
+   "surface": "panel",
+   "surfaceArgb": "0xFFF8F4EA",
+   "foreground": "ink",
+   "foregroundArgb": "0xFF241F14",
+   "kind": "text",
+   "threshold": 4.5,
+   "ratio": 14.92,
+   "verdict": "PASS"
+  },
+  {
+   "surface": "panel",
+   "surfaceArgb": "0xFFF8F4EA",
+   "foreground": "inkSecondary",
+   "foregroundArgb": "0xFF554E3E",
+   "kind": "text",
+   "threshold": 4.5,
+   "ratio": 7.51,
+   "verdict": "PASS"
+  },
+  {
+   "surface": "panel",
+   "surfaceArgb": "0xFFF8F4EA",
+   "foreground": "inkDim",
+   "foregroundArgb": "0xFF665E4C",
+   "kind": "text",
+   "threshold": 4.5,
+   "ratio": 5.85,
+   "verdict": "PASS"
+  },
+  {
+   "surface": "panel",
+   "surfaceArgb": "0xFFF8F4EA",
+   "foreground": "amber (SIMULAZIONE dot)",
+   "foregroundArgb": "0xFF7E4A00",
+   "kind": "icon",
+   "threshold": 3.0,
+   "ratio": 6.67,
+   "verdict": "PASS"
+  },
+  {
+   "surface": "panel",
+   "surfaceArgb": "0xFFF8F4EA",
+   "foreground": "cyanCore (connected dot)",
+   "foregroundArgb": "0xFF0085A8",
+   "kind": "icon",
+   "threshold": 3.0,
+   "ratio": 3.89,
+   "verdict": "PASS"
+  },
+  {
+   "surface": "panel",
+   "surfaceArgb": "0xFFF8F4EA",
+   "foreground": "redBronze (seal/error icon)",
+   "foregroundArgb": "0xFF9E3A22",
+   "kind": "icon",
+   "threshold": 3.0,
+   "ratio": 6.2,
+   "verdict": "PASS"
+  },
+  {
+   "surface": "raised",
+   "surfaceArgb": "0xFFFFFBF1",
+   "foreground": "ink",
+   "foregroundArgb": "0xFF241F14",
+   "kind": "text",
+   "threshold": 4.5,
+   "ratio": 15.86,
+   "verdict": "PASS"
+  },
+  {
+   "surface": "raised",
+   "surfaceArgb": "0xFFFFFBF1",
+   "foreground": "inkSecondary",
+   "foregroundArgb": "0xFF554E3E",
+   "kind": "text",
+   "threshold": 4.5,
+   "ratio": 7.98,
+   "verdict": "PASS"
+  },
+  {
+   "surface": "raised",
+   "surfaceArgb": "0xFFFFFBF1",
+   "foreground": "inkDim",
+   "foregroundArgb": "0xFF665E4C",
+   "kind": "text",
+   "threshold": 4.5,
+   "ratio": 6.21,
+   "verdict": "PASS"
+  },
+  {
+   "surface": "raised",
+   "surfaceArgb": "0xFFFFFBF1",
+   "foreground": "amber (SIMULAZIONE dot)",
+   "foregroundArgb": "0xFF7E4A00",
+   "kind": "icon",
+   "threshold": 3.0,
+   "ratio": 7.09,
+   "verdict": "PASS"
+  },
+  {
+   "surface": "raised",
+   "surfaceArgb": "0xFFFFFBF1",
+   "foreground": "cyanCore (connected dot)",
+   "foregroundArgb": "0xFF0085A8",
+   "kind": "icon",
+   "threshold": 3.0,
+   "ratio": 4.13,
+   "verdict": "PASS"
+  },
+  {
+   "surface": "raised",
+   "surfaceArgb": "0xFFFFFBF1",
+   "foreground": "redBronze (seal/error icon)",
+   "foregroundArgb": "0xFF9E3A22",
+   "kind": "icon",
+   "threshold": 3.0,
+   "ratio": 6.59,
+   "verdict": "PASS"
+  },
+  {
+   "surface": "panel",
+   "surfaceArgb": "0xFFF8F4EA",
+   "foreground": "amber as text (SIMULAZIONE label)",
+   "foregroundArgb": "0xFF7E4A00",
+   "kind": "text",
+   "threshold": 4.5,
+   "ratio": 6.67,
+   "verdict": "PASS"
+  },
+  {
+   "surface": "panel",
+   "surfaceArgb": "0xFFF8F4EA",
+   "foreground": "redBronzeText (error text)",
+   "foregroundArgb": "0xFF8F3420",
+   "kind": "text",
+   "threshold": 4.5,
+   "ratio": 7.13,
+   "verdict": "PASS"
+  },
+  {
+   "surface": "panel",
+   "surfaceArgb": "0xFFF8F4EA",
+   "foreground": "gold (primary nav label)",
+   "foregroundArgb": "0xFF6E5420",
+   "kind": "text",
+   "threshold": 4.5,
+   "ratio": 6.48,
+   "verdict": "PASS"
+  },
+  {
+   "surface": "panel",
+   "surfaceArgb": "0xFFF8F4EA",
+   "foreground": "bronzeLight (interactive outline)",
+   "foregroundArgb": "0xFF8F6B33",
+   "kind": "border",
+   "threshold": 3.0,
+   "ratio": 4.43,
+   "verdict": "PASS"
+  },
+  {
+   "surface": "background",
+   "surfaceArgb": "0xFFF2EFE7",
+   "foreground": "textPrimary",
+   "foregroundArgb": "0xFF201E19",
+   "kind": "text",
+   "threshold": 4.5,
+   "ratio": 14.49,
+   "verdict": "PASS"
+  },
+  {
+   "surface": "background",
+   "surfaceArgb": "0xFFF2EFE7",
+   "foreground": "textSecondary",
+   "foregroundArgb": "0xFF5A554A",
+   "kind": "text",
+   "threshold": 4.5,
+   "ratio": 6.45,
+   "verdict": "PASS"
+  },
+  {
+   "surface": "background",
+   "surfaceArgb": "0xFFF2EFE7",
+   "foreground": "textTertiaryReadable",
+   "foregroundArgb": "0xFF6B655A",
+   "kind": "text",
+   "threshold": 4.5,
+   "ratio": 5.03,
+   "verdict": "PASS"
+  },
+  {
+   "surface": "surface",
+   "surfaceArgb": "0xFFFAF7F0",
+   "foreground": "textPrimary",
+   "foregroundArgb": "0xFF201E19",
+   "kind": "text",
+   "threshold": 4.5,
+   "ratio": 15.56,
+   "verdict": "PASS"
+  },
+  {
+   "surface": "surface",
+   "surfaceArgb": "0xFFFAF7F0",
+   "foreground": "textSecondary",
+   "foregroundArgb": "0xFF5A554A",
+   "kind": "text",
+   "threshold": 4.5,
+   "ratio": 6.93,
+   "verdict": "PASS"
+  },
+  {
+   "surface": "surface",
+   "surfaceArgb": "0xFFFAF7F0",
+   "foreground": "textTertiaryReadable",
+   "foregroundArgb": "0xFF6B655A",
+   "kind": "text",
+   "threshold": 4.5,
+   "ratio": 5.4,
+   "verdict": "PASS"
+  },
+  {
+   "surface": "surfaceVariant",
+   "surfaceArgb": "0xFFE9E4D8",
+   "foreground": "textPrimary",
+   "foregroundArgb": "0xFF201E19",
+   "kind": "text",
+   "threshold": 4.5,
+   "ratio": 13.13,
+   "verdict": "PASS"
+  },
+  {
+   "surface": "surfaceVariant",
+   "surfaceArgb": "0xFFE9E4D8",
+   "foreground": "textSecondary",
+   "foregroundArgb": "0xFF5A554A",
+   "kind": "text",
+   "threshold": 4.5,
+   "ratio": 5.84,
+   "verdict": "PASS"
+  },
+  {
+   "surface": "surfaceVariant",
+   "surfaceArgb": "0xFFE9E4D8",
+   "foreground": "textTertiaryReadable",
+   "foregroundArgb": "0xFF6B655A",
+   "kind": "text",
+   "threshold": 4.5,
+   "ratio": 4.55,
+   "verdict": "PASS"
+  },
+  {
+   "surface": "surfaceVariant",
+   "surfaceArgb": "0xFFE9E4D8",
+   "foreground": "textDisabled (\u22653.0 + border/fill cues)",
+   "foregroundArgb": "0xFF857E70",
+   "kind": "disabled",
+   "threshold": 3.0,
+   "ratio": 3.17,
+   "verdict": "PASS"
+  },
+  {
+   "surface": "surface",
+   "surfaceArgb": "0xFFFAF7F0",
+   "foreground": "textWarning",
+   "foregroundArgb": "0xFF8A5210",
+   "kind": "text",
+   "threshold": 4.5,
+   "ratio": 5.96,
+   "verdict": "PASS"
+  },
+  {
+   "surface": "surface",
+   "surfaceArgb": "0xFFFAF7F0",
+   "foreground": "textError",
+   "foregroundArgb": "0xFFB3261E",
+   "kind": "text",
+   "threshold": 4.5,
+   "ratio": 6.11,
+   "verdict": "PASS"
+  },
+  {
+   "surface": "surface",
+   "surfaceArgb": "0xFFFAF7F0",
+   "foreground": "textInfo",
+   "foregroundArgb": "0xFF0C6478",
+   "kind": "text",
+   "threshold": 4.5,
+   "ratio": 6.31,
+   "verdict": "PASS"
+  },
+  {
+   "surface": "background",
+   "surfaceArgb": "0xFFF2EFE7",
+   "foreground": "outlineFocus (focus border)",
+   "foregroundArgb": "0xFF7A5C2E",
+   "kind": "border",
+   "threshold": 3.0,
+   "ratio": 5.38,
+   "verdict": "PASS"
+  }
+ ],
+ "failCount": 0
+}

@@ -48,7 +48,7 @@ fun ArchitecturalPanel(
         modifier
             .background(
                 Brush.linearGradient(
-                    listOf(colors.obsidianRaised, colors.obsidianPanel, Color(0xFF0A0D14)),
+                    listOf(colors.obsidianRaised, colors.obsidianPanel, colors.obsidianPanel),
                 ),
                 RoundedCornerShape(10.dp),
             )
@@ -165,7 +165,7 @@ fun ControlMedallion(
                     .size(size)
                     .background(
                         Brush.radialGradient(
-                            listOf(colors.obsidianRaised, colors.obsidianPanel, Color(0xFF070A10)),
+                            listOf(colors.obsidianRaised, colors.obsidianPanel, colors.obsidian),
                         ),
                         CircleShape,
                     )

@@ -2045,3 +2045,31 @@ PENDING_DEVICE (PHYSICAL_QUALIFICATION_PENDING — Owner device; nothing
 fabricated).
 CHECKPOINT: CP-G4.14-005 CLOSED.
 NEXT: theme convergence (CP-G4.14-006/007/008).
+
+## 2026-11-09 — CP-G4.14-006/007/008: theme convergence + complete Marble Light + contrast qualification
+
+FINDING: Theme.kt:35 pinned LocalMonumentalColors to MonumentalObsidian
+UNCONDITIONALLY — Marble Light could never reach the Console/shell (FINDING-04
+root); the frieze/medallion/chrome carried hardcoded dark ARGB; Appearance
+subtitle used m.gold (light-on-light in marble); theme swatch labels were
+hardcoded English.
+ACTION: (1) MonumentalMarble — full light monumental palette (stage ivory/
+pale stone, panels light, dark ink family ≥4.5, deepened bronze/gold/cyan/
+amber/red ≥3.0 icons and ≥4.5 text; the tower artwork may stay dark with a
+local halo per §18). (2) Theme.kt — ONE theme-aware authority provides BOTH
+locals + scheme per theme; the pin is REMOVED; no separate Console authority.
+(3) Hardcoded literals → tokens: ConsoleScreen frieze 0xFF0A0E16/070A11 →
+m.obsidianSheen/m.obsidianDeep; medallion radial 0xFF070A10 → m.obsidian;
+MonumentalChrome 0xFF0A0D14/070A10 → colors.obsidian*; drawer dot + Console
+pill consume BridgeModeAuthority (theme-aware). (4) MainActivity: system bars
+theme-reactive (dark icons on marble, light on obsidian; immediate on switch,
+no restart). (5) Appearance: subtitle → c.gold; swatch labels localized
+(app_theme_marble/obsidian ×5). (6) THEME_AUTHORITY_CONSUMER_MAP.md (16
+routes) + MARBLE_LIGHT_RENDERED_CONTRAST_REPORT.{json,md} — 42 computed rows
+/ 0 FAIL (one fix: marble cyanCore 0xFF0090B5 → 0xFF0085A8 to clear the 3.0
+icon threshold on stage). (7) ThemeAuthorityTest — 5 JVM pins (theme-aware
+palettes distinct, marble ink ≥4.5 ×4 surfaces, energy accents ≥3.0 icons /
+≥4.5 text, marble semantics ≥4.5, obsidian identity regression-guarded).
+TEST: unit suite GREEN (incl. 5 new pins); compile GREEN.
+CHECKPOINT: CP-G4.14-006/007/008.
+NEXT: Model Library truth statuses (CP-G4.14-009) then the reference Tower.

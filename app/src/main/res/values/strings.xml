@@ -862,4 +862,6 @@ MANUAL_ADVANCED — independent per-component selection, full visibility, no sil
     <string name="bridge_truth_never">Never checked</string>
     <string name="desc_bridge_mock">Simulation mode: local mock bridge, no real Tower.</string>
     <string name="desc_bridge_local">Local bridge process healthy — no real Tower connected yet.</string>
+    <string name="app_theme_marble">MARBLE LIGHT</string>
+    <string name="app_theme_obsidian">OBSIDIAN NIGHT</string>
 </resources>

@@ -96,6 +96,58 @@ val MonumentalObsidian = MonumentalColors(
     inkDim = Color(0xFF8A8375),
 )
 
+/**
+ * GRAPH 4.14 §15/§17/§18 — the MARBLE Light monumental identity.
+ *
+ * FINDING-04/05 repair: the shell/chrome/stage are no longer hard-pinned to
+ * obsidian. In Marble Light the STAGE is ivory/pale warm stone, panels are
+ * light, chrome gradients are light, ink is dark — while the bronze/cyan
+ * energy identity of the Tower is preserved (the tower artwork itself may
+ * stay dark on a light stage, with a controlled local halo — §18).
+ * Every text/icon token is chosen ≥4.5:1 (text) / ≥3:1 (icons) on the light
+ * surfaces it hosts; measured pairs live in
+ * MARBLE_LIGHT_RENDERED_CONTRAST_REPORT.json.
+ */
+val MonumentalMarble = MonumentalColors(
+    // stage surfaces: ivory / pale warm stone (light equivalents of the obsidian family)
+    obsidianDeep = Color(0xFFF1EBDD),
+    obsidian = Color(0xFFEAE3D2),
+    obsidianPanel = Color(0xFFF8F4EA),
+    obsidianRaised = Color(0xFFFFFBF1),
+    obsidianSheen = Color(0xFFE3DBC7),
+    // carved stone: light warm neutrals
+    stoneDeep = Color(0xFFDCD2B8),
+    stone = Color(0xFFE6DEC9),
+    stoneMid = Color(0xFFEFE8D6),
+    stoneEdge = Color(0xFFC4B897),
+    stoneLit = Color(0xFF9C8E6C),
+    // aged bronze + gold: deepened for light-surface contrast (text-capable)
+    bronzeDeep = Color(0xFF6E5424),
+    bronze = Color(0xFF7A5C2E),
+    bronzeEdge = Color(0xFF947739),
+    bronzeLight = Color(0xFF8F6B33),
+    gold = Color(0xFF6E5420),
+    goldBright = Color(0xFF54400F),
+    marble = Color(0xFFEFE7D8),
+    // energy roles: deepened cyan/amber/red for ≥3:1 icons and ≥4.5:1 text on ivory
+    cyanCore = Color(0xFF0085A8),
+    cyan = Color(0xFF0083A8),
+    cyanDeep = Color(0xFF0B5E76),
+    cyanAbyss = Color(0xFF124B5E),
+    towerBlue = Color(0xFF2C5BD9),
+    towerBlueDeep = Color(0xFF1E3FA8),
+    localGold = Color(0xFF7A5C1E),
+    localCyan = Color(0xFF0B6E62),
+    amber = Color(0xFF7E4A00),
+    redBronze = Color(0xFF9E3A22),
+    redBronzeDeep = Color(0xFF6E2818),
+    redBronzeText = Color(0xFF8F3420),
+    // text: dark ink family on light surfaces
+    ink = Color(0xFF241F14),
+    inkSecondary = Color(0xFF554E3E),
+    inkDim = Color(0xFF665E4C),
+)
+
 val LocalMonumentalColors = staticCompositionLocalOf { MonumentalObsidian }
 
 val monumentalColors: MonumentalColors

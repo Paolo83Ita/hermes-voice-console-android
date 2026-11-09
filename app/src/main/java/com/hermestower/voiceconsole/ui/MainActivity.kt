@@ -70,6 +70,30 @@ class MainActivity : ComponentActivity() {
                 }
                 onDispose { }
             }
+            // GRAPH 4.14 §17: system bars follow the theme — dark status-bar
+            // icons on the light Marble shell, light icons on Obsidian. Applies
+            // IMMEDIATELY on theme switch (no process restart).
+            DisposableEffect(settings.darkTheme) {
+                enableEdgeToEdge(
+                    statusBarStyle = if (settings.darkTheme) {
+                        androidx.activity.SystemBarStyle.dark(android.graphics.Color.TRANSPARENT)
+                    } else {
+                        androidx.activity.SystemBarStyle.light(
+                            android.graphics.Color.TRANSPARENT,
+                            android.graphics.Color.TRANSPARENT,
+                        )
+                    },
+                    navigationBarStyle = if (settings.darkTheme) {
+                        androidx.activity.SystemBarStyle.dark(android.graphics.Color.TRANSPARENT)
+                    } else {
+                        androidx.activity.SystemBarStyle.light(
+                            android.graphics.Color.TRANSPARENT,
+                            android.graphics.Color.TRANSPARENT,
+                        )
+                    },
+                )
+                onDispose { }
+            }
             // GRAPH 4.12 §3/§4: the first-run crash recovery dialog gates the
             // app shell until the Owner picks a typed recovery action.
             var recoveryHandled by remember { androidx.compose.runtime.mutableStateOf(false) }

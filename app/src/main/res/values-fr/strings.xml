@@ -862,4 +862,6 @@ MANUAL_ADVANCED — sélection indépendante par composant, visibilité totale, 
     <string name="bridge_truth_never">Jamais vérifié</string>
     <string name="desc_bridge_mock">Mode simulation : bridge local simulé, aucune Tour réelle.</string>
     <string name="desc_bridge_local">Processus bridge local sain — aucune Tour réelle connectée.</string>
+    <string name="app_theme_marble">MARBLE LIGHT</string>
+    <string name="app_theme_obsidian">OBSIDIAN NIGHT</string>
 </resources>

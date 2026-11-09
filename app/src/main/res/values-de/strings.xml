@@ -862,4 +862,6 @@ MANUAL_ADVANCED — unabhängige Auswahl pro Komponente, volle Sichtbarkeit, kei
     <string name="bridge_truth_never">Niemals geprüft</string>
     <string name="desc_bridge_mock">Simulationsmodus: lokale Mock-Bridge, keine echte Tower.</string>
     <string name="desc_bridge_local">Lokaler Bridge-Prozess aktiv — keine echte Tower verbunden.</string>
+    <string name="app_theme_marble">MARMOR HELL</string>
+    <string name="app_theme_obsidian">OBSIDIAN NACHT</string>
 </resources>

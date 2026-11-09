@@ -172,7 +172,8 @@ fun ConsoleScreen(
             Box(
                 Modifier
                     .fillMaxWidth()
-                    .background(Brush.verticalGradient(listOf(Color(0xFF0A0E16), Color(0xFF070A11)))),
+                    // GRAPH 4.14 §17: the frieze gradient is theme-aware (ivory in Marble).
+                    .background(Brush.verticalGradient(listOf(m.obsidianSheen, m.obsidianDeep))),
             ) {
                 // navigation chamber access — same content description as Graph 2 E2E pins
                 IconButton(
@@ -857,7 +858,7 @@ private fun MedallionDisc(
         Modifier
             .size(size)
             .background(
-                Brush.radialGradient(listOf(m.obsidianRaised, m.obsidianPanel, Color(0xFF070A10))),
+                Brush.radialGradient(listOf(m.obsidianRaised, m.obsidianPanel, m.obsidian)),
                 CircleShape,
             )
             .border(
