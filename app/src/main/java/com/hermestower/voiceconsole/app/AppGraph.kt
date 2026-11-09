@@ -317,6 +317,116 @@ class AppGraph(
                     engine = naturalTtsPaola,
                 )
             },
+            // GRAPH 4.14 §25 (ST-58): REAL Silero inference on the Italian fixture.
+            sileroVadProbe = {
+                val engine = sileroVadIfDelivered()
+                when {
+                    engine == null -> com.hermestower.voiceconsole.selftest.SileroVadReadback(
+                        modelDelivered = false,
+                        runtimeLoaded = false,
+                        realInferenceRan = false,
+                        speechDetectedOnFixture = null,
+                        lastError = "org.silero.vad.v5 not delivered/ACTIVE yet",
+                    )
+                    else -> {
+                        var ran = false
+                        var detected: Boolean? = null
+                        var err: String? = null
+                        runCatching {
+                            val wav = context.assets.open("models/fixtures/fixture_benvenuto_torre_it.wav").use { it.readBytes() }
+                            val pcm = com.hermestower.voiceconsole.voice.SttFixtureTestRunner.parsePcm16Mono16k(wav)
+                            var any = false
+                            var i = 0
+                            while (i + com.hermestower.voiceconsole.voice.SileroVadEngine.SILERO_WINDOW_SAMPLES_16K <= pcm.size) {
+                                val frame = com.hermestower.voiceconsole.voice.AudioFrame(
+                                    pcm.copyOfRange(i, i + com.hermestower.voiceconsole.voice.SileroVadEngine.SILERO_WINDOW_SAMPLES_16K),
+                                )
+                                any = engine.isSpeech(frame) || any
+                                ran = true
+                                i += com.hermestower.voiceconsole.voice.SileroVadEngine.SILERO_WINDOW_SAMPLES_16K
+                            }
+                            detected = any
+                        }.onFailure { err = "${it.javaClass.simpleName}: ${it.message ?: ""}" }
+                        com.hermestower.voiceconsole.selftest.SileroVadReadback(
+                            modelDelivered = true,
+                            runtimeLoaded = true,
+                            realInferenceRan = ran,
+                            speechDetectedOnFixture = detected,
+                            lastError = err,
+                        )
+                    }
+                }
+            },
+            // GRAPH 4.14 §25 (ST-59): REAL GTCRN streaming inference on the fixture.
+            gtcrnProbe = {
+                val engine = gtcrnDenoiserIfDelivered()
+                when {
+                    engine == null -> com.hermestower.voiceconsole.selftest.GtcrnReadback(
+                        modelDelivered = false,
+                        runtimeLoaded = false,
+                        realInferenceRan = false,
+                        framesProcessed = null,
+                        lastError = "org.gtcrn.speech-enhancement.simple not delivered/ACTIVE yet",
+                    )
+                    else -> {
+                        var ran = false
+                        var frames: Int? = null
+                        var err: String? = null
+                        runCatching {
+                            val wav = context.assets.open("models/fixtures/fixture_benvenuto_torre_it.wav").use { it.readBytes() }
+                            val pcm = com.hermestower.voiceconsole.voice.SttFixtureTestRunner.parsePcm16Mono16k(wav)
+                            val enhanced = engine.enhance(pcm, 16000)
+                            ran = enhanced.size == pcm.size
+                            frames = pcm.size / 512
+                        }.onFailure { err = "${it.javaClass.simpleName}: ${it.message ?: ""}" }
+                        com.hermestower.voiceconsole.selftest.GtcrnReadback(
+                            modelDelivered = true,
+                            runtimeLoaded = true,
+                            realInferenceRan = ran,
+                            framesProcessed = frames,
+                            lastError = err,
+                        )
+                    }
+                }
+            },
+            // GRAPH 4.14 §25 (ST-60): wake-word typed qualification (OFF by default).
+            wakeWordProbe = {
+                val ids = listOf(
+                    "org.openwakeword.model.melspectrogram",
+                    "org.openwakeword.model.embedding",
+                    "org.openwakeword.wakeword.hey-jarvis",
+                )
+                val files = ids.mapNotNull { id ->
+                    modelCatalog.find(id)?.let { modelStorage.installedFile(it) }
+                }
+                val graphsLoaded = files.size == 3 && runCatching {
+                    com.hermestower.voiceconsole.voice.OpenWakeWordEngine(
+                        frontend = com.hermestower.voiceconsole.voice.RealMelEmbedFrontend(
+                            com.hermestower.voiceconsole.voice.onnx.OrtOnnxRunner(files[0].toString()),
+                            com.hermestower.voiceconsole.voice.onnx.OrtOnnxRunner(files[1].toString()),
+                        ),
+                        scorer = com.hermestower.voiceconsole.voice.RealHeadScorer(
+                            com.hermestower.voiceconsole.voice.onnx.OrtOnnxRunner(files[2].toString()),
+                        ),
+                    )
+                }.isSuccess
+                com.hermestower.voiceconsole.selftest.WakeWordReadback(
+                    disabledByDefault = true,
+                    graphsLoaded = graphsLoaded,
+                    typedQualificationState = "OFF_BY_DEFAULT_QUALIFICATION_PENDING_FA_FR_HARNESS",
+                )
+            },
+            // GRAPH 4.14 §25 (ST-61): the local-LLM chain truth from the ENGINE.
+            localLlmProbe = {
+                val d = localLlmEngine.diagnostics()
+                com.hermestower.voiceconsole.selftest.LocalLlmReadback(
+                    hasVerifiedRuntime = localLlmEngine.hasVerifiedRuntime,
+                    runtimeName = d.runtimeName,
+                    state = d.state.name,
+                    integrityCode = d.lastDiagnosticCode.name,
+                    modelFileExists = localLlmEngine.resolveInstalledFile()?.isFile == true,
+                )
+            },
         ),
         dispatcher = Dispatchers.Default,
     )
@@ -869,7 +979,13 @@ class AppGraph(
                         else -> null
                     }
                 },
-                llmState = "No local model (default) — Qwen2.5-0.5B candidate present, llama.cpp runtime pending",
+                // GRAPH 4.14 §5 honesty gate: the diagnostic reads the ENGINE truth
+                // (runtime name + state) — never a stale hardcoded claim.
+                llmState = run {
+                    val d = localLlmEngine.diagnostics()
+                    if (d.enabled) "local LLM enabled — runtime ${d.runtimeName}, state ${d.state}"
+                    else "Local model disabled (default) — llama.cpp runtime integrated (${d.runtimeName})"
+                },
                 onnxRuntime = "onnxruntime-android 1.20.0 (Gradle)",
             )
         }

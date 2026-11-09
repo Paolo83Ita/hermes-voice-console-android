@@ -9,7 +9,6 @@
     <string name="composer_send">Senden</string>
     <string name="composer_speak_instead">Sprechen</string>
     <string name="composer_stop">Unterbrechen</string>
-    <string name="desc_bridge_fmt">Tower-Brücke: %1$s, Endpunkt %2$s</string>
     <string name="desc_mic_live">Systemerkennung erfasst — Sprechtaste aktiv</string>
     <string name="desc_mic_ready">Mikrofon bereit für die Sprechtaste; Aufnahme nur während eines Sprechturns</string>
     <string name="desc_muted">Mikrofon stummschalten aktiv, Mikrofon physisch getrennt</string>
@@ -45,13 +44,9 @@
     <string name="nav_primary">HAUPTBEREICH</string>
     <string name="nav_truth_note">Jeder angezeigte Zustand ist der echte Zustand der Konsole.</string>
     <string name="no_conversation">Noch keine Unterhaltung. Sprechen Sie mit dem Mikrofon oder schreiben Sie eine Nachricht — alles Gezeigte ist die echte Ausgabe der Konsole.</string>
-    <string name="pill_connected">BRÜCKE OK</string>
-    <string name="pill_connecting">BRÜCKE…</string>
     <string name="pill_mic">MIKRO</string>
     <string name="pill_mic_live">MIKRO AKTIV</string>
-    <string name="pill_mock">SIMULIERT</string>
     <string name="pill_muted">STUMM</string>
-    <string name="pill_offline">OFFLINE</string>
     <string name="pill_queued_fmt">IN WARTESCHLANGE ×%1$d</string>
     <string name="repeat_cd">Letzte gesprochene Antwort wiederholen</string>
     <string name="sim_wake_cd">Aktivierungswort und Beispielsatz simulieren</string>
@@ -450,7 +445,6 @@
     <string name="mm_intro">Lokale Intelligenz ist optional und pro Komponente unabhängig; komplexe, unsichere und folgenreiche Schlussfolgerungen gehören immer zu Hermes Tower. Kein Modell wird ohne Ihre ausdrückliche Bestätigung heruntergeladen.</string>
     <string name="mm_section_a">A. Empfohlene Einrichtung</string>
     <string name="mm_tts_none">keine gemeldet</string>
-    <string name="mm_network">Netzwerk: %1$s%2$s</string>
     <string name="mm_network_online">online</string>
     <string name="mm_network_offline">offline</string>
     <string name="mm_compat_summary">Kompatibilitätsübersicht: %1$s</string>
@@ -469,11 +463,9 @@
     <string name="mm_licenses">Lizenzen: %1$s</string>
     <string name="mm_optional_note">Optional und NICHT enthalten (nie automatisch geladen): %1$s — einschließlich des lokalen LLM; komplexes Denken bleibt auf Hermes Tower.</string>
     <string name="mm_install_pack">Empfohlenes Sprachpaket installieren</string>
-    <string name="mm_section_b">B. Installierte Sprachkomponenten</string>
     <string name="mm_nothing_installed">Noch nichts installiert — die Konsole läuft vollständig im reinen Tower-Fallback (ohne jedes lokale Modell nutzbar).</string>
     <string name="mm_verified_line">verifiziert: %1$s · qualifiziert: %2$s</string>
     <string name="mm_never">nie</string>
-    <string name="mm_section_c">C. Verfügbare Komponenten</string>
     <string name="mm_update_available">Update verfügbar: installiert v%1$s → Katalog v%2$s.</string>
     <string name="mm_download_progress">Download: %1$s %2$d/%3$d Bytes (%4$d %%)</string>
     <string name="mm_last_download_event">Letztes Download-Ereignis: %1$s</string>
@@ -532,7 +524,6 @@
     <string name="mm_rollback">Zurückrollen</string>
     <string name="mm_remove">Entfernen</string>
     <string name="mm_redownload">Erneut laden</string>
-    <string name="mm_repair">Reparieren</string>
     <string name="mm_update">Aktualisieren</string>
     <string name="mm_open_diagnostics">Diagnose öffnen</string>
     <string name="mm_probe_started">Probe-Download vom lokalen Testserver gestartet (Port %1$d).</string>
@@ -554,8 +545,6 @@
     <string name="listening_mode_continuous">Durchgehendes Zuhören bei geöffneter Konsole</string>
     <string name="listening_mode_wake_word">Aktivierungswort</string>
     <string name="listening_mode_off">Deaktiviert</string>
-    <string name="continuous_start">Durchgehendes Zuhören</string>
-    <string name="continuous_stop">Durchgehendes Zuhören stoppen</string>
     <string name="continuous_active_indicator">Durchgehendes Zuhören aktiv</string>
     <string name="session_limit_5">5 Minuten</string>
     <string name="session_limit_15">15 Minuten</string>
@@ -572,7 +561,6 @@
     <string name="chat_speech_state_muted">Sprachantworten stummgeschaltet</string>
     <string name="chat_speech_state_manual">Sprachantworten manuell</string>
     <string name="msg_repeat_label">Wiederholen</string>
-    <string name="msg_listen_label">Anhören</string>
     <string name="mm_voice_qualifying">Stimme %1$s wird qualifiziert (Test-Synthese und -Wiedergabe)…</string>
     <string name="mm_voice_active">Stimme %1$s AKTIV — das Runtime spricht jetzt damit.</string>
     <string name="mm_voice_runtime_failed">Runtime-Aktivierung der Stimme %1$s fehlgeschlagen (%2$s) — installierte Dateien bleiben erhalten; die italienische Systemstimme gilt.</string>
@@ -785,7 +773,6 @@ MANUAL_ADVANCED — unabhängige Auswahl pro Komponente, volle Sichtbarkeit, kei
     <string name="mm_section_e2">Optionale lokale Intelligenz</string>
     <string name="mm_section_f2">Installierte Komponenten</string>
     <string name="mm_section_g2">Aktualisierungen oder Reparaturen</string>
-    <string name="mm_cfg_device">Gerät</string>
     <string name="mm_cfg_android">Android-Version</string>
     <string name="mm_cfg_arch">Architektur</string>
     <string name="mm_cfg_ram">Verfügbarer RAM</string>

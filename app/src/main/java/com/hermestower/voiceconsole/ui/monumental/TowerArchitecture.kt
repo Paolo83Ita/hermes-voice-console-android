@@ -50,22 +50,6 @@ object TowerArchitecture {
     fun stateDrivesFlow(state: ConsoleState): Boolean = state in flowStates
 }
 
-@Composable
-fun TowerEnergyPhase(flowing: Boolean, frozen: Boolean): Float {
-    if (!flowing || frozen) return 0f
-    val transition = rememberInfiniteTransition(label = "towerEnergy")
-    val phase by transition.animateFloat(
-        initialValue = 0f,
-        targetValue = 1f,
-        animationSpec = infiniteRepeatable(
-            animation = tween(durationMillis = 2600, easing = LinearEasing),
-            repeatMode = RepeatMode.Restart,
-        ),
-        label = "towerEnergyPhase",
-    )
-    return phase
-}
-
 /**
  * The architectural frame: upper order, lower structure and the state-driven
  * messenger path — drawn as the FOREGROUND architecture INSIDE the existing

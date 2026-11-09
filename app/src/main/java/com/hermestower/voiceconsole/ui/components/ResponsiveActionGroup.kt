@@ -44,11 +44,11 @@ data class ResponsiveAction(
 @Composable
 fun ResponsiveActionGroup(
     widthClass: ConsoleWindowWidthClass,
+    modifier: Modifier = Modifier,
     primary: ResponsiveAction? = null,
     secondary: List<ResponsiveAction> = emptyList(),
     management: List<ResponsiveAction> = emptyList(),
     destructive: List<ResponsiveAction> = emptyList(),
-    modifier: Modifier = Modifier,
 ) {
     val c = hermesColors
     Column(modifier.fillMaxWidth(), verticalArrangement = Arrangement.spacedBy(6.dp)) {

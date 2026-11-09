@@ -111,6 +111,13 @@ data class SelfTestSubjects(
     // usingAndroidSystemTts=true can NEVER be ACTIVE (INSTALLED_RUNTIME_NOT_AVAILABLE).
     val sherpaFunctionProbeRiccardo: (() -> SherpaFunctionReadback?)? = null,
     val sherpaFunctionProbePaola: (() -> SherpaFunctionReadback?)? = null,
+    // GRAPH 4.14 §25 (ST-58..ST-61): REAL runtime self-test read-backs for the
+    // remaining integrated runtimes. Every probe runs the REAL engine path;
+    // a null probe (JVM) degrades honestly to QUALIFICATION_PENDING_DEVICE.
+    val sileroVadProbe: (() -> SileroVadReadback?)? = null,
+    val gtcrnProbe: (() -> GtcrnReadback?)? = null,
+    val wakeWordProbe: (() -> WakeWordReadback?)? = null,
+    val localLlmProbe: (() -> LocalLlmReadback?)? = null,
 )
 
 /** CP-G4.9-003 (ST-52): the honest snapshot of the spoken-output route. */
@@ -207,6 +214,55 @@ data class SherpaFunctionReadback(
     val restartPersistenceOk: Boolean?,
     /** Typed detail. */
     val detail: String? = null,
+)
+
+/** GRAPH 4.14 §25 (ST-58): the honest Silero VAD runtime read-back. */
+data class SileroVadReadback(
+    /** The artifact is delivered+ACTIVE (false = Sanctum repair path, not a FAIL). */
+    val modelDelivered: Boolean = true,
+    /** The real ORT runner was constructed with the Silero graph. */
+    val runtimeLoaded: Boolean,
+    /** REAL inference frames ran through the ONNX graph (never a stub). */
+    val realInferenceRan: Boolean,
+    /** Speech detected on the Italian fixture (null = fixture not runnable here). */
+    val speechDetectedOnFixture: Boolean?,
+    /** Typed last engine error (null = healthy). */
+    val lastError: String? = null,
+)
+
+/** GRAPH 4.14 §25 (ST-59): the honest GTCRN denoiser runtime read-back. */
+data class GtcrnReadback(
+    val modelDelivered: Boolean = true,
+    val runtimeLoaded: Boolean,
+    /** REAL streaming ONNX inference frames processed. */
+    val realInferenceRan: Boolean,
+    /** Frames actually processed through the graph. */
+    val framesProcessed: Int?,
+    val lastError: String? = null,
+)
+
+/** GRAPH 4.14 §25 (ST-60): the honest wake-word typed qualification state. */
+data class WakeWordReadback(
+    /** Wake word is OFF by default (Owner §8/§9 — the FA/FR harness is the gate). */
+    val disabledByDefault: Boolean,
+    /** The real 3-graph ORT chain loads the bundled melspec/embedding/graph. */
+    val graphsLoaded: Boolean,
+    /** Typed qualification state (never a bare PASS from catalog presence). */
+    val typedQualificationState: String,
+)
+
+/** GRAPH 4.14 §25 (ST-61): the honest local-LLM chain read-back. */
+data class LocalLlmReadback(
+    /** A verified runtime is injected (llama.cpp in-tree since CP-G4.14-005). */
+    val hasVerifiedRuntime: Boolean,
+    /** Verbatim runtime identity (never invented). */
+    val runtimeName: String,
+    /** The engine state (DISABLED/NOT_INSTALLED/LOADING/LOADED/ERROR). */
+    val state: String,
+    /** The last integrity diagnostic code (typed). */
+    val integrityCode: String,
+    /** The installed GGUF file resolves on disk. */
+    val modelFileExists: Boolean,
 )
 
 /**

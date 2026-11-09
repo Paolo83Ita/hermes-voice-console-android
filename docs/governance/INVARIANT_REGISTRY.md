@@ -29,3 +29,17 @@ INV-17 Evidence is typed; generic PASS is forbidden.
 INV-18 No public artifact of any kind; build outputs leave GitHub only as private Actions
        artifacts or Owner-local files.
 INV-19 Every APK claim carries its SHA-256 and the commit it was built from.
+
+INV-20 (G4.14) The bridge indicator truth is derived ONLY by BridgeModeAuthority;
+       mock endpoints resolve to the amber SIMULAZIONE role in every transport
+       state — no consumer may re-derive truth from raw status.
+INV-21 (G4.14) The local-LLM selectability is keyed to runtime INTEGRATION truth
+       (hasVerifiedRuntime), never to catalog presence; physical LLM claims stay
+       LLM_PHYSICAL_QUALIFICATION_PENDING until device evidence exists.
+INV-22 (G4.14) The Self-Test battery is the registry's RETURNED list — definitions
+       appended outside it are dead code (CP-G4.12 latent defect repaired; battery
+       = 61 definitions).
+INV-23 (G4.14) Tower raster assets ship at 0 calibrated chroma-key residue
+       (signature: hue 295–345°, sat≥0.62, val≥0.55 — a signature the Owner
+       reference contains zero of); every residue repair is in-slice, never a
+       re-extraction without a material-defect gate.

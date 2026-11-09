@@ -20,3 +20,10 @@ No new blocker in Graph 4.13. Standing deferred items unchanged (B-0001
 physical qualification runbook now = OWNER_POCO_XIAOMI_RETEST_PACKAGE_6_GRAPH413.md;
 B-0003 real Tower API still V0.4). OWNER_VISUAL_RETEST_PENDING is a
 pending OWNER ACTION, not an executor blocker.
+
+Graph 4.14 continuation: no new executor blocker. B-0001 → the physical
+qualification runbook is now OWNER_POCO_XIAOMI_RETEST_PACKAGE_7_GRAPH414.md
+(POCO 17 + Xiaomi 15 items; OWNER_VISUAL_RETEST_PENDING). B-0003 unchanged
+(real Tower API V0.4; scope freeze holds). New typed pending items (NOT
+blockers): LLM_PHYSICAL_QUALIFICATION_PENDING (Owner device legs B/C/D/F/K/L);
+E2E arbitration at the new tip (standing R-42..R-49 harness line).

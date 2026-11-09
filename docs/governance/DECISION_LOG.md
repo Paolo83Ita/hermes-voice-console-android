@@ -108,3 +108,23 @@ The 4.10 tight-band canvases (sign 629×203, stairs 484×154, gate 291×342, for
 
 ## G4.11-D3 (2026-11-07) — layer naming map (Node 5 list vs disk)
 The Node-5 layer list names `tower_gate`; the shipped asset is `tower_lower_gate` (4.10 name). Decision: keep the disk name (no churn, no rebuild of working assets) and record the mapping tower_lower_gate == tower_gate in the manifest + report. tower_energy remains the Canvas-driven static energy path (the 4.11 list omits it because motion is code-owned).
+
+## G4.14-D5 (2026-11-09) — calibrated magenta gate (not the generation gate)
+The §38 generation gate ("no_magenta_remnant") had missed 110 opaque + feather-spread
+chroma-key signature pixels. Decision: the SHIPPED-pixel gate is the CALIBRATED
+signature (hue 295–345°, sat≥0.62, val≥0.55; Owner reference cross-check = 0 such
+pixels); dark-wine artwork tones (val≤0.60) are documented-accepted. Repair =
+in-slice median inpaint (deterministic, no re-extraction — honoring the charter's
+"no new extraction without a material defect gate"; the residue WAS material at the
+calibrated definition, and the repair avoided a rebuild).
+
+## G4.14-D6 (2026-11-09) — DISCONNECTED/ERROR carry no dedicated tower overlay
+The tower animates the console's OWN states; link truth (gray/red indicator) stays
+with BridgeModeAuthority — the tower never fakes states the authority does not
+declare (§40 coherence; typed in the animation audit).
+
+## G4.14-D7 (2026-11-09) — self-test registration is structural truth
+ST-55..57 (CP-G4.12) were appended after the returned list's closing paren — their
+def() values were discarded, silently shrinking the battery to 54. Decision: the
+battery = the RETURNED list (61); the test pins 61; a latent-count drift is a
+BLOCKER-class honesty defect if ever reintroduced (INV-22).

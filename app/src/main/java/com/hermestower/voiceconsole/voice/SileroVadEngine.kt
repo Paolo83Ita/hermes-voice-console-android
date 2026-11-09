@@ -112,7 +112,7 @@ class SileroVadEngine(
         lastError = null
     }
 
-    private companion object {
+    internal companion object {
         /** Silero v5 16 kHz window (512 samples = 32 ms). */
         const val SILERO_WINDOW_SAMPLES_16K = 512
 

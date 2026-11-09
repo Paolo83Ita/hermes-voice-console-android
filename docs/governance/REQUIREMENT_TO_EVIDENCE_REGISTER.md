@@ -110,3 +110,18 @@ Test totals (physical, 2026-11-01): 33 `@Test` in 6 classes; 33 executed, 0 fail
 | G4.13 §44 version + APKs | 0.3.6-alpha-graph4.13-visual-accessibility / code 9; arm64 3b79b7c6…, universal da8a0ee1…, x86_64 a2e3cea8… | 9d4f3d0 |
 | G4.13 §43 warning classification | LINT_WARNING_CLASSIFICATION.md addendum (0 errors / 82 warnings; 0 newly introduced) | 9d4f3d0 |
 | G4.13 §46 terminality | GRAPH413_OWNER_VISUAL_ACCESSIBILITY_PACKAGE_READY reached; OWNER_VISUAL_RETEST_PENDING (physical grant Owner-only) | this convergence |
+
+---
+
+# GRAPH 4.14 ADDITIVE BLOCK — requirement evidence pins (this session)
+
+| Req | Requirement (short) | Evidence | Status |
+| --- | --- | --- | --- |
+| G4.14-runtime | Every integrated runtime verified (identity/coords/ABI/minSdk/format/seams/fallback/no-false-ACTIVE) | GRAPH414_FINAL_RUNTIME_AUDIT.md + measured APK ZIP contents | VERIFIED_LOCAL |
+| G4.14-llm | Local LLM honesty gate: no PASS from AAR presence; physical layers typed | GRAPH414_LLM_HONESTY_GATE.md; LlamaCppAndroidRuntimeTest + LocalLlmEngineTest | UNIT_TEST_EXECUTED — LLM_PHYSICAL_QUALIFICATION_PENDING |
+| G4.14-bridge | Mock NEVER appears as real Tower (SIMULAZIONE amber always) | BridgeModeAuthorityTest + deleted legacy cyan pills + renders/* | UNIT_TEST_EXECUTED — device leg OWNER PENDING |
+| G4.14-theme | Marble Light on EVERY route; contrast ≥4.5 text / ≥3.0 icons; no mixed chrome | GRAPH414_MARBLE_ROUTE_MATRIX.md + MARBLE_LIGHT_RENDERED_CONTRAST_REPORT (42 rows/0 FAIL) + ThemeAuthorityTest | UNIT_TEST_EXECUTED — rendered device leg OWNER PENDING |
+| G4.14-library | Truthful product states (typed verdicts, one primary action, installed≠active, probe hidden) | GRAPH414_MODEL_LIBRARY_FINAL_REPORT.md + ModelUxSemanticsTest | UNIT_TEST_EXECUTED |
+| G4.14-tower | Reference Tower integrated; §38 gates on SHIPPED pixels; 10-state visible animation; §40 mock-amber coherence | GRAPH414_TOWER_FINAL_ASSET_AUDIT.md (allPass) + contact sheet + animation strips | AUDIT_EXECUTED — ordinary-speed visibility OWNER PENDING |
+| G4.14-selftests | §25: real runtime self-tests (no catalog-state PASS) | ST-58..61 + repaired ST-55..57 registration; AppGraph probes | UNIT_TEST_EXECUTED — device probes QUALIFICATION_PENDING_DEVICE |
+| G4.14-package | 3 APK variants, version above the fresh tip, hashes + size classification | GRAPH414_APK_SIZE_AND_RUNTIME_REPORT.md + aapt2 badging | MEASURED |

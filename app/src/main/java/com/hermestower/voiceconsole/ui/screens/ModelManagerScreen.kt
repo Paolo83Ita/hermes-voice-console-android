@@ -14,6 +14,7 @@ import androidx.compose.material3.Text
 import androidx.compose.material3.TextButton
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.getValue
+import androidx.compose.runtime.mutableIntStateOf
 import androidx.compose.runtime.mutableStateMapOf
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
@@ -82,7 +83,7 @@ fun ModelManagerScreen(graph: AppGraph) {
             } ?: VoiceModelProfile.TOWER_FIRST,
         )
     }
-    var registryTick by remember { mutableStateOf(0) }
+    var registryTick by remember { mutableIntStateOf(0) }
     var packRunning by remember { mutableStateOf(false) }
     var packEvents by remember { mutableStateOf<List<String>>(emptyList()) }
     var packConfirmOpen by remember { mutableStateOf(false) }

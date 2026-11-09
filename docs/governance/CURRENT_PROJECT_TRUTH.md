@@ -408,3 +408,63 @@ Current terminal state: POCO_XIAOMI_RETEST_PACKAGE_3_READY (physical verdict = O
   typed R-42..R-49 harness family, predates 4.13; zero Process-crashed).
   Tip build run 42531971944 SUCCESS, JUnit independently re-parsed
   472/472 (0 failed, 0 errors, 0 skipped).
+
+---
+
+# GRAPH 4.14 ADDITIVE BLOCK — CONTINUATION CONVERGENCE (this session)
+
+Implementation boundary reached: **GRAPH414_RUNTIME_THEME_TOWER_PACKAGE_READY**
+(implementation terminality — the Owner-only physical states below stay
+PENDING).
+
+- Fresh continuation read-back: local was 61 behind → ff-only afefd3d →
+  d66a523 (remote tip; no force-push; main e7ab101 untouched; tree clean).
+  First incomplete action after d66a523 = version bump + the audit wave +
+  packaging (confirmed: no commits existed after d66a523).
+- Runtime: 12-entry matrix verified accurate (NOT recreated); llama.cpp
+  Android runtime (dev.ffmpegkit-maintained:llama-android:0.1.1, MIT,
+  arm64-v8a, AAR sha-verified) consumes the pinned Qwen2.5 0.5B GGUF;
+  Silero VAD real ORT seam + typed Energy fallback; GTCRN/sherpa/vosk/
+  wake-chain verified per component (GRAPH414_FINAL_RUNTIME_AUDIT.md).
+- Local LLM terminal decision HOLDS: VERIFIED_LOCAL_LLM_RUNTIME_INTEGRATED;
+  honesty gate at **LLM_PHYSICAL_QUALIFICATION_PENDING** (layers A–L typed;
+  no LOCAL_LLM_QUALIFIED claim); stale "runtime pending" diagnostic replaced
+  with the engine truth.
+- Bridge truth: BridgeModeAuthority = the ONE indicator authority (mock →
+  SIMULAZIONE amber in EVERY transport state — never cyan/BRIDGE OK; legacy
+  cyan pill strings DELETED from all 5 locales); truth panel rows + §40
+  tower coherence verified; preview evidence set committed.
+- Theme: ONE authority (HermesTheme → Marble|Obsidian; 4.13 pin removed);
+  Marble route matrix produced (GRAPH414_MARBLE_ROUTE_MATRIX.md — every
+  route light under Marble; the only darks are artwork: halo/bronze/portal);
+  contrast regression re-run: **42 rows / 0 FAIL**.
+- Model Library: product truth verified per §8 (typed verdicts, one filled
+  primary action, installed-vs-active ladder, probe hidden, runtime-missing
+  reasons; GRAPH414_MODEL_LIBRARY_FINAL_REPORT.md).
+- Tower: the reference central Tower is the visual authority; final asset
+  audit found + repaired 110 opaque (+ feather-spread) chroma-key residue
+  pixels (calibrated in-slice despill, NO re-extraction) → 14/14 shipped
+  slices at 0 residue, single body 100%, 0 holes, budgets 3.09/6.74 MB;
+  animation audit: 12 states × 3 frames with §40 mock-amber coherence.
+- §25 honesty repair: ST-55/56/57 had been appended OUTSIDE the registry's
+  returned list since CP-G4.12 (silently unregistered — battery ran 54);
+  FIXED + ST-58..61 added (Silero/GTCRN/wake/LLM real probes) → battery is
+  now **61 definitions**.
+- Tests: **496/496 GREEN** (0 f/e/s; 68 suites; JUnit XML re-parsed).
+- Lint: **0 errors / 72 warnings** (89 → 72: 7 newly-introduced repaired —
+  13 orphaned strings ×5 locales removed, 2 AutoboxingStateCreation,
+  dead composable, ModifierParameter; all 72 previously classified).
+- Secret scan: 0 findings.
+- Version: **0.3.7-alpha-graph4.14-runtime-theme-tower / versionCode 10**,
+  label OWNER RUNTIME THEME TOWER PACKAGE 7; three validation APKs hashed
+  (arm64 1c3697a5…c593 124,010,662 B; universal 216e95a6…d784 253,657,491 B;
+  x86_64 ce628573…693e 123,139,244 B); growth vs Package 6 classified
+  EXPECTED_RUNTIME_GROWTH (llama.cpp native 4.25 MB + JVM classes;
+  x86_64 carries no llama native — typed RUNTIME_ABI_LIMITATION).
+- Explicitly NOT true yet: E2E green (standing R-42..R-49 harness line;
+  arbitration at the new tip is the CI wave's job); physical visual/runtime
+  retest — **OWNER_VISUAL_RETEST_PENDING** (Package 7 runbook ready:
+  OWNER_POCO_XIAOMI_RETEST_PACKAGE_7_GRAPH414.md, POCO 17 + Xiaomi 15
+  items); OWNER_VISUAL_APPROVED / REAL_TOWER_PAIRED / REAL_ARCHIVE_ACTIVE
+  are NOT granted; LLM physical qualification PENDING (not
+  LOCAL_LLM_QUALIFIED).

@@ -17,11 +17,11 @@ android {
         applicationId = "com.hermestower.voiceconsole"
         minSdk = 30
         targetSdk = 35
-        // GRAPH 4.13 (§44): OWNER VISUAL ACCESSIBILITY PACKAGE 6 MUST exceed
-        // 0.3.5-alpha-graph4.12-physical-repair / versionCode 8 (the fresh
-        // remote-tip identity at CP-G4.13-001).
-        versionCode = 9
-        versionName = "0.3.6-alpha-graph4.13-visual-accessibility"
+        // GRAPH 4.14 (§14): OWNER RUNTIME THEME TOWER PACKAGE 7 MUST exceed
+        // 0.3.6-alpha-graph4.13-visual-accessibility / versionCode 9 (the fresh
+        // remote-tip identity at CP-G4.14-001).
+        versionCode = 10
+        versionName = "0.3.7-alpha-graph4.14-runtime-theme-tower"
         testInstrumentationRunner = "androidx.test.runner.AndroidJUnitRunner"
 
         // OWNER PHYSICAL RETEST §1 (build provenance): authoritative build
@@ -43,7 +43,7 @@ android {
         buildConfigField("String", "BUILD_TIMESTAMP_ISO8601", "\"$buildStamp\"")
         buildConfigField("String", "BUILD_WORKFLOW_RUN_ID", "\"$ciRun\"")
         buildConfigField("String", "BUILD_WORKFLOW_REF", "\"$ciRef\"")
-        buildConfigField("String", "BUILD_LABEL", "\"${project.findProperty("hermes.buildLabel") ?: "OWNER VISUAL ACCESSIBILITY PACKAGE 6"}\"")
+        buildConfigField("String", "BUILD_LABEL", "\"${project.findProperty("hermes.buildLabel") ?: "OWNER RUNTIME THEME TOWER PACKAGE 7"}\"")
     }
 
     // GRAPH 4 FINAL §20: DUAL APK OUTPUT — the UNIVERSAL debug APK keeps every

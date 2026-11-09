@@ -16,6 +16,7 @@ import androidx.compose.material3.TextButton
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.getValue
+import androidx.compose.runtime.mutableIntStateOf
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
 import androidx.compose.runtime.rememberCoroutineScope
@@ -83,7 +84,7 @@ fun OnboardingScreen(graph: AppGraph, onFinish: (pendingRoute: String?) -> Unit)
     val c = hermesColors
     val context = LocalContext.current
     val scope = rememberCoroutineScope()
-    var step by rememberSaveable { mutableStateOf(0) }
+    var step by rememberSaveable { mutableIntStateOf(0) }
     var towerChoiceQr by rememberSaveable { mutableStateOf(false) }
     var openModelsAfter by rememberSaveable { mutableStateOf(false) }
     var packEvents by remember { mutableStateOf<List<String>>(emptyList()) }

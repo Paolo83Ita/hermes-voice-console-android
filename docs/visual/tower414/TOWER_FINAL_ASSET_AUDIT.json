@@ -1,0 +1,474 @@
+{
+ "perLayer": {
+  "tower414_architecture": {
+   "balanced": {
+    "file": "tower414_architecture.webp",
+    "bytes": 166050,
+    "sha256": "d27834756469249eef28b52fc1aa14b7e10948a87bda172f1073d1cd4d65384f",
+    "manifestSha256": "d27834756469249eef28b52fc1aa14b7e10948a87bda172f1073d1cd4d65384f",
+    "shaMatchesManifest": true,
+    "px": [
+     680,
+     963
+    ],
+    "manifestPx": [
+     680,
+     963
+    ],
+    "pxMatchesManifest": true,
+    "decodedMb": 2.619,
+    "alphaMin": 0,
+    "alphaMax": 255,
+    "alphaOpaquePct": 77.68,
+    "alphaTransparentPct": 20.46,
+    "hasAlphaChannel": true,
+    "placementFrac": [
+     0.0,
+     0.0,
+     1.0,
+     1.0
+    ]
+   },
+   "low": {
+    "file": "tower414l_architecture.webp",
+    "bytes": 96148,
+    "sha256": "a6d23afa7672b8c5385206c8a79d4f31535ed12df6c09abf19d6f97f585b3dcd",
+    "manifestSha256": "a6d23afa7672b8c5385206c8a79d4f31535ed12df6c09abf19d6f97f585b3dcd",
+    "shaMatchesManifest": true,
+    "px": [
+     460,
+     652
+    ],
+    "manifestPx": [
+     460,
+     652
+    ],
+    "pxMatchesManifest": true,
+    "decodedMb": 1.2,
+    "alphaMin": 0,
+    "alphaMax": 255,
+    "alphaOpaquePct": 77.69,
+    "alphaTransparentPct": 20.66,
+    "hasAlphaChannel": true,
+    "placementFrac": [
+     0.0,
+     0.0,
+     1.0,
+     1.0
+    ]
+   }
+  },
+  "tower414_crown_sign": {
+   "balanced": {
+    "file": "tower414_crown_sign.webp",
+    "bytes": 28844,
+    "sha256": "8714666d636d5fd9ebdb62c3c896ba4349204ef57c50ebf447bd35efda04227b",
+    "manifestSha256": "8714666d636d5fd9ebdb62c3c896ba4349204ef57c50ebf447bd35efda04227b",
+    "shaMatchesManifest": true,
+    "px": [
+     476,
+     187
+    ],
+    "manifestPx": [
+     476,
+     187
+    ],
+    "pxMatchesManifest": true,
+    "decodedMb": 0.356,
+    "alphaMin": 0,
+    "alphaMax": 255,
+    "alphaOpaquePct": 95.18,
+    "alphaTransparentPct": 3.52,
+    "hasAlphaChannel": true,
+    "placementFrac": [
+     0.15,
+     0.03,
+     0.7,
+     0.195
+    ]
+   },
+   "low": {
+    "file": "tower414l_crown_sign.webp",
+    "bytes": 16712,
+    "sha256": "02d61872e76b23e8ee6a465a4776f9bcb77acdd59a1e95c09b8f731bad49b762",
+    "manifestSha256": "02d61872e76b23e8ee6a465a4776f9bcb77acdd59a1e95c09b8f731bad49b762",
+    "shaMatchesManifest": true,
+    "px": [
+     322,
+     127
+    ],
+    "manifestPx": [
+     322,
+     127
+    ],
+    "pxMatchesManifest": true,
+    "decodedMb": 0.164,
+    "alphaMin": 0,
+    "alphaMax": 255,
+    "alphaOpaquePct": 95.16,
+    "alphaTransparentPct": 3.65,
+    "hasAlphaChannel": true,
+    "placementFrac": [
+     0.15,
+     0.03,
+     0.7,
+     0.195
+    ]
+   }
+  },
+  "tower414_ring_outer": {
+   "balanced": {
+    "file": "tower414_ring_outer.webp",
+    "bytes": 42710,
+    "sha256": "e1860fbb981bc3cb53cd0f839e11e569abf6e8315aacbb232431a92a403389fd",
+    "manifestSha256": "e1860fbb981bc3cb53cd0f839e11e569abf6e8315aacbb232431a92a403389fd",
+    "shaMatchesManifest": true,
+    "px": [
+     435,
+     298
+    ],
+    "manifestPx": [
+     435,
+     298
+    ],
+    "pxMatchesManifest": true,
+    "decodedMb": 0.519,
+    "alphaMin": 255,
+    "alphaMax": 255,
+    "alphaOpaquePct": 100.0,
+    "alphaTransparentPct": 0.0,
+    "hasAlphaChannel": true,
+    "placementFrac": [
+     0.18,
+     0.3,
+     0.64,
+     0.31
+    ]
+   },
+   "low": {
+    "file": "tower414l_ring_outer.webp",
+    "bytes": 24634,
+    "sha256": "9459cae8a2120fe5434b17cb6ceb042664013d140cc4bf937a46bb51c73f79a3",
+    "manifestSha256": "9459cae8a2120fe5434b17cb6ceb042664013d140cc4bf937a46bb51c73f79a3",
+    "shaMatchesManifest": true,
+    "px": [
+     294,
+     202
+    ],
+    "manifestPx": [
+     294,
+     202
+    ],
+    "pxMatchesManifest": true,
+    "decodedMb": 0.238,
+    "alphaMin": 255,
+    "alphaMax": 255,
+    "alphaOpaquePct": 100.0,
+    "alphaTransparentPct": 0.0,
+    "hasAlphaChannel": true,
+    "placementFrac": [
+     0.18,
+     0.3,
+     0.64,
+     0.31
+    ]
+   }
+  },
+  "tower414_ring_middle": {
+   "balanced": {
+    "file": "tower414_ring_middle.webp",
+    "bytes": 24328,
+    "sha256": "ee5786144c110d235f97a93fc5b0ed981ba853f7d788120609b0a5e4ade3f6e5",
+    "manifestSha256": "ee5786144c110d235f97a93fc5b0ed981ba853f7d788120609b0a5e4ade3f6e5",
+    "shaMatchesManifest": true,
+    "px": [
+     320,
+     226
+    ],
+    "manifestPx": [
+     320,
+     226
+    ],
+    "pxMatchesManifest": true,
+    "decodedMb": 0.289,
+    "alphaMin": 255,
+    "alphaMax": 255,
+    "alphaOpaquePct": 100.0,
+    "alphaTransparentPct": 0.0,
+    "hasAlphaChannel": true,
+    "placementFrac": [
+     0.265,
+     0.34,
+     0.47,
+     0.235
+    ]
+   },
+   "low": {
+    "file": "tower414l_ring_middle.webp",
+    "bytes": 14582,
+    "sha256": "90cb3e236d575e7ff2c262b39279d69e80298e714539fa16147ca0dd42ca76df",
+    "manifestSha256": "90cb3e236d575e7ff2c262b39279d69e80298e714539fa16147ca0dd42ca76df",
+    "shaMatchesManifest": true,
+    "px": [
+     216,
+     153
+    ],
+    "manifestPx": [
+     216,
+     153
+    ],
+    "pxMatchesManifest": true,
+    "decodedMb": 0.132,
+    "alphaMin": 255,
+    "alphaMax": 255,
+    "alphaOpaquePct": 100.0,
+    "alphaTransparentPct": 0.0,
+    "hasAlphaChannel": true,
+    "placementFrac": [
+     0.265,
+     0.34,
+     0.47,
+     0.235
+    ]
+   }
+  },
+  "tower414_ring_inner": {
+   "balanced": {
+    "file": "tower414_ring_inner.webp",
+    "bytes": 9598,
+    "sha256": "bdf18e4a7e1bdaeb053fb9a564865c069c60632d38bb81d92c3f8634d620699d",
+    "manifestSha256": "bdf18e4a7e1bdaeb053fb9a564865c069c60632d38bb81d92c3f8634d620699d",
+    "shaMatchesManifest": true,
+    "px": [
+     177,
+     149
+    ],
+    "manifestPx": [
+     177,
+     149
+    ],
+    "pxMatchesManifest": true,
+    "decodedMb": 0.105,
+    "alphaMin": 255,
+    "alphaMax": 255,
+    "alphaOpaquePct": 100.0,
+    "alphaTransparentPct": 0.0,
+    "hasAlphaChannel": true,
+    "placementFrac": [
+     0.37,
+     0.385,
+     0.26,
+     0.155
+    ]
+   },
+   "low": {
+    "file": "tower414l_ring_inner.webp",
+    "bytes": 5740,
+    "sha256": "9470426389a77cd7517c224f1cfc17230b66bde8e3142c677214ce2fb1dafe9a",
+    "manifestSha256": "9470426389a77cd7517c224f1cfc17230b66bde8e3142c677214ce2fb1dafe9a",
+    "shaMatchesManifest": true,
+    "px": [
+     119,
+     101
+    ],
+    "manifestPx": [
+     119,
+     101
+    ],
+    "pxMatchesManifest": true,
+    "decodedMb": 0.048,
+    "alphaMin": 255,
+    "alphaMax": 255,
+    "alphaOpaquePct": 100.0,
+    "alphaTransparentPct": 0.0,
+    "hasAlphaChannel": true,
+    "placementFrac": [
+     0.37,
+     0.385,
+     0.26,
+     0.155
+    ]
+   }
+  },
+  "tower414_portal": {
+   "balanced": {
+    "file": "tower414_portal.webp",
+    "bytes": 14894,
+    "sha256": "bec431d1eeac5947d94058780d66e8f685314d78007528534baa4de646a0c520",
+    "manifestSha256": "bec431d1eeac5947d94058780d66e8f685314d78007528534baa4de646a0c520",
+    "shaMatchesManifest": true,
+    "px": [
+     271,
+     212
+    ],
+    "manifestPx": [
+     271,
+     212
+    ],
+    "pxMatchesManifest": true,
+    "decodedMb": 0.23,
+    "alphaMin": 255,
+    "alphaMax": 255,
+    "alphaOpaquePct": 100.0,
+    "alphaTransparentPct": 0.0,
+    "hasAlphaChannel": true,
+    "placementFrac": [
+     0.3,
+     0.705,
+     0.4,
+     0.22
+    ]
+   },
+   "low": {
+    "file": "tower414l_portal.webp",
+    "bytes": 8876,
+    "sha256": "bdd62e13e1dc9482231afb80bc9bd6bdfbb799cd6fc99d15ce04e9bf32ad4482",
+    "manifestSha256": "bdd62e13e1dc9482231afb80bc9bd6bdfbb799cd6fc99d15ce04e9bf32ad4482",
+    "shaMatchesManifest": true,
+    "px": [
+     183,
+     143
+    ],
+    "manifestPx": [
+     183,
+     143
+    ],
+    "pxMatchesManifest": true,
+    "decodedMb": 0.105,
+    "alphaMin": 255,
+    "alphaMax": 255,
+    "alphaOpaquePct": 100.0,
+    "alphaTransparentPct": 0.0,
+    "hasAlphaChannel": true,
+    "placementFrac": [
+     0.3,
+     0.705,
+     0.4,
+     0.22
+    ]
+   }
+  },
+  "tower414_energy_mask": {
+   "balanced": {
+    "file": "tower414_energy_mask.webp",
+    "bytes": 83402,
+    "sha256": "1da46b983a845c2c198cf6b0ce1d83dd5885893cb0b545485a337dfbf5f6be28",
+    "manifestSha256": "1da46b983a845c2c198cf6b0ce1d83dd5885893cb0b545485a337dfbf5f6be28",
+    "shaMatchesManifest": true,
+    "px": [
+     680,
+     963
+    ],
+    "manifestPx": [
+     680,
+     963
+    ],
+    "pxMatchesManifest": true,
+    "decodedMb": 2.619,
+    "alphaMin": 0,
+    "alphaMax": 200,
+    "alphaOpaquePct": 1.66,
+    "alphaTransparentPct": 87.99,
+    "hasAlphaChannel": true,
+    "placementFrac": [
+     0.0,
+     0.0,
+     1.0,
+     1.0
+    ]
+   },
+   "low": {
+    "file": "tower414l_energy_mask.webp",
+    "bytes": 51216,
+    "sha256": "88e59a668406d389e425718d7f5b9125f7c8155dca9ca068bf1c227dba76d615",
+    "manifestSha256": "88e59a668406d389e425718d7f5b9125f7c8155dca9ca068bf1c227dba76d615",
+    "shaMatchesManifest": true,
+    "px": [
+     460,
+     652
+    ],
+    "manifestPx": [
+     460,
+     652
+    ],
+    "pxMatchesManifest": true,
+    "decodedMb": 1.2,
+    "alphaMin": 0,
+    "alphaMax": 200,
+    "alphaOpaquePct": 1.67,
+    "alphaTransparentPct": 88.02,
+    "hasAlphaChannel": true,
+    "placementFrac": [
+     0.0,
+     0.0,
+     1.0,
+     1.0
+    ]
+   }
+  }
+ },
+ "perTier": {},
+ "gates": {
+  "balanced": {
+   "stagePx": [
+    680,
+    964
+   ],
+   "defectScan": {
+    "opaquePx": 509061,
+    "magentaRemnantPx": 0,
+    "darkWineArtworkTonesPx": 147,
+    "gateDefinition": "calibrated chroma-key signature: hue 295-345, sat>=0.62, val>=0.55 (cross-checked: Owner reference contains 0 such pixels)",
+    "arrowGreenPx": 0,
+    "arrowPurplePx": 0,
+    "arrowOrangePx": 0
+   },
+   "connectedBodies": 1,
+   "largestBodyCoveragePct": 100.0,
+   "enclosedHoles": 0,
+   "largestHoleAreasPx": [],
+   "decodedTotalMb": 6.74,
+   "backgroundsComposite": {
+    "black": "ok",
+    "white": "ok",
+    "magenta": "ok",
+    "checker": "ok"
+   }
+  },
+  "low": {
+   "stagePx": [
+    460,
+    652
+   ],
+   "defectScan": {
+    "opaquePx": 233200,
+    "magentaRemnantPx": 0,
+    "darkWineArtworkTonesPx": 19,
+    "gateDefinition": "calibrated chroma-key signature: hue 295-345, sat>=0.62, val>=0.55 (cross-checked: Owner reference contains 0 such pixels)",
+    "arrowGreenPx": 0,
+    "arrowPurplePx": 0,
+    "arrowOrangePx": 0
+   },
+   "connectedBodies": 1,
+   "largestBodyCoveragePct": 100.0,
+   "enclosedHoles": 0,
+   "largestHoleAreasPx": [],
+   "decodedTotalMb": 3.09,
+   "backgroundsComposite": {
+    "black": "ok",
+    "white": "ok",
+    "magenta": "ok",
+    "checker": "ok"
+   }
+  }
+ },
+ "hardGates": {
+  "no_magenta_remnant": true,
+  "no_residual_arrow_hues": true,
+  "single_connected_body": true,
+  "sha_manifest_pin": true,
+  "budget_low_12mb": true,
+  "budget_balanced_24mb": true
+ },
+ "allPass": true
+}

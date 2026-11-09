@@ -1,0 +1,177 @@
+{
+ "method": "offline replication of ReferenceTowerVisual.kt shipped equations over shipped raster layers (no emulator in sandbox; physical visibility = Owner retest PENDING)",
+ "stagePx": [
+  640,
+  907
+ ],
+ "states": {
+  "IDLE": {
+   "expected": "slow ring shimmer + portal breathing (visible but subtle)",
+   "frames": [
+    "IDLE.png#f1",
+    "IDLE.png#f2",
+    "IDLE.png#f3"
+   ],
+   "frameTimesLoopFraction": [
+    0.02,
+    0.45,
+    0.85
+   ],
+   "authority": "ConsoleState + BridgeModeAuthority + privacy/continuous/chat flags (typed inputs of ReferenceTowerVisual)"
+  },
+  "LISTENING": {
+   "expected": "5 incoming lines + stronger portal pulse \u2014 clearly distinct from IDLE",
+   "frames": [
+    "LISTENING.png#f1",
+    "LISTENING.png#f2",
+    "LISTENING.png#f3"
+   ],
+   "frameTimesLoopFraction": [
+    0.02,
+    0.45,
+    0.85
+   ],
+   "authority": "ConsoleState + BridgeModeAuthority + privacy/continuous/chat flags (typed inputs of ReferenceTowerVisual)"
+  },
+  "TRANSCRIBING": {
+   "expected": "12 sequential illumination ticks on the mechanism ring",
+   "frames": [
+    "TRANSCRIBING.png#f1",
+    "TRANSCRIBING.png#f2",
+    "TRANSCRIBING.png#f3"
+   ],
+   "frameTimesLoopFraction": [
+    0.02,
+    0.45,
+    0.85
+   ],
+   "authority": "ConsoleState + BridgeModeAuthority + privacy/continuous/chat flags (typed inputs of ReferenceTowerVisual)"
+  },
+  "LOCAL_PROCESSING": {
+   "expected": "inner mechanism energy at 0.7 alpha, no remote conduit",
+   "frames": [
+    "LOCAL_PROCESSING.png#f1",
+    "LOCAL_PROCESSING.png#f2",
+    "LOCAL_PROCESSING.png#f3"
+   ],
+   "frameTimesLoopFraction": [
+    0.02,
+    0.45,
+    0.85
+   ],
+   "authority": "ConsoleState + BridgeModeAuthority + privacy/continuous/chat flags (typed inputs of ReferenceTowerVisual)"
+  },
+  "CONTACTING_TOWER": {
+   "expected": "outer path arc sweep \u2014 cyan, real-transport only",
+   "frames": [
+    "CONTACTING_TOWER.png#f1",
+    "CONTACTING_TOWER.png#f2",
+    "CONTACTING_TOWER.png#f3"
+   ],
+   "frameTimesLoopFraction": [
+    0.02,
+    0.45,
+    0.85
+   ],
+   "authority": "ConsoleState + BridgeModeAuthority + privacy/continuous/chat flags (typed inputs of ReferenceTowerVisual)"
+  },
+  "SPEAKING": {
+   "expected": "portal responds visibly to the TTS amplitude",
+   "frames": [
+    "SPEAKING.png#f1",
+    "SPEAKING.png#f2",
+    "SPEAKING.png#f3"
+   ],
+   "frameTimesLoopFraction": [
+    0.02,
+    0.45,
+    0.85
+   ],
+   "authority": "ConsoleState + BridgeModeAuthority + privacy/continuous/chat flags (typed inputs of ReferenceTowerVisual)"
+  },
+  "CONTINUOUS_LISTENING": {
+   "expected": "persistent listening pulse (same family as LISTENING, sustained)",
+   "frames": [
+    "CONTINUOUS_LISTENING.png#f1",
+    "CONTINUOUS_LISTENING.png#f2",
+    "CONTINUOUS_LISTENING.png#f3"
+   ],
+   "frameTimesLoopFraction": [
+    0.02,
+    0.45,
+    0.85
+   ],
+   "authority": "ConsoleState + BridgeModeAuthority + privacy/continuous/chat flags (typed inputs of ReferenceTowerVisual)"
+  },
+  "PRIVACY_MUTED": {
+   "expected": "red-bronze seal over the input path, energy dimmed",
+   "frames": [
+    "PRIVACY_MUTED.png#f1",
+    "PRIVACY_MUTED.png#f2",
+    "PRIVACY_MUTED.png#f3"
+   ],
+   "frameTimesLoopFraction": [
+    0.02,
+    0.45,
+    0.85
+   ],
+   "authority": "ConsoleState + BridgeModeAuthority + privacy/continuous/chat flags (typed inputs of ReferenceTowerVisual)"
+  },
+  "CHAT_SPEECH_MUTED": {
+   "expected": "output path dims (energy tint 0.12)",
+   "frames": [
+    "CHAT_SPEECH_MUTED.png#f1",
+    "CHAT_SPEECH_MUTED.png#f2",
+    "CHAT_SPEECH_MUTED.png#f3"
+   ],
+   "frameTimesLoopFraction": [
+    0.02,
+    0.45,
+    0.85
+   ],
+   "authority": "ConsoleState + BridgeModeAuthority + privacy/continuous/chat flags (typed inputs of ReferenceTowerVisual)"
+  },
+  "MOCK_MODE": {
+   "expected": "AMBER simulation pulse 0.35\u21920.80 \u2014 never cyan (\u00a740)",
+   "frames": [
+    "MOCK_MODE.png#f1",
+    "MOCK_MODE.png#f2",
+    "MOCK_MODE.png#f3"
+   ],
+   "frameTimesLoopFraction": [
+    0.02,
+    0.45,
+    0.85
+   ],
+   "authority": "ConsoleState + BridgeModeAuthority + privacy/continuous/chat flags (typed inputs of ReferenceTowerVisual)"
+  },
+  "DISCONNECTED": {
+   "expected": "no dedicated tower overlay \u2014 truth carried by the gray bridge indicator (\u00a740 coherence)",
+   "frames": [
+    "DISCONNECTED.png#f1",
+    "DISCONNECTED.png#f2",
+    "DISCONNECTED.png#f3"
+   ],
+   "frameTimesLoopFraction": [
+    0.02,
+    0.45,
+    0.85
+   ],
+   "authority": "ConsoleState + BridgeModeAuthority + privacy/continuous/chat flags (typed inputs of ReferenceTowerVisual)"
+  },
+  "ERROR": {
+   "expected": "no dedicated tower overlay \u2014 truth carried by the red bridge indicator (\u00a740 coherence)",
+   "frames": [
+    "ERROR.png#f1",
+    "ERROR.png#f2",
+    "ERROR.png#f3"
+   ],
+   "frameTimesLoopFraction": [
+    0.02,
+    0.45,
+    0.85
+   ],
+   "authority": "ConsoleState + BridgeModeAuthority + privacy/continuous/chat flags (typed inputs of ReferenceTowerVisual)"
+  }
+ }
+}

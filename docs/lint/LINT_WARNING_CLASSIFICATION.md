@@ -65,3 +65,52 @@ across 5 locales; they were REMOVED, not suppressed).
 
 Newly introduced warnings: **0**. Release blockers: **0**.
 Deferred dependency upgrades: the standing pinned-catalog set only.
+
+---
+
+# GRAPH 4.14 ADDENDUM (§17 — no new warning accepted without classification)
+
+Re-measured after the Graph 4.14 continuation (runtime integration + bridge
+truth + Marble + Model Library truth + reference Tower). At the continuation
+tip the first lint pass reported **0 errors / 89 warnings** — 7 above the
+classified 82 baseline. Per §17 the newly-introduced set was REPAIRED before
+package delivery, not suppressed:
+
+| Repair | Count | Class | Disposition |
+| --- | --- | --- | --- |
+| 13 orphaned string keys removed across ALL 5 locales (`desc_bridge_fmt`, `pill_connected`, `pill_connecting`, `pill_mock`, `pill_offline`, `mm_network`, `mm_section_b`, `mm_section_c`, `mm_repair`, `continuous_start`, `continuous_stop`, `msg_listen_label`, `mm_cfg_device`) — zero-reference verified (main+test+androidTest) before removal | 13 UnusedResources → 0 | orphaned localized strings from the 4.13/4.14 UI rebuild | REPAIRED |
+| `mutableStateOf(0)` → `mutableIntStateOf(0)` (ModelManagerScreen registryTick; OnboardingScreen step) | 2 AutoboxingStateCreation → 0 | newly introduced | REPAIRED |
+| dead `TowerEnergyPhase` composable deleted (retired 4.13 direction; zero call sites) + dead import | 1 ComposableNaming → 0 | dead runtime declaration | REPAIRED |
+| ResponsiveActionGroup: `modifier` moved to the first optional parameter | 1 ModifierParameter → 0 | newly introduced | REPAIRED |
+
+Note on the baseline drift: the 4.13 classification listed 9
+`UnusedResources` (drawable/attr entries referenced dynamically). Those
+entries disappeared with the RETIRED 4.13 Tower assets (30 webp deleted in
+d66a523) — the class is now genuinely empty (0), which is why the post-repair
+total (72) sits 10 BELOW the 82 baseline.
+
+## Post-repair terminal set (0 errors / 72 warnings — all previously classified)
+
+| Count | Rule | Classification |
+| --- | --- | --- |
+| 42 | GradleDependency | ACCEPTED, INTENTIONAL — pinned versions (docs/DEPENDENCY_PINNING.md); the 4.14 runtime additions (llama-android 0.1.1) are part of the integrated runtime, not bulk upgrades |
+| 3 | AndroidGradlePluginVersion | ACCEPTED, INTENTIONAL — AGP 8.7.3 pinned |
+| 8 | ApplySharedPref | PRE-EXISTING (Graph 2 era persistence; deferred to a dedicated persistence-hygiene node) |
+| 11 | PluralsCandidate | PRE-EXISTING (deferred to localization-polish) |
+| 3 | MissingQuantity | PRE-EXISTING (deferred with PluralsCandidate) |
+| 1 | StaticFieldLeak | PRE-EXISTING (Graph 2 registry singleton, app-lifetime scope) |
+| 1 | DataExtractionRules | PRE-EXISTING (legacy fullBackupContent kept for the migration window) |
+| 1 | UnusedAttribute | PRE-EXISTING (locale-config vs minSdk) |
+| 1 | AppBundleLocaleChanges | PRE-EXISTING (debug qualification packaging; not shipped as AAB) |
+| 1 | Typos | PRE-EXISTING (intentional identifier) |
+
+Newly introduced warnings after repair: **0**. Release blockers: **0**.
+Deferred dependency upgrades: the standing pinned-catalog set only (no mass
+upgrades performed; llama-android was a REQUIRED integrated runtime, not an
+upgrade).
+
+## §12 gate verification (Graph 4.14)
+
+- `:app:lintDebug` executed locally post-repair: **0 errors / 72 warnings**
+  (abortOnError=true stays terminal truth).
+- Secret scan: 0 findings (working-tree diff + full-tree pattern sweep).

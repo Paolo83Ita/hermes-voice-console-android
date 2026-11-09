@@ -2127,3 +2127,31 @@ BALANCED 6.43 MB.
 CHECKPOINT: CP-G4.14-010/011/012.
 NEXT: full regression + version 0.3.7/code 10 + APKs + Package 7 + governance
 convergence.
+
+## GRAPH 4.14 CONTINUATION (CP-G4.14-C01..C08)
+
+- C01: fresh read-back — local afefd3d stale (sandbox recycle), remote tip
+  d66a523 (Tower integration); ff-only; clean tree; first incomplete action =
+  version + audits + packaging. Repairs executed in the wave: 13 orphaned
+  strings ×5 locales removed (§17), 2 AutoboxingStateCreation, dead
+  TowerEnergyPhase + import, ModifierParameter reorder → lint 89 → 72 (0
+  errors); stale LLM diagnostic → engine truth; ST-55..57 LATENT REGISTRATION
+  BUG FIXED (appended outside the returned list since CP-G4.12 — battery ran
+  54 silently) + ST-58..61 added with real AppGraph probes → 61-definition
+  battery; tower re-audit found 110 opaque chroma-key residue px (50
+  clusters; Owner reference has ZERO of that signature) → calibrated in-slice
+  median despill (no re-extraction) → 0 residue on all 14 shipped slices;
+  manifest re-pinned; contact sheet regenerated + visually inspected.
+- C02..C06: runtime audit (12 components, ABI/minSdk measured from the APK),
+  LLM honesty gate (LLM_PHYSICAL_QUALIFICATION_PENDING), bridge truth final
+  check + Marble route matrix + contrast re-run (42/0) + renders, Model
+  Library report, animation audit (12 states × 3 frames, §40 amber mock
+  coherence), owner reference comparison. 496/496 unit GREEN throughout.
+- C07: version 0.3.7-alpha-graph4.14-runtime-theme-tower / code 10 / PACKAGE
+  7; assembleDebug → arm64/universal/x86_64 (ZIP-integrity + aapt2-verified,
+  SHA-256 recorded); size report (growth = EXPECTED_RUNTIME_GROWTH); lint
+  addendum; local build receipt; Owner Tower package final + Package 7
+  runbook (POCO 17 + Xiaomi 15).
+- C08: governance convergence (this block, truth, registers, rehydration) +
+  push + cloud qualification arbitration (verdict recorded in the deployment
+  read-back).

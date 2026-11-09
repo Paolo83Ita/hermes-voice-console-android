@@ -40,8 +40,8 @@
       460,
       652
      ],
-     "webpSha256": "e81fad84b5b88b101f6e6f166b6d69ee9a5919fadd9acd430de3c50a6a6d2aa8",
-     "webpBytes": 97114,
+     "webpSha256": "a6d23afa7672b8c5385206c8a79d4f31535ed12df6c09abf19d6f97f585b3dcd",
+     "webpBytes": 96148,
      "decodedMb": 1.14
     },
     {
@@ -50,8 +50,8 @@
       322,
       127
      ],
-     "webpSha256": "030fae8488012a5b97347c94a0005c5c774849146da82c458f2caa362b02ab5c",
-     "webpBytes": 16660,
+     "webpSha256": "02d61872e76b23e8ee6a465a4776f9bcb77acdd59a1e95c09b8f731bad49b762",
+     "webpBytes": 16712,
      "decodedMb": 0.16
     },
     {
@@ -117,8 +117,8 @@
       680,
       963
      ],
-     "webpSha256": "3ae1c2f058e2f8484c5d49b650b6b5cd45dab734cfd6ebf45d63a37b92690385",
-     "webpBytes": 167442,
+     "webpSha256": "d27834756469249eef28b52fc1aa14b7e10948a87bda172f1073d1cd4d65384f",
+     "webpBytes": 166050,
      "decodedMb": 2.5
     },
     {
@@ -127,8 +127,8 @@
       476,
       187
      ],
-     "webpSha256": "959fd1db68bb48d72767ef557aec3b269d757f4c7da9acecb7f52aafb3fdafaa",
-     "webpBytes": 28926,
+     "webpSha256": "8714666d636d5fd9ebdb62c3c896ba4349204ef57c50ebf447bd35efda04227b",
+     "webpBytes": 28844,
      "decodedMb": 0.34
     },
     {
@@ -184,5 +184,12 @@
    ]
   }
  },
- "license": "OWNER-AUTHORIZED DERIVATIVE (charter \u00a732/\u00a735; app-specific use)"
+ "license": "OWNER-AUTHORIZED DERIVATIVE (charter \u00a732/\u00a735; app-specific use)",
+ "repair": {
+  "date": "graph-4.14-continuation",
+  "finding": "110 opaque chroma-key-signature pixels (50 clusters, 1-9 px) at feather boundaries on the master; Owner reference has ZERO such pixels (calibrated cross-check)",
+  "method": "in-slice median inpaint of signature + 1px feather pixels (no re-extraction, no geometry change)",
+  "changedSlices": [],
+  "secondPass": "feather-alpha despill: every remaining alpha>0 signature pixel median-inpainted to 0 residual"
+ }
 }

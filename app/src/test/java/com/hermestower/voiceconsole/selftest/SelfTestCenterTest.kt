@@ -114,7 +114,7 @@ class SelfTestCenterTest {
         // ST-51 (Italian TTS negotiation) + ST-52 (natural TTS route,
         // CP-G4.9-003) + ST-53 (offline STT route, CP-G4.9-004) + ST-54 (voice
         // A/B comparison, Graph 4.11 Node 1) join the battery.
-        assertEquals(54, results.size)
+        assertEquals(61, results.size)
         val quick = results.values.filter { it.state != SelfTestState.NOT_RUN }
         assertTrue("quick subset empty", quick.isNotEmpty())
         // JVM runtime: bundled manifest is not readable → ST-46 is honestly skipped;
@@ -147,8 +147,8 @@ class SelfTestCenterTest {
         center.run(SelfTestMode.FULL)
         awaitCompletion()
         val results = center.results.value
-        assertEquals(54, results.size)
-        assertTrue(results.keys.containsAll((1..54).map { "ST-%02d".format(it) }))
+        assertEquals(61, results.size)
+        assertTrue(results.keys.containsAll((1..61).map { "ST-%02d".format(it) }))
         // JVM runtime: the Android-asset subjects degrade to typed skips;
         // the TTS voice probe is not wired on the JVM (ST-51 →
         // QUALIFICATION_PENDING_DEVICE, Owner retest §7).

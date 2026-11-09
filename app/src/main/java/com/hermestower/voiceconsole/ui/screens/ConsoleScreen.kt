@@ -84,7 +84,6 @@ import com.hermestower.voiceconsole.ui.monumental.BurnInRegion
 import com.hermestower.voiceconsole.ui.monumental.MonumentalColors
 import com.hermestower.voiceconsole.ui.monumental.MonumentalType
 import com.hermestower.voiceconsole.ui.monumental.ReferenceTowerVisual
-import com.hermestower.voiceconsole.ui.monumental.TowerEnergyPhase
 import com.hermestower.voiceconsole.ui.monumental.drawTowerFrame
 import com.hermestower.voiceconsole.ui.monumental.VisualQuality
 import com.hermestower.voiceconsole.ui.monumental.burnInOffset

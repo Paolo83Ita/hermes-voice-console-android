@@ -780,8 +780,12 @@ object SelfTestRegistry {
                     }
                 }
             },
-        )
             // ---- GRAPH 4.12 §9: ST-55 (Vosk physical function truth) ----
+            // GRAPH 4.14 §25 HONESTY REPAIR: ST-55..ST-57 were appended AFTER the
+            // closing paren of the returned list (a latent CP-G4.12 defect — the
+            // bare def() values were DISCARDED, so the battery silently ran 54
+            // tests while the file grew to 57). They are now INSIDE the returned
+            // list, together with the new ST-58..ST-61.
             def("ST-55", "Vosk function truth (Graph 4.12 §9)", SelfTestCategory.DIAGNOSTICS, setOf(SelfTestMode.STANDARD, SelfTestMode.FULL, SelfTestMode.VOICE_FOUNDATION_ONLY)) { s ->
                 val probe = s.voskFunctionProbe
                 when {
@@ -816,7 +820,7 @@ object SelfTestRegistry {
                         }
                     }
                 }
-            }
+            },
 
             // ---- GRAPH 4.12 §10: ST-56 (Riccardo physical function truth) ----
             def("ST-56", "Riccardo function truth (Graph 4.12 §10)", SelfTestCategory.DIAGNOSTICS, setOf(SelfTestMode.STANDARD, SelfTestMode.FULL, SelfTestMode.VOICE_FOUNDATION_ONLY)) { s ->
@@ -852,7 +856,7 @@ object SelfTestRegistry {
                         }
                     }
                 }
-            }
+            },
 
             // ---- GRAPH 4.12 §10: ST-57 (Paola physical function truth) ----
             def("ST-57", "Paola function truth (Graph 4.12 §10)", SelfTestCategory.DIAGNOSTICS, setOf(SelfTestMode.STANDARD, SelfTestMode.FULL, SelfTestMode.VOICE_FOUNDATION_ONLY)) { s ->
@@ -888,8 +892,118 @@ object SelfTestRegistry {
                         }
                     }
                 }
-            }
+            },
 
+            // ---- GRAPH 4.14 §25: ST-58 (Silero VAD real inference truth) ----
+            def("ST-58", "Silero VAD function truth (Graph 4.14 §25)", SelfTestCategory.DIAGNOSTICS, setOf(SelfTestMode.STANDARD, SelfTestMode.FULL, SelfTestMode.VOICE_FOUNDATION_ONLY)) { s ->
+                val probe = s.sileroVadProbe
+                when {
+                    probe == null ->
+                        SelfTestState.QUALIFICATION_PENDING_DEVICE to
+                            "JVM/emulator runtime: the Silero graph needs the real ORT runner. PHYSICAL_QUALIFICATION_PENDING."
+                    else -> {
+                        val rb = probe()
+                        when {
+                            rb == null ->
+                                SelfTestState.SKIPPED_NOT_APPLICABLE to "no Silero read-back this run."
+                            !rb.modelDelivered ->
+                                SelfTestState.BLOCKED_DEPENDENCY to
+                                    "org.silero.vad.v5 is not delivered/ACTIVE in Model Sanctum — install it, then re-run."
+                            !rb.runtimeLoaded ->
+                                SelfTestState.FAIL to
+                                    "the Silero ORT runner did not load (lastError=${rb.lastError ?: "none"}) — the VAD stays on the typed Energy fallback, never reported ACTIVE."
+                            !rb.realInferenceRan ->
+                                SelfTestState.FAIL to
+                                    "no REAL inference frames ran through the Silero graph — catalog presence alone is never a PASS (§25)."
+                            rb.speechDetectedOnFixture == false ->
+                                SelfTestState.FAIL to
+                                    "the Silero graph ran but detected NO speech on the Italian fixture — inference output is suspect."
+                            else ->
+                                SelfTestState.PASS to
+                                    "REAL Silero inference: graph loaded, fixture frames processed, speech detected=${rb.speechDetectedOnFixture ?: true}. Physical microphone leg stays with the Owner retest."
+                        }
+                    }
+                }
+            },
+
+            // ---- GRAPH 4.14 §25: ST-59 (GTCRN real ONNX inference truth) ----
+            def("ST-59", "GTCRN denoiser function truth (Graph 4.14 §25)", SelfTestCategory.DIAGNOSTICS, setOf(SelfTestMode.STANDARD, SelfTestMode.FULL, SelfTestMode.VOICE_FOUNDATION_ONLY)) { s ->
+                val probe = s.gtcrnProbe
+                when {
+                    probe == null ->
+                        SelfTestState.QUALIFICATION_PENDING_DEVICE to
+                            "JVM/emulator runtime: the GTCRN streaming graph needs the real ORT runner. PHYSICAL_QUALIFICATION_PENDING."
+                    else -> {
+                        val rb = probe()
+                        when {
+                            rb == null ->
+                                SelfTestState.SKIPPED_NOT_APPLICABLE to "no GTCRN read-back this run."
+                            !rb.modelDelivered ->
+                                SelfTestState.BLOCKED_DEPENDENCY to
+                                    "org.gtcrn.speech-enhancement.simple is not delivered/ACTIVE in Model Sanctum — install it, then re-run."
+                            !rb.runtimeLoaded ->
+                                SelfTestState.FAIL to
+                                    "the GTCRN ORT runner did not load (lastError=${rb.lastError ?: "none"}) — denoising stays typed-OFF, never reported ACTIVE."
+                            !rb.realInferenceRan || (rb.framesProcessed ?: 0) <= 0 ->
+                                SelfTestState.FAIL to
+                                    "no REAL streaming frames processed through the GTCRN graph — catalog presence alone is never a PASS (§25)."
+                            else ->
+                                SelfTestState.PASS to
+                                    "REAL GTCRN ONNX inference: ${rb.framesProcessed} streaming frames processed with no engine error."
+                        }
+                    }
+                }
+            },
+
+            // ---- GRAPH 4.14 §25: ST-60 (wake-word typed qualification state) ----
+            def("ST-60", "Wake word typed qualification (Graph 4.14 §25)", SelfTestCategory.DIAGNOSTICS, setOf(SelfTestMode.STANDARD, SelfTestMode.FULL)) { s ->
+                val probe = s.wakeWordProbe
+                when {
+                    probe == null ->
+                        SelfTestState.QUALIFICATION_PENDING_DEVICE to
+                            "JVM/emulator runtime: the 3-graph ORT chain needs the real runtime. PHYSICAL_QUALIFICATION_PENDING."
+                    else -> {
+                        val rb = probe()
+                        when {
+                            rb == null ->
+                                SelfTestState.SKIPPED_NOT_APPLICABLE to "no wake-word read-back this run."
+                            !rb.disabledByDefault ->
+                                SelfTestState.FAIL to
+                                    "the wake word is NOT disabled by default — Owner §8/§9 requires the FA/FR harness as the activation gate."
+                            else ->
+                                SelfTestState.PASS to
+                                    "typed state: ${rb.typedQualificationState} (graphsLoaded=${rb.graphsLoaded}) — OFF by default; physical FA/FR qualification stays with the Owner retest."
+                        }
+                    }
+                }
+            },
+
+            // ---- GRAPH 4.14 §25: ST-61 (local LLM chain truth) ----
+            def("ST-61", "Local LLM chain truth (Graph 4.14 §25)", SelfTestCategory.DIAGNOSTICS, setOf(SelfTestMode.STANDARD, SelfTestMode.FULL)) { s ->
+                val probe = s.localLlmProbe
+                when {
+                    probe == null ->
+                        SelfTestState.QUALIFICATION_PENDING_DEVICE to
+                            "JVM/emulator runtime: the llama.cpp native load needs the arm64 device. PHYSICAL_QUALIFICATION_PENDING."
+                    else -> {
+                        val rb = probe()
+                        when {
+                            rb == null ->
+                                SelfTestState.SKIPPED_NOT_APPLICABLE to "no local-LLM read-back this run."
+                            !rb.hasVerifiedRuntime ->
+                                SelfTestState.FAIL to
+                                    "the engine does NOT hold a verified runtime — selectability must be disabled honestly (§25: no PASS from catalog state alone)."
+                            rb.modelFileExists && rb.state == "ERROR" ->
+                                SelfTestState.FAIL to
+                                    "the model file exists but the engine is in ERROR (integrity=${rb.integrityCode}) — inspect the typed diagnostic."
+                            else ->
+                                SelfTestState.PASS to
+                                    "dependency VERIFIED, runtime identity '${rb.runtimeName}', engine state ${rb.state}, integrity ${rb.integrityCode}, model file present=${rb.modelFileExists}. Physical native-load/output/memory/thermal qualification stays PENDING (§4)."
+                        }
+                    }
+                }
+            },
+        )
     }
 
     // ---------- helpers ----------

@@ -9,7 +9,6 @@
     <string name="composer_send">Send</string>
     <string name="composer_speak_instead">Speak</string>
     <string name="composer_stop">Interrupt</string>
-    <string name="desc_bridge_fmt">Tower bridge: %1$s, endpoint %2$s</string>
     <string name="desc_mic_live">System recognizer is capturing — push-to-talk active</string>
     <string name="desc_mic_ready">Microphone ready for push-to-talk; capture runs only during a turn</string>
     <string name="desc_muted">Privacy mute engaged, microphone physically disconnected</string>
@@ -45,13 +44,9 @@
     <string name="nav_primary">PRIMARY</string>
     <string name="nav_truth_note">Every state shown is the real state of the console.</string>
     <string name="no_conversation">No conversation yet. Speak with the microphone or write a message — everything shown is the console\'s real output.</string>
-    <string name="pill_connected">BRIDGE OK</string>
-    <string name="pill_connecting">BRIDGE…</string>
     <string name="pill_mic">MIC</string>
     <string name="pill_mic_live">MIC LIVE</string>
-    <string name="pill_mock">MOCK</string>
     <string name="pill_muted">MUTED</string>
-    <string name="pill_offline">OFFLINE</string>
     <string name="pill_queued_fmt">QUEUED ×%1$d</string>
     <string name="repeat_cd">Repeat last spoken response</string>
     <string name="sim_wake_cd">Simulate wake word and canned utterance</string>
@@ -450,7 +445,6 @@
     <string name="mm_intro">Local intelligence is optional and independent per component; complex, uncertain and consequential reasoning always belongs to Hermes Tower. No model is downloaded without your explicit confirmation.</string>
     <string name="mm_section_a">A. Recommended setup</string>
     <string name="mm_tts_none">none reported</string>
-    <string name="mm_network">Network: %1$s%2$s</string>
     <string name="mm_network_online">online</string>
     <string name="mm_network_offline">offline</string>
     <string name="mm_compat_summary">Compatibility summary: %1$s</string>
@@ -469,11 +463,9 @@
     <string name="mm_licenses">Licenses: %1$s</string>
     <string name="mm_optional_note">Optional and NOT included (never auto-downloaded): %1$s — including the local LLM; complex reasoning stays on Hermes Tower.</string>
     <string name="mm_install_pack">Install Recommended Voice Pack</string>
-    <string name="mm_section_b">B. Installed voice components</string>
     <string name="mm_nothing_installed">Nothing installed yet — the console runs fully in Tower-only fallback (usable without any local model).</string>
     <string name="mm_verified_line">verified: %1$s · qualified: %2$s</string>
     <string name="mm_never">never</string>
-    <string name="mm_section_c">C. Available components</string>
     <string name="mm_update_available">Update available: installed v%1$s → catalog v%2$s.</string>
     <string name="mm_download_progress">Download: %1$s %2$d/%3$d bytes (%4$d%%)</string>
     <string name="mm_last_download_event">Last download event: %1$s</string>
@@ -532,7 +524,6 @@
     <string name="mm_rollback">Roll back</string>
     <string name="mm_remove">Remove</string>
     <string name="mm_redownload">Re-download</string>
-    <string name="mm_repair">Repair</string>
     <string name="mm_update">Update</string>
     <string name="mm_open_diagnostics">Open diagnostics</string>
     <string name="mm_probe_started">Probe download started from the local test server (port %1$d).</string>
@@ -554,8 +545,6 @@
     <string name="listening_mode_continuous">Continuous listening while the Console is open</string>
     <string name="listening_mode_wake_word">Wake word</string>
     <string name="listening_mode_off">Off</string>
-    <string name="continuous_start">Continuous listening</string>
-    <string name="continuous_stop">Stop continuous listening</string>
     <string name="continuous_active_indicator">Continuous listening active</string>
     <string name="session_limit_5">5 minutes</string>
     <string name="session_limit_15">15 minutes</string>
@@ -572,7 +561,6 @@
     <string name="chat_speech_state_muted">Spoken responses muted</string>
     <string name="chat_speech_state_manual">Spoken responses manual</string>
     <string name="msg_repeat_label">Repeat</string>
-    <string name="msg_listen_label">Listen</string>
     <string name="mm_voice_qualifying">Qualifying voice %1$s (test synthesis and playback)…</string>
     <string name="mm_voice_active">Voice %1$s ACTIVE — the runtime now speaks with it.</string>
     <string name="mm_voice_runtime_failed">Voice %1$s runtime activation failed (%2$s) — installed files preserved; the Italian system voice applies.</string>
@@ -785,7 +773,6 @@ MANUAL_ADVANCED — independent per-component selection, full visibility, no sil
     <string name="mm_section_e2">Optional local intelligence</string>
     <string name="mm_section_f2">Installed components</string>
     <string name="mm_section_g2">Updates or repairs</string>
-    <string name="mm_cfg_device">Device</string>
     <string name="mm_cfg_android">Android version</string>
     <string name="mm_cfg_arch">Architecture</string>
     <string name="mm_cfg_ram">Available RAM</string>
