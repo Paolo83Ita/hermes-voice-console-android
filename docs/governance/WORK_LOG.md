@@ -1951,3 +1951,25 @@ truth table, state machines, voice authorities, bridge/theme/Tower surfaces,
 scope freeze). Scope: 5 programs only; 4 preliminary physical PASS preserved.
 CHECKPOINT: CP-G4.14-001.
 NEXT: CP-G4.14-002 runtime requirement matrix.
+
+## 2026-11-09 — CP-G4.14-002/003: runtime requirement matrix + terminal decisions
+
+FINDING: 12 catalog components inventoried against code truth; two
+download-exposed-but-unusable cases confirmed (Silero VAD — no engine;
+Qwen GGUF — NoVerifiedLlmRuntime) + one stale catalog label (sherpa-onnx
+runtime still CANDIDATE_PENDING_DISCOVERY) + probe fixture visible risk.
+External verification (§3 authorized): llama-android AAR 0.1.1 downloaded
+from Maven Central, inspected in-sandbox (sha256 fdccf04c…7501; 2.06MB;
+jni/arm64-v8a only; minSdk 24 ≤ 30; classes dev.ffmpegkit.llama.*; API
+Llama.loadModel/complete/releaseModel + LlamaConfig + LlamaResult
+(text,tokensPerSecond); llama.cpp b9878 submodule 2da6686; MIT; maintained
+last commit 2026-09-15).
+ACTION: ANDROID_RUNTIME_REQUIREMENT_MATRIX.{json,md} — 12 entries × 27
+charter-§4 fields; per-component §5 decision (7× REUSE, 1× EXTEND
+SileroVadEngine, 1× ADD llama-android, 1× KEEP_DOWNLOAD_ONLY_IN_ADVANCED_LAB
+hey-jarvis, 1× BLOCK hermes-it wake (no verified source), 1× REMOVE probe
+from ordinary catalog). No component remains downloadable-but-unusable.
+CHECKPOINT: CP-G4.14-002/003 (decisions) — integration code follows in the
+§6 order.
+NEXT: runtime integration code (Silero engine, LLM runtime, catalog truth,
+capability states §7).
