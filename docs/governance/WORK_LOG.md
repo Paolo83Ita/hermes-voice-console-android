@@ -2027,3 +2027,21 @@ authority READS existing truth only.
 CHECKPOINT: CP-G4.14-004.
 NEXT: LLM terminal decision doc (CP-G4.14-005 closure) at CI-green read-back;
 then theme convergence (CP-G4.14-006).
+
+## 2026-11-09 — CP-G4.14-005: LOCAL LLM terminal decision — VERIFIED_LOCAL_LLM_RUNTIME_INTEGRATED
+
+FINDING: charter §9 forbids leaving CANDIDATE_PENDING_DISCOVERY without a
+terminal investigation; the Qwen2.5 0.5B GGUF entry was download-exposed but
+unusable (FINDING-01/02).
+ACTION: fresh runtime comparison completed (llama.cpp-AAR vs LiteRT-LM vs
+MediaPipe GenAI vs MLC vs ORT-GenAI — see LOCAL_LLM_RUNTIME_DECISION.md
+table); llama-android 0.1.1 adopted (Maven Central, MIT, llama.cpp b9878,
+arm64-v8a, minSdk 24, AAR sha256 fdccf04c…7501 verified in-sandbox); the
+EXISTING pinned GGUF stays the compatible artifact (no replacement, Italian
+capability preserved); integration in-tree at f6d5cd6 (seam + sole-touching
+real bridge + adapter + AppGraph injection + 6 tests); NoVerifiedLlmRuntime
+retained as typed fallback. On-device latency/thermal/persistence stay typed
+PENDING_DEVICE (PHYSICAL_QUALIFICATION_PENDING — Owner device; nothing
+fabricated).
+CHECKPOINT: CP-G4.14-005 CLOSED.
+NEXT: theme convergence (CP-G4.14-006/007/008).
