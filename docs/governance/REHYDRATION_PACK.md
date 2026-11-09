@@ -109,3 +109,13 @@ Same toolchain as Graph 1, re-verified in a fresh sandbox:
 - Tower truth: docs/receipts/CENTRAL_TOWER_VISUAL_REFOUNDATION_REPORT.md (Graph 4.11 update section) + docs/visual/ASSET_MANIFEST.json (manifestVersion graph-4.11-central-tower-refoundation-2) + scripts/tower_refoundation_g411.py (reproducible measure/build/preview).
 - Package 4: docs/receipts/OWNER_POCO_PACKAGE_4_GRAPH411.md (runbook; version 7 / 0.3.4-alpha-graph4.11).
 - Standing pending tokens: OWNER_VISUAL_RETEST_PENDING, VOICE_SWITCHING_OWNER_VERIFICATION_PENDING, REAL_TOWER_PENDING_GRAPH_1_7.
+
+## GRAPH 4.13 rehydration pointer (2026-11-09)
+- Working branch (authoritative, fresh remote tip always wins): `graph-4/real-voice-pairing-archive-e2e` — CP-G4.13-015 tip `afbe48d`; ff-only re-attach, never trust an old SHA.
+- Read first: docs/governance/GRAPH413_FRESH_READBACK.md → CURRENT_PROJECT_TRUTH.md "GRAPH 4.13 TRUTH" block → WORK_LOG from CP-G4.13-001 → CHECKPOINT_INDEX G4.13 rows.
+- Implementation boundary REACHED: **GRAPH413_OWNER_VISUAL_ACCESSIBILITY_PACKAGE_READY** — Block 1 semantic color authority (25 tokens, live audit 50 rows / 0 FAIL both themes), Block 2 Model Library rebuild (§13–§27, presentation-only over the UNCHANGED model authority), Block 3 tower refoundation (candidate A "Monumental Oracle Citadel", 13-layer §36 contract, docs/visual/tower413/, defect gates ALL PASS, 4.12 assets retired).
+- Version: 0.3.6-alpha-graph4.13-visual-accessibility / versionCode 9 / label OWNER VISUAL ACCESSIBILITY PACKAGE 6; Owner runbook = OWNER_POCO_XIAOMI_RETEST_PACKAGE_6_GRAPH413.md (POCO 15 + Xiaomi 10 items); tower package = OWNER_TOWER_VISUAL_PACKAGE_GRAPH413.md.
+- Tests truth at the tip: unit 472/472 GREEN (independently re-parsed from CI), lint 0 errors / 82 classified warnings (below the 84 baseline), secret scan 0.
+- Standing e2e line: both lanes E2E_VERDICT_FAILED typed — gate signatures IDENTICAL to the pre-4.13 baseline 4b8bfb2 (R-42..R-49 harness-anchor family; residual 7/2 byte-identical; zero Process-crashed → crash family stays eliminated) → NO 4.13-attributed e2e regression (CP-G4.13-015 arbitration). The e2e arbitrates autonomously at every new tip; record its verdict in the next read-back, never as an Owner-gate claim.
+- ONLY open gate: **OWNER_VISUAL_RETEST_PENDING** — the Owner physically runs Package 6 on POCO X6 Pro (2311DRK48G) + Xiaomi 11 Lite 5G NE. OWNER_VISUAL_ACCESSIBILITY_AND_MODEL_LIBRARY_RETEST_PASSED is Owner-only and is NEVER self-granted.
+- Next session resume action: fetch; ff-only to the remote tip; read CURRENT_PROJECT_TRUTH; if the Owner granted the physical PASS, converge governance to the terminal state; otherwise report pending.
