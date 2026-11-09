@@ -83,9 +83,8 @@ import com.hermestower.voiceconsole.ui.components.labelRes
 import com.hermestower.voiceconsole.ui.monumental.BurnInRegion
 import com.hermestower.voiceconsole.ui.monumental.MonumentalColors
 import com.hermestower.voiceconsole.ui.monumental.MonumentalType
-import com.hermestower.voiceconsole.ui.monumental.ReforgedTowerVisual
+import com.hermestower.voiceconsole.ui.monumental.ReferenceTowerVisual
 import com.hermestower.voiceconsole.ui.monumental.TowerEnergyPhase
-import com.hermestower.voiceconsole.ui.monumental.TowerArchitecture
 import com.hermestower.voiceconsole.ui.monumental.drawTowerFrame
 import com.hermestower.voiceconsole.ui.monumental.VisualQuality
 import com.hermestower.voiceconsole.ui.monumental.burnInOffset
@@ -286,11 +285,11 @@ fun ConsoleScreen(
                 val byHeight = screenHeightDp * heightFraction * coreScale
                 val byWidth = maxWidth * 1.375f * coreScale
                 val coreH = minOf(byHeight, byWidth)
-                // GRAPH 4.10 §29: the procedural Tower is REJECTED by the Owner —
-                // the Console renders the Owner-reference-derived LAYERED central
-                // Tower (ReforgedTowerVisual, §31 layers + §34 state animations,
-                // §35 performance profiles). Same §33 stage sizing (chat focus).
-                ReforgedTowerVisual(
+                // GRAPH 4.14 §32: the Owner-REFERENCE central Tower is the
+                // primary visual (clean extraction, all §38 defect gates PASS).
+                // §40: the tower and the Bridge indicator consume the SAME truth
+                // — mock mode renders the amber simulation pulse, never cyan.
+                ReferenceTowerVisual(
                     state = state,
                     speakingAmplitude = amplitude,
                     quality = quality,
@@ -299,17 +298,10 @@ fun ConsoleScreen(
                     privacyMuted = muted,
                     continuousActive = continuousActive,
                     chatSpeechMuted = speechMode == com.hermestower.voiceconsole.voice.ChatSpeechOutputPolicy.Mode.MUTED,
+                    bridgeIsMock = com.hermestower.voiceconsole.domain.BridgeModeAuthority.resolve(connection).isMock,
                     modifier = Modifier
                         .fillMaxWidth()
                         .height(coreH),
-                )
-                // GRAPH 4 directive §7: the original architectural frame (upper
-                // order, lower structure, state-driven messenger path) drawn over
-                // the core stage — foreground built order, no bitmap memory.
-                val towerPhase = TowerEnergyPhase(
-                    flowing = TowerArchitecture.stateDrivesFlow(state),
-                    frozen = settings.reducedMotion ||
-                        com.hermestower.voiceconsole.ui.runtime.MotionProfile.ornamentsFrozen,
                 )
                 StateOverlayChip(
                     state,

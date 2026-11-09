@@ -2089,3 +2089,41 @@ ordinary cards (REMOVE decision); raw enums never render (§18/§26 pins stand).
 TEST: unit suite GREEN incl. the new mapping pin.
 CHECKPOINT: CP-G4.14-009.
 NEXT: reference central Tower extraction + integration (§32-§43).
+
+## 2026-11-09 — CP-G4.14-010/011/012: reference central Tower extracted + integrated + themed variants
+
+FINDING: CURRENT_TOWER_OWNER_REJECTED (the flat geometric direction); the
+Owner authorized the central Tower of the supplied reference as the primary
+visual (§32/§33), subject to clean extraction/reconstruction/animation.
+ACTION (§34 pipeline, Owner-authorized tools per §3): (1) center-column crop
+of the 1536×1024 reference (x 522-986, y 0-823); (2) AI-assisted subject
+extraction onto a pure-magenta key (z-ai image edit, 768×1344); (3) PIL/
+numpy/scipy post: magenta chroma-key, CALIBRATED arrow-hue removal
+(green/purple bands + super-saturated orange, iterative passes + vertical
+inpaint inside the body core — the crown-sign gold letters guarded by a
+y-band), border-reachability hole fill, island removal, magenta-hue despill,
+edge decontamination + feather; bbox trim to 637×903. (4) §37 layer slicing
+on ONE normalized stage: architecture / crown_sign / ring_outer /
+ring_middle / ring_inner / portal / energy_mask ×2 tiers (LOW 460 w =
+2.94MB decoded, BALANCED 680 w = 6.43MB — budgets respected, structure
+never sacrificed). (5) §38 defect gates STRICT, computed on final pixels:
+no_magenta_remnant / no_residual_arrow_hues / single_connected_body /
+no_hole_mechanism / no_hole_portal / sign_present / sign_not_clipped —
+ALL PASS (DEFECT_GATES.json) + independent multimodal review of the master
+(sign intact, mechanism intact, zero arrows, zero fringe). (6) §36 hybrid
+renderer ReferenceTowerVisual: raster layers carry the full architecture;
+Canvas layers carry portal glow (breathing/listening/amplitude), ring
+rotation shimmer, transcribing ticks, contacting-tower arc, privacy seal,
+mock amber pulse; §40 coherence — the tower consumes BridgeModeAuthority
+(mock NEVER shows cyan remote energy); §41 composition (FillWidth, bottom
+anchor; keyboard collapse keeps sign+mechanism+portal via stage clipping);
+Obsidian/Marble variants via the theme-aware stage (§42). (7) Retired the
+rejected 4.13 tower: ReforgedTowerVisual.kt + 30 webp assets deleted;
+ConsoleScreen swapped (dead towerPhase removed); INTEGRATION manifest under
+docs/visual/tower414/ (ASSET_MANIFEST.json with per-asset SHA-256 +
+owner_reference_source.png provenance).
+TEST: compile GREEN; unit suite GREEN; gates ALL PASS; memory LOW 2.94 /
+BALANCED 6.43 MB.
+CHECKPOINT: CP-G4.14-010/011/012.
+NEXT: full regression + version 0.3.7/code 10 + APKs + Package 7 + governance
+convergence.

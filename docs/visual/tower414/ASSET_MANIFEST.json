@@ -1,0 +1,188 @@
+{
+ "manifestVersion": "graph-4.14-reference-tower-1",
+ "source": {
+  "file": "upload/Immagine_Hermes_Tower.png",
+  "px": [
+   1536,
+   1024
+  ],
+  "sha256": "bc49a6d9caa94fafcc05a7557ebb2c9906080bc673f13e8b8ff2b3dd1f4b3add"
+ },
+ "extraction": {
+  "method": "AI-assisted subject extraction (magenta key) + v3 calibrated arrow-hue removal (outside core: drop; inside: vertical inpaint) + hole fill + island removal + magenta-hue despill + feather",
+  "tool": "z-ai image edit (Owner-authorized \u00a734) + PIL/numpy/scipy post",
+  "centerCropPx": [
+   522,
+   0,
+   986,
+   823
+  ],
+  "extractRaw": [
+   768,
+   1344
+  ],
+  "towerBboxInRaw": [
+   74,
+   325,
+   710,
+   1227
+  ]
+ },
+ "tiers": {
+  "low": {
+   "stageWidth": 460,
+   "decodedTotalMb": 2.94,
+   "budget": "LOW \u226412 / BALANCED \u226424",
+   "layers": [
+    {
+     "layer": "tower414_architecture",
+     "px": [
+      460,
+      652
+     ],
+     "webpSha256": "e81fad84b5b88b101f6e6f166b6d69ee9a5919fadd9acd430de3c50a6a6d2aa8",
+     "webpBytes": 97114,
+     "decodedMb": 1.14
+    },
+    {
+     "layer": "tower414_crown_sign",
+     "px": [
+      322,
+      127
+     ],
+     "webpSha256": "030fae8488012a5b97347c94a0005c5c774849146da82c458f2caa362b02ab5c",
+     "webpBytes": 16660,
+     "decodedMb": 0.16
+    },
+    {
+     "layer": "tower414_ring_outer",
+     "px": [
+      294,
+      202
+     ],
+     "webpSha256": "9459cae8a2120fe5434b17cb6ceb042664013d140cc4bf937a46bb51c73f79a3",
+     "webpBytes": 24634,
+     "decodedMb": 0.23
+    },
+    {
+     "layer": "tower414_ring_middle",
+     "px": [
+      216,
+      153
+     ],
+     "webpSha256": "90cb3e236d575e7ff2c262b39279d69e80298e714539fa16147ca0dd42ca76df",
+     "webpBytes": 14582,
+     "decodedMb": 0.13
+    },
+    {
+     "layer": "tower414_ring_inner",
+     "px": [
+      119,
+      101
+     ],
+     "webpSha256": "9470426389a77cd7517c224f1cfc17230b66bde8e3142c677214ce2fb1dafe9a",
+     "webpBytes": 5740,
+     "decodedMb": 0.05
+    },
+    {
+     "layer": "tower414_portal",
+     "px": [
+      183,
+      143
+     ],
+     "webpSha256": "bdd62e13e1dc9482231afb80bc9bd6bdfbb799cd6fc99d15ce04e9bf32ad4482",
+     "webpBytes": 8876,
+     "decodedMb": 0.1
+    },
+    {
+     "layer": "tower414_energy_mask",
+     "px": [
+      460,
+      652
+     ],
+     "webpSha256": "88e59a668406d389e425718d7f5b9125f7c8155dca9ca068bf1c227dba76d615",
+     "webpBytes": 51216,
+     "decodedMb": 1.14
+    }
+   ]
+  },
+  "balanced": {
+   "stageWidth": 680,
+   "decodedTotalMb": 6.43,
+   "budget": "LOW \u226412 / BALANCED \u226424",
+   "layers": [
+    {
+     "layer": "tower414_architecture",
+     "px": [
+      680,
+      963
+     ],
+     "webpSha256": "3ae1c2f058e2f8484c5d49b650b6b5cd45dab734cfd6ebf45d63a37b92690385",
+     "webpBytes": 167442,
+     "decodedMb": 2.5
+    },
+    {
+     "layer": "tower414_crown_sign",
+     "px": [
+      476,
+      187
+     ],
+     "webpSha256": "959fd1db68bb48d72767ef557aec3b269d757f4c7da9acecb7f52aafb3fdafaa",
+     "webpBytes": 28926,
+     "decodedMb": 0.34
+    },
+    {
+     "layer": "tower414_ring_outer",
+     "px": [
+      435,
+      298
+     ],
+     "webpSha256": "e1860fbb981bc3cb53cd0f839e11e569abf6e8315aacbb232431a92a403389fd",
+     "webpBytes": 42710,
+     "decodedMb": 0.49
+    },
+    {
+     "layer": "tower414_ring_middle",
+     "px": [
+      320,
+      226
+     ],
+     "webpSha256": "ee5786144c110d235f97a93fc5b0ed981ba853f7d788120609b0a5e4ade3f6e5",
+     "webpBytes": 24328,
+     "decodedMb": 0.28
+    },
+    {
+     "layer": "tower414_ring_inner",
+     "px": [
+      177,
+      149
+     ],
+     "webpSha256": "bdf18e4a7e1bdaeb053fb9a564865c069c60632d38bb81d92c3f8634d620699d",
+     "webpBytes": 9598,
+     "decodedMb": 0.1
+    },
+    {
+     "layer": "tower414_portal",
+     "px": [
+      271,
+      212
+     ],
+     "webpSha256": "bec431d1eeac5947d94058780d66e8f685314d78007528534baa4de646a0c520",
+     "webpBytes": 14894,
+     "decodedMb": 0.22
+    },
+    {
+     "layer": "tower414_energy_mask",
+     "px": [
+      680,
+      963
+     ],
+     "webpSha256": "1da46b983a845c2c198cf6b0ce1d83dd5885893cb0b545485a337dfbf5f6be28",
+     "webpBytes": 83402,
+     "decodedMb": 2.5
+    }
+   ]
+  }
+ },
+ "license": "OWNER-AUTHORIZED DERIVATIVE (charter \u00a732/\u00a735; app-specific use)"
+}

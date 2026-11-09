@@ -1,0 +1,12 @@
+{
+ "gates": {
+  "no_magenta_remnant": true,
+  "no_residual_arrow_hues": true,
+  "single_connected_body": true,
+  "no_hole_mechanism": true,
+  "no_hole_portal": true,
+  "sign_present": true,
+  "sign_not_clipped": true
+ },
+ "allPass": true
+}
