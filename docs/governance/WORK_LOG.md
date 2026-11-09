@@ -2073,3 +2073,19 @@ palettes distinct, marble ink ≥4.5 ×4 surfaces, energy accents ≥3.0 icons /
 TEST: unit suite GREEN (incl. 5 new pins); compile GREEN.
 CHECKPOINT: CP-G4.14-006/007/008.
 NEXT: Model Library truth statuses (CP-G4.14-009) then the reference Tower.
+
+## 2026-11-09 — CP-G4.14-009: Model Library runtime truth (over the preserved 4.13 rebuild)
+
+FINDING: the 4.13 presentation rebuild stands (sections A–G, config card,
+vertical profile cards, typed verdicts, one primary action); the 4.14 truth
+deltas: Local-experimental selectability was keyed to engine LOADED (wrong
+ladder level) and RUNTIME_RESOLVED had no action mapping.
+ACTION: LocalLlmEngine.hasVerifiedRuntime (data-driven §25 truth — the
+runtime IS integrated since CP-G4.14-005, so the profile selector enables
+with the honest pending-delivery body; if a future build loses the runtime,
+the selector disables itself with the honest note); ModelActionResolver +
+RUNTIME_RESOLVED → CHECK_RUNTIME (§27) + test pin; probe stays filtered from
+ordinary cards (REMOVE decision); raw enums never render (§18/§26 pins stand).
+TEST: unit suite GREEN incl. the new mapping pin.
+CHECKPOINT: CP-G4.14-009.
+NEXT: reference central Tower extraction + integration (§32-§43).

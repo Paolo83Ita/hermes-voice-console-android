@@ -136,6 +136,7 @@ object ModelActionResolver {
             recordState == "ACTIVE" || active == true -> ModelPrimaryAction.TEST
             recordState == "FUNCTIONAL_TEST_PASSED" -> ModelPrimaryAction.ACTIVATE
             recordState == "RUNTIME_AVAILABLE" -> ModelPrimaryAction.RUN_FUNCTIONAL_TEST
+            recordState == "RUNTIME_RESOLVED" -> ModelPrimaryAction.CHECK_RUNTIME
             recordState == "INSTALLED" -> ModelPrimaryAction.CHECK_RUNTIME
             recordState == "HASH_VERIFIED" -> ModelPrimaryAction.INSTALL
             recordState == "DOWNLOADED" -> ModelPrimaryAction.VERIFY

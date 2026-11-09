@@ -121,8 +121,13 @@ fun ModelManagerScreen(graph: AppGraph) {
         // Diagnostics, the ordinary card shows the device CLASS) ----------
         run {
             val resources = remember { graph.deviceResourceReader.read() }
+            // GRAPH 4.14 §25: the Local-experimental profile is selectable when
+            // the runtime is INTEGRATED (llama.cpp in-tree, CP-G4.14-005) —
+            // model delivery/activation is the capability ladder's job, not the
+            // selector's. Data-driven: if a future build ships without a verified
+            // runtime, the selector disables itself again with the honest note.
             val localLlmAvailable = remember(registryTick) {
-                graph.localLlmEngine.state.value == com.hermestower.voiceconsole.local.LocalLlmEngine.State.LOADED
+                graph.localLlmEngine.hasVerifiedRuntime
             }
             RecommendedConfigurationCard(
                 deviceClass = com.hermestower.voiceconsole.models.DeviceClassLabel.resolve(resources.deviceModel),

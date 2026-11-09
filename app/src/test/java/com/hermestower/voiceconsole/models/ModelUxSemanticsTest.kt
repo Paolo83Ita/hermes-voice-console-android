@@ -139,6 +139,8 @@ class ModelUxSemanticsTest {
         assertEquals(ModelPrimaryAction.VERIFY, plan("DOWNLOADED"))
         assertEquals(ModelPrimaryAction.INSTALL, plan("HASH_VERIFIED"))
         assertEquals(ModelPrimaryAction.CHECK_RUNTIME, plan("INSTALLED"))
+        // GRAPH 4.14 §7/§27: the resolution state keeps the same next step.
+        assertEquals(ModelPrimaryAction.CHECK_RUNTIME, plan("RUNTIME_RESOLVED"))
         assertEquals(ModelPrimaryAction.RUN_FUNCTIONAL_TEST, plan("RUNTIME_AVAILABLE"))
         assertEquals(ModelPrimaryAction.ACTIVATE, plan("FUNCTIONAL_TEST_PASSED"))
         assertEquals(ModelPrimaryAction.TEST, plan("ACTIVE", active = true))

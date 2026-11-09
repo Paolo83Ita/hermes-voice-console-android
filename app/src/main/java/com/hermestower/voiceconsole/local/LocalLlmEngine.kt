@@ -78,6 +78,15 @@ class LocalLlmEngine(
     private val _state = MutableStateFlow(State.DISABLED)
     val state: StateFlow<State> = _state.asStateFlow()
 
+    /**
+     * GRAPH 4.14 §25: the SELECTABILITY truth for the Local-experimental
+     * profile. True when a verified runtime is injected (llama.cpp in-tree
+     * since CP-G4.14-005); false only for the NoVerifiedLlmRuntime fallback.
+     * Model delivery/activation remains the catalog ladder's job.
+     */
+    val hasVerifiedRuntime: Boolean
+        get() = runtime !is NoVerifiedLlmRuntime
+
     @Volatile
     private var lastCode: DiagnosticCode = DiagnosticCode.DISABLED_BY_DEFAULT
 
