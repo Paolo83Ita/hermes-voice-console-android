@@ -90,7 +90,10 @@ class ModelUxSemanticsTest {
     }
 
     @Test
-    fun `runtime requirement without installation is runtime unavailable`() {
+    fun `runtime requirement without verified runtime is runtime unavailable`() {
+        // OWNER PHYSICAL RETEST F-C (Package 8): RUNTIME_UNAVAILABLE is now an
+        // HONEST verdict — it fires only when the linked runtime seam is
+        // genuinely absent (runtimeAvailable = false).
         val v = CompatVerdictResolver.resolve(
             entryClassification = "VERIFIED_DOWNLOADABLE",
             recordState = null,
@@ -99,8 +102,46 @@ class ModelUxSemanticsTest {
             compatible = true,
             incompatibilityReason = null,
             progressState = null,
+            runtimeAvailable = false,
         )
         assertEquals(CompatVerdictKind.RUNTIME_UNAVAILABLE, v.kind)
+    }
+
+    @Test
+    fun `f-c repair - integrated runtime with no install record is not downloaded, never runtime unavailable`() {
+        // The Owner's physical defect: nine cards (vosk model, piper voices,
+        // qwen GGUF, wake trio, silero, gtcrn) showed "runtime Android richiesto
+        // non disponibile" although their runtimes are bundled and integrated.
+        // With the runtime seam present the verdict is NOT_DOWNLOADED and the
+        // primary action is DOWNLOAD (the card is usable again).
+        val v = CompatVerdictResolver.resolve(
+            entryClassification = "VERIFIED_DOWNLOADABLE",
+            recordState = null,
+            active = null,
+            runtimeRequirement = "com.alphacephei:vosk-android:0.3.75 (Gradle, Maven Central) — INTEGRATED",
+            compatible = true,
+            incompatibilityReason = null,
+            progressState = null,
+            runtimeAvailable = true,
+        )
+        assertEquals(CompatVerdictKind.NOT_DOWNLOADED, v.kind)
+        val plan = ModelActionResolver.resolve(
+            entryClassification = "VERIFIED_DOWNLOADABLE",
+            recordState = null,
+            active = null,
+            progressState = null,
+            verdict = v,
+        )
+        assertEquals(ModelPrimaryAction.DOWNLOAD, plan.primary)
+    }
+
+    @Test
+    fun `f-c repair - probe mapping routes each family to its own runtime seam`() {
+        // LOCAL_LLM follows the injected llama.cpp seam (never a class probe).
+        assertTrue(ComponentRuntimeAvailability.probe(ModelComponentType.LOCAL_LLM, localLlmHasVerifiedRuntime = true))
+        assertFalse(ComponentRuntimeAvailability.probe(ModelComponentType.LOCAL_LLM, localLlmHasVerifiedRuntime = false))
+        // A class that cannot exist is honestly absent.
+        assertFalse(ComponentRuntimeAvailability.classPresent("com.hermestower.runtime.that.does.not.Exist"))
     }
 
     @Test

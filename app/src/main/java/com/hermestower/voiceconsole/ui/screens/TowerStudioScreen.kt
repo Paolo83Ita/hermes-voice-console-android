@@ -183,11 +183,13 @@ fun TowerStudioScreen(graph: AppGraph, onOpenScanner: (() -> Unit)? = null) {
             HermesOutlinedField(language, onValueChange = { language = it }, label = { Text(stringResource(R.string.ts_field_language)) }, modifier = Modifier.fillMaxWidth())
             Row(horizontalArrangement = Arrangement.spacedBy(12.dp)) {
                 HermesSwitch(checked = autoConnect, onCheckedChange = { autoConnect = it })
-                Text(stringResource(R.string.ts_switch_autoconnect), style = HermesType.body, color = c.textPrimary)
+                // OWNER PHYSICAL RETEST F-D REPAIR: weighted text column — long
+                // localized switch labels wrap instead of pushing the row overflow.
+                Text(stringResource(R.string.ts_switch_autoconnect), style = HermesType.body, color = c.textPrimary, modifier = Modifier.weight(1f))
             }
             Row(horizontalArrangement = Arrangement.spacedBy(12.dp)) {
                 HermesSwitch(checked = useTailscale, onCheckedChange = { useTailscale = it })
-                Text(stringResource(R.string.ts_switch_tailscale), style = HermesType.body, color = c.textPrimary)
+                Text(stringResource(R.string.ts_switch_tailscale), style = HermesType.body, color = c.textPrimary, modifier = Modifier.weight(1f))
             }
         }
 
@@ -207,7 +209,7 @@ fun TowerStudioScreen(graph: AppGraph, onOpenScanner: (() -> Unit)? = null) {
                 HermesOutlinedField(verbosity, onValueChange = { verbosity = it }, label = { Text(stringResource(R.string.ts_field_verbosity)) }, modifier = Modifier.fillMaxWidth())
                 Row(horizontalArrangement = Arrangement.spacedBy(12.dp)) {
                     HermesSwitch(checked = consequentialConfirm, onCheckedChange = { consequentialConfirm = it })
-                    Text(stringResource(R.string.ts_switch_consequential), style = HermesType.body, color = c.textPrimary)
+                    Text(stringResource(R.string.ts_switch_consequential), style = HermesType.body, color = c.textPrimary, modifier = Modifier.weight(1f))
                 }
                 Text(stringResource(R.string.ts_label_cert_behavior), style = HermesType.sectionLabel, color = c.bronze)
                 Row(horizontalArrangement = Arrangement.spacedBy(6.dp)) {

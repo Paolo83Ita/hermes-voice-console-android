@@ -3,39 +3,33 @@ package com.hermestower.voiceconsole.ui.monumental
 import androidx.compose.foundation.Canvas
 import androidx.compose.foundation.Image
 import androidx.compose.foundation.layout.Box
-import androidx.compose.foundation.layout.fillMaxHeight
 import androidx.compose.foundation.layout.offset
 import androidx.compose.foundation.layout.size
 import androidx.compose.ui.unit.dp
 import androidx.compose.foundation.layout.fillMaxSize
-import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.runtime.Composable
-import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.getValue
-import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
-import androidx.compose.runtime.setValue
 import androidx.compose.animation.core.RepeatMode
 import androidx.compose.animation.core.animateFloat
 import androidx.compose.animation.core.infiniteRepeatable
 import androidx.compose.animation.core.rememberInfiniteTransition
 import androidx.compose.animation.core.tween
 import androidx.compose.animation.core.animateFloatAsState
-import androidx.compose.foundation.layout.height
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.draw.clipToBounds
 import androidx.compose.ui.geometry.Offset
 import androidx.compose.ui.graphics.Brush
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.graphics.drawscope.Stroke
 import androidx.compose.ui.graphics.graphicsLayer
 import androidx.compose.ui.layout.ContentScale
-import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.res.painterResource
 import com.hermestower.voiceconsole.R
 import com.hermestower.voiceconsole.core.state.ConsoleState
 import com.hermestower.voiceconsole.ui.monumental.VisualQuality
-import kotlin.math.min
+import androidx.compose.foundation.layout.BoxWithConstraints
 
 /**
  * GRAPH 4.14 §32-§39 — REFERENCE CENTRAL TOWER (the primary Console visual).
@@ -68,6 +62,21 @@ import kotlin.math.min
  * Mobile composition (§41): the tower fills the stage width; keyboard-open
  * collapse keeps sign + oracle mechanism + portal visible (the lower
  * architecture is clipped by the stage height, never horizontally scaled).
+ *
+ * OWNER PHYSICAL RETEST REPAIR (Package 8, finding F-A "torre duplicata e
+ * sfasata in basso"): the extraction layer crops (rings / portal / crown
+ * sign) are measured as fractions of the ASSET's normalized stage
+ * (680×963 BALANCED / 460×652 LOW — aspect ≈1.416), but they were placed at
+ * fractions of the CONSOLE STAGE BOX (min(screen·0.50, width·1.375) — aspect
+ * ≤1.375). Whenever the stage box is shorter than the drawn image, the
+ * ContentScale.FillWidth + BottomCenter architecture is top-clipped while the
+ * crops keep box-relative geometry → every crop renders a SECOND copy of its
+ * baked content, offset DOWNWARD and scaled smaller (the Owner's duplicated,
+ * misaligned central element). The repair draws ALL layers — architecture,
+ * crops, energy mask, Canvas dynamics AND the §18 halo — inside ONE computed
+ * IMAGE RECT (the exact rectangle ContentScale.FillWidth + BottomCenter
+ * produces for the architecture painter's intrinsic aspect), so the crops sit
+ * precisely on their baked copies at every stage aspect, on every device.
  */
 @Composable
 fun ReferenceTowerVisual(
@@ -145,34 +154,56 @@ fun ReferenceTowerVisual(
     val isSpeaking = stateName.contains("Speaking", ignoreCase = true)
     val remoteActive = (isContactingTower || isSpeaking) && !bridgeIsMock
 
-    Box(modifier.fillMaxSize()) {
-        // ---- controlled local dark halo behind the portal (§18) ----
-        Canvas(Modifier.fillMaxSize()) {
-            val haloCenter = Offset(size.width * 0.5f, size.height * 0.78f)
-            drawCircle(
-                brush = Brush.radialGradient(
-                    listOf(Color.Black.copy(alpha = if (low) 0.55f else 0.42f), Color.Transparent),
-                    center = haloCenter,
+    // ---- OWNER F-A REPAIR: the drawn IMAGE RECT (one coordinate system) ----
+    // ContentScale.FillWidth + Alignment.BottomCenter draws the architecture at
+    // width = stage width, height = width × intrinsic aspect, bottom-anchored.
+    // The extraction fractions (§37 manifest) are only valid against THAT rect.
+    val fallbackAspect = 963f / 680f // BALANCED normalized stage (manifest §37)
+    val intr = architecture.intrinsicSize
+    val imageAspect = if (intr.width > 0f && intr.height > 0f) intr.height / intr.width else fallbackAspect
+
+    BoxWithConstraints(modifier.fillMaxSize().clipToBounds()) {
+        val boxW = maxWidth
+        val imgH = boxW * imageAspect
+
+        // ---- the image-rect container: every layer inside shares its geometry ----
+        // Bottom-anchored INSIDE the stage box: when the stage is shorter than
+        // the drawn image, the rect overflows ABOVE and the stage's clipToBounds
+        // crops it exactly like the architecture bitmap's own top-clip.
+        Box(
+            Modifier
+                .align(Alignment.BottomStart)
+                .size(boxW, imgH)
+                .clipToBounds(),
+        ) {
+            // ---- controlled local dark halo behind the portal (§18) ----
+            Canvas(Modifier.fillMaxSize()) {
+                val haloCenter = Offset(size.width * 0.5f, size.height * 0.815f)
+                drawCircle(
+                    brush = Brush.radialGradient(
+                        listOf(Color.Black.copy(alpha = if (low) 0.55f else 0.42f), Color.Transparent),
+                        center = haloCenter,
+                        radius = size.width * 0.62f,
+                    ),
                     radius = size.width * 0.62f,
-                ),
-                radius = size.width * 0.62f,
-                center = haloCenter,
+                    center = haloCenter,
+                )
+            }
+
+            // ---- raster architecture (the full monument) ----
+            Image(
+                architecture,
+                contentDescription = null,
+                modifier = Modifier.fillMaxSize(),
+                contentScale = ContentScale.FillWidth,
+                alignment = Alignment.BottomCenter,
             )
-        }
 
-        // ---- raster architecture (the full monument) ----
-        Image(
-            architecture,
-            contentDescription = null,
-            modifier = Modifier.fillMaxSize(),
-            contentScale = ContentScale.FillWidth,
-            alignment = Alignment.BottomCenter,
-        )
-
-        // ---- oracle mechanism: ring crops + rotation shimmer ----
-        // The ring layers are crops of the SAME normalized stage (§37): they are
-        // positioned by the extraction's measured fractions, never re-drawn.
-        Box(Modifier.matchParentSize()) {
+            // ---- oracle mechanism: ring crops + rotation shimmer ----
+            // The ring layers are crops of the SAME normalized stage (§37): with
+            // the image-rect coordinate system they sit exactly on their baked
+            // copies (F-A repair) — at rest they are invisible seams; the
+            // rotation shimmer is the only motion.
             LayerAt(ringOuter, xFrac = 0.180f, yFrac = 0.300f, wFrac = 0.640f, hFrac = 0.310f, rotation = if (frozen) 0f else shimmer * 8f)
             LayerAt(ringMiddle, xFrac = 0.265f, yFrac = 0.340f, wFrac = 0.470f, hFrac = 0.235f, rotation = if (frozen) 0f else -shimmer * 14f)
             LayerAt(ringInner, xFrac = 0.370f, yFrac = 0.385f, wFrac = 0.260f, hFrac = 0.155f, rotation = if (frozen) 0f else shimmer * 22f)
@@ -180,7 +211,7 @@ fun ReferenceTowerVisual(
             LayerAt(crownSign, xFrac = 0.150f, yFrac = 0.030f, wFrac = 0.700f, hFrac = 0.195f, rotation = 0f)
 
             // ---- §39 dynamic overlays (Canvas — never architectural geometry) ----
-            Canvas(Modifier.matchParentSize()) {
+            Canvas(Modifier.fillMaxSize()) {
                 val w = size.width
                 val h = size.height
                 val portalCx = w * 0.5f
@@ -298,7 +329,7 @@ fun ReferenceTowerVisual(
                 energyMask,
                 contentDescription = null,
                 modifier = Modifier
-                    .matchParentSize()
+                    .fillMaxSize()
                     .graphicsLayer { alpha = energyTintAlpha },
                 contentScale = ContentScale.FillWidth,
                 alignment = Alignment.BottomCenter,
@@ -307,7 +338,11 @@ fun ReferenceTowerVisual(
     }
 }
 
-/** Places one normalized-stage layer at its extraction fractions (single coordinate system §37). */
+/**
+ * Places one normalized-stage layer at its extraction fractions — expressed in
+ * the SURROUNDING image-rect box (F-A repair: the parent box now has exactly
+ * the asset's normalized aspect, so the fractions are pixel-true again).
+ */
 @Composable
 private fun LayerAt(
     painter: androidx.compose.ui.graphics.painter.Painter,
@@ -317,7 +352,7 @@ private fun LayerAt(
     hFrac: Float,
     rotation: Float,
 ) {
-    androidx.compose.foundation.layout.BoxWithConstraints(Modifier.fillMaxSize()) {
+    BoxWithConstraints(Modifier.fillMaxSize()) {
         val pw = maxWidth * wFrac
         val ph = maxHeight * hFrac
         Image(
@@ -332,4 +367,3 @@ private fun LayerAt(
         )
     }
 }
-

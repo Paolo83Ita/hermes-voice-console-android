@@ -1,123 +1,164 @@
-# GRAPH 4.14 — CONTINUATION READ-BACK (CP-G4.14-C01)
+# GRAPH 4.14 — CONTINUATION READ-BACK (CP-G4.14-C11) — OWNER PHYSICAL RETEST ROUND
 
 Mission mode: CONTINUE_THE_EXISTING_GRAPH_FROM_LATEST_VERIFIED_REMOTE_AUTHORITY.
 Fresh remote tip prevails. No restart of Graph 4.14; no repeated discovery; no
 recreated matrix/authority/theme; main untouched; no force-push.
 
 ## NODE
-CP-G4.14-C01 — fresh continuation read-back after the reported "stopped during
-final APK production" state (Tower commit d66a523).
+CP-G4.14-C11 — continuation after the Owner's physical retest of
+**OWNER RUNTIME THEME TOWER PACKAGE 7** (0.3.7-alpha-graph4.14-runtime-theme-tower,
+versionCode 10) on the **POCO X6 Pro**. The Owner granted the retest verdict and
+it OPENS the `OWNER_VISUAL_RETEST_PENDING` gate with 4 defects + 1 requirement
+(F-A..F-D). The gate is NOT closed; the repairs below are the response package
+(Package 8) and the physical re-grant stays Owner-only.
 
-## FINDING
+## READ-BACK (verified this session)
 
 | Item | Verified value |
 | --- | --- |
 | Active branch | graph-4/real-voice-pairing-archive-e2e |
 | Local HEAD at session start | afefd3d (recycled sandbox snapshot — stale) |
-| Remote tip (fetch + ls-remote verified) | d66a523 (CP-G4.14-010/011/012 reference central Tower) |
-| Delta | 0 ahead / 61 behind → ff-only afefd3d → d66a523 (forward-only, preserved) |
-| Working tree | clean at read-back; no uncommitted packaging changes found |
-| Commits after d66a523 | NONE — d66a523 is the remote tip |
-| main | e7ab101 — untouched |
-| Active processes | none (no gradle/adb/emulator) — no duplicate execution started |
-| Version at read-back | 0.3.6-alpha-graph4.13-visual-accessibility / versionCode 9 / label OWNER VISUAL ACCESSIBILITY PACKAGE 6 |
-| Build label needed | OWNER RUNTIME THEME TOWER PACKAGE 7 (versionCode 10) — NOT yet committed → first incomplete action |
+| Remote tip (fetch + ls-remote verified) | 89e8da0 (CP-G4.14-C10 terminality convergence) |
+| Delta | 0 ahead / 65 behind → ff-only afefd3d → 89e8da0 (forward-only) |
+| Working tree | clean at read-back |
+| main | untouched |
+| CI at tip | build 42642866825 SUCCESS (496/496, lint 0/73), e2e dual full samples arbitrated at C10 |
+| Open gates at read-back | OWNER_VISUAL_RETEST_PENDING + LLM_PHYSICAL_QUALIFICATION_PENDING |
 
-Remote-tip truth inventory (all VERIFIED in-tree, not from narrative):
+## OWNER RETEST VERDICT (Package 7 on POCO X6 Pro) — registered verbatim-class
 
-- Runtime matrix: `docs/governance/ANDROID_RUNTIME_REQUIREMENT_MATRIX.{json,md}`
-  (12 entries × 27 charter fields, terminal §5 decisions — REUSE ×5,
-  EXTEND (Silero), ADD_VERIFIED_ANDROID_RUNTIME (Qwen GGUF via llama.cpp),
-  KEEP_DOWNLOAD_ONLY (hey-jarvis), BLOCK_UNTIL_RUNTIME_AVAILABLE (hermes-it),
-  REMOVE_MISLEADING_ENTRY (probe artifact)).
-- LLM runtime: `LlamaCppAndroidRuntime` + `LlamaRealNativeBridge` wired in
-  AppGraph (dev.ffmpegkit-maintained:llama-android:0.1.1 → llama.cpp b9878,
-  arm64-v8a, MIT); decision VERIFIED_LOCAL_LLM_RUNTIME_INTEGRATED
-  (`LOCAL_LLM_RUNTIME_DECISION.md`).
-- Silero VAD: `SileroVadEngine` real ORT seam + typed Energy fallback.
-- Bridge truth: `BridgeModeAuthority` (§10 modes × §11 indicator roles;
-  mock → SIMULAZIONE amber in every transport state) + `bridge_pill_*`
-  strings in 5 locales; Console + drawer + truth panel consume the authority.
-- Marble Light: `Theme.kt` theme-aware monumental layer (Marble in light,
-  Obsidian in dark; the 4.13 hard pin removed) + MonumentalMarble palette +
-  contrast report (42 rows / 0 FAIL) + THEME_AUTHORITY_CONSUMER_MAP.md.
-- Model Library truth: §25 selectability keyed to runtime INTEGRATION truth
-  (`LocalLlmEngine.hasVerifiedRuntime`), §27 RUNTIME_RESOLVED→CHECK_RUNTIME.
-- Tower: `ReferenceTowerVisual` hybrid renderer + 7 raster layers ×2 tiers
-  (tower414*/tower414l*) + docs/visual/tower414 manifest; the rejected 4.13
-  tower retired (ReforgedTowerVisual + 30 webp deleted).
-- CI at tip: build run 42571197175 SUCCESS @ 17090bb (pre-4.14 tip); e2e
-  standing typed R-42..R-49 family re-verified (both lanes
-  E2E_VERDICT_FAILED, gate-A onboarding-anchor signature — no 4.14-attributed
-  regression at the last measured tip; the 4.14 code commits had no CI run
-  yet).
+| ID | Finding (Owner, it) | Repair surface |
+| --- | --- | --- |
+| F-A | "l'elemento centrale dell'immagine della torre risulta duplicato e sfasato in basso rispetto all'immagine retrostante" (Console vocale) | ReferenceTowerVisual geometry |
+| F-B | "alcune scritte nel tema scuro sono scritte in nero e risultano quasi invisibili" | fixed-palette text sweep |
+| F-C | "alcune voci rimangono non utilizzabili perché il runtime Android richiesto non è disponibile e lo stesso il modello di intelligenza locale" | §19 verdict truth + runtime probe |
+| F-D | "ricontrollare l'impaginazione dei testi e la disposizione dei testi, che si adatti ad ogni tipo di schermo" | ledger-class layout sweep |
 
-## ACTION
+## ROOT CAUSES (code-proven) + REPAIRS (all in this package)
 
-1. ff-only advance afefd3d → d66a523 (this read-back).
-2. Execute the first incomplete action set: version truth (0.3.7/code 10/
-   PACKAGE 7), the §3–§12 final audit wave, the three APK variants, receipts,
-   cloud qualification, governance convergence.
-3. Repairs applied DURING this continuation (all verified by tests):
-   - §17 newly-introduced lint warnings repaired: 13 orphaned strings removed
-     across 5 locales; 2 AutoboxingStateCreation → mutableIntStateOf;
-     dead `TowerEnergyPhase` composable deleted (+ dead import);
-     ResponsiveActionGroup modifier parameter reordered first-optional.
-     Lint after repair: **0 errors / 72 warnings** (was 89; the 72 are exactly
-     the previously classified set — 9 drawable/attr entries retired with the
-     4.13 tower assets).
-   - §5 honesty gate: stale hardcoded diagnostic "llama.cpp runtime pending"
-     replaced with the ENGINE truth (runtimeName + state, data-driven).
-   - §25 self-tests: ST-58 (Silero real inference), ST-59 (GTCRN real ONNX),
-     ST-60 (wake-word typed qualification), ST-61 (local-LLM chain) added with
-     REAL probes wired in AppGraph.
-   - LATENT CP-G4.12 DEFECT REPAIRED: ST-55/56/57 were appended AFTER the
-     closing paren of the registry's returned list — bare def() values were
-     DISCARDED, so the battery silently ran 54 tests while the file grew to
-     57. All defs now inside the returned list (61 total); test pins updated.
-   - §9 Tower asset re-audit found 110 opaque + 3192 feather chroma-key
-     signature pixels (50 clusters) the generation gate had missed →
-     calibrated in-slice despill (median inpaint, no re-extraction, no
-     geometry change) → all 14 shipped slices at 0 residue; contact sheet
-     regenerated; manifest re-pinned.
+### F-A — Tower duplication: crop coordinates vs image rect (mechanism, numeric)
+The extraction layer crops (rings/portal/crown sign) are measured as fractions
+of the asset's normalized stage (680×963 BALANCED / 460×652 LOW, aspect ≈1.416),
+but `LayerAt` placed them at fractions of the CONSOLE STAGE BOX
+(`min(screen·0.50, width·1.375)` — aspect ≤1.375) while the architecture is
+drawn `ContentScale.FillWidth + BottomCenter` (top-clipped when the box is
+shorter). Result on the POCO X6 Pro (412×457.5dp stage, 412×583.5dp drawn
+image, 126dp top clip) — MEASURED drift of the OLD placement:
+
+| Layer | OLD y drift vs baked | OLD size error |
+| --- | --- | --- |
+| ring_outer | +88.2 dp | −39.0 dp |
+| portal | +37.2 dp | −27.7 dp |
+| crown_sign | +122.2 dp | −24.6 dp |
+
+Every crop rendered a SECOND copy of its baked content, offset DOWNWARD and
+smaller — the Owner's duplicated, misaligned central element. The Canvas
+dynamics (portal glow 0.815h, energy 0.455h) shared the same broken base.
+
+REPAIR: `ReferenceTowerVisual` now computes ONE IMAGE RECT (the exact rectangle
+FillWidth+BottomCenter produces from the architecture painter's INTRINSIC
+aspect — no hardcoded constant; manifest fallback 963/680) and draws ALL
+layers — halo, architecture, 5 crops, Canvas dynamics, energy mask — inside
+that rect (bottom-anchored; stage `clipToBounds` preserves the §41 clipping
+semantics). Post-repair drift = **0.0 dp on every layer** (numeric check in
+the session log; asset-level coherence additionally covered by the CI
+screenshot channel).
+
+### F-B — black text in dark theme: swatch labels colored by the SWATCH's palette
+`AppearanceScreen.ThemeSwatch` colored its label with the swatch's FIXED
+palette (`colors.inkSecondary` / `colors.bronze` where `colors` =
+MarbleLightColors or ObsidianNightColors). In the dark theme the UNSELECTED
+Marble swatch label rendered MarbleLight `inkSecondary` 0xFF5A554A (near-black)
+on the obsidian shell ≈ **2.6:1** — the Owner's "scritte in nero quasi
+invisibili". This is the same defect class as the 4.13 "device information
+almost black on a dark panel" finding, in the one component that still used a
+fixed palette for AMBIENT text. Full-tree sweep: AppearanceScreen is the ONLY
+file importing the fixed palettes (grep-verified); all other text is semantic
+(`c.textPrimary/...`) and the live two-theme audit re-ran at **50 rows / 0 FAIL**.
+
+REPAIR: swatch labels now use ambient semantic tokens
+(`c.textPrimary` selected / `c.textSecondary` unselected — ≥4.5:1 in BOTH
+themes; the selected cue stays on the swatch border). The swatch preview boxes
+keep the fixed palette intentionally (they PREVIEW the theme's own colors on
+their own surface).
+
+### F-C — "runtime Android richiesto non disponibile" on nine usable components
+Two stacked defects in `CompatVerdictResolver` + `ModelActionResolver`:
+1. `runtimeRequirement != null && recordState == null` resolved
+   RUNTIME_UNAVAILABLE unconditionally — on a FRESH INSTALL every
+   VERIFIED_DOWNLOADABLE entry with a runtimeRequirement string (vosk model,
+   Riccardo, Paola, Qwen GGUF, wake trio, Silero, GTCRN = 9 cards) showed
+   "Non utilizzabile: il runtime Android richiesto non è disponibile" although
+   the runtimes are REAL Gradle-bundled AARs (vosk-android 0.3.75, sherpa-onnx
+   v1.12.24, onnxruntime 1.20.0, llama-android 0.1.1 — all in
+   app/build.gradle.kts).
+2. `ModelActionResolver` has no branch for RUNTIME_UNAVAILABLE →
+   DETAILS_ONLY → **no download button at all**: the voices and the local
+   model were literally unusable, exactly as the Owner reported.
+
+REPAIR (truth-keyed, not label-keyed):
+- `CompatVerdictResolver.resolve` gains a typed `runtimeAvailable: Boolean`
+  (default true); with a real runtime present the verdict is NOT_DOWNLOADED
+  (→ §21 DOWNLOAD primary action); RUNTIME_UNAVAILABLE now fires ONLY when the
+  runtime seam is genuinely absent (stays honest).
+- NEW `models/ComponentRuntimeAvailability.kt`: per-family probes over the
+  LINKED native seams (`com.k2fsa.sherpa.onnx.OfflineTts`,
+  `org.vosk.Model`, `ai.onnxruntime.OrtEnvironment`) + the injected llama.cpp
+  seam (`LocalLlmEngine.hasVerifiedRuntime`) — a build that drops a runtime
+  loses the class and the card honestly flips back to RUNTIME_UNAVAILABLE.
+- `ModelManagerScreen` call site feeds the probe result into the verdict.
+- Local-experimental profile selectability was already keyed to
+  `hasVerifiedRuntime` (CP-G4.14-009) — unchanged.
+- The Qwen GGUF (522 MB) and the voices remain download-first-run by design
+  (§3 external access policy: verified sources, published checksums); after
+  the repair the cards say NOT_DOWNLOADED and offer DOWNLOAD — the physical
+  download leg stays part of the Owner retest (Package 7 runbook steps 6–10).
+
+PINS: `ModelUxSemanticsTest` — the old unconditional-RUNTIME_UNAVAILABLE pin
+updated to the honest `runtimeAvailable=false` case + 2 new pins:
+integrated-runtime-with-no-record → NOT_DOWNLOADED + DOWNLOAD action;
+probe family mapping (LOCAL_LLM injected seam, missing class → absent).
+
+### F-D — adaptive text layout (ledger-class sweep)
+- Console status-pill row: fixed non-wrapping Row → `BadgeFlowRow`
+  (BADGE_ROW_OVERFLOW class; bridge + queued + mic labels wrap at 360dp).
+- TowerStudioScreen: 3 switch rows (autoconnect / tailscale / consequential)
+  had unweighted label columns → `weight(1f)` (UNWEIGHTED_TEXT_COLUMN class;
+  the long "azioni consequenziali" label no longer overflows).
+- Re-verified repaired classes: SettingsRow (weight+56dp), VoiceAudio/
+  LocalIntelligence/Connection/History/Diagnostics/Archive badge rows already
+  on BadgeFlowRow; config card/profile selector governed by the §14/§15/§16
+  width contract (stacked <600dp).
+- The CI visual channel (`ScreenshotMatrixTest`, 360/393/411/600dp ×
+  fontScale 1.0/1.3/1.5) continues to arbitrate the physical re-check; no
+  harness change was needed.
 
 ## TEST
 
-- Unit suite (local, post-repair): **496/496 GREEN** (0 failures, 0 errors,
-  0 skipped; 68 suites; JUnit XML independently re-parsed).
-- Lint: **0 errors / 72 warnings** (all previously classified; 0 newly
-  introduced).
-- Secret scan: 0 findings (working tree diff + full-tree pattern sweep).
-- Build: `:app:assembleDebug` SUCCESS — 3 variants (arm64 / universal /
-  x86_64) with versionCode 10 / versionName 0.3.7-alpha-graph4.14-runtime-theme-tower.
+- Unit suite (local, post-repair): **498/498 GREEN** (68 suites; 0 f/e/s;
+  JUnit XML independently re-parsed — 496 baseline + 2 net new pins).
+- Lint: **0 errors / 72 warnings** (exactly the previously classified set;
+  0 newly introduced).
+- F-A numeric drift check: 0.0 dp on all layers post-repair (see table above).
+- Live two-theme rendered contrast audit re-run: 50 rows / 0 FAIL.
 
 ## FILES
-- Modified: app/build.gradle.kts (version truth), ConsoleScreen.kt (dead
-  import), ModelManagerScreen.kt + OnboardingScreen.kt (mutableIntStateOf),
-  TowerArchitecture.kt (dead composable deleted), ResponsiveActionGroup.kt
-  (modifier order), AppGraph.kt (stale diagnostic + 4 probes),
-  SelfTestCenter.kt + SelfTestRegistry.kt + SelfTestCenterTest.kt (ST-58..61
-  + registration repair), SileroVadEngine.kt (companion visibility),
-  strings.xml ×5 locales (13 orphaned keys removed).
-- Added: scripts/audit_g414_tower_final.py, scripts/repair_g414_magenta_residue.py,
-  scripts/repair_g414_feather_despill.py, scripts/gen_g414_animation_frames.py,
-  scripts/gen_g414_bridge_truth_renders.py;
-  docs/visual/tower414/{GRAPH414_TOWER_LAYER_CONTACT_SHEET.png,
-  TOWER_FINAL_ASSET_AUDIT.json, animation/*, renders/*}.
-
-## EVIDENCE
-- git ls-remote: origin/graph-4/real-voice-pairing-archive-e2e = d66a523…;
-  local HEAD == remote tip at read-back; tree clean.
-- JUnit XML: suites=68 tests=496 failures=0 errors=0 skipped=0.
-- Lint XML: 89 → 72 warnings, 0 errors, after repairs.
-- Tower audit JSON: allPass=true (calibrated gates), contact sheet visually
-  inspected on black/white/magenta/checkerboard (both tiers).
+- Modified: ReferenceTowerVisual.kt (image-rect coordinate system),
+  AppearanceScreen.kt (swatch labels), ModelUxSemantics.kt (typed
+  runtimeAvailable), ModelManagerScreen.kt (probe wiring), TowerStudioScreen.kt
+  (weighted switch labels), ConsoleScreen.kt (BadgeFlowRow pills),
+  app/build.gradle.kts (0.3.8 / versionCode 11 / PACKAGE 8).
+- Added: models/ComponentRuntimeAvailability.kt.
+- Tests: ModelUxSemanticsTest.kt (updated pin + 2 new).
 
 ## CHECKPOINT
-CP-G4.14-C01 — Fresh continuation read-back: DONE.
+CP-G4.14-C11 — Owner retest intake + F-A..F-D repairs: DONE (this package).
+State after this package: **GRAPH414_OWNER_RETEST_REPAIRS_PACKAGE_READY** with
+`OWNER_VISUAL_RETEST_PENDING` (round 2) + `LLM_PHYSICAL_QUALIFICATION_PENDING`
+unchanged — no physical verdict is self-granted.
 
 ## NEXT
-CP-G4.14-C02 — GRAPH414_FINAL_RUNTIME_AUDIT (source + dependency audit for the
-11 runtime components), then C03 LLM honesty gate, C04 bridge/theme truth,
-C05 Model Library qualification, C06 tower layer/animation audit, then the
-§14–§31 packaging and cloud-qualification sequence.
+1. Package 8 APKs (arm64-v8a / universal / x86_64) + SHA-256 receipt.
+2. Push to graph-4/real-voice-pairing-archive-e2e (never main); CI arbitrates.
+3. Owner physical retest round 2 on POCO X6 Pro (+ Xiaomi 11 Lite 5G NE),
+   Package 7 runbook steps re-run with the F-A..F-D checklist.

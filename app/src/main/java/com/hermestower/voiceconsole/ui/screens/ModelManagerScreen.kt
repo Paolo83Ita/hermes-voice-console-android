@@ -419,6 +419,15 @@ fun ModelManagerScreen(graph: AppGraph) {
                 // ---- §19 typed compatibility verdict (never "false") ----
                 val rec = recommendation
                 val resolved = rec?.components?.firstOrNull { it.identity == entry.identity }
+                // OWNER PHYSICAL RETEST F-C REPAIR: the verdict consumes the REAL
+                // runtime truth (linked native seam per component family), never
+                // the label — an integrated runtime with no install record is a
+                // NOT_DOWNLOADED component with a DOWNLOAD action, not a
+                // "runtime unavailable" dead end.
+                val runtimeReady = com.hermestower.voiceconsole.models.ComponentRuntimeAvailability.probe(
+                    componentType = entry.componentTypeEnum(),
+                    localLlmHasVerifiedRuntime = graph.localLlmEngine.hasVerifiedRuntime,
+                )
                 val verdict = com.hermestower.voiceconsole.models.CompatVerdictResolver.resolve(
                     entryClassification = entry.entryClassification,
                     recordState = record?.state,
@@ -427,6 +436,7 @@ fun ModelManagerScreen(graph: AppGraph) {
                     compatible = resolved?.compatible,
                     incompatibilityReason = resolved?.incompatibilityReason,
                     progressState = progress?.state?.name,
+                    runtimeAvailable = runtimeReady,
                 )
                 Row(horizontalArrangement = Arrangement.spacedBy(6.dp), verticalAlignment = Alignment.CenterVertically) {
                     Text(stringResource(R.string.mm_card_compatibility), style = com.hermestower.voiceconsole.ui.monumental.MonumentalType.sealSub, color = c.textTertiaryReadable)

@@ -49,7 +49,20 @@ object CompatVerdictResolver {
         "REJECTED",
     )
 
-    /** §19: compatibility must not be false merely because installation has not occurred. */
+    /**
+     * §19: compatibility must not be false merely because installation has not
+     * occurred. OWNER PHYSICAL RETEST F-C REPAIR (Package 8): a never-downloaded
+     * entry with a declared runtime requirement used to resolve to
+     * RUNTIME_UNAVAILABLE unconditionally — on the physical POCO X6 Pro the
+     * Owner saw "runtime Android richiesto non disponibile" on NINE cards whose
+     * runtimes (vosk-android / sherpa-onnx / onnxruntime / llama.cpp) are REAL,
+     * BUNDLED and INTEGRATED, and with no actionable primary action the voices
+     * and the local model became literally unusable. The verdict is now keyed to
+     * the ACTUAL runtime truth ([runtimeAvailable], probed from the linked
+     * native seams — not from labels): only a genuinely absent runtime says
+     * RUNTIME_UNAVAILABLE; a present runtime with no install record says
+     * NOT_DOWNLOADED (→ the DOWNLOAD primary action, §21).
+     */
     fun resolve(
         entryClassification: String,
         recordState: String?,
@@ -58,6 +71,7 @@ object CompatVerdictResolver {
         compatible: Boolean?,
         incompatibilityReason: String?,
         progressState: String?,
+        runtimeAvailable: Boolean = true,
     ): CompatVerdict {
         if (progressState == "QUARANTINED" || recordState == "QUARANTINED") {
             return CompatVerdict(CompatVerdictKind.QUARANTINED)
@@ -72,7 +86,8 @@ object CompatVerdictResolver {
         if (entryClassification in BLOCKED) return CompatVerdict(CompatVerdictKind.DOWNLOAD_BLOCKED, entryClassification)
         if (entryClassification == "RUNTIME_BUNDLED") return CompatVerdict(CompatVerdictKind.COMPATIBLE)
         if (runtimeRequirement != null && recordState == null) {
-            return CompatVerdict(CompatVerdictKind.RUNTIME_UNAVAILABLE)
+            return if (runtimeAvailable) CompatVerdict(CompatVerdictKind.NOT_DOWNLOADED)
+            else CompatVerdict(CompatVerdictKind.RUNTIME_UNAVAILABLE)
         }
         return when (recordState) {
             null -> CompatVerdict(CompatVerdictKind.NOT_DOWNLOADED)

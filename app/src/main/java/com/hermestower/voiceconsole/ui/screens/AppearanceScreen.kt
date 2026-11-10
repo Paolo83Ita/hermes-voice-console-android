@@ -248,6 +248,7 @@ private fun ThemeSwatch(
     colors: com.hermestower.voiceconsole.ui.theme.HermesColors,
     onClick: () -> Unit,
 ) {
+    val c = hermesColors
     // CP-G4-007 accessibility-semantics repair (Owner §3): the whole swatch card
     // is the control — the label text merges into a clickable node (onClickLabel
     // names the action for TalkBack; E2E may click the label). The USE/ACTIVE
@@ -278,7 +279,13 @@ private fun ThemeSwatch(
         Text(
             label,
             style = HermesType.pill,
-            color = if (selected) colors.bronze else colors.inkSecondary,
+            // OWNER PHYSICAL RETEST F-B REPAIR (Package 8): the label sits on the
+            // AMBIENT screen surface, never inside the swatch preview — coloring
+            // it with the SWATCH's own palette rendered MarbleLight inkSecondary
+            // (0xFF5A554A, near-black) on the dark obsidian shell ≈2.6:1, the
+            // Owner's "black text in dark theme". Ambient semantic tokens keep
+            // ≥4.5:1 in BOTH themes; the selected cue stays on the swatch border.
+            color = if (selected) c.textPrimary else c.textSecondary,
             modifier = Modifier.padding(top = 4.dp),
         )
         androidx.compose.material3.TextButton(onClick = onClick) {

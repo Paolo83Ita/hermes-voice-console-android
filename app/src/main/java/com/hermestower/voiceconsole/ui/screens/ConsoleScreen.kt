@@ -218,12 +218,14 @@ fun ConsoleScreen(
                         )
                     }
                 }
-                Row(
+                // OWNER PHYSICAL RETEST F-D REPAIR: the pill row is a WRAPPING
+                // BadgeFlowRow (the ledger's BADGE_ROW_OVERFLOW class) — at 360dp
+                // the bridge + queued + mic labels wrap to a second line instead
+                // of clipping at the screen edge.
+                com.hermestower.voiceconsole.ui.components.BadgeFlowRow(
                     Modifier
                         .fillMaxWidth()
                         .padding(horizontal = 12.dp),
-                    horizontalArrangement = Arrangement.spacedBy(6.dp, Alignment.CenterHorizontally),
-                    verticalAlignment = Alignment.CenterVertically,
                 ) {
                     // GRAPH 4.14 §10/§11: the indicator consumes the BridgeModeAuthority.
                     // Mock mode renders SIMULAZIONE on amber/bronze — NEVER the cyan
