@@ -2176,3 +2176,34 @@ convergence.
   plain Text row) → hardened to clickFirstClickable (hasClickAction required).
   VERDICT stayed E2E_VERDICT_FAILED honestly (standing failures remain — no
   falsified green). The historical harness campaign is NOT restarted.
+
+## 2026-11-11 — GRAPH 4.14 Package 9 continuation (CP-G4.14-P9, verification-only)
+
+Recycled sandbox resumed with stale local afefd3d; fresh fetch → remote tip
+7fc1c0b (CP-G4.14-C12, Package 9) → ff-only forward. No previous execution
+active. First incomplete gate = deployment/convergence receipts → closed
+this session, evidence-first, icon never trusted:
+
+- build run #179 (42865207716) SUCCESS at 7fc1c0b: JUnit 68 suites /
+  501 / 0 f-e-s parsed == local; lint 0 errors / 73 warnings = classified
+  set + 1 env-only OldTargetApi, 0 new unclassified rules; 3 APK variants
+  downloaded, ZIP-verified, manifest-verified (0.3.9 / code 12 ×3), 11/11
+  native libs present, tower ×2 tiers + catalogs + 5 locales →
+  GRAPH414_PACKAGE9_APK_RECEIPT.md.
+- e2e run #196 (42865207852) dual-lane honest E2E_VERDICT_FAILED ×2:
+  both lanes' artifacts downloaded and diffed against the accepted C10
+  baseline (1d3adb9, run 42642866873) → per-class verdicts AND failure
+  signatures baseline-identical on BOTH lanes → no new Graph 4.14
+  regression; standing families preserved; fleet campaign not restarted.
+- Resolver truth read from tip: AppGraph → LocalLlmEngine(runtime =
+  LlamaCppAndroidRuntime(LlamaRealNativeBridge())) — production path
+  verified; NoVerifiedLlmRuntime = typed fallback retained.
+- Downloader NOT rewritten (mission ban; no new defect evidence):
+  transport repair verified live in ModelDownloadManager.kt + 3 pins in
+  the cloud 501.
+- Tower rotation-removal / concentric arc / Canvas effects + theme-root
+  LocalContentColor verified in code; C12 measurement JSON in-repo.
+- Owner round-3 runbook issued (OWNER_POCO_XIAOMI_RETEST_PACKAGE_9_GRAPH414.md).
+- Governance converged (truth / checkpoints C11..C12 + P9-001..007 /
+  this log). Secret scan 0/0. Docs-only commit; ff-only push to
+  graph-4/real-voice-pairing-archive-e2e; main untouched; no force-push.

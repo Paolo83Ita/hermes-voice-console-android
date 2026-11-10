@@ -468,3 +468,52 @@ PENDING).
   items); OWNER_VISUAL_APPROVED / REAL_TOWER_PAIRED / REAL_ARCHIVE_ACTIVE
   are NOT granted; LLM physical qualification PENDING (not
   LOCAL_LLM_QUALIFIED).
+
+# GRAPH 4.14 — PACKAGE 9 CONTINUATION CONVERGENCE (CP-G4.14-P9, 2026-11-11)
+
+Implementation boundary: **GRAPH414_PACKAGE9_CONTINUATION_COMPLETE**
+(verification-only continuation — the four Round-2 repairs at C12/7fc1c0b
+were verified from the REMOTE AUTHORITY, not re-implemented; no code repair
+repeated; no downloader rewrite; no Tower regeneration).
+
+- Fresh read-back: stale local afefd3d → ff-only → **7fc1c0bc1731e77e65908d
+  f061aa08a402ffde66** (0 ahead / 67 behind; tree clean; main untouched;
+  no force-push; no active previous-execution processes).
+- Cloud qualification (build run **#179** SUCCESS, artifacts parsed — icon
+  not trusted): JUnit 68 suites / **501 / 0 f-e-s** == local; lint **0
+  errors / 73 warnings** = the classified 72-set + 1 environment-only
+  OldTargetApi instance, 0 new unclassified rules; secret scan 0/0.
+- E2E (run **#196**, dual lane): both lanes honest E2E_VERDICT_FAILED;
+  per-class + signature diff vs the accepted C10 baseline (1d3adb9,
+  run 42642866873) is **baseline-identical on both lanes** → NO new Graph
+  4.14 regression; standing families (gates A1/B/E, FreshInstall,
+  ModelManager, e2e_14, SelfTest ST-49, residual 2, BridgeTruth) remain
+  recorded; the historical fleet campaign is NOT restarted (§17).
+- APK receipt: 3 cloud variants manifest-verified (0.3.9 /
+  versionCode 12 / OWNER RUNTIME THEME TOWER PACKAGE 9 ×3);
+  **ARM64 = Owner artifact** bc79ced6…90e8 (122,639,026 B);
+  universal e3b4aabe…fe18 (252,285,855 B); x86_64 f88ab300…4b6e
+  (121,767,608 B); 11/11 required native libraries physically present;
+  tower 9 crops × 2 tiers + 4 bundled ONNX + catalogs + 5 locales verified.
+  (Cloud SHAs differ from the C12 local-build SHAs by ZIP/timestamp
+  variance — the C09-decomposed class; identity fields identical.)
+- Resolver truth: AppGraph injects LlamaCppAndroidRuntime(LlamaRealNativeBridge())
+  — the ordinary ARM64 production path; NoVerifiedLlmRuntime = typed
+  fallback only (retained per mission).
+- Qwen: transport repair verified LIVE at the tip (UA, bounded redirect
+  walk, true-offset resume, 416 reset, one hf-mirror attempt, SHA-256
+  gate); 3 pins inside the cloud 501. No rewrite performed (no new defect
+  evidence — mission ban honored). Pinned source: q5_k_m 522,186,592 B.
+- Tower/Obsidian: crop rotation removed + concentric arc + Canvas effects
+  code-verified; C12 measurement (drift ≤1.2 dp, NCC ≥0.96) in-repo;
+  theme-root LocalContentColor + hub token live. Dark-screen rendered
+  evidence stays **OBSIDIAN_OWNER_RETEST_PENDING** (no self-granted PASS).
+- Owner delivery: round-3 runbook issued
+  (OWNER_POCO_XIAOMI_RETEST_PACKAGE_9_GRAPH414.md, POCO 23 + Xiaomi 8
+  items, A..W).
+- Explicitly NOT true yet: **QWEN_RUNTIME_IMPLEMENTED_PHYSICAL_RETEST_PENDING**,
+  **RICCARDO_RUNTIME_IMPLEMENTED_PHYSICAL_RETEST_PENDING**,
+  **PAOLA_RUNTIME_IMPLEMENTED_PHYSICAL_RETEST_PENDING**,
+  **OBSIDIAN_CONTRAST_REPAIR_OWNER_RETEST_PENDING**,
+  **TOWER_EFFECT_REPAIR_OWNER_RETEST_PENDING** — only the Owner may set
+  the *_OWNER_VERIFIED states after physical evidence (§28).
