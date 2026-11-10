@@ -165,6 +165,63 @@ class ModelDownloadLifecycleTest {
         assertEquals(before, server.requestCount.get())
     }
 
+    // ---- Package 9 (F-E repair pins): redirect walk + client identity + true-offset resume ----
+
+    @Test
+    fun `redirect chain is followed with the download user agent`() = runBlocking {
+        server.putRedirect("/redirect/pinned", "/artifacts/hermes-test-artifact-v1")
+        val e = entry()
+        downloads.start(e, "${server.baseUrl}/redirect/pinned")
+        awaitState(e.identity, ModelInstallState.DOWNLOADED)
+        assertEquals(artifactBytes.size.toLong(), downloads.progress(e.identity).value.bytesDownloaded)
+        assertTrue(downloads.verifyHash(e))
+        // the client identity travels on every request (CDN 403 class repair)
+        assertEquals(DefaultModelDownloadManager.DOWNLOAD_USER_AGENT, server.lastUserAgent.get())
+    }
+
+    @Test
+    fun `stale partial from a crashed attempt is resumed at its true offset, never appended over`() = runBlocking {
+        // The pre-9 retry loop re-downloaded from a STALE offset into an APPEND
+        // channel: a mid-stream failure left a .part that the retry prefixed
+        // AGAIN from byte 0 → corrupt file → hash-mismatch quarantine. The pin:
+        // a partial holding the artifact's first N bytes must COMPLETE via a
+        // Range request and verify — old behavior fails the hash assertion.
+        val splitAt = 100 * 1024
+        val big = DeterministicTestArtifact.generate("stale-resume", 384 * 1024)
+        server.putArtifact("stale", LocalTowerMockServer.Artifact(big))
+        val e = entry().copy(
+            identity = "org.hermestower.test.stale-resume",
+            downloadSizeBytes = big.size.toLong(),
+            installedSizeBytes = big.size.toLong(),
+            sha256 = ModelSha256.ofBytes(big),
+        )
+        val partial = storage.tempDir().resolve("${e.identity}.part")
+        Files.createDirectories(partial.parent)
+        Files.write(partial, big.copyOfRange(0, splitAt))
+        downloads.start(e, "${server.baseUrl}/artifacts/stale")
+        awaitState(e.identity, ModelInstallState.DOWNLOADED)
+        assertEquals(big.size.toLong(), downloads.progress(e.identity).value.bytesDownloaded)
+        assertTrue("true-offset resume must produce the exact artifact bytes", downloads.verifyHash(e))
+        assertTrue(downloads.install(e) != null)
+    }
+
+    @Test
+    fun `redirect without following leaves the failure typed and bounded`() = runBlocking {
+        // 302 → target served; the WALK itself is pinned by the redirect test
+        // above. This pin freezes the budget: a permanently redirecting source
+        // must end FAILED (honest), never loop.
+        server.putRedirect("/loop/a", "/loop/b")
+        server.putRedirect("/loop/b", "/loop/a")
+        val e = entry().copy(identity = "org.hermestower.test.redirect-loop")
+        downloads.start(e, "${server.baseUrl}/loop/a")
+        awaitState(e.identity, ModelInstallState.FAILED, timeoutMs = 15000)
+        val error = downloads.progress(e.identity).value.error ?: ""
+        assertTrue(
+            "the failure must name the redirect bound (got: $error)",
+            error.contains("Too many redirects") || error.contains("redirect"),
+        )
+    }
+
     @Test
     fun `rollback restores the verified previous version and removal cleans up`() = runBlocking {
         val e = entry()

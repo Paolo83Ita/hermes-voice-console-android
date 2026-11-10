@@ -59,6 +59,16 @@ class LocalTowerMockServer(
         artifacts[name] = artifact
     }
 
+    // Package 9 (F-E repair evidence): explicit redirect route + User-Agent capture
+    // so the downloader's redirect walk and client identity are test-pinned.
+    private val redirects = ConcurrentHashMap<String, String>()
+    val lastUserAgent = java.util.concurrent.atomic.AtomicReference<String?>(null)
+
+    /** Serves GET path -> 302 Location: <base><toPath>. */
+    fun putRedirect(fromPath: String, toPath: String) {
+        redirects[fromPath] = toPath
+    }
+
     init {
         thread = Thread({ loop() }, "hermes-towersim").apply {
             isDaemon = true
@@ -104,8 +114,15 @@ class LocalTowerMockServer(
                 }
                 val contentLength = headers["content-length"]?.toIntOrNull() ?: 0
                 if (contentLength > 0) drain(reader, contentLength)
+                lastUserAgent.set(headers["user-agent"])
                 val path = parts[1].substringBefore('?')
                 when {
+                    redirects.containsKey(path) -> {
+                        val location = baseUrl + redirects[path]
+                        val head = "HTTP/1.1 302 Found\r\nLocation: $location\r\nContent-Length: 0\r\nConnection: close\r\n\r\n"
+                        out.write(head.toByteArray(StandardCharsets.US_ASCII))
+                        out.flush()
+                    }
                     path.startsWith("/artifacts/") -> serveArtifact(path.removePrefix("/artifacts/"), headers, out)
                     else -> serveTower(parts[0], path, headers, out)
                 }

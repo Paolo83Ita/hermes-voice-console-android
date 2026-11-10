@@ -77,6 +77,31 @@ import androidx.compose.foundation.layout.BoxWithConstraints
  * IMAGE RECT (the exact rectangle ContentScale.FillWidth + BottomCenter
  * produces for the architecture painter's intrinsic aspect), so the crops sit
  * precisely on their baked copies at every stage aspect, on every device.
+ *
+ * OWNER PHYSICAL RETEST REPAIR ROUND 2 (Package 9, F-A residual + F-E effects):
+ * the Owner confirmed the tower background is now correct, but the CENTRAL
+ * CIRCLE still read as "sdoppiato e traslato in basso" and "nessun effetto è
+ * stato aggiunto". Two code-proven causes, both repaired here:
+ *  1. The IDLE "ring shimmer" rotated the RASTER CROPS (±8°/−14°/22° about
+ *     the crop box). The baked crops carry the FULL mechanism artwork (gears,
+ *     sigil triangle, figures — NOT rotationally symmetric), so the rotating
+ *     copy visibly separated from its baked original (masked-NCC deformation
+ *     proof: similarity 0.9955 → 0.878 at the 8° extreme); the same shimmer
+ *     was also the only motion, i.e. imperceptible AS an effect while harmful
+ *     to geometry. The crops are now drawn at rotation 0 ALWAYS — pixel-true
+ *     on their baked copies (NCC-verified ≤1.2dp on both tiers, C12
+ *     measurement JSON) — and the shimmer became a CANVAS LIGHT SWEEP on the
+ *     ring band (a rotating highlight arc), which cannot move geometry.
+ *  2. The CONTACTING arc mixed h- and w-fractions (topLeft 0.30·h with size
+ *     0.60·w): its circle centered +33dp BELOW the baked ring on the POCO
+ *     stage with an 8dp-smaller radius — a literal second circle outline
+ *     translated downward during every real contacting/queued state. The arc
+ *     (and the transcribing ticks) are now CONCENTRIC with the measured ring
+ *     band (center 0.5w, 0.455h; radius 0.32w = the ring_outer crop's outer
+ *     edge).
+ * The idle effects are also now VISIBLE (the F-E runbook expectations):
+ * stronger portal breathing + ring sweep + energy tint, all Canvas-only,
+ * all still amber in mock mode (§40 truth unchanged).
  */
 @Composable
 fun ReferenceTowerVisual(
@@ -118,16 +143,21 @@ fun ReferenceTowerVisual(
         if (low) R.drawable.tower414l_energy_mask else R.drawable.tower414_energy_mask
     )
 
-    // ---- §39 IDLE: slow ring shimmer + portal breathing ----
+    // ---- §39 IDLE: portal breathing + ring light sweep ----
+    // ROUND 2: the former "ring shimmer" was the crop ROTATION — removed (it
+    // deformed the raster crops against their baked originals: the Owner's
+    // doubled central circle — see the class KDoc). The shimmer phase now
+    // drives the Canvas ring sweep; the portal breath is stronger so the idle
+    // state is visibly alive (runbook §11 expectation).
     val transition = rememberInfiniteTransition(label = "tower414")
     val shimmer by transition.animateFloat(
         initialValue = 0f, targetValue = 1f,
         animationSpec = infiniteRepeatable(
-            tween(if (low) 120_000 else 90_000), RepeatMode.Restart,
-        ), label = "ringShimmer",
+            tween(if (low) 120_000 else 42_000), RepeatMode.Restart,
+        ), label = "ringSweep",
     )
     val breath by transition.animateFloat(
-        initialValue = 0.72f, targetValue = 1f,
+        initialValue = 0.55f, targetValue = 1f,
         animationSpec = infiniteRepeatable(tween(2400), RepeatMode.Reverse), label = "portalBreath",
     )
     val listeningPulse by transition.animateFloat(
@@ -199,16 +229,18 @@ fun ReferenceTowerVisual(
                 alignment = Alignment.BottomCenter,
             )
 
-            // ---- oracle mechanism: ring crops + rotation shimmer ----
+            // ---- oracle mechanism: ring crops (NO rotation — ROUND 2) ----
             // The ring layers are crops of the SAME normalized stage (§37): with
             // the image-rect coordinate system they sit exactly on their baked
-            // copies (F-A repair) — at rest they are invisible seams; the
-            // rotation shimmer is the only motion.
-            LayerAt(ringOuter, xFrac = 0.180f, yFrac = 0.300f, wFrac = 0.640f, hFrac = 0.310f, rotation = if (frozen) 0f else shimmer * 8f)
-            LayerAt(ringMiddle, xFrac = 0.265f, yFrac = 0.340f, wFrac = 0.470f, hFrac = 0.235f, rotation = if (frozen) 0f else -shimmer * 14f)
-            LayerAt(ringInner, xFrac = 0.370f, yFrac = 0.385f, wFrac = 0.260f, hFrac = 0.155f, rotation = if (frozen) 0f else shimmer * 22f)
-            LayerAt(portal, xFrac = 0.300f, yFrac = 0.705f, wFrac = 0.400f, hFrac = 0.220f, rotation = 0f)
-            LayerAt(crownSign, xFrac = 0.150f, yFrac = 0.030f, wFrac = 0.700f, hFrac = 0.195f, rotation = 0f)
+            // copies (F-A repair, NCC-verified C12). A rotated raster crop
+            // visibly separates from its baked original (the Owner's doubled
+            // central circle) — the rotation shimmer is GONE; the only motion
+            // is the Canvas ring sweep drawn ABOVE this band.
+            LayerAt(ringOuter, xFrac = 0.180f, yFrac = 0.300f, wFrac = 0.640f, hFrac = 0.310f)
+            LayerAt(ringMiddle, xFrac = 0.265f, yFrac = 0.340f, wFrac = 0.470f, hFrac = 0.235f)
+            LayerAt(ringInner, xFrac = 0.370f, yFrac = 0.385f, wFrac = 0.260f, hFrac = 0.155f)
+            LayerAt(portal, xFrac = 0.300f, yFrac = 0.705f, wFrac = 0.400f, hFrac = 0.220f)
+            LayerAt(crownSign, xFrac = 0.150f, yFrac = 0.030f, wFrac = 0.700f, hFrac = 0.195f)
 
             // ---- §39 dynamic overlays (Canvas — never architectural geometry) ----
             Canvas(Modifier.fillMaxSize()) {
@@ -216,13 +248,18 @@ fun ReferenceTowerVisual(
                 val h = size.height
                 val portalCx = w * 0.5f
                 val portalCy = h * 0.815f
+                // measured ring band (ring_outer crop box: x 0.180..0.820,
+                // y 0.300..0.610 → center (0.5w, 0.455h), outer radius 0.32w)
+                val ringCx = w * 0.5f
+                val ringCy = h * 0.455f
+                val ringR = w * 0.32f
 
                 // portal glow — breathing idle; stronger listening; amplitude when speaking
                 val glowBase = when {
                     isSpeaking -> 0.45f + smoothAmplitude * 0.55f
                     isListening -> 0.55f + listeningPulse * 0.3f
                     isTranscribing -> 0.5f + listeningPulse * 0.25f
-                    else -> breath * 0.4f
+                    else -> breath * 0.45f
                 }
                 val glowColor = if (bridgeIsMock) m.amber else m.cyanCore
                 drawCircle(
@@ -234,6 +271,29 @@ fun ReferenceTowerVisual(
                     radius = w * (0.16f + glowBase * 0.10f),
                     center = Offset(portalCx, portalCy),
                 )
+
+                // §39 IDLE ring light sweep (ROUND 2 F-E): a rotating highlight
+                // arc ON the ring band — visible but architectural-safe (it
+                // paints over the band, it cannot move any geometry; the crop
+                // rotation that deformed the mechanism is gone). Amber in mock (§40).
+                if (!frozen) {
+                    val sweepAlpha = if (isListening) 0.34f else 0.22f
+                    drawArc(
+                        brush = Brush.sweepGradient(
+                            0f to glowColor.copy(alpha = 0f),
+                            0.12f to glowColor.copy(alpha = sweepAlpha),
+                            0.30f to glowColor.copy(alpha = 0f),
+                            1f to glowColor.copy(alpha = 0f),
+                            center = Offset(ringCx, ringCy),
+                        ),
+                        startAngle = shimmer * 360f,
+                        sweepAngle = 360f,
+                        useCenter = false,
+                        topLeft = Offset(ringCx - ringR, ringCy - ringR),
+                        size = androidx.compose.ui.geometry.Size(ringR * 2f, ringR * 2f),
+                        style = Stroke(width = w * 0.018f),
+                    )
+                }
 
                 // energy mask tint follows the connection truth (§40)
                 val energyAlpha = when {
@@ -271,14 +331,14 @@ fun ReferenceTowerVisual(
                     }
                 }
 
-                // TRANSCRIBING: sequential illumination ticks on the outer ring
+                // TRANSCRIBING: sequential illumination ticks ON the outer ring band
                 if (isTranscribing) {
                     val tick = (listeningPulse * 12f).toInt()
                     repeat(12) { i ->
                         val active = i == tick % 12
                         val angle = i * (Math.PI * 2 / 12.0)
-                        val cx = w * 0.5f + (w * 0.30f * kotlin.math.cos(angle)).toFloat()
-                        val cy = h * 0.455f + (w * 0.30f * kotlin.math.sin(angle)).toFloat()
+                        val cx = ringCx + (ringR * kotlin.math.cos(angle)).toFloat()
+                        val cy = ringCy + (ringR * kotlin.math.sin(angle)).toFloat()
                         drawCircle(
                             color = (if (bridgeIsMock) m.amber else m.cyanCore).copy(alpha = if (active) 0.9f else 0.25f),
                             radius = w * 0.012f,
@@ -287,15 +347,18 @@ fun ReferenceTowerVisual(
                     }
                 }
 
-                // CONTACTING TOWER (real only): outer path activation
+                // CONTACTING TOWER (real only): outer path activation — ROUND 2:
+                // CONCENTRIC with the baked ring band (the old arc mixed h- and
+                // w-fractions and rendered a second circle +33dp below the ring —
+                // the Owner's "cerchio centrale sdoppiato e traslato in basso").
                 if (isContactingTower && !bridgeIsMock && !frozen) {
                     drawArc(
                         color = m.cyanCore.copy(alpha = 0.5f),
                         startAngle = -90f,
                         sweepAngle = (shimmer * 300f) % 360f,
                         useCenter = false,
-                        topLeft = Offset(w * 0.20f, h * 0.30f),
-                        size = androidx.compose.ui.geometry.Size(w * 0.60f, w * 0.60f),
+                        topLeft = Offset(ringCx - ringR, ringCy - ringR),
+                        size = androidx.compose.ui.geometry.Size(ringR * 2f, ringR * 2f),
                         style = Stroke(width = 3.dp.toPx()),
                     )
                 }
@@ -342,6 +405,8 @@ fun ReferenceTowerVisual(
  * Places one normalized-stage layer at its extraction fractions — expressed in
  * the SURROUNDING image-rect box (F-A repair: the parent box now has exactly
  * the asset's normalized aspect, so the fractions are pixel-true again).
+ * ROUND 2: the rotation parameter is REMOVED — raster crops must never rotate
+ * against their baked originals (the doubled-central-circle class).
  */
 @Composable
 private fun LayerAt(
@@ -350,7 +415,6 @@ private fun LayerAt(
     yFrac: Float,
     wFrac: Float,
     hFrac: Float,
-    rotation: Float,
 ) {
     BoxWithConstraints(Modifier.fillMaxSize()) {
         val pw = maxWidth * wFrac
@@ -361,8 +425,7 @@ private fun LayerAt(
             modifier = Modifier
                 .align(Alignment.TopStart)
                 .offset(x = maxWidth * xFrac, y = maxHeight * yFrac)
-                .size(pw, ph)
-                .graphicsLayer { rotationZ = rotation },
+                .size(pw, ph),
             contentScale = ContentScale.Fit,
         )
     }

@@ -199,7 +199,12 @@ private fun SettingsRow(
                 .weight(1f)
                 .padding(start = 12.dp, end = 8.dp),
         ) {
-            Text(label, style = HermesType.body)
+            // OWNER PHYSICAL RETEST round 2 (Package 9, F-B residual): this label
+            // had NO explicit color and the hub rows are NOT inside a Material
+            // Surface — LocalContentColor defaulted to Color.Black → the Owner's
+            // black-on-dark settings-menu label. Explicit theme token now (the
+            // theme-root LocalContentColor provider is the class-level repair).
+            Text(label, style = HermesType.body, color = hermesColors.textPrimary)
             Text(sub, style = HermesType.bodySecondary, color = hermesColors.textSecondary)
         }
     }

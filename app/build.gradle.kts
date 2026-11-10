@@ -17,11 +17,11 @@ android {
         applicationId = "com.hermestower.voiceconsole"
         minSdk = 30
         targetSdk = 35
-        // GRAPH 4.14 (§14, OWNER PHYSICAL RETEST round): OWNER RUNTIME THEME
-        // TOWER PACKAGE 8 MUST exceed 0.3.7-alpha-graph4.14-runtime-theme-tower /
-        // versionCode 10 (the fresh remote-tip identity at the retest read-back).
-        versionCode = 11
-        versionName = "0.3.8-alpha-graph4.14-owner-retest-repairs"
+        // GRAPH 4.14 (§14, OWNER PHYSICAL RETEST round 2): OWNER RUNTIME THEME
+        // TOWER PACKAGE 9 MUST exceed 0.3.8-alpha-graph4.14-owner-retest-repairs /
+        // versionCode 11 (the fresh remote-tip identity at the round-2 read-back).
+        versionCode = 12
+        versionName = "0.3.9-alpha-graph4.14-round2-repairs"
         testInstrumentationRunner = "androidx.test.runner.AndroidJUnitRunner"
 
         // OWNER PHYSICAL RETEST §1 (build provenance): authoritative build
@@ -43,7 +43,7 @@ android {
         buildConfigField("String", "BUILD_TIMESTAMP_ISO8601", "\"$buildStamp\"")
         buildConfigField("String", "BUILD_WORKFLOW_RUN_ID", "\"$ciRun\"")
         buildConfigField("String", "BUILD_WORKFLOW_REF", "\"$ciRef\"")
-        buildConfigField("String", "BUILD_LABEL", "\"${project.findProperty("hermes.buildLabel") ?: "OWNER RUNTIME THEME TOWER PACKAGE 8"}\"")
+        buildConfigField("String", "BUILD_LABEL", "\"${project.findProperty("hermes.buildLabel") ?: "OWNER RUNTIME THEME TOWER PACKAGE 9"}\"")
     }
 
     // GRAPH 4 FINAL §20: DUAL APK OUTPUT — the UNIVERSAL debug APK keeps every
