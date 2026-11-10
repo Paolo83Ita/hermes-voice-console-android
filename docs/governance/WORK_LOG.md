@@ -2207,3 +2207,7 @@ this session, evidence-first, icon never trusted:
 - Governance converged (truth / checkpoints C11..C12 + P9-001..007 /
   this log). Secret scan 0/0. Docs-only commit; ff-only push to
   graph-4/real-voice-pairing-archive-e2e; main untouched; no force-push.
+- Post-push wave (build #180 @ eef4e0e) verified from artifacts: JUnit
+  68/501/0, lint 0e/73w, 3 APKs 0.3.9/12 ×3 — convergence record folded
+  into GRAPH414_PACKAGE9_CONTINUATION_READBACK.md; E2E #197 recorded
+  honestly as the standing-family carry-over (docs-only tip, §17/§31).

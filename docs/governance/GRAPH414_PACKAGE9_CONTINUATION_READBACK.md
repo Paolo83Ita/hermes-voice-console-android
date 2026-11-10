@@ -143,8 +143,21 @@ manifest-keyed (voice_pack_catalog.json packaged). Voice A/B stays
 
 ## COMMIT / REMOTE READ-BACK / TERMINALITY
 
-- Continuation commit: docs-only (receipts + governance convergence) on
-  graph-4/real-voice-pairing-archive-e2e, ff-only push, main untouched.
+- Continuation commit: **eef4e0ebd0212f20dc862b3cb4e9e08c274ed329**
+  (docs-only: receipts + governance convergence) pushed ff-only to
+  graph-4/real-voice-pairing-archive-e2e; fresh read-back remote tip ==
+  local HEAD; tree clean; main untouched. No source change → version stays
+  0.3.9 / versionCode 12 (§25 — no two materially different APKs share an
+  identity, and no identity changed at all).
+- Post-push wave verified from artifacts (icon not trusted): build run
+  **#180** (42889929433) SUCCESS at eef4e0e — JUnit 68 suites / **501 / 0
+  f-e-s**, lint **0 errors / 73 warnings** (same classified set), 3 APKs
+  manifest-verified 0.3.9 / 12 ×3 (fresh SHAs, docs-only source identity).
+- E2E wave at eef4e0e (run **#197**): the classification carries from the
+  Package 9 SOURCE-tip arbitration (run #196 at 7fc1c0b, baseline-identical
+  on both lanes) — eef4e0e changes documentation only (zero source delta),
+  which is not new evidence under §17; the standing-failure record is
+  preserved honestly and the Owner physical qualification path stays open.
 - Implementation terminality: **GRAPH414_PACKAGE9_CONTINUATION_COMPLETE**
   with the Owner-only gates OPEN:
   `QWEN_RUNTIME_IMPLEMENTED_PHYSICAL_RETEST_PENDING`,
