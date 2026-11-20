@@ -542,3 +542,11 @@ repeated; no downloader rewrite; no Tower regeneration).
 - Version truth: 0.4.0-alpha-grapha4r-merged-b-base / versionCode 13 / debug applicationId `com.hermestower.voiceconsole.a4rdebug` (isolated suffix — coexists with A and B; NOT the commercial package; signing decision stays open).
 - Local verification at the tip: unit 566/566 GREEN (incl. 33 new A4R tests: contract fixtures, pairing machine, scan flow, controller mapping), lint 0 errors (classified warning set), assembleDebug 3 variants. CI gates on the branch: BUILD/UNIT/LINT/SECRET_SCAN/APK_IDENTITY/FINGERPRINT + keystore instrumentation lane.
 - Terminality: VOICE_CONSOLE_PAIRED_AND_VERIFIED = NOT_REACHED (Xiaomi mini-gate P1-P8 pending Owner); ANDROID_CANONICAL_BASE_SELECTED = not claimed (mission §16); GRAPH_A4R_PASS = not claimed.
+
+## GRAPH A4R C1-C4 FINAL CI + DELIVERY truth (2026-11-20)
+
+- Final tip: `a58c630` (branch graph-a4r/merge-with-b-base). Build run 44752839878 = SUCCESS (566/566 unit, lint 0 errors, secret-scan 0, identity+fingerprint recorded). Keystore run 44752839915 = SUCCESS (**14/14 REAL AndroidKeyStore tests on emulator** = SOFTWARE_ANDROID_KEYSTORE_TESTED; HARDWARE_BACKED reserved for the Xiaomi).
+- Delivered: HERMES_VOICE_CONSOLE_A4R_REPAIRED_DEBUG.apk 122,891,305 B sha256 26dbad0c…80922e (download-back verified: identity/signer/ZIP all match), package com.hermestower.voiceconsole.a4rdebug v13 0.4.0-alpha-grapha4r-merged-b-base, signer 56e00e40…1faa1f (CI debug, NON-PRODUCTION).
+- The instrumented lane EARNED its existence: it caught 3 REAL keystore-semantics defects (invalidation precedence; certificate-under-PUBLIC-KEY-label ×2) plus one stale A2-era pin, all repaired with the SAME assertions then passing.
+- Typed findings: B original source UNAVAILABLE (Owner bundle upload pending); 7 contract ambiguities filed (CD-A4R-C1-001); SOFTWARE (not hardware) keystore evidence.
+- Owner gate NOW OPEN: mini-gate P1-P8 (A4R_C1_OWNER_MINI_GATE_IT.md). VOICE_CONSOLE_PAIRED_AND_VERIFIED / GRAPH_A4R_PASS / ANDROID_CANONICAL_BASE_SELECTED remain NOT claimed.

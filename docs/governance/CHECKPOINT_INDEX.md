@@ -226,3 +226,6 @@ Graph A4R checkpoints (branch `graph-4/real-voice-pairing-archive-e2e`, this rep
 | CP-A4R-C1-013 | Repaired APK delivery package + download-back verification (post-CI) | download/A4R/ + A4R_REPAIRED_APK_* receipts | SHA-256 download-back |
 | CP-A4R-C1-014 | Owner mini-gate P1-P8 prepared (Italian, one step at a time, no secrets requested) | docs/a4r/c1/A4R_C1_OWNER_MINI_GATE_IT.md | (this commit) |
 | CP-A4R-C1-015 | Authority convergence (Rule Theta: truth/checkpoints/worklog/blocker/decision + IT guides + registries) | this wave | (this commit) |
+| CP-A4R-C1-013 (final) | CI arbitrated to BOTH LANES GREEN @ a58c630 (build 44752839878 SUCCESS + keystore 44752839915 SUCCESS 14/14) + delivery package assembled + download-back verified (SHA/identity/signer/ZIP) | download/A4R/c1_delivery/ (27 files) + this row | (this commit) |
+| CP-A4R-C1-014 (final) | Owner mini-gate P1-P8 prepared (IT, one step at a time, no secrets) | A4R_C1_OWNER_MINI_GATE_IT.md | (this commit) |
+| CP-A4R-C1-015 (final) | Authority convergence complete (truth/worklog/checkpoints/blocker B-A4R-001/decisions D1..D3/contract delta request/port matrix/package strategy/IT guides); terminal state CONDITIONAL_PASS_WITH_TYPED_FINDINGS recorded | this block | (this commit) |
