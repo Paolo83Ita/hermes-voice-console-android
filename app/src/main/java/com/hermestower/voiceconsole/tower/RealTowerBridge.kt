@@ -134,6 +134,17 @@ class RealTowerBridge(
                 code !in 200..299 -> emit(errorEvent(frame.requestId, BridgeError.TRANSPORT, "Tower answered HTTP $code.", retryable = true))
                 else -> emitAllParsed(frame.requestId, body)
             }
+        } catch (e: kotlinx.coroutines.CancellationException) {
+            // GRAPH A4R C1-C4 CI repair (ST-08 race, run 44734438054): the
+            // collector may cancel BETWEEN frames (take(1)); the in-flight emit
+            // throws AbortFlowException (a CancellationException). Swallowing it
+            // here and emitting an ERROR frame from a catch block violates Flow
+            // exception transparency ("Emissions from 'catch' blocks are
+            // prohibited") and turned the honest cancellation into a spurious
+            // typed failure on the slower CI interleaving. Cancellation is
+            // ALWAYS rethrown — genuine transport failures keep their mapping
+            // below (their emit-from-catch is legal: the flow was not aborted).
+            throw e
         } catch (e: SocketTimeoutException) {
             emit(errorEvent(frame.requestId, BridgeError.TRANSPORT, "Request timed out after ${profile.requestTimeoutMs} ms.", retryable = true))
         } catch (e: Exception) {
