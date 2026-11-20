@@ -100,7 +100,7 @@ class TowerStoreInstrumentedTest {
     // ---- mission: corrupted ciphertext test ------------------------------------------
 
     @Test
-    fun corruptedCiphertext_recordsCorrupt_wipesRecordOnly() {
+    fun corruptedCiphertext_recordsAuthFailure_wipesRecordOnly() {
         val store = TowerStore(context)
         store.setDeviceId("device-42")
         store.setEndpoint("https://hermestower.aclclouds.online")
@@ -110,7 +110,10 @@ class TowerStoreInstrumentedTest {
         context.getSharedPreferences("tower_console", 0).edit()
             .putString("endpoint", JavaBase64.getEncoder().encodeToString(blob)).commit()
         assertNull(store.getEndpoint())
-        assertEquals(KeystoreFailure.ENCRYPTED_STORE_CORRUPT, store.lastFailure)
+        // C1-C4 mission section 4 typed truth: a tampered GCM AUTH TAG is
+        // ENCRYPTED_STORE_AUTHENTICATION_FAILED (the A2-era 5-state set had no
+        // dedicated auth state; the framing-garbage case below stays CORRUPT).
+        assertEquals(KeystoreFailure.ENCRYPTED_STORE_AUTHENTICATION_FAILED, store.lastFailure)
         assertNull(rawBlob("endpoint")) // record wiped
         assertEquals("device-42", store.getDeviceId()) // sibling records untouched
     }
