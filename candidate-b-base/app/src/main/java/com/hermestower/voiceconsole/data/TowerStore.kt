@@ -94,9 +94,14 @@ class TowerStore(context: Context, private val encryptInterceptor: ((ByteArray) 
         }
     }
 
-    /** True when [keystoreKey] had to GENERATE the alias during this process run. */
+    /** True when the alias was GENERATED while encrypted records already
+     *  existed — the deterministic invalidation class (the old key is gone,
+     *  every pre-existing record is unrecoverable). A generation that happens
+     *  with NO records present is a normal first install: a later tag failure
+     *  on a record WRITTEN by this same key is corruption, NOT invalidation
+     *  (instrumented-lane run 44748785017 caught the precedence bug). */
     @Volatile
-    private var keyWasJustGenerated = false
+    private var keyGeneratedOverExistingRecords = false
 
     private fun clearFailureState() {
         lastFailure = null
@@ -162,7 +167,9 @@ class TowerStore(context: Context, private val encryptInterceptor: ((ByteArray) 
             )
         }
         return try {
-            generator.generateKey().also { keyWasJustGenerated = true }
+            generator.generateKey().also {
+                keyGeneratedOverExistingRecords = RECORD_KEYS.any { prefs.getString(it, null) != null }
+            }
         } catch (e: Exception) {
             throw TowerStoreKeystoreException(
                 KeystoreFailure.ANDROID_KEYSTORE_INITIALIZATION_FAILED,
@@ -285,10 +292,12 @@ class TowerStore(context: Context, private val encryptInterceptor: ((ByteArray) 
         } catch (e: TowerStoreKeystoreException) {
             when {
                 // DETERMINISTIC invalidation class: the keystore just produced a
-                // NEW key during this read while an old ciphertext existed - the
-                // original key is gone (uninstall/reinstall/invalidation). ALL
-                // old records are unrecoverable: wipe them, typed state.
-                keyWasJustGenerated -> {
+                // NEW key WHILE old records existed - the original key is gone
+                // (uninstall/reinstall/invalidation). ALL old records are
+                // unrecoverable: wipe them, typed state. A tag failure when the
+                // key did NOT regenerate over records is ENCRYPTED_STORE_CORRUPT
+                // (the data is broken, not the key).
+                keyGeneratedOverExistingRecords -> {
                     record(KeystoreFailure.ANDROID_KEY_INVALIDATED)
                     wipeEncryptedRecords()
                 }
@@ -425,5 +434,8 @@ class TowerStore(context: Context, private val encryptInterceptor: ((ByteArray) 
         private const val KEY_CONSOLE_TOKEN = "console_token"
         private const val KEY_DEVICE_LABEL = "device_label"
         private const val KEY_FINGERPRINT = "fingerprint"
+
+        /** The encrypted record keys (the invalidation-class existence check). */
+        private val RECORD_KEYS = listOf(KEY_ENDPOINT, KEY_DEVICE_ID, KEY_CONSOLE_TOKEN, KEY_DEVICE_LABEL, KEY_FINGERPRINT)
     }
 }

@@ -56,8 +56,8 @@ class DeviceKeys : PairingFlow.DeviceKeysContract {
         val ks = KeyStore.getInstance(ANDROID_KEYSTORE).apply { load(null) }
         val entry = ks.getEntry(ALIAS, null) as? KeyStore.PrivateKeyEntry
             ?: throw IllegalStateException("device key alias missing")
-        val cert = entry.certificate
-        val b64 = Base64.encodeToString(cert.encoded, Base64.NO_WRAP)
+        val spki = entry.certificate.publicKey.encoded
+        val b64 = Base64.encodeToString(spki, Base64.NO_WRAP)
         return buildString {
             append("-----BEGIN PUBLIC KEY-----\n")
             b64.chunked(64).forEach { append(it).append('\n') }
