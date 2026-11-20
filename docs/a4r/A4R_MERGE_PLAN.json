@@ -1,0 +1,24 @@
+{
+  "schema": "a4r.merge_plan/1.0",
+  "produced_utc": "2026-11-20T12:00:00Z",
+  "owner": "Paolo Lombisani",
+  "mission": "GRAPH A4R NODE A5",
+  "direction": "MERGE_WITH_B_AS_BASE (conditional on the scorecard conditions C1..C5)",
+  "merge_definition_enforced": "one canonical repository, one app, one package strategy, one signing strategy, one release line, no duplicated implementations",
+  "canonical_repository": "Paolo83Ita/hermes-voice-console-android",
+  "phases": [
+    {"id": "M0", "name": "keystore_repair_landing", "location": "Tower repo (B)", "content": "the Tower account integrates the A2 drop-in package (TowerStore.kt + PairingPersistence.kt + tests + PairingFlow delta), rebuilds with the SAME debug keystore, registers the new SHA-256, hands the APK to the Owner", "owner_gate": "C1 physical retest (QR pairing PASS)", "rollback": "reinstall the previous B APK; the failed build stays in the ledger"},
+    {"id": "M1", "name": "authority_core_port", "location": "canonical repo (A)", "content": "port B's authority lane into the canonical repository behind a typed TowerRuntimeIntegration seam: PairingFlow(+repaired TowerStore), DeviceKeys(EC-P256), QrPayload v2 parser, TowerApi (18 endpoints), ConsoleTurnController/Service, TtsPlayer, VoiceCaptureEngine, ArchiveRepository+SafeIntents, NsdDiscovery, ArtifactDownloadWorker, ZXing decode adapter", "constraint": "mock executors move to test/simulator scopes ONLY - production paths use the real authority (no parallel authority, section 2)", "owner_gate": "C4 merge-direction approval BEFORE start", "rollback": "seam keeps the mock executor selectable in MOCK_SIMULATOR mode; revert commit removes the port cleanly"},
+    {"id": "M2", "name": "qr_v2_adapter", "location": "canonical repo (A)", "content": "versioned QR v2 parser beside the existing strict v1 parser (RD-04): accepts the live Tower schema, rejects secret-bearing payloads, maps rejections to the six mission typed states", "constraint": "v1 parser stays for legacy test fixtures; v2 is the production scanner default", "owner_gate": "none (additive)", "rollback": "revert commit"},
+    {"id": "M3", "name": "product_maturity_absorption", "location": "canonical repo (A)", "content": "B's UX screens adopt A's theme system, 5-language layer, accessibility, responsive shell, diagnostics; A's offline STT/model-manager lanes stay OPTIONAL under the Resource Envelope (A7), Tower-first default", "owner_gate": "per-phase Owner review", "rollback": "revert per phase"},
+    {"id": "M4", "name": "unification", "location": "canonical repo (A)", "content": "ONE applicationId, ONE release signing authority (Owner-held keystore, secure backup, fingerprint registered), ONE version line continuing code 12+ lineage, SBOM/NOTICE regenerated", "owner_gate": "C5 - package ID change + signing authority + supersede of installed apps: EXPLICIT Owner approvals, one per item", "rollback": "both previous APKs remain installable until Owner accepts the unified build"},
+    {"id": "M5", "name": "dedup_and_retirement", "location": "both repos", "content": "delete duplicated implementations (A's candidate Tower contract files retire to simulator scopes; B's repo keeps history but stops producing new APKs); Rule Theta final pass; license registries reconciled", "owner_gate": "retirement of either codebase = explicit Owner decision", "rollback": "git history preserves everything; no force operations"}
+  ],
+  "invariants_during_merge": [
+    "Tower stays the ONLY authority (no client-side bypass at any phase)",
+    "every phase ships as a testable build; no phase deletes evidence",
+    "every phase records a typed receipt + semantic diff + fresh read-back (Rule Theta)",
+    "no secrets, no private keys, ever"
+  ],
+  "verdict": "A4R_MERGE_PLAN_PRODUCED - 6 phases, owner-gated, rollback per phase"
+}

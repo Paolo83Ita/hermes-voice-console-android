@@ -1,0 +1,201 @@
+{
+ "schema": "a4r.tower_golden/1.0",
+ "canvas": [
+  680,
+  963
+ ],
+ "checks": [
+  {
+   "check": "manifest_matches_g37_extraction",
+   "result": {
+    "tower414_crown_sign": {
+     "manifest": [
+      102,
+      29,
+      476,
+      187
+     ],
+     "g37_size": [
+      476,
+      187
+     ],
+     "fraction_origin": [
+      102,
+      29
+     ],
+     "diff_px": 0
+    },
+    "tower414_ring_outer": {
+     "manifest": [
+      122,
+      289,
+      435,
+      298
+     ],
+     "g37_size": [
+      435,
+      298
+     ],
+     "fraction_origin": [
+      122,
+      289
+     ],
+     "diff_px": 0
+    },
+    "tower414_ring_middle": {
+     "manifest": [
+      180,
+      327,
+      320,
+      226
+     ],
+     "g37_size": [
+      320,
+      226
+     ],
+     "fraction_origin": [
+      180,
+      327
+     ],
+     "diff_px": 0
+    },
+    "tower414_ring_inner": {
+     "manifest": [
+      252,
+      371,
+      177,
+      149
+     ],
+     "g37_size": [
+      177,
+      149
+     ],
+     "fraction_origin": [
+      252,
+      371
+     ],
+     "diff_px": 0
+    },
+    "tower414_portal": {
+     "manifest": [
+      204,
+      679,
+      272,
+      212
+     ],
+     "g37_size": [
+      271,
+      212
+     ],
+     "fraction_origin": [
+      204,
+      679
+     ],
+     "diff_px": 1
+    }
+   }
+  },
+  {
+   "check": "contain_transform_matrix",
+   "result": {
+    "1080x2400": {
+     "scale": 1.588235,
+     "rect": [
+      1080,
+      1529
+     ],
+     "fits_inside": true,
+     "whole_monument_visible": true
+    },
+    "990x2218": {
+     "scale": 1.455882,
+     "rect": [
+      990,
+      1402
+     ],
+     "fits_inside": true,
+     "whole_monument_visible": true
+    },
+    "1133x2540": {
+     "scale": 1.666176,
+     "rect": [
+      1133,
+      1604
+     ],
+     "fits_inside": true,
+     "whole_monument_visible": true
+    },
+    "1320x2963": {
+     "scale": 1.941176,
+     "rect": [
+      1320,
+      1869
+     ],
+     "fits_inside": true,
+     "whole_monument_visible": true
+    }
+   }
+  },
+  {
+   "check": "scale_invariance_360_vs_480dp",
+   "result": {
+    "diff_bbox": [
+     0,
+     176,
+     467,
+     596
+    ],
+    "mean_gray_diff": 10.7514,
+    "note": "nonzero only from rescale ringing; structure identical"
+   }
+  },
+  {
+   "check": "z_order_deterministic",
+   "result": [
+    "tower414_architecture",
+    "tower414_crown_sign",
+    "tower414_ring_outer",
+    "tower414_ring_middle",
+    "tower414_ring_inner",
+    "tower414_portal",
+    "tower414_energy_mask"
+   ]
+  },
+  {
+   "check": "single_variant_per_tier",
+   "result": {
+    "balanced": "tower414",
+    "low": "tower414l",
+    "mixing_forbidden": true
+   }
+  }
+ ],
+ "max_placement_diff_px": 1,
+ "renders": {
+  "golden_xiaomi_1080x2400_dark": [
+   1080,
+   2400
+  ],
+  "golden_xiaomi_1080x2400_light": [
+   1080,
+   2400
+  ],
+  "golden_width_360dp_dark": [
+   990,
+   2218
+  ],
+  "golden_width_412dp_dark": [
+   1133,
+   2540
+  ],
+  "golden_width_480dp_dark": [
+   1320,
+   2963
+  ],
+  "golden_xiaomi_energy_full_dark": [
+   1080,
+   2400
+  ]
+ },
+ "verdict": "A4R_TOWER_GOLDEN_OFFLINE_PASS"
+}

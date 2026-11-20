@@ -257,7 +257,16 @@ fun OnboardingScreen(graph: AppGraph, onFinish: (pendingRoute: String?) -> Unit)
                     Text(stringResource(R.string.ob_s6_body), style = HermesType.body, color = c.textPrimary)
                 }
                 HermesFilledButton(onClick = {
-                    onFinish(if (openModelsAfter) com.hermestower.voiceconsole.ui.AppRoutes.MODEL_MANAGER else null)
+                    onFinish(
+                        when {
+                            openModelsAfter -> com.hermestower.voiceconsole.ui.AppRoutes.MODEL_MANAGER
+                            // A4R NODE A3 (A4R-P1-003): the QR choice DEMONSTRATES the
+                            // scanner path — the wizard hands the user straight to the
+                            // live QR pairing screen instead of only recording a flag.
+                            towerChoiceQr -> com.hermestower.voiceconsole.ui.AppRoutes.QR_SCANNER
+                            else -> null
+                        },
+                    )
                 }) { Text(stringResource(R.string.ob_s6_finish)) }
             }
         }

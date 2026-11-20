@@ -1,0 +1,53 @@
+{
+  "schema": "a4r.tower_contract_delta/1.0",
+  "node": "A6",
+  "produced_utc": "2026-11-20T12:10:00Z",
+  "owner": "Paolo Lombisani",
+  "mission": "GRAPH A4R NODE A6 - Tower contract integration",
+  "rule": "Tower server code is NOT modified; incompatibilities become versioned contract deltas with request/response evidence, handed to the Tower account; no client-side bypass is created",
+  "contract_truth_source": "CANDIDATE_B dex API surface (physical, unobfuscated) + the Tower-side G4R receipts; the live Tower at https://hermestower.aclclouds.online/",
+  "discovered_contract_surface": {
+    "pairing": ["/api/tower/voice-console/v2/pairings", "/api/tower/voice-console/v2/pairings/%s/claim", "/api/tower/voice-console/v2/pairings/%s/attest", "/api/tower/voice-console/v2/pop-challenge"],
+    "capture_streaming": ["/api/tower/voice-console/v2/g4/capture/open", "/api/tower/voice-console/v2/g4/capture/append", "/api/tower/voice-console/v2/g4/capture/partial", "/api/tower/voice-console/v2/g4/capture/commit", "/api/tower/voice-console/v2/g4/capture/resume", "/api/tower/voice-console/v2/g4/capture/cancel"],
+    "voice_turn": ["/api/tower/voice-console/v2/g4/voice/submit", "/api/tower/voice-console/v2/g4/voice/response-stream", "/api/tower/voice-console/v2/g4/voice/cancel"],
+    "archive": ["/api/tower/voice-console/v2/g4/archive/bind", "/api/tower/voice-console/v2/g4/archive/list", "/api/tower/voice-console/v2/g4/archive/metadata", "/api/tower/voice-console/v2/g4/archive/fetch", "/api/tower/voice-console/v2/g4/archive/download-receipt"],
+    "qr_v2_payload_keys": ["protocol_version", "tower_instance_id", "endpoint", "pairing_id", "scope", "expires_at", "transport_hint", "nonce_ref"],
+    "device_identity": "EC-P256 AndroidKeyStore keypair, SHA256withECDSA proof-of-possession, attestation metadata (keystore/algorithm/curve/digest/signature_format)",
+    "websocket": "okhttp WebSocket present in B for the streaming plane"
+  },
+  "incompatibility_semantic_diff": {
+    "field": "pairing entry",
+    "candidate_a_current": "QR scheme hermes-pair://v1/<towerId>?... (URI, env=local, nonce+challenge in payload, 11 typed rejections); executor MockTowerPairingClient; endpoints /tower/api + /tower/ws (hermes.console.v0.1)",
+    "live_tower_truth": "QR v2 JSON (protocol_version/tower_instance_id/endpoint/pairing_id/scope/expires_at/transport_hint/nonce_ref); pairing POST /v2/pairings/{claim,attest} + pop-challenge; EC-P256 PoP; NO secrets in QR (token_secret/private_key/refresh_token rejected)",
+    "delta_request_to_tower": "none required from the Tower - the CLIENT adapts: production scanner default switches to the v2 parser (RD-04/M2); the v1 parser remains for test fixtures only; the candidate /tower/api+/tower/ws lanes retire to simulator scopes (M5)",
+    "versioned_contract_delta_id": "CD-A4R-001 QR-v2-client-adoption (client-side, no server change)"
+  },
+  "contract_test_matrix_required": [
+    {"id": "CT-01", "item": "QR v2 parse accept (live Tower payload shape)", "method": "unit + instrumented with a Tower-issued QR"},
+    {"id": "CT-02", "item": "QR v2 rejects secret-bearing payload", "method": "unit (token_secret/private_key/refresh_token variants)"},
+    {"id": "CT-03", "item": "numeric pairing claim+attest", "method": "instrumented vs live Tower (A8 step 5)"},
+    {"id": "CT-04", "item": "challenge TTL expiry", "method": "unit with injected clock + physical expired QR (A8)"},
+    {"id": "CT-05", "item": "phrase matching + bilateral Owner confirmation", "method": "physical (A8 step 6)"},
+    {"id": "CT-06", "item": "device public key registration (EC-P256 PoP)", "method": "instrumented: ensureDeviceKeyPair+signChallenge vs /pop-challenge"},
+    {"id": "CT-07", "item": "replay rejection", "method": "physical (A8 step 20)"},
+    {"id": "CT-08", "item": "revocation surviving restart", "method": "physical (A8 steps 19+22)"},
+    {"id": "CT-09", "item": "capability negotiation", "method": "unit against B's Contracts.kt fields + live probe"},
+    {"id": "CT-10", "item": "WebSocket audio protocol (16k PCM16 seq chunks)", "method": "instrumented loopback + physical voice turn (A8 step 7)"},
+    {"id": "CT-11", "item": "transcript partial/final states", "method": "physical (A8 steps 8-11)"},
+    {"id": "CT-12", "item": "response streaming + cancel", "method": "physical (A8 steps 7+12)"},
+    {"id": "CT-13", "item": "TTS + interruption", "method": "physical (A8 step 12)"},
+    {"id": "CT-14", "item": "Archive list/metadata/fetch + SHA verification", "method": "physical (A8 steps 15-18) + unit hash chain"},
+    {"id": "CT-15", "item": "download receipt + WorkManager re-download", "method": "unit + physical network loss (A8 step 13)"},
+    {"id": "CT-16", "item": "typed error states rendering", "method": "unit (mapping matrix A3) + physical failure paths"},
+    {"id": "CT-17", "item": "version negotiation", "method": "unit against protocol_version field; live probe"},
+    {"id": "CT-18", "item": "restart and rehydration", "method": "physical (A8 steps 22-23) + instrumented persistence (A2 suite)"}
+  ],
+  "evidence_discipline": "every CT row lands in the A4R ledger with request/response or physical evidence; nothing is declared PASS without the Xiaomi run",
+  "tower_account_actions_requested": [
+    "1. integrate the A2 keystore repair package (handoff A4R_CANDIDATE_B_KEYSTORE_REPAIR.zip)",
+    "2. rebuild B with the same debug keystore; register the new SHA-256 in the fingerprint matrix",
+    "3. confirm CD-A4R-001 (client-side v2 adoption) - no server change required",
+    "4. optionally issue one live Tower QR fixture (scope-limited, short TTL) for CT-01/CT-04 instrumented tests"
+  ],
+  "verdict": "A4R_TOWER_CONTRACT_DELTA_PRODUCED - one client-side delta (CD-A4R-001), 18-row contract test matrix, no Tower core modification"
+}

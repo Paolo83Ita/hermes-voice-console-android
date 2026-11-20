@@ -1,0 +1,109 @@
+{
+  "schema": "a4r.candidate_provenance/1.0",
+  "produced_utc": "2026-11-20T10:22:00Z",
+  "owner": "Paolo Lombisani",
+  "candidates": {
+    "CANDIDATE_A": {
+      "name": "app-arm64-v8a-debug.apk",
+      "source_lineage": {
+        "repository": "Paolo83Ita/hermes-voice-console-android",
+        "branch_assessed": "graph-4/real-voice-pairing-archive-e2e",
+        "tip": "487d2a992aa8b6fa968c9b72032a70918935429b",
+        "main_kotlin_files": 162,
+        "test_files": 84,
+        "unit_tests_ci_green": "498-501 (68 suites)",
+        "instrumentation_files": 16,
+        "license": "Apache-2.0",
+        "ci": "GitHub Actions build+E2E emulator fleet (runs #178-#180 verified green in prior campaign)"
+      },
+      "apk": {
+        "size_bytes": 122639026,
+        "sha256": "0846130a1100b9f4f839a57ee80c9c5f7cd7ebe075db6f7a470b3ba495398ff3",
+        "package": "com.hermestower.voiceconsole",
+        "versionName": "0.3.9-alpha-graph4.14-round2-repairs",
+        "versionCode": 12,
+        "minSdk": 30, "targetSdk": 35,
+        "agp": "8.7.3",
+        "signing": {
+          "scheme": "v2 (single signer)",
+          "cert_subject": "C=US, O=Android, CN=Android Debug",
+          "cert_algorithm": "SHA256withRSA, 2048-bit RSA",
+          "cert_sha256": "28:E4:25:1F:06:F7:8D:58:E5:37:0D:96:49:D3:33:25:91:59:E4:BA:00:EF:AD:8F:AF:9D:76:91:66:3D:B3:9A",
+          "cert_valid_from_utc": "2026-11-20T07:59:16Z",
+          "cert_valid_until_utc": "2056-11-12T07:59:16Z"
+        }
+      },
+      "provenance_delta": {
+        "recorded_ci_artifact": {"identity": "Package 9 ARM64 (CI run #179)", "size_bytes": 122639026, "sha256_prefix": "bc79ced6…90e8"},
+        "uploaded_apk": {"size_bytes": 122639026, "sha256": "0846130a…"},
+        "finding": "BYTE-SIZE IDENTICAL to the recorded CI Package 9 artifact but SHA-256 DIFFERENT and signed with a NEW debug certificate generated 2026-11-20T07:59:16Z",
+        "interpretation": "the uploaded APK is a FRESH REBUILD of the same source lineage (versionName/versionCode identical, AGP identical 8.7.3, AGP pins zip entry timestamps to 1981-01-01 so a same-input rebuild reproduces entry sizes exactly; only the signing block differs)",
+        "typed_as": "PROVENANCE_REBUILD_SAME_LINEAGE_NEW_DEBUG_KEY",
+        "consequences": [
+          "cannot install-over the CI-installed Package 9 on any device (distinct signing key -> uninstall/reinstall required)",
+          "hash alone cannot prove source lineage for debug rebuilds; versionName+size+AGP+layout are the lineage evidence",
+          "the previous CI artifact bc79ced6…90e8 remains recorded and unchanged"
+        ]
+      }
+    },
+    "CANDIDATE_B": {
+      "name": "HERMES_VOICE_CONSOLE_g4_app-debug.apk",
+      "source_lineage": {
+        "repository": "Paolo83Ita/Hermes-Tower",
+        "path": "apps/android-voice-console",
+        "commit_assessed_by_tower_account": "ff9544bc",
+        "main_kotlin_files": 19,
+        "client_tests": 17,
+        "tower_side_batteries": "24 g4 console incl. property tests, 9 EC key tests, 10 runtime qualification, 21 EITA trigger, 4 Rizzo import-boundary",
+        "license": "Tower-side records",
+        "remote_access_from_this_executor": "NOT_CLONABLE (canonical Tower repo not exposed to this token; evidence via Tower handoff receipts + physical APK)"
+      },
+      "apk": {
+        "size_bytes": 61714401,
+        "sha256": "908b289f8edc65d970aec3ca406c1fb0306dd78f0fe7448bf69264eb3bf66f56",
+        "package": "com.hermestower.voiceconsole.debug",
+        "versionName": "1.0.0-g4",
+        "versionCode": 1,
+        "minSdk": 29, "targetSdk": 35,
+        "agp": "8.7.3",
+        "signing": {
+          "scheme": "v2 (single signer)",
+          "cert_subject": "C=US, O=Android, CN=Android Debug",
+          "cert_algorithm": "SHA256withRSA, 2048-bit RSA",
+          "cert_sha256": "2C:BB:E2:41:61:0D:3B:19:A9:3D:69:21:4F:16:81:C6:3E:96:D4:87:97:8F:6F:6F:31:1C:28:C0:8C:00:5B:AF",
+          "cert_valid_from_utc": "2026-11-20T07:00:49Z",
+          "cert_valid_until_utc": "2056-11-12T07:00:49Z"
+        }
+      },
+      "provenance_delta": {
+        "recorded_handoff_artifact": {"identity": "G4Q_C2B handoff via Tower Drive", "size_bytes": 61714401, "sha256": "908b289f8edc65d970aec3ca406c1fb0306dd78f0fe7448bf69264eb3bf66f56"},
+        "uploaded_apk": {"size_bytes": 61714401, "sha256": "908b289f8edc65d970aec3ca406c1fb0306dd78f0fe7448bf69264eb3bf66f56"},
+        "finding": "BYTE-EXACT MATCH with the Tower handoff record (hash and size identical)",
+        "typed_as": "PROVENANCE_BYTE_EXACT_MATCH",
+        "consequences": ["this is exactly the APK the Owner crashed on the Xiaomi during QR pairing - the crash evidence binds to THIS artifact"]
+      }
+    }
+  },
+  "coexistence_and_update_truth": {
+    "same_base_package": "com.hermestower.voiceconsole (A) vs com.hermestower.voiceconsole.debug (B) - distinct applicationId, CAN coexist side by side",
+    "signing": "distinct debug keystores -> NEITHER can update-install over the other; both are qualification-grade only",
+    "version_codes": "A=12, B=1 - no shared version line",
+    "release_implication": "A4R-P2-006: a future canonical app needs ONE package strategy + ONE release signing authority (Owner-held keystore) - Owner approval required before any change"
+  },
+  "b_source_truth_physical": {
+    "method": "dex string-table inventory + jadx single-class decompile (debug build, unobfuscated)",
+    "classes_recovered": 182,
+    "key_classes": [
+      "data/TowerStore (+inner Keystore) - 125-line source file per SMAP",
+      "pairing/PairingFlow (claim/attest/awaitOwnerAck/freshPop + DeviceKeysContract)",
+      "pairing/DeviceKeys (EC-P256, KeyGenParameterSpec API used CORRECTLY here)",
+      "pairing/QrPayload (QR v2 JSON schema)",
+      "net/TowerApi", "archive/ArchiveRepository (+SafeIntents)",
+      "voice/ConsoleTurnController + ConsoleTurnService + TtsPlayer + VoiceCaptureEngine",
+      "discovery/NsdDiscovery", "work/ArtifactDownloadWorker",
+      "ui/PairingScreenKt + ConsoleScreenKt + ArchiveScreenKt + ThemeKt"
+    ],
+    "smap_line_count_TowerStore": 125
+  },
+  "verdict": "A4R_CANDIDATE_PROVENANCE_COMPLETE - both candidates provenance-typed: A = same-lineage rebuild with a new debug key; B = byte-exact handoff artifact (the crash artifact)"
+}

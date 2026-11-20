@@ -184,31 +184,31 @@ fun ReferenceTowerVisual(
     val isSpeaking = stateName.contains("Speaking", ignoreCase = true)
     val remoteActive = (isContactingTower || isSpeaking) && !bridgeIsMock
 
-    // ---- OWNER F-A REPAIR: the drawn IMAGE RECT (one coordinate system) ----
-    // ContentScale.FillWidth + Alignment.BottomCenter draws the architecture at
-    // width = stage width, height = width × intrinsic aspect, bottom-anchored.
-    // The extraction fractions (§37 manifest) are only valid against THAT rect.
-    val fallbackAspect = 963f / 680f // BALANCED normalized stage (manifest §37)
-    val intr = architecture.intrinsicSize
-    val imageAspect = if (intr.width > 0f && intr.height > 0f) intr.height / intr.width else fallbackAspect
+    // ---- A4R NODE A4 REPAIR: the ONE master-canvas contain transform ----
+    // Mission formula: scale = min(containerWidth / 680, containerHeight / 963).
+    // ALL layers (architecture, crops, energy mask, Canvas dynamics, halo) share
+    // this single canvas rect: same variant, same scale, same origin, explicit
+    // clip, deterministic z-order (TowerLayerManifest is the authority). The
+    // whole monument is always visible — no device-specific pixel offsets ever.
 
     BoxWithConstraints(modifier.fillMaxSize().clipToBounds()) {
         val boxW = maxWidth
-        val imgH = boxW * imageAspect
+        val boxH = maxHeight
+        val (canvasScale, rectW, rectH) = TowerLayerManifest.containTransform(boxW, boxH)
 
-        // ---- the image-rect container: every layer inside shares its geometry ----
-        // Bottom-anchored INSIDE the stage box: when the stage is shorter than
-        // the drawn image, the rect overflows ABOVE and the stage's clipToBounds
-        // crops it exactly like the architecture bitmap's own top-clip.
+        // ---- the manifest-canvas container: every layer inside shares its geometry ----
         Box(
             Modifier
-                .align(Alignment.BottomStart)
-                .size(boxW, imgH)
+                .align(Alignment.Center)
+                .size(rectW, rectH)
                 .clipToBounds(),
         ) {
             // ---- controlled local dark halo behind the portal (§18) ----
             Canvas(Modifier.fillMaxSize()) {
-                val haloCenter = Offset(size.width * 0.5f, size.height * 0.815f)
+                val haloCenter = Offset(
+                    size.width * TowerLayerManifest.PORTAL_CENTER_X_FRAC,
+                    size.height * TowerLayerManifest.PORTAL_CENTER_Y_FRAC,
+                )
                 drawCircle(
                     brush = Brush.radialGradient(
                         listOf(Color.Black.copy(alpha = if (low) 0.55f else 0.42f), Color.Transparent),
@@ -226,33 +226,31 @@ fun ReferenceTowerVisual(
                 contentDescription = null,
                 modifier = Modifier.fillMaxSize(),
                 contentScale = ContentScale.FillWidth,
-                alignment = Alignment.BottomCenter,
+                alignment = Alignment.TopCenter,
             )
 
-            // ---- oracle mechanism: ring crops (NO rotation — ROUND 2) ----
-            // The ring layers are crops of the SAME normalized stage (§37): with
-            // the image-rect coordinate system they sit exactly on their baked
-            // copies (F-A repair, NCC-verified C12). A rotated raster crop
-            // visibly separates from its baked original (the Owner's doubled
-            // central circle) — the rotation shimmer is GONE; the only motion
-            // is the Canvas ring sweep drawn ABOVE this band.
-            LayerAt(ringOuter, xFrac = 0.180f, yFrac = 0.300f, wFrac = 0.640f, hFrac = 0.310f)
-            LayerAt(ringMiddle, xFrac = 0.265f, yFrac = 0.340f, wFrac = 0.470f, hFrac = 0.235f)
-            LayerAt(ringInner, xFrac = 0.370f, yFrac = 0.385f, wFrac = 0.260f, hFrac = 0.155f)
-            LayerAt(portal, xFrac = 0.300f, yFrac = 0.705f, wFrac = 0.400f, hFrac = 0.220f)
-            LayerAt(crownSign, xFrac = 0.150f, yFrac = 0.030f, wFrac = 0.700f, hFrac = 0.195f)
+            // ---- A4R NODE A4: manifest-driven layers (NO hand-coded fractions) ----
+            // The ring layers are crops of the SAME normalized stage; the manifest
+            // places them on their baked copies at EVERY stage size (C12 NCC-verified
+            // boxes). Raster crops never rotate against their baked originals.
+            LayerAt(ringOuter, TowerLayerManifest.ringOuter, canvasScale)
+            LayerAt(ringMiddle, TowerLayerManifest.ringMiddle, canvasScale)
+            LayerAt(ringInner, TowerLayerManifest.ringInner, canvasScale)
+            LayerAt(portal, TowerLayerManifest.portal, canvasScale)
+            LayerAt(crownSign, TowerLayerManifest.crownSign, canvasScale)
 
             // ---- §39 dynamic overlays (Canvas — never architectural geometry) ----
             Canvas(Modifier.fillMaxSize()) {
                 val w = size.width
                 val h = size.height
-                val portalCx = w * 0.5f
-                val portalCy = h * 0.815f
-                // measured ring band (ring_outer crop box: x 0.180..0.820,
-                // y 0.300..0.610 → center (0.5w, 0.455h), outer radius 0.32w)
-                val ringCx = w * 0.5f
-                val ringCy = h * 0.455f
-                val ringR = w * 0.32f
+                // A4R NODE A4: dynamic anchors come from the manifest constants
+                // (the measured C12 ring band and the §39 portal center) — the
+                // same coordinate truth the raster layers use.
+                val portalCx = w * TowerLayerManifest.PORTAL_CENTER_X_FRAC
+                val portalCy = h * TowerLayerManifest.PORTAL_CENTER_Y_FRAC
+                val ringCx = w * TowerLayerManifest.RING_CENTER_X_FRAC
+                val ringCy = h * TowerLayerManifest.RING_CENTER_Y_FRAC
+                val ringR = w * TowerLayerManifest.RING_RADIUS_W_FRAC
 
                 // portal glow — breathing idle; stronger listening; amplitude when speaking
                 val glowBase = when {
@@ -308,11 +306,11 @@ fun ReferenceTowerVisual(
                             (if (bridgeIsMock) m.amber else m.cyanCore).copy(alpha = energyAlpha * 0.5f),
                             Color.Transparent,
                         ),
-                        center = Offset(w * 0.5f, h * 0.455f),
-                        radius = w * 0.33f,
+                        center = Offset(ringCx, ringCy),
+                        radius = ringR * 1.03f, // the energy tint rides the measured ring band
                     ),
-                    radius = w * 0.33f,
-                    center = Offset(w * 0.5f, h * 0.455f),
+                    radius = ringR * 1.03f,
+                    center = Offset(ringCx, ringCy),
                 )
 
                 // LISTENING: incoming cyan lines toward the mechanism
@@ -395,38 +393,30 @@ fun ReferenceTowerVisual(
                     .fillMaxSize()
                     .graphicsLayer { alpha = energyTintAlpha },
                 contentScale = ContentScale.FillWidth,
-                alignment = Alignment.BottomCenter,
+                alignment = Alignment.TopCenter,
             )
         }
     }
 }
 
 /**
- * Places one normalized-stage layer at its extraction fractions — expressed in
- * the SURROUNDING image-rect box (F-A repair: the parent box now has exactly
- * the asset's normalized aspect, so the fractions are pixel-true again).
- * ROUND 2: the rotation parameter is REMOVED — raster crops must never rotate
- * against their baked originals (the doubled-central-circle class).
+ * A4R NODE A4: places ONE manifest layer at its spec, in the shared canvas
+ * scale — same variant, same scale, same origin as every other layer.
+ * Rotation is structurally absent: raster crops must never rotate against
+ * their baked originals (the C12 doubled-central-circle class).
  */
 @Composable
 private fun LayerAt(
     painter: androidx.compose.ui.graphics.painter.Painter,
-    xFrac: Float,
-    yFrac: Float,
-    wFrac: Float,
-    hFrac: Float,
+    spec: TowerLayerManifest.TowerLayerSpec,
+    scale: Float,
 ) {
-    BoxWithConstraints(Modifier.fillMaxSize()) {
-        val pw = maxWidth * wFrac
-        val ph = maxHeight * hFrac
-        Image(
-            painter,
-            contentDescription = null,
-            modifier = Modifier
-                .align(Alignment.TopStart)
-                .offset(x = maxWidth * xFrac, y = maxHeight * yFrac)
-                .size(pw, ph),
-            contentScale = ContentScale.Fit,
-        )
-    }
+    Image(
+        painter,
+        contentDescription = null,
+        modifier = Modifier
+            .offset(x = (spec.x * scale).dp, y = (spec.y * scale).dp)
+            .size((spec.width * scale).dp, (spec.height * scale).dp),
+        contentScale = ContentScale.Fit,
+    )
 }

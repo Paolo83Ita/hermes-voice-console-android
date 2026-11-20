@@ -1,0 +1,113 @@
+{
+  "schema": "a4r.n0.resume_receipt/1.0",
+  "mission": "GRAPH A4R - two-candidate reconciliation, physical repair, canonical app selection and Tower integration qualification",
+  "owner": "Paolo Lombisani",
+  "executor": "GLM 5.3 Web - second Android development account",
+  "produced_utc": "2026-11-20T10:20:00Z",
+  "resume_mode": "CONTINUE_FROM_LATEST_VERIFIED_LOCAL_AUTHORITY",
+  "android_tip_at_resume": {
+    "repo": "Paolo83Ita/hermes-voice-console-android",
+    "branch": "graph-4/real-voice-pairing-archive-e2e",
+    "commit": "487d2a992aa8b6fa968c9b72032a70918935429b",
+    "commit_subject": "graph-4/HANDOFF-TOWER-VPS-001 Tower VPS handoff intake",
+    "working_tree_clean": true
+  },
+  "branches_fresh_read": [
+    "main",
+    "foundation/v0.1-cloud-build",
+    "graph-2/model-manager-tower-connection-e2e",
+    "graph-3/monumental-oracle-tower-visual-refoundation",
+    "graph-4/real-voice-pairing-archive-e2e (tip)"
+  ],
+  "physical_reads_performed": [
+    "app-arm64-v8a-debug.apk extracted from upload zip: 122,639,026 bytes",
+    "HERMES_VOICE_CONSOLE_g4_app-debug.apk extracted from upload zip: 61,714,401 bytes",
+    "HERMES_TOWER_GRAPH4R_RECONCILIATION.zip: 20 documents fresh-read (Tower-side Graph 4 terminal reconciliation, msn_ht_graph4r_canonical_reconciliation_v1, produced 2026-11-20T09:35:00Z)",
+    "Photos-1-001.zip: 3 MIUI bug-report screenshots (crash evidence, timestamps 09:50:20/09:50:26/09:50:34)",
+    "Candidate B dex inventory: 182 com.hermestower classes extracted from 11 dex files (debug build, unobfuscated)",
+    "jadx single-class decompile of B: TowerStore, PairingFlow, DeviceKeys, QrPayload",
+    "Candidate A source audit at tip: pairing, QR scanner, Tower visual, vault, bridge, voice pipeline"
+  ],
+  "apk_identity_physical": {
+    "candidate_a": {
+      "package": "com.hermestower.voiceconsole",
+      "versionName": "0.3.9-alpha-graph4.14-round2-repairs",
+      "versionCode": 12,
+      "minSdk": 30, "targetSdk": 35,
+      "label": "Hermes Console",
+      "size_bytes": 122639026,
+      "sha256": "0846130a1100b9f4f839a57ee80c9c5f7cd7ebe075db6f7a470b3ba495398ff3",
+      "native_libs_arm64": 17,
+      "dex_count": 18,
+      "asset_count": 11
+    },
+    "candidate_b": {
+      "package": "com.hermestower.voiceconsole.debug",
+      "versionName": "1.0.0-g4",
+      "versionCode": 1,
+      "minSdk": 29, "targetSdk": 35,
+      "label": "Hermes Voice Console",
+      "size_bytes": 61714401,
+      "sha256": "908b289f8edc65d970aec3ca406c1fb0306dd78f0fe7448bf69264eb3bf66f56",
+      "native_libs_arm64": 3,
+      "dex_count": 11,
+      "asset_count": 0
+    }
+  },
+  "timeline_of_authority": [
+    {"t": "2026-11-20T07:00:49Z", "fact": "Candidate B debug signing certificate generated (its build follows)"},
+    {"t": "2026-11-20T07:55:54Z", "fact": "A tip 487d2a9 committed (Tower VPS handoff intake; three-fingerprint conflict typed)"},
+    {"t": "2026-11-20T08:36Z", "fact": "Candidate B APK file mtime (upload zip)"},
+    {"t": "2026-11-20T08:53Z", "fact": "Candidate A APK file mtime (upload zip)"},
+    {"t": "2026-11-20T09:35:00Z", "fact": "Tower-side Graph 4R canonical selection produced: REUSE_AND_EXTEND_CANDIDATE_B (msn_ht_graph4r_canonical_reconciliation_v1)"},
+    {"t": "2026-11-20T09:50:20Z", "fact": "Owner captures MIUI crash feedback screenshots: Candidate B QR pairing crash on the Xiaomi (the evidence is NEWER than the selection)"},
+    {"t": "2026-11-20T09:35-09:36Z", "fact": "Owner uploads the A4R mission package with the crash evidence: A4R supersedes the pre-selection"}
+  ],
+  "g4r_pre_selection_supersession": {
+    "tower_side_selection": "REUSE_AND_EXTEND_CANDIDATE_B (Graph 4R receipt, 09:35Z)",
+    "owner_physical_counter_evidence": "Candidate B crashes on the PRIMARY pairing path at 09:50Z (A4R-P1-001)",
+    "a4r_directive": "mission section 0: do not assume either candidate is canonical; selection only after source audit, contract comparison, repair, equivalent physical testing, Owner review; A4R-P1-005 CANONICAL_BASELINE_UNRESOLVED is OPEN",
+    "status": "A4R IS THE SUPERSEDING AUTHORITY; the Graph 4R selection is input evidence, not binding"
+  },
+  "owner_crash_evidence_binding": {
+    "finding": "A4R-P1-001 ANDROID_KEYSTORE_PAIRING_CRASH",
+    "photos": 3,
+    "photos_path": "a4r-staging/photos/",
+    "exception": "java.lang.UnsupportedOperationException: Cannot initialize without a android.security.keystore.KeyGenParameterSpec parameter",
+    "stack_confirmed_by_screenshot": [
+      "android.security.keystore2.AndroidKeyStoreKeyGeneratorSpi.engineInit(AndroidKeyStoreKeyGeneratorSpi.java:163)",
+      "javax.crypto.KeyGenerator.init(KeyGenerator.java:582)",
+      "javax.crypto.KeyGenerator.init(KeyGenerator.java:566)",
+      "com.hermestower.voiceconsole.data.TowerStore$Keystore.key(TowerStore.kt:35)",
+      "com.hermestower.voiceconsole.data.TowerStore.encrypt(TowerStore.kt:42)",
+      "com.hermestower.voiceconsole.data.TowerStore.putEncrypted(TowerStore.kt:59)",
+      "com.hermestower.voiceconsole.data.TowerStore.setEndpoint(TowerStore.kt:75)",
+      "com.hermestower.voiceconsole.pairing.PairingFlow.pairFromQr(PairingFlow.kt:54)",
+      "com.hermestower.voiceconsole.ui.PairingScreenKt$PairingScreen$2$5$1$1.invokeSuspend(PairingScreen.kt:148)"
+    ],
+    "root_cause_physical": "TowerStore$Keystore.key() calls KeyGenerator.init(int keysize) on the AndroidKeyStore provider WITHOUT a KeyGenParameterSpec - the framework throws at engineInit; confirmed by decompile: kg.init(256) at TowerStore.kt:35",
+    "second_screenshot": "full continuation to PairingScreen.kt:148 invokeSuspend (compose coroutine)",
+    "third_screenshot": "stack tail + Suppressed DiagnosticCoroutineContextException"
+  },
+  "device_evidence": {
+    "device": "Xiaomi 11 Lite 5G NE",
+    "battery_percent_visible": 74,
+    "wifi_connected": true,
+    "crash_time_local": "2026-11-20 09:50"
+  },
+  "discovery_completeness": {
+    "builds_before_discovery": false,
+    "ban_build_no_apk_before_discovery_respected": true,
+    "tower_repo_remote_from_this_token": "ABSENT (token enumerates 2 repos only - confirmed by prior intake 487d2a9; B source therefore delivered via handoff mechanism, not direct write)",
+    "tower_live_endpoint": "https://hermestower.aclclouds.online/ (read-only access mode)"
+  },
+  "open_findings_at_resume": [
+    "A4R-P1-001 ANDROID_KEYSTORE_PAIRING_CRASH (root cause physically identified - repair packaged in NODE A2)",
+    "A4R-P1-002 JVM_TEST_FAILED_TO_REPRESENT_ANDROID_KEYSTORE (B: 17 client tests never exercised the real KeyGenerator path; DeviceKeys.kt uses the correct spec API while TowerStore does not - asymmetry proof)",
+    "A4R-P1-003 CANDIDATE_A_QR_SCANNER_USER_PATH_NOT_DEMONSTRATED (A: scanner implemented+reachable only from TowerStudio; no numeric code lane; no manual endpoint lane; mock executor only)",
+    "A4R-P2-004 TOWER_CENTRAL_PORTAL_LAYER_MISALIGNED (A: Owner finding; compositing already image-rect unified from C11/C12, but NOT yet formalized as the mission's 680x963 master-canvas manifest with shared contain transform + golden tests)",
+    "A4R-P1-005 CANONICAL_BASELINE_UNRESOLVED (OPEN by mission directive)",
+    "A4R-P2-006 RELEASE_SIGNING_AND_MIGRATION_UNRESOLVED (both candidates debug-signed today with DISTINCT fresh debug keystores - A cert created 07:59:16Z, B cert created 07:00:49Z, 2026-11-20)"
+  ],
+  "verdict": "A4R_N0_RESUME_COMPLETE - discovery complete, no APK built, both candidates physically fingerprinted, crash evidence bound at source level, G4R pre-selection superseded by Owner evidence + A4R directive"
+}

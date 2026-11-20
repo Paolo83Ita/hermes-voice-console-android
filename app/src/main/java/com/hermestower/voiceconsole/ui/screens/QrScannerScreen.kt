@@ -44,6 +44,8 @@ import com.google.mlkit.vision.barcode.common.Barcode
 import com.google.mlkit.vision.common.InputImage
 import com.hermestower.voiceconsole.app.AppGraph
 import com.hermestower.voiceconsole.pairing.QrPairingScanFlow
+import com.hermestower.voiceconsole.pairing.toPairingEntryState
+import com.hermestower.voiceconsole.locale.StateLabels
 import com.hermestower.voiceconsole.ui.components.ResponsiveScreenHeader
 import com.hermestower.voiceconsole.ui.components.SectionCard
 import com.hermestower.voiceconsole.ui.components.MeanderBand
@@ -202,6 +204,18 @@ fun QrScannerScreen(graph: AppGraph, onBack: () -> Unit) {
                             Text(
                                 stringResource(com.hermestower.voiceconsole.R.string.qr_refused_fmt, s.reject.kind, s.reject.detail),
                                 style = HermesType.body, color = c.textInfo,
+                            )
+                            // A4R NODE A3: the mission typed state, surfaced explicitly
+                            // (§23 discipline: localized label, never a raw enum).
+                            Text(
+                                stringResource(
+                                    com.hermestower.voiceconsole.R.string.qr_typed_state_fmt,
+                                    StateLabels.label(
+                                        s.reject.kind.toPairingEntryState().name,
+                                        com.hermestower.voiceconsole.locale.AppLanguage.effectiveTag(context),
+                                    ),
+                                ),
+                                style = HermesType.body, color = c.textPrimary,
                             )
                             Text(
                                 stringResource(com.hermestower.voiceconsole.R.string.qr_refused_note),

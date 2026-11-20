@@ -259,6 +259,31 @@ object StateLabels {
         "PASSED" to mapOf(
             "it" to "Superato", "en" to "Passed", "es" to "Superada", "fr" to "Réussi", "de" to "Bestanden",
         ),
+        // ---- A4R NODE A3: the six mission pairing-entry typed states ----
+        "CAMERA_PERMISSION_DENIED" to mapOf(
+            "it" to "Permesso fotocamera negato", "en" to "Camera permission denied",
+            "es" to "Permiso de cámara denegado", "fr" to "Autorisation caméra refusée", "de" to "Kameraberechtigung verweigert",
+        ),
+        "CAMERA_UNAVAILABLE" to mapOf(
+            "it" to "Fotocamera non disponibile", "en" to "Camera unavailable",
+            "es" to "Cámara no disponible", "fr" to "Caméra indisponible", "de" to "Kamera nicht verfügbar",
+        ),
+        "QR_NOT_RECOGNIZED" to mapOf(
+            "it" to "QR non riconosciuto", "en" to "QR not recognized",
+            "es" to "QR no reconocido", "fr" to "QR non reconnu", "de" to "QR nicht erkannt",
+        ),
+        "QR_EXPIRED" to mapOf(
+            "it" to "QR scaduto o già usato", "en" to "QR expired or already used",
+            "es" to "QR caducado o ya usado", "fr" to "QR expiré ou déjà utilisé", "de" to "QR abgelaufen oder bereits benutzt",
+        ),
+        "QR_SCHEMA_UNSUPPORTED" to mapOf(
+            "it" to "Schema QR non supportato", "en" to "QR schema unsupported",
+            "es" to "Esquema QR no compatible", "fr" to "Schéma QR non pris en charge", "de" to "QR-Schema nicht unterstützt",
+        ),
+        "PAIRING_ENDPOINT_UNREACHABLE" to mapOf(
+            "it" to "Endpoint di pairing non raggiungibile", "en" to "Pairing endpoint unreachable",
+            "es" to "Endpoint de emparejamiento inaccesible", "fr" to "Endpoint d’appairage inaccessible", "de" to "Pairing-Endpunkt nicht erreichbar",
+        ),
     )
 
     /** The localized label for a state identifier; falls back to the identifier itself. */

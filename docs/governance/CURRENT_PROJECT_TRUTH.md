@@ -517,3 +517,13 @@ repeated; no downloader rewrite; no Tower regeneration).
   **OBSIDIAN_CONTRAST_REPAIR_OWNER_RETEST_PENDING**,
   **TOWER_EFFECT_REPAIR_OWNER_RETEST_PENDING** — only the Owner may set
   the *_OWNER_VERIFIED states after physical evidence (§28).
+
+## GRAPH A4R truth block (2026-11-20, executor fresh-read)
+
+- Candidate A = this repository @ `487d2a9` (uploaded build FP-A-UPLOAD = same-lineage rebuild, new debug key 07:59Z, sha 0846130a…).
+- Candidate B = Hermes-Tower/apps/android-voice-console @ ff9544bc (uploaded build FP-B-G4 sha 908b289f… BYTE-EXACT = the build that crashed QR pairing on the Xiaomi at 09:50Z).
+- A4R-P1-001 root cause: `KeyGenerator.init(256)` without KeyGenParameterSpec at TowerStore.kt:35 (framework throws; pre-network). Repair package delivered to the Tower account (A2).
+- The Tower-side Graph 4R canonical selection (09:35Z) predates the crash evidence (09:50Z); A4R supersedes: canonical base UNRESOLVED until A5 conditions C1..C5 close (recommendation: MERGE_WITH_B_AS_BASE into THIS repository).
+- A3 wiring: numeric + manual endpoint lanes, six mission typed states, onboarding QR choice demonstrates the scanner (all SIMULATED-labeled until the authority port M1).
+- A4: the Tower visual is now manifest-driven on the 680×963 master canvas with the shared contain transform; offline golden PASS; Owner device acceptance PENDING.
+- Terminal state VOICE_CONSOLE_PAIRED_AND_VERIFIED: NOT_REACHED (no Xiaomi physical evidence yet). OPEN_P1 = 3 (all repaired-in-code, retest pending).

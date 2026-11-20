@@ -1,0 +1,47 @@
+{
+  "schema": "a4r.resource_truth_receipt/1.0",
+  "node": "A7",
+  "produced_utc": "2026-11-20T12:15:00Z",
+  "owner": "Paolo Lombisani",
+  "mission": "GRAPH A4R NODE A7 - resource and runtime truth",
+  "physical_today": {
+    "candidate_a_apk_bytes": 122639026,
+    "candidate_b_apk_bytes": 61714401,
+    "ratio": "A is 1.99x B",
+    "a_native_libs_arm64": ["libandroidx.graphics.path.so", "libbarhopper_v3.so", "libc++_shared.so", "libggml-base.so", "libggml-cpu.so", "libggml.so", "libimage_processing_util_jni.so", "libjnidispatch.so", "libllama.so", "libllama_jni.so", "libonnxruntime.so", "libonnxruntime4j_jni.so", "libsherpa-onnx-c-api.so", "libsherpa-onnx-cxx-api.so", "libsherpa-onnx-jni.so", "libsurface_util_jni.so", "libvosk.so"],
+    "b_native_libs_arm64": ["libandroidx.graphics.path.so", "libdatastore_shared_counter.so", "libimage_processing_util_jni.so"],
+    "a_bundled_assets": ["mlkit_barcode_models x3 (tflite)", "models/bundled: embed.onnx, gtcrn_simple.onnx, hey_jarvis.onnx, melspec.onnx + bundled_manifest.json", "voice_pack_catalog.json", "fixtures x2"],
+    "b_bundled_assets": 0,
+    "a_dex_count": 18, "b_dex_count": 11,
+    "min_sdk": "A 30 / B 29", "target_sdk": "35 both", "agp": "8.7.3 both"
+  },
+  "component_storage_estimate_a": {
+    "llama_cpp_family": "libllama.so + libllama_jni.so + libggml*.so (runtime only; GGUF models are downloadable, not bundled)",
+    "stt": "libvosk.so + bundled ONNX voice-pack pieces (embed/gtcrn/hey_jarvis/melspec)",
+    "tts": "libsherpa-onnx-*.so + downloadable voice catalogs",
+    "vision_qr": "libbarhopper_v3.so + mlkit tflite models (bundled, on-device)",
+    "note": "exact per-component byte split requires unpacking at install time - measured on device in the A8 protocol (R1)"
+  },
+  "governance_requirements_enforced": {
+    "optional_runtimes": "not loaded at startup unless required (A's runtime seams are lazy: resolver flips RUNTIME_UNAVAILABLE only when the seam is genuinely absent - C11 repair); downloadable with identity/hash/license (model catalog carries sha256 + license); removable (model manager uninstall); storage-visible (ModelManager screen); rollback-capable (ModelRollbackController)",
+    "tower_first_usability": "the console must remain usable Tower-first without downloading the local LLM - VERIFIED BY DESIGN in A (LLM lane is optional and never required for pairing/voice/Archive) and to be PROVEN physically (A8 protocol R6: fresh profile with zero local models completes the full Tower gate)",
+    "resource_envelope": "decoded-MB budgets (LOW <=12 / BALANCED <=24) already govern A's visual tier; the same envelope register will govern runtimes after the A8 measurements"
+  },
+  "device_measurements_required": {
+    "device": "Xiaomi 11 Lite 5G NE",
+    "protocol_rows": [
+      {"id": "R1", "measure": "APK size + installed size (per candidate)", "method": "adb size / Settings app info, after install"},
+      {"id": "R2", "measure": "first-open time (cold, from icon tap to first frame)", "method": "screen recording timestamp, 3 runs median"},
+      {"id": "R3", "measure": "baseline RSS / peak RSS", "method": "adb shell dumpsys meminfo <pkg> at idle and during a voice turn"},
+      {"id": "R4", "measure": "battery delta over a 10-minute voice session", "method": "dumpsys batterystats reset + read"},
+      {"id": "R5", "measure": "thermal state after 10 minutes", "method": "dumpsys thermalservice"},
+      {"id": "R6", "measure": "Tower-first usability with zero local models", "method": "fresh profile, full A8 gate without any model download"},
+      {"id": "R7", "measure": "model download/load/unload latencies + storage by component (A only)", "method": "ModelManager receipts + adb du on app dirs"},
+      {"id": "R8", "measure": "STT latency, TTS first audio, local LLM latency (A, optional lane)", "method": "in-app diagnostics receipts"},
+      {"id": "R9", "measure": "camera latency QR-to-detect", "method": "A3 typed flow framesAnalyzed counter + screen recording"},
+      {"id": "R10", "measure": "background behavior (10 min backgrounded)", "method": "adb shell dumpsys activity processes"}
+    ],
+    "status": "PENDING_OWNER_RUN (A8) - no synthetic numbers are invented here"
+  },
+  "verdict": "A4R_RESOURCE_TRUTH_PHYSICAL_PART_COMPLETE - artifact facts measured, device protocol defined, all runtime numbers PENDING the Xiaomi run"
+}

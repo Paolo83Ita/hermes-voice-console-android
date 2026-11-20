@@ -204,3 +204,9 @@ Graph 4 checkpoints (branch graph-4/real-voice-pairing-archive-e2e, from ca8980b
 | CP-G4.14-P9-006 | Qwen readiness without rewrite (mission ban honored): transport repair verified live in tip code (UA/redirect/true-offset/416/mirror/hash) + 3 pins inside the cloud 501; physical qualification stays Owner-only | GRAPH414_PACKAGE9_CONTINUATION_READBACK.md §downloader | code read + JUnit | (this commit) |
 | CP-G4.14-P9-007 | Tower + Obsidian verification: rotation removal + concentric arc + Canvas effects code-verified; C12 measurement (drift ≤1.2dp / NCC ≥0.96) in-repo; theme-root fix live; dark-screen evidence = OBSIDIAN_OWNER_RETEST_PENDING (no self-granted PASS); Owner round-3 runbook issued | OWNER_POCO_XIAOMI_RETEST_PACKAGE_9_GRAPH414.md + C12_CROP_ALIGNMENT_MEASUREMENT.json | code read + measurement JSON | (this commit) |
 | HANDOFF-TOWER-VPS-001 | Tower VPS handoff intake: runtime UP (auth-gated), canonical GitHub remote ABSENT (owner-account enumeration), commit 296dd83e unreachable, third Android-client fingerprint typed (908b289f vs bc79ced6 vs f7a76735), no merge performed; bundle upload + Xiaomi physical start requested | GRAPH4_TOWER_VPS_HANDOFF_READBACK.md + download/GRAPH4_REMOTE_CONVERGENCE_RECEIPT.md | 4 fresh GitHub reads + endpoint probe + 2 SHA fingerprints | (this commit) |
+
+Graph A4R checkpoints (branch `graph-4/real-voice-pairing-archive-e2e`, this repository):
+
+| Checkpoint | Content | Evidence added |
+| --- | --- | --- |
+| graph-4/a4r-two-candidate-reconciliation | NODE A0–A8: physical probes of both candidates, crash root cause bound, A2 keystore repair package, A3 pairing entry wiring + typed states, A4 master-canvas manifest + golden, A5 canonical recommendation, A6 contract delta, A7 resource truth, A8 ledger + runbook | A4R receipts under docs/a4r/ (13) + keystore repair package + offline golden renders + ledger; physical verdicts remain PENDING (no self-granted PASS) |

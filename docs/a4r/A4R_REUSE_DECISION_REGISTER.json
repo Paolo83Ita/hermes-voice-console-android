@@ -1,0 +1,22 @@
+{
+  "schema": "a4r.reuse_decision_register/1.0",
+  "produced_utc": "2026-11-20T10:42:00Z",
+  "owner": "Paolo Lombisani",
+  "mission": "GRAPH A4R NODE A1",
+  "rule": "each decision states what A4R does with that capability, independent of the final canonical choice (A4R-P1-005 stays OPEN)",
+  "decisions": [
+    {"id": "RD-01", "capability": "B TowerStore keystore persistence", "decision": "REPAIR_B", "action": "A2 drop-in corrected TowerStore.kt + typed states + instrumentation tests delivered to the Tower account via the handoff contribution mechanism; no client-side bypass", "blocks_selection": true},
+    {"id": "RD-02", "capability": "B EC-P256 DeviceKeys", "decision": "KEEP_B_AS_IS", "action": "already correct API usage (KeyGenParameterSpec+secp256r1); no change", "blocks_selection": false},
+    {"id": "RD-03", "capability": "A QR scanner implementation", "decision": "EXPOSE_A", "action": "wire primary/secondary/advanced pairing actions + typed states per NODE A3; scanner code is quality and stays", "blocks_selection": false},
+    {"id": "RD-04", "capability": "A hermes-pair://v1 QR schema", "decision": "ADAPTER_REQUIRED", "action": "add a versioned QR v2 parser beside the v1 parser (never repurpose v1); A can then ACCEPT real Tower QRs for physical testing; contract delta filed under A6 if field semantics differ", "blocks_selection": true},
+    {"id": "RD-05", "capability": "A Tower visual compositing", "decision": "MANIFEST_REFACTOR", "action": "formalize 680x963 master canvas manifest + shared contain transform + golden tests (NODE A4)", "blocks_selection": false},
+    {"id": "RD-06", "capability": "A mock pairing/archive executors", "decision": "KEEP_TEST_ONLY", "action": "stay in the app but ALWAYS labeled SIMULATED; they never contact the Tower; no parallel authority (§2 boundary)", "blocks_selection": false},
+    {"id": "RD-07", "capability": "A local runtimes (llama/vosk/sherpa/wake/denoiser)", "decision": "RESOURCE_ENVELOPE_GOVERNED", "action": "A7 measurements on Xiaomi decide load policy; console must stay usable Tower-first without local LLM; optional runtimes downloadable/removable with hash+license", "blocks_selection": false},
+    {"id": "RD-08", "capability": "B NSD LAN ladder", "decision": "CANDIDATE_FOR_MERGE", "action": "if B becomes base: absorb as-is; if A becomes base: port NSD module; either way one implementation only", "blocks_selection": false},
+    {"id": "RD-09", "capability": "A 5-language i18n + themes + a11y", "decision": "CANDIDATE_FOR_MERGE", "action": "the typed long-term convergence source (both G4R P-C1 and A4R A5 point here)", "blocks_selection": false},
+    {"id": "RD-10", "capability": "signing identities", "decision": "OWNER_GATE", "action": "both debug keystores are qualification-only; any package/signing unification requires explicit Owner approval (P2-006)", "blocks_selection": true},
+    {"id": "RD-11", "capability": "B ZXing QR decode", "decision": "KEEP_B_AS_IS", "action": "no models, no Play Services - acceptable; A's bundled ML Kit remains A's own strength", "blocks_selection": false},
+    {"id": "RD-12", "capability": "A HttpURLConnection candidate contract", "decision": "SUPERSEDE_ON_MERGE", "action": "if B becomes base, A's hermes.console.v0.1 lanes are retired to simulator scopes only (no dual contracts in production)", "blocks_selection": false}
+  ],
+  "verdict": "A4R_REUSE_DECISION_REGISTER_COMPLETE - 12 typed decisions; RD-01/RD-04/RD-10 block the canonical selection until closed"
+}

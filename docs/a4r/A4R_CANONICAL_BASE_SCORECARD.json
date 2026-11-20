@@ -1,0 +1,54 @@
+{
+  "schema": "a4r.canonical_base_scorecard/1.0",
+  "produced_utc": "2026-11-20T11:55:00Z",
+  "owner": "Paolo Lombisani",
+  "mission": "GRAPH A4R NODE A5",
+  "status": "RECOMMENDATION_ONLY - final selection is an OWNER GATE; every physical-dependent cell carries its evidence class; no PASS is self-granted",
+  "candidates": {"A": "FP-A-UPLOAD (com.hermestower.voiceconsole, code 12)", "B": "FP-B-G4 (com.hermestower.voiceconsole.debug, code 1, CRASHED build)"},
+  "hard_gates": [
+    {"gate": "physical_stability_primary_path", "A": "PASS_BY_HISTORY (POCO retest rounds, opens without crash)", "B": "FAIL_AS_IS (A4R-P1-001 QR pairing crash; repair package A2 ready but NOT yet built/physically verified)"},
+    {"gate": "tower_contract_completeness", "A": "FAIL (candidate contract not served by the live Tower; mock executors only)", "B": "PASS (18 live v2 endpoints, QR v2, WS, real authority lanes)"},
+    {"gate": "no_crash_on_primary_path", "A": "PASS (its primary paths are mock/simulated but stable)", "B": "BLOCKED_UNTIL_A2_LANDED_AND_RETESTED"}
+  ],
+  "criteria": [
+    {"criterion": "physical stability", "weight": 10, "A": 8, "B": 2, "evidence": "A: Packages 3/4/5/9 retest history; B: confirmed crash on QR pairing", "class": "PHYSICAL"},
+    {"criterion": "Tower contract completeness", "weight": 10, "A": 1, "B": 9, "evidence": "A: hermes.console.v0.1 candidate over /tower/api+/tower/ws (not served); B: /api/tower/voice-console/v2/* live (18 endpoints, dex-verified)", "class": "SOURCE_LIVE"},
+    {"criterion": "UX", "weight": 7, "A": 9, "B": 4, "evidence": "A: 6-step onboarding, settings hub, archive/model/diagnostics screens; B: 4 screens", "class": "SOURCE"},
+    {"criterion": "i18n", "weight": 5, "A": 9, "B": 2, "evidence": "A: 5-locale parity-tested layer (831 keys x5); B: Italian only", "class": "SOURCE"},
+    {"criterion": "voice maturity", "weight": 7, "A": 7, "B": 7, "evidence": "A: offline STT+VAD+denoiser+5-lang TTS; B: Tower whisper+turbo STT, push-to-talk streaming, real turn admission", "class": "COMPLEMENTARY"},
+    {"criterion": "offline capability", "weight": 6, "A": 9, "B": 2, "evidence": "A: full offline-first lanes; B: Tower-dependent", "class": "SOURCE"},
+    {"criterion": "maintainability", "weight": 7, "A": 6, "B": 6, "evidence": "A: 162 files, typed seams everywhere; B: 19 files, small readable core", "class": "SOURCE"},
+    {"criterion": "APK size", "weight": 5, "A": 3, "B": 8, "evidence": "122,639,026 B vs 61,714,401 B (physical)", "class": "PHYSICAL"},
+    {"criterion": "battery", "weight": 5, "A": 4, "B": 6, "evidence": "A: heavy local inference risk; B: thin client; MEASUREMENT_REQUIRED on Xiaomi", "class": "PHYSICAL_PENDING"},
+    {"criterion": "RAM", "weight": 5, "A": 4, "B": 6, "evidence": "same class as battery; MEASUREMENT_REQUIRED", "class": "PHYSICAL_PENDING"},
+    {"criterion": "storage", "weight": 4, "A": 3, "B": 8, "evidence": "A: bundled models + downloadable catalogs; B: none", "class": "PHYSICAL"},
+    {"criterion": "signing continuity", "weight": 6, "A": 4, "B": 4, "evidence": "both fresh debug keystores TODAY, distinct; neither is a release identity (A4R-P2-006 OPEN)", "class": "PHYSICAL"},
+    {"criterion": "update path", "weight": 6, "A": 8, "B": 4, "evidence": "A: CI line code 1..12; B: manual Drive deliveries", "class": "RECORD"},
+    {"criterion": "rollback", "weight": 5, "A": 8, "B": 5, "evidence": "A: version lineage + model rollback controller; B: reinstall previous APK", "class": "RECORD"},
+    {"criterion": "test quality", "weight": 8, "A": 9, "B": 2, "evidence": "A: 501 unit green + 16 instrumentation + E2E fleet; B: 17 client tests that missed the keystore path (A4R-P1-002)", "class": "CI"},
+    {"criterion": "license", "weight": 3, "A": 9, "B": 8, "evidence": "A: Apache-2.0 registry; B: SBOM+LICENSES docs", "class": "SOURCE"},
+    {"criterion": "dependency risk", "weight": 5, "A": 4, "B": 8, "evidence": "A: 17 native libs + bundled models; B: 3 native libs, minimal surface", "class": "PHYSICAL"}
+  ],
+  "weighted_scores": {"A": 6.16, "B": 5.15, "total_weight": 104, "note": "weighted means over the 17 criteria (weights sum 104), verified by computation; the HARD GATES, not the mean, decide as-is usability"},
+  "weighted_scores_with_gates": {
+    "REUSE_AND_EXTEND_A": "REJECTED_AS_IS - gate 2 fails (cannot collect any live-Tower physical evidence; its Tower lanes are mock)",
+    "REUSE_AND_EXTEND_B": "REJECTED_AS_IS_TODAY - gate 1 fails until A2 lands and the Owner physically re-pairs; becomes the QUALIFICATION VEHICLE the moment the repaired build passes",
+    "MERGE_WITH_A_AS_BASE": "REJECTED - the authority core would live in the candidate with no real authority integration (the Tower-side reconciliation reached the same verdict independently)",
+    "MERGE_WITH_B_AS_BASE": "RECOMMENDED (conditional) - port B's Tower authority core INTO the canonical repository Paolo83Ita/hermes-voice-console-android (the mission's CANONICAL_ANDROID_REPOSITORY), absorbing A's product maturity as the feature source"
+  },
+  "decision": {
+    "recommendation": "MERGE_WITH_B_AS_BASE",
+    "canonical_repository": "Paolo83Ita/hermes-voice-console-android (per mission header)",
+    "canonical_app_end_state": "ONE app: B's authority lane (pairing/keys/protocol/archive) + repaired TowerStore + A's UX/i18n/themes/models/tests",
+    "conditions": [
+      "C1: A2 keystore repair integrated by the Tower account + rebuilt APK + Owner QR-pairing retest PASS on the Xiaomi (ANDROID_KEYSTORE_PASS)",
+      "C2: QR v2 adapter implemented in A (RD-04) so the canonical app accepts real Tower QRs",
+      "C3: comparable physical tests (mission A8 sequence) on the repaired B AND the post-A3/A4 A build - evidence in the ledger",
+      "C4: explicit OWNER APPROVAL of the merge direction + later package-ID/signing unification (A4R-P2-006 gate)",
+      "C5: package ID change, signing change, supersede of installed apps - each a separate explicit Owner approval (mission section 8)"
+    ],
+    "qualification_vehicle_for_graph4": "the REPAIRED B build (until C3 evidence exists), per the Tower-side G4R selection SUPERSEDED only as a final-state decision, kept here as the bridge",
+    "rejected_options_recorded": true
+  },
+  "verdict": "A4R_CANONICAL_BASE_RECOMMENDATION_PRODUCED - MERGE_WITH_B_AS_BASE conditional on C1..C5; OWNER_REVIEW_REQUIRED; no self-granted PASS"
+}

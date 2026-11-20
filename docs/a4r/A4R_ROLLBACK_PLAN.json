@@ -1,0 +1,55 @@
+{
+  "schema": "a4r.rollback_plan/1.0",
+  "produced_utc": "2026-11-20T12:02:00Z",
+  "owner": "Paolo Lombisani",
+  "mission": "GRAPH A4R NODE A5",
+  "principle": "every rollback path preserves Owner data, receipts, evidence ledgers and both codebases; no rollback ever deletes history; no force operations anywhere",
+  "rollbacks": [
+    {
+      "scope": "A2 keystore repair on B (M0)",
+      "trigger": "the repaired B build fails any physical gate on the Xiaomi",
+      "procedure": [
+        "1. the Owner reports the typed failure (screen text + Settings receipts tail; NO secret-bearing screenshots)",
+        "2. reinstall the previous B APK (FP-B-G4, sha 908b289f…) if needed - it remains recorded, never deleted",
+        "3. the executor repairs the root cause in the Tower repo; NEW APK, new SHA-256, same debug keystore for update continuity",
+        "4. ONLY the failed step is re-requested (full mini-gate restart only if the failure is at the pairing root)",
+        "5. the ledger row records finding + repair + retest columns"
+      ],
+      "authority_note": "B's device registration is revoked server-side BEFORE any reinstall (A8 step order respected)"
+    },
+    {
+      "scope": "A3/A4 code changes in the canonical repo",
+      "trigger": "any regression in A's CI or a failed Owner visual retest",
+      "procedure": [
+        "the changes are additive and file-scoped (PairingEntryActions.kt NEW; TowerStudio/Onboarding/QrScanner/StateLabels/strings MODIFIED; TowerLayerManifest.kt NEW; ReferenceTowerVisual REFACTORED)",
+        "git revert of the A4R commit restores the exact pre-A4R tree (501-test baseline)",
+        "the manifest refactor keeps the previous C11/C12 behavior reachable by reverting ReferenceTowerVisual only"
+      ]
+    },
+    {
+      "scope": "merge phases M1..M5",
+      "trigger": "any phase fails its gate",
+      "procedure": [
+        "revert the phase commit (each phase lands as ONE reviewable commit)",
+        "the TowerRuntimeIntegration seam keeps the MOCK_SIMULATOR mode selectable - the app always launches, even mid-revert",
+        "installed apps: both A and B remain installable until the Owner accepts the unified build (M4); uninstalling one never affects the other"
+      ]
+    },
+    {
+      "scope": "canonical selection reversal",
+      "trigger": "Owner declines MERGE_WITH_B_AS_BASE or condition C1 fails physically",
+      "procedure": [
+        "no code was deleted by the recommendation itself; both candidates remain intact",
+        "the recommendation re-opens with the ledger evidence (scorecard conditions updated)",
+        "A continues its own campaign line (round-3 visual retest remains Owner's discretion)"
+      ]
+    }
+  ],
+  "data_and_authority_invariants": [
+    "the Tower device/pairing/Archive registries are the ONLY authorities; client state is reconstructible by re-pairing",
+    "A holds no real Tower-paired state (mock only); B's state is revocable server-side before any reinstall",
+    "no rollback path deletes Owner data, receipts, evidence ledgers or either codebase",
+    "every executed rollback is recorded as a typed receipt in the mission records"
+  ],
+  "verdict": "A4R_ROLLBACK_PLAN_PRODUCED - 4 typed rollback scopes, invariants fixed"
+}

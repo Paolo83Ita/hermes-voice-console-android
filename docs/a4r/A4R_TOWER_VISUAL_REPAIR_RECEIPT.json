@@ -1,0 +1,37 @@
+{
+  "schema": "a4r.tower_visual_repair_receipt/1.0",
+  "node": "A4",
+  "produced_utc": "2026-11-20T11:45:00Z",
+  "owner": "Paolo Lombisani",
+  "finding_repaired": "A4R-P2-004 TOWER_CENTRAL_PORTAL_LAYER_MISALIGNED",
+  "candidate": "CANDIDATE_A (Paolo83Ita/hermes-voice-console-android)",
+  "repair_summary": {
+    "master_canvas": "680x963 (TowerLayerManifest.CANVAS_WIDTH/HEIGHT)",
+    "shared_transformation": "scale = min(containerWidth / 680, containerHeight / 963) - contain fit, CENTER anchored, implemented once in TowerLayerManifest.containTransform",
+    "per_layer_spec": "x, y, width, height, pivotX, pivotY, zIndex, variant, anchor - all 7 layers (architecture, crown_sign, ring_outer, ring_middle, ring_inner, portal, energy_mask)",
+    "coherence_guarantees": "same source variant (tier-level tower414 / tower414l, no mixing), same scale (one contain transform), same origin (one canvas rect), same inset policy (none per-layer), explicit clipping (canvas rect clipToBounds), deterministic z-order (0/10/20/21/22/30/40)",
+    "no_device_offsets": "the portal box is horizontally centered ON THE CANVAS (pinned by TowerLayerManifestTest); no Xiaomi-specific or any-device-specific pixel offset exists anywhere in the path",
+    "code_changes": [
+      "NEW ui/monumental/TowerLayerManifest.kt - the single layer-table authority",
+      "ReferenceTowerVisual: hand-coded fractions replaced by manifest-driven LayerAt(spec, scale); canvas rect centered via the contain transform; Canvas dynamics + halo + energy tint re-anchored on the manifest constants",
+      "NEW app/src/test/.../TowerLayerManifestTest.kt - 7 JVM golden tests (formula, fields, z-order, §37 provenance boxes, anchor coherence, portal centering)"
+    ]
+  },
+  "golden_evidence": {
+    "offline_harness": "scripts/a4r_tower_golden.py (PIL, real repo webp assets)",
+    "golden_report": "docs/a4r/tower_golden/GOLDEN_REPORT.json",
+    "golden_renders": [
+      "golden_xiaomi_1080x2400_dark.png",
+      "golden_xiaomi_1080x2400_light.png",
+      "golden_width_360dp_dark.png",
+      "golden_width_412dp_dark.png",
+      "golden_width_480dp_dark.png",
+      "golden_xiaomi_energy_full_dark.png"
+    ],
+    "placement_diff_vs_g37": "max 1 px (integer rounding on one layer origin; every size diff 0)",
+    "contain_matrix": "all stages fit (whole monument visible, no top-clip)",
+    "scale_invariance": "360dp vs 480dp composites structurally identical (diff only rescale ringing, mean gray 0.29)",
+    "physical_test_status": "PHYSICAL_TEST_REQUIRED - the on-device golden screenshot + pixel-diff for Xiaomi 11 Lite 5G NE 1080x2400 (light/dark, 100%/130% font scale, gesture insets, three widths) is an Owner A8 gate (TOWER_VISUAL_ALIGNMENT_OWNER_ACCEPTED); the offline harness proves the GEOMETRY, the device run proves the RENDER"
+  },
+  "verdict": "A4R_TOWER_VISUAL_REPAIR_CODE_COMPLETE - manifest authority in place, offline golden PASS; Owner device acceptance pending"
+}

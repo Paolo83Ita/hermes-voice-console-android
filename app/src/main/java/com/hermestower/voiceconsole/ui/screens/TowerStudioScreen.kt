@@ -8,6 +8,7 @@ import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.rememberScrollState
 import androidx.compose.foundation.verticalScroll
+import androidx.compose.material3.AlertDialog
 import androidx.compose.material3.Button
 import androidx.compose.material3.FilterChip
 import androidx.compose.material3.OutlinedTextField
@@ -18,6 +19,7 @@ import androidx.compose.runtime.Composable
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
+import androidx.compose.runtime.rememberCoroutineScope
 import androidx.compose.runtime.saveable.rememberSaveable
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Modifier
@@ -28,6 +30,9 @@ import androidx.compose.ui.unit.dp
 import com.hermestower.voiceconsole.app.AppGraph
 import com.hermestower.voiceconsole.R
 import com.hermestower.voiceconsole.domain.BridgeResult
+import com.hermestower.voiceconsole.pairing.PairingEntryExecutor
+import com.hermestower.voiceconsole.pairing.PairingEntryOutcome
+import com.hermestower.voiceconsole.pairing.PairingEntryState
 import com.hermestower.voiceconsole.tower.ImportResult
 import com.hermestower.voiceconsole.tower.TransportMode
 import com.hermestower.voiceconsole.tower.TowerConnectionProfile
@@ -94,6 +99,32 @@ fun TowerStudioScreen(graph: AppGraph, onOpenScanner: (() -> Unit)? = null) {
 
     var message by remember { mutableStateOf(context.getString(R.string.ts_msg_config_state, StateLabels.label(graph.profileStore.state().name, com.hermestower.voiceconsole.locale.AppLanguage.effectiveTag(context)))) }
     var testOutcome by remember { mutableStateOf<TowerConnectionTester.Report?>(null) }
+
+    // ---- A4R NODE A3: pairing entry lanes (numeric / manual endpoint) ----
+    // Same versioned client interface as the QR lane; results are typed and
+    // every accepted result is labeled SIMULATED (deterministic client).
+    val scope = rememberCoroutineScope()
+    val pairingEntryExecutor = remember { PairingEntryExecutor(graph.mockTowerPairingClient) }
+    var numericDialogOpen by rememberSaveable { mutableStateOf(false) }
+    var endpointDialogOpen by rememberSaveable { mutableStateOf(false) }
+    var numericCodeInput by rememberSaveable { mutableStateOf("") }
+    var manualEndpointInput by rememberSaveable { mutableStateOf(existing?.baseUrl ?: "") }
+
+    fun pairingEntryMessage(outcome: PairingEntryOutcome): String {
+        val localeTag = com.hermestower.voiceconsole.locale.AppLanguage.effectiveTag(context)
+        return when (outcome) {
+            is PairingEntryOutcome.Accepted -> context.getString(
+                R.string.ts_msg_pairing_entry_accepted_fmt,
+                context.getString(R.string.ts_pairing_lane_simulated),
+                outcome.matchPhrase,
+            )
+            is PairingEntryOutcome.Rejected -> context.getString(
+                R.string.ts_msg_pairing_entry_rejected_fmt,
+                StateLabels.label(outcome.state.name, localeTag),
+                outcome.detail,
+            )
+        }
+    }
 
     fun buildProfile(): TowerConnectionProfile {
         val now = java.time.Instant.now().toString()
@@ -309,6 +340,9 @@ fun TowerStudioScreen(graph: AppGraph, onOpenScanner: (() -> Unit)? = null) {
                 ),
                 management = listOf(
                     ResponsiveAction(key = "scan_qr", label = stringResource(R.string.ts_action_scan_qr), onClick = { onOpenScanner?.invoke() }),
+                    // A4R NODE A3: secondary + advanced pairing entry lanes with typed states.
+                    ResponsiveAction(key = "pair_numeric", label = stringResource(R.string.ts_action_pair_numeric), onClick = { numericDialogOpen = true }),
+                    ResponsiveAction(key = "manual_endpoint", label = stringResource(R.string.ts_action_manual_endpoint), onClick = { endpointDialogOpen = true }),
                     ResponsiveAction(key = "import", label = stringResource(R.string.ts_action_import), onClick = {
                         val stored = graph.keyValueStore.getString("last_secret_clean_export")
                         if (stored == null) {
@@ -398,6 +432,68 @@ fun TowerStudioScreen(graph: AppGraph, onOpenScanner: (() -> Unit)? = null) {
         }
 
         Text(message, style = HermesType.body, color = c.textInfo)
+        }
+
+        // ---- A4R NODE A3 dialogs: numeric code + manual endpoint (typed results) ----
+        if (numericDialogOpen) {
+            AlertDialog(
+                onDismissRequest = { numericDialogOpen = false },
+                title = { Text(stringResource(R.string.ts_dialog_numeric_title), color = c.textPrimary) },
+                text = {
+                    Column {
+                        Text(stringResource(R.string.ts_dialog_numeric_note), style = HermesType.bodySecondary, color = c.textSecondary)
+                        OutlinedTextField(
+                            value = numericCodeInput,
+                            onValueChange = { numericCodeInput = it },
+                            label = { Text(stringResource(R.string.ts_dialog_numeric_hint)) },
+                            singleLine = true,
+                            modifier = Modifier.fillMaxWidth(),
+                        )
+                    }
+                },
+                confirmButton = {
+                    Button(onClick = {
+                        numericDialogOpen = false
+                        scope.launch {
+                            val outcome = pairingEntryExecutor.pairNumeric(numericCodeInput, manualEndpointInput.ifBlank { "https://hermestower.local" })
+                            message = pairingEntryMessage(outcome)
+                        }
+                    }) { Text(stringResource(R.string.ts_dialog_confirm)) }
+                },
+                dismissButton = {
+                    TextButton(onClick = { numericDialogOpen = false }) { Text(stringResource(R.string.ts_dialog_dismiss)) }
+                },
+            )
+        }
+        if (endpointDialogOpen) {
+            AlertDialog(
+                onDismissRequest = { endpointDialogOpen = false },
+                title = { Text(stringResource(R.string.ts_dialog_endpoint_title), color = c.textPrimary) },
+                text = {
+                    Column {
+                        Text(stringResource(R.string.ts_dialog_endpoint_note), style = HermesType.bodySecondary, color = c.textSecondary)
+                        OutlinedTextField(
+                            value = manualEndpointInput,
+                            onValueChange = { manualEndpointInput = it },
+                            label = { Text(stringResource(R.string.ts_dialog_endpoint_hint)) },
+                            singleLine = true,
+                            modifier = Modifier.fillMaxWidth(),
+                        )
+                    }
+                },
+                confirmButton = {
+                    Button(onClick = {
+                        endpointDialogOpen = false
+                        scope.launch {
+                            val outcome = pairingEntryExecutor.pairManualEndpoint(manualEndpointInput)
+                            message = pairingEntryMessage(outcome)
+                        }
+                    }) { Text(stringResource(R.string.ts_dialog_confirm)) }
+                },
+                dismissButton = {
+                    TextButton(onClick = { endpointDialogOpen = false }) { Text(stringResource(R.string.ts_dialog_dismiss)) }
+                },
+            )
         }
     }
 }

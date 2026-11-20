@@ -1,0 +1,71 @@
+{
+  "schema": "a4r.apk_fingerprint_matrix/1.0",
+  "produced_utc": "2026-11-20T10:24:00Z",
+  "owner": "Paolo Lombisani",
+  "purpose": "single register of every Hermes Voice Console Android artifact identity known to both campaigns (the three-fingerprint conflict of intake 487d2a9 reconciled with the physical evidence of A4R)",
+  "fingerprints": [
+    {
+      "id": "FP-A-G1",
+      "lineage": "A graph-1 v0.1 (CI)",
+      "size_bytes": 57848596,
+      "sha256_prefix": "f7a76735…",
+      "package": "com.hermestower.voiceconsole",
+      "version": "0.1 / code 1 (record)",
+      "tests": 33,
+      "status": "HISTORICAL (recorded by both campaigns)"
+    },
+    {
+      "id": "FP-A-P9-CI",
+      "lineage": "A Package 9 ARM64 (GitHub Actions run #179)",
+      "size_bytes": 122639026,
+      "sha256_prefix": "bc79ced6…90e8",
+      "package": "com.hermestower.voiceconsole",
+      "version": "0.3.9-alpha-graph4.14-round2-repairs / code 12",
+      "tests": 501,
+      "status": "RECORDED CI ARTIFACT (kept; not physically re-downloaded in A4R - CI artifacts are private)"
+    },
+    {
+      "id": "FP-A-UPLOAD",
+      "lineage": "A upload app-arm64-v8a-debug.apk (Owner-provided, mtime 2026-11-20T08:53Z)",
+      "size_bytes": 122639026,
+      "sha256": "0846130a1100b9f4f839a57ee80c9c5f7cd7ebe075db6f7a470b3ba495398ff3",
+      "package": "com.hermestower.voiceconsole",
+      "version": "0.3.9-alpha-graph4.14-round2-repairs / code 12 (aapt-verified by pyaxmlparser)",
+      "min_target_sdk": "30/35",
+      "agp": "8.7.3",
+      "native_libs_arm64": 17,
+      "signing_cert_sha256": "28E4251F06F78D58E5370D9649D333259159E4BA00EFAD8FAF9D7691663DB39A",
+      "cert_created_utc": "2026-11-20T07:59:16Z",
+      "status": "PHYSICALLY VERIFIED THIS SESSION - typed as same-lineage rebuild with new debug key",
+      "update_compatibility": "install-over FP-A-P9-CI: BLOCKED (distinct key); uninstall+install required"
+    },
+    {
+      "id": "FP-B-G4",
+      "lineage": "B Hermes-Tower/apps/android-voice-console @ ff9544bc (handoff G4Q_C2B)",
+      "size_bytes": 61714401,
+      "sha256": "908b289f8edc65d970aec3ca406c1fb0306dd78f0fe7448bf69264eb3bf66f56",
+      "package": "com.hermestower.voiceconsole.debug",
+      "version": "1.0.0-g4 / code 1 (aapt-verified)",
+      "min_target_sdk": "29/35",
+      "agp": "8.7.3",
+      "native_libs_arm64": 3,
+      "signing_cert_sha256": "2CBBE241610D3B19A93D69214F1681C63E96D487978F6F6F311C28C08C005BAF",
+      "cert_created_utc": "2026-11-20T07:00:49Z",
+      "status": "PHYSICALLY VERIFIED THIS SESSION - byte-exact match with the Tower handoff record; THIS IS THE APK THAT CRASHED ON THE XIAOMI (A4R-P1-001)",
+      "update_compatibility": "install-over itself: OK (same key) for FUTURE rebuilt B APKs signed with the SAME Tower debug keystore; any rebuild must keep that keystore for update continuity"
+    }
+  ],
+  "invariants": [
+    "A and B have DIFFERENT signing certificates -> no cross-update, coexistence by distinct applicationId",
+    "FP-A-UPLOAD == FP-A-P9-CI in size but not in hash: debug rebuild identity rule recorded",
+    "FP-B-G4 is byte-identical to the handoff record: the physical crash evidence binds to this exact artifact",
+    "no candidate may be declared canonical by fingerprint alone (A4R-P1-005 OPEN)"
+  ],
+  "verification_methods": {
+    "sha256": "sha256sum on extracted files",
+    "manifest_identity": "pyaxmlparser (package, versionCode, versionName, min/target SDK, label)",
+    "signing": "APK Signing Block v2 parsed from the ZIP central-directory boundary; certificates extracted as DER and verified with keytool -printcert -file (SHA256withRSA 2048-bit Android Debug, validity dates)",
+    "content_inventory": "unzip listing (dex count, native libs, assets)"
+  },
+  "verdict": "A4R_APK_FINGERPRINT_MATRIX_COMPLETE - 4 identities registered, physical verification complete for both uploaded APKs"
+}
