@@ -128,3 +128,31 @@ ST-55..57 (CP-G4.12) were appended after the returned list's closing paren — t
 def() values were discarded, silently shrinking the battery to 54. Decision: the
 battery = the RETURNED list (61); the test pins 61; a latent-count drift is a
 BLOCKER-class honesty defect if ever reintroduced (INV-22).
+
+
+## A4R-C1-D1 (2026-11-20) — RECONSTRUCTED-SOURCE path under a typed blocker
+The mission requires binding B's ORIGINAL source; that source is unreachable
+(404 fresh-read, no local copy). Decision: execute the A5 merge plan's M1
+authority_core_port as the sanctioned fallback — B's architecture as the base,
+implemented as fresh canonical code bound to the forensic contract surface —
+while recording CANDIDATE_B_ORIGINAL_SOURCE_BOUND_PASS as
+BLOCKED_WITH_TYPED_EVIDENCE and listing the Owner action that unblocks a
+true-source rebind. Decompiled code is never copied (mission §1 qualifier
+"when the original source is available" honored literally: it is not).
+Rationale: the alternative (declared CI_BUILD_BLOCKED) would deliver nothing
+buildable while a faithful, evidence-bound authority lane is achievable now.
+
+## A4R-C1-D2 (2026-11-20) — numeric code 6 digits (mission §7 supersedes)
+The prior executor recorded an 8-digit numeric code ("Tower shape"); the
+C1-C4 mission states "six-digit numeric code". Decision: implement 6 digits
+as the client truth and file AMB-1 in CD-A4R-C1-001 so the Tower confirms;
+the claim secret is server-consumed either way and no client-side bypass is
+created.
+
+## A4R-C1-D3 (2026-11-20) — debug applicationIdSuffix .a4rdebug
+Mission §10: the repaired candidate must coexist with A and B for direct
+A/B/C comparison without overwriting Owner installations. Decision: a
+consistent Gradle debug applicationIdSuffix (com.hermestower.voiceconsole.
+a4rdebug), versionCode 13 / versionName 0.4.0-alpha-grapha4r-merged-b-base;
+the commercial package and signing lineage remain explicitly undecided
+(mission §16).

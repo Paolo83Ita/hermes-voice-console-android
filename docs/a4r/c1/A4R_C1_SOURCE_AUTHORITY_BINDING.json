@@ -1,0 +1,27 @@
+{
+  "schema": "a4r.c1.source_authority_binding/1.0",
+  "produced_utc": "2026-11-20T11:44:10Z",
+  "mission": "GRAPH A4R CONTINUATION BLOCK C1-C4 (CP-A4R-C1-003)",
+  "candidate_a_source_authority": {
+    "repository": "Paolo83Ita/hermes-voice-console-android",
+    "branch": "graph-4/real-voice-pairing-archive-e2e (now graph-a4r/merge-with-b-base)",
+    "tip_bound": "d133087",
+    "role": "merge target + product-maturity donor (theme system, 5 languages, accessibility, diagnostics, Tower visual master canvas already integrated at d133087)"
+  },
+  "candidate_b_source_authority": {
+    "declared_repository": "Paolo83Ita/Hermes-Tower apps/android-voice-console",
+    "declared_commit": "296dd83e (handoff) / ff9544bc (Tower-account assessed)",
+    "reachable": false,
+    "typed_blocker": "CANDIDATE_B_ORIGINAL_SOURCE_UNAVAILABLE",
+    "evidence": [
+      "GET /repos/Paolo83Ita/Hermes-Tower -> 404 (2026-11-20 fresh read)",
+      "GET /users/Paolo83Ita/repos -> 2 repos only",
+      "GET /search/repositories?q=user:Paolo83Ita+hermes -> total_count 1",
+      "no local Tower checkout, no git bundle in the execution environment"
+    ],
+    "resolution": "RECONSTRUCTED-SOURCE PATH (A5 merge plan phase M1): B's authority lane implemented as fresh canonical source in candidate-b-base/, bound to the forensic contract surface (byte-exact APK 908b289f\u2026, dex inventory 182 classes, jadx behavioral spec, CD-A4R-001). NO decompiled code copied. Gate CANDIDATE_B_ORIGINAL_SOURCE_BOUND_PASS recorded BLOCKED_WITH_TYPED_EVIDENCE; owner action recorded to unblock a later true-source rebind.",
+    "manifest": "candidate-b-base/CANDIDATE_B_SOURCE_MANIFEST.json (per-file SHA-256 + provenance classes)"
+  },
+  "no_decompiled_code_as_merge_source": true,
+  "original_source_first_exception": "exception typed and evidence-bound: original source is NOT AVAILABLE anywhere in this environment; decompiled material used only for forensic confirmation / behavioral-spec binding / provenance validation, per mission section 1's own qualifier"
+}

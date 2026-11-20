@@ -1,0 +1,38 @@
+{
+  "schema": "a4r.merged_resource_envelope/1.0",
+  "produced_utc": "2026-11-20T12:15:54Z",
+  "mission": "GRAPH A4R C1-C4 (mission section 13)",
+  "apk_size_local_build": {
+    "arm64-v8a": {
+      "bytes": 122874921,
+      "sha256_local_build": "2ea811d1e42bbe093f4f959ca2194d7d417417c4770fb4917e2fb4218d82d67e"
+    },
+    "universal": {
+      "bytes": 252521750,
+      "sha256_local_build": "94255461f01193b312599b1ed1229243955ef1412c4855745c63f3d47207fd29"
+    },
+    "x86_64": {
+      "bytes": 122003503,
+      "sha256_local_build": "145e259254248b6a24cd3dc913f564d61ceabd53e8463309c881c3c840c9d5fa"
+    }
+  },
+  "apk_size_ci_build": "recorded in A4R_REPAIRED_APK_MANIFEST.json after the CI run (CI artifact is the delivered APK)",
+  "installed_size": "NOT_EXPOSED",
+  "cold_start": "NOT_EXPOSED",
+  "warm_start": "NOT_EXPOSED",
+  "baseline_rss": "NOT_EXPOSED",
+  "pairing_peak_rss": "NOT_EXPOSED",
+  "camera_peak_rss": "NOT_EXPOSED",
+  "cpu": "NOT_EXPOSED",
+  "storage_delta": "no new runtime assets this block: the merge adds source only (~120 KB compiled dex growth vs Package 9 measured on the arm64 local build: 122,874,921 vs 122,639,026 = +235,895 B)",
+  "network_requests_pairing": "claim + pop-challenge + attest + ack poll(s) = 4..n HTTPS requests per pairing (the ack poll repeats at 2 s intervals until ACKED/timeout)",
+  "model_runtime_loading": "NONE at pairing time \u2014 no local LLM/STT/TTS model is loaded on the pairing path",
+  "battery_indicators": "NOT_EXPOSED",
+  "thermal_indicators": "NOT_EXPOSED",
+  "measurement_policy": "NOT_EXPOSED is recorded where CI/emulator does not expose the metric; device battery/thermal behavior is NEVER estimated from emulator data (mission section 13); the Xiaomi mini-gate measures what the device exposes",
+  "tower_first_flags": {
+    "LOCAL_LLM_REQUIRED_FOR_PAIRING": false,
+    "LOCAL_LLM_REQUIRED_FOR_VOICE": false,
+    "LOCAL_LLM_REQUIRED_FOR_ARCHIVE": false
+  }
+}

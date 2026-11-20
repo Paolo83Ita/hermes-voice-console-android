@@ -1,0 +1,44 @@
+{
+  "schema": "a4r.c1.ci_readback/1.0",
+  "produced_utc": "2026-11-20T11:44:10Z",
+  "mission": "GRAPH A4R CONTINUATION BLOCK C1-C4 (CP-A4R-C1-002)",
+  "entry_sha": "d133087",
+  "runs": [
+    {
+      "workflow": "android-debug-build",
+      "run_id": 44719962661,
+      "head_sha": "d133087",
+      "status": "completed",
+      "conclusion": "success",
+      "created_utc": "2026-11-20T10:31:31Z",
+      "reading": "BUILD_PASS for the entry SHA"
+    },
+    {
+      "workflow": "android-e2e",
+      "run_id": 44719962547,
+      "head_sha": "d133087",
+      "status": "in_progress",
+      "conclusion": null,
+      "created_utc": "2026-11-20T10:31:31Z",
+      "reading": "RUNNING at read-back time; recorded as RUNNING (not PASS \u2014 do not assume); per mission section 2 the source preparation continues WITHOUT duplicating or cancelling it"
+    },
+    {
+      "workflow": "android-debug-build",
+      "run_id": 44718706619,
+      "head_sha": "bc1750e",
+      "status": "completed",
+      "conclusion": "failure",
+      "reading": "the two compile errors the wave-1 commit d133087 repaired (:app:compileDebugKotlin PairingEntryActions)"
+    },
+    {
+      "workflow": "android-e2e",
+      "run_id": 44718706585,
+      "head_sha": "bc1750e",
+      "status": "completed",
+      "conclusion": "failure",
+      "reading": "failed with the build (no new evidence)"
+    }
+  ],
+  "e2e_policy": "E2E results from d133087 are HISTORICAL evidence for that tip only; they are NOT evidence for the merged graph-a4r/merge-with-b-base APK. The merged branch does NOT trigger the E2E fleet (the full 29-test physical campaign is not requested by this block; the first physical gate is the Owner mini-gate P1-P8).",
+  "e2e_final_result_at_readback": "RUNNING"
+}

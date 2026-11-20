@@ -1,0 +1,36 @@
+{
+  "schema": "a4r.c1.next_exact_action/1.0",
+  "produced_utc": "2026-11-20T11:44:10Z",
+  "mission": "GRAPH A4R CONTINUATION BLOCK C1-C4",
+  "next_exact_action": {
+    "id": "C1-C4-MERGE-EXECUTION",
+    "branch": "graph-a4r/merge-with-b-base (created from d133087, never force-pushed, historical branches untouched)",
+    "steps": [
+      "1. candidate-b-base/ integration area + CANDIDATE_B_SOURCE_MANIFEST.json (CP-A4R-C1-004/003)",
+      "2. A2 keystore repair applied to the B authority lane (7 mission typed states, atomic commit, no plaintext fallback) (CP-A4R-C1-005)",
+      "3. Keystore test suites: BlobFramingTest (JVM, 7) + TowerStoreInstrumentedTest (9, real keystore) + DeviceKeysInstrumentedTest (3) + dedicated CI emulator workflow -> SOFTWARE_ANDROID_KEYSTORE_TESTED (CP-A4R-C1-006)",
+      "4. A-to-B selective port (PairingEntryActions evaluation, 5-language layer kept, themes kept, accessibility kept, diagnostics kept; heavy local runtimes DEFERRED) (CP-A4R-C1-007)",
+      "5. Production QR wiring: TowerQrV2ScanFlow + TowerPairingController replace the SIMULATED executor in scanner + Tower Studio lanes; mock pairing removed from production navigation (CP-A4R-C1-008)",
+      "6. Visual manifest: d133087's 680x963 master-canvas repair carried unchanged into the merged build (CP-A4R-C1-009)",
+      "7. Tower contract fixtures: SIMULATED_CONTRACT_TEST suite over the transport seam (CP-A4R-C1-010)",
+      "8. CI build on the merged branch (unit + lint + assembleDebug + secret scan + APK identity) (CP-A4R-C1-011)",
+      "9. Emulator qualification: keystore instrumentation lane (CP-A4R-C1-012)",
+      "10. Repaired APK delivery package + download-back hash verification (CP-A4R-C1-013)",
+      "11. Owner mini-gate P1-P8 preparation (CP-A4R-C1-014) + authority convergence / Rule Theta (CP-A4R-C1-015)"
+    ]
+  },
+  "owner_visible_gates_open": [
+    "TOWER_VISUAL_ALIGNMENT_OWNER_ACCEPTED (still Owner-controlled, unchanged)",
+    "XIAOMI_KEYSTORE_PAIRING_REPAIR_PASS (mini-gate P1-P8)",
+    "OWNER_CANONICAL_BASE_APPROVAL (mission section 16)"
+  ],
+  "forbidden_now": [
+    "declare GRAPH_A4R_PASS",
+    "declare VOICE_CONSOLE_PAIRED_AND_VERIFIED",
+    "declare ANDROID_CANONICAL_BASE_SELECTED",
+    "modify Tower core",
+    "force-push",
+    "decide the commercial release package/signing lineage",
+    "maintain two production apps"
+  ]
+}

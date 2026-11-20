@@ -284,6 +284,27 @@ object StateLabels {
             "it" to "Endpoint di pairing non raggiungibile", "en" to "Pairing endpoint unreachable",
             "es" to "Endpoint de emparejamiento inaccesible", "fr" to "Endpoint d’appairage inaccessible", "de" to "Pairing-Endpunkt nicht erreichbar",
         ),
+        // ---- A4R C1-C4: the five remaining mission section 8 typed states ----
+        "CAMERA_PERMISSION_PERMANENTLY_DENIED" to mapOf(
+            "it" to "Permesso fotocamera negato in modo permanente", "en" to "Camera permission permanently denied",
+            "es" to "Permiso de cámara denegado permanentemente", "fr" to "Autorisation caméra refusée de façon permanente", "de" to "Kameraberechtigung dauerhaft verweigert",
+        ),
+        "QR_CONTAINS_FORBIDDEN_FIELD" to mapOf(
+            "it" to "QR contiene un campo vietato", "en" to "QR contains a forbidden field",
+            "es" to "El QR contiene un campo prohibido", "fr" to "Le QR contient un champ interdit", "de" to "QR enthält ein verbotenes Feld",
+        ),
+        "PAIRING_CHALLENGE_REJECTED" to mapOf(
+            "it" to "Challenge di pairing rifiutata", "en" to "Pairing challenge rejected",
+            "es" to "Desafío de emparejamiento rechazado", "fr" to "Défi d’appairage rejeté", "de" to "Pairing-Challenge abgelehnt",
+        ),
+        "PAIRING_PERSISTENCE_FAILED" to mapOf(
+            "it" to "Salvataggio dello stato di pairing non riuscito", "en" to "Pairing state persistence failed",
+            "es" to "Fallo al guardar el estado de emparejamiento", "fr" to "Échec de la sauvegarde de l’état d’appairage", "de" to "Speichern des Pairing-Status fehlgeschlagen",
+        ),
+        "DEVICE_REVOKED" to mapOf(
+            "it" to "Dispositivo revocato", "en" to "Device revoked",
+            "es" to "Dispositivo revocado", "fr" to "Appareil révoqué", "de" to "Gerät widerrufen",
+        ),
     )
 
     /** The localized label for a state identifier; falls back to the identifier itself. */

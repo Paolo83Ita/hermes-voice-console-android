@@ -1,0 +1,55 @@
+{
+  "schema": "a4r.c1.controlled_resume/1.0",
+  "produced_utc": "2026-11-20T11:44:10Z",
+  "owner": "Paolo Lombisani",
+  "executor": "GLM 5.3 Flash Web \u2014 Android development account",
+  "mission": "GRAPH A4R CONTINUATION BLOCK C1-C4 (CP-A4R-C1-001)",
+  "entry_point": {
+    "expected_entry_sha": "d133087",
+    "actual_local_head_after_fresh_fetch": "d133087",
+    "match": true,
+    "branch": "graph-4/real-voice-pairing-archive-e2e",
+    "remote": "https://github.com/Paolo83Ita/hermes-voice-console-android.git",
+    "worktree_state": "clean (no uncommitted changes after checkout + reset --hard to origin tip)",
+    "local_was_behind_by": 72,
+    "fast_forwarded": true
+  },
+  "fresh_reads_performed": [
+    "local Android checkout (graph-4 tip afefd3d behind remote by 72)",
+    "GitHub Android repository tip + all 5 remote branches (foundation/v0.1-cloud-build 01fe407, graph-2 bc186db, graph-3 ca8980b, graph-4 d133087, main e7ab101)",
+    "commit d133087 present on remote graph-4 branch (A4R CI-repair wave 1: PairingEntryActions .getOrNull() compile fix + TowerLayerManifest.ringOuter.pivotX 339)",
+    "build CI status for d133087: run 44719962661 android-debug-build = completed/SUCCESS",
+    "E2E CI status for d133087: run 44719962547 android-e2e = in_progress (recorded as RUNNING; not duplicated, not cancelled \u2014 mission section 2)",
+    "failed/cancelled/incomplete runs enumerated: bc1750e build+e2e = failure (the two compile errors d133087 repaired); 487d2a9 e2e = failure (honest E2E verdict line); historical standing families unchanged",
+    "A4R receipts (docs/a4r/, 16 files from the A0-A8 wave) read back",
+    "A4R physical ledger read back (A4R-P1-001 CONFIRMED, mini-gate P1-P8 lane open)",
+    "Candidate A APK fingerprint: app-arm64-v8a-debug.apk sha 0846130a\u2026, com.hermestower.voiceconsole 0.3.9/12 (PROVENANCE_REBUILD_SAME_LINEAGE_NEW_DEBUG_KEY)",
+    "Candidate B APK fingerprint: HERMES_VOICE_CONSOLE_g4_app-debug.apk sha 908b289f\u2026, com.hermestower.voiceconsole.debug 1.0.0-g4/1 (byte-exact handoff artifact)",
+    "signing fingerprints both candidates re-verified in A4R_APK_FINGERPRINT_MATRIX.json (distinct debug keystores)",
+    "Tower integration contract: frozen surface = dex-bound voice-console/v2 (18 routes) + CD-A4R-001; NO 'ANDROID_TOWER_INTEGRATION_CONTRACT v1.0.0' document exists in either repo (recorded as a contract ambiguity in ANDROID_TOWER_CONTRACT_DELTA_REQUEST.json)",
+    "Tower source SHA containing Candidate B: 296dd83e (handoff) / ff9544bc (commit assessed by Tower account) \u2014 NOT remotely reachable (Tower GitHub repo ABSENT: GET /repos/Paolo83Ita/Hermes-Tower = 404, fresh read 2026-11-20)",
+    "exact Candidate B source tree: UNREACHABLE (no GitHub repo, no local checkout, no bundle) \u2014 typed as CANDIDATE_B_ORIGINAL_SOURCE_UNAVAILABLE",
+    "A2 repair package (docs/a4r/keystore_repair/: TowerStore.kt, PairingPersistence.kt, BlobFramingTest.kt, TowerStoreInstrumentedTest.kt, PATCH_NOTES_PairingFlow.md, README_INTEGRATION.md) read back",
+    "A3 source delta (PairingEntryActions.kt, TowerStudio dialogs, onboarding QR choice, QrScanner typed states) verified in d133087",
+    "A4 source delta (TowerLayerManifest.kt 680x963 master canvas, ReferenceTowerVisual manifest-driven, TowerLayerManifestTest golden JVM suite) verified in d133087",
+    "Current Truth / Next Exact Action / checkpoint index / worklog: read back from docs/governance/"
+  ],
+  "prior_state_as_declared": {
+    "A0": "PASS",
+    "A1": "PASS",
+    "A2": "REPAIR_PACKAGE_PREPARED_NOT_YET_INTEGRATED",
+    "A3": "SOURCE_WIRING_PREPARED_IN_CANDIDATE_A",
+    "A4": "VISUAL_REPAIR_PREPARED_IN_CANDIDATE_A",
+    "A5": "CONDITIONAL_RECOMMENDATION_MERGE_WITH_B_AS_BASE",
+    "A6": "OPEN",
+    "A7": "OPEN",
+    "A8": "PHYSICAL_LEDGER_OPEN",
+    "VOICE_CONSOLE_PAIRED_AND_VERIFIED": false,
+    "CANONICAL_RELEASE_APK": "absent",
+    "OWNER_CANONICAL_BASE_APPROVAL": "pending"
+  },
+  "mission_corrections_recorded": [
+    "The Owner mission states the prior session integrated A2/A3/A4 repair preparation only \u2014 CONFIRMED: at d133087 the keystore repair existed as a drop-in package (not applied to B source), the pairing UI ran the SIMULATED executor, and no merged B-base build existed.",
+    "TOWER_REPOSITORY Paolo83Ita/Hermes-Tower is referenced by the mission but does NOT exist on GitHub (404 fresh-read). READ-ONLY Tower access is honored via the live runtime https://hermestower.aclclouds.online/ (3 read-only GETs by the prior intake) and via the dex-bound contract; no Tower write was attempted."
+  ]
+}

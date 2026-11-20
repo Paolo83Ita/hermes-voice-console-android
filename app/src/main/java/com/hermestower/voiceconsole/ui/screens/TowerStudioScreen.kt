@@ -30,9 +30,9 @@ import androidx.compose.ui.unit.dp
 import com.hermestower.voiceconsole.app.AppGraph
 import com.hermestower.voiceconsole.R
 import com.hermestower.voiceconsole.domain.BridgeResult
-import com.hermestower.voiceconsole.pairing.PairingEntryExecutor
-import com.hermestower.voiceconsole.pairing.PairingEntryOutcome
-import com.hermestower.voiceconsole.pairing.PairingEntryState
+import com.hermestower.voiceconsole.pairing.NumericPairingCode
+import com.hermestower.voiceconsole.towerpair.TowerPairingOutcome
+import com.hermestower.voiceconsole.towerpair.TowerPairingState
 import com.hermestower.voiceconsole.tower.ImportResult
 import com.hermestower.voiceconsole.tower.TransportMode
 import com.hermestower.voiceconsole.tower.TowerConnectionProfile
@@ -100,30 +100,44 @@ fun TowerStudioScreen(graph: AppGraph, onOpenScanner: (() -> Unit)? = null) {
     var message by remember { mutableStateOf(context.getString(R.string.ts_msg_config_state, StateLabels.label(graph.profileStore.state().name, com.hermestower.voiceconsole.locale.AppLanguage.effectiveTag(context)))) }
     var testOutcome by remember { mutableStateOf<TowerConnectionTester.Report?>(null) }
 
-    // ---- A4R NODE A3: pairing entry lanes (numeric / manual endpoint) ----
-    // Same versioned client interface as the QR lane; results are typed and
-    // every accepted result is labeled SIMULATED (deterministic client).
+    // ---- A4R C1-C4: pairing entry lanes on the REAL Tower v2 contract ----
+    // The production numeric / manual-endpoint lanes run the SAME repaired
+    // B authority lane as the QR scanner (TowerPairingController); results are
+    // typed (mission §8 states) and never labeled SIMULATED. The old
+    // deterministic mock executor is retained in TESTS only.
     val scope = rememberCoroutineScope()
-    val pairingEntryExecutor = remember { PairingEntryExecutor(graph.mockTowerPairingClient) }
     var numericDialogOpen by rememberSaveable { mutableStateOf(false) }
     var endpointDialogOpen by rememberSaveable { mutableStateOf(false) }
     var numericCodeInput by rememberSaveable { mutableStateOf("") }
+    var numericPairingIdInput by rememberSaveable { mutableStateOf("") }
     var manualEndpointInput by rememberSaveable { mutableStateOf(existing?.baseUrl ?: "") }
 
-    fun pairingEntryMessage(outcome: PairingEntryOutcome): String {
+    fun pairingOutcomeMessage(outcome: TowerPairingOutcome): String {
         val localeTag = com.hermestower.voiceconsole.locale.AppLanguage.effectiveTag(context)
         return when (outcome) {
-            is PairingEntryOutcome.Accepted -> context.getString(
-                R.string.ts_msg_pairing_entry_accepted_fmt,
-                context.getString(R.string.ts_pairing_lane_simulated),
-                outcome.matchPhrase,
+            is TowerPairingOutcome.Registered -> context.getString(
+                R.string.ts_msg_pairing_registered_fmt, outcome.deviceId,
             )
-            is PairingEntryOutcome.Rejected -> context.getString(
+            is TowerPairingOutcome.AwaitingOwnerAck -> context.getString(
+                R.string.ts_msg_pairing_awaiting_fmt, outcome.phraseHint ?: "—",
+            )
+            is TowerPairingOutcome.Rejected -> context.getString(
                 R.string.ts_msg_pairing_entry_rejected_fmt,
                 StateLabels.label(outcome.state.name, localeTag),
                 outcome.detail,
             )
         }
+    }
+
+    /** claim → attest → Owner-ack pipeline shared by both entry lanes. */
+    suspend fun runProductionPairing(endpoint: String, pairingId: String, code: String) {
+        message = context.getString(R.string.ts_msg_pairing_progress)
+        var outcome = graph.towerPairingController.pair(endpoint, pairingId, code, null)
+        if (outcome is TowerPairingOutcome.AwaitingOwnerAck) {
+            message = pairingOutcomeMessage(outcome)
+            outcome = graph.towerPairingController.awaitOwnerAcknowledgement()
+        }
+        message = pairingOutcomeMessage(outcome)
     }
 
     fun buildProfile(): TowerConnectionProfile {
@@ -434,7 +448,10 @@ fun TowerStudioScreen(graph: AppGraph, onOpenScanner: (() -> Unit)? = null) {
         Text(message, style = HermesType.body, color = c.textInfo)
         }
 
-        // ---- A4R NODE A3 dialogs: numeric code + manual endpoint (typed results) ----
+        // ---- A4R C1-C4 dialogs: numeric code + manual endpoint on the REAL
+        // Tower v2 contract (typed results; no SIMULATED executor). The
+        // numeric lane needs the pairing id (from the QR, or manual if known)
+        // and the endpoint. ----
         if (numericDialogOpen) {
             AlertDialog(
                 onDismissRequest = { numericDialogOpen = false },
@@ -443,8 +460,22 @@ fun TowerStudioScreen(graph: AppGraph, onOpenScanner: (() -> Unit)? = null) {
                     Column {
                         Text(stringResource(R.string.ts_dialog_numeric_note), style = HermesType.bodySecondary, color = c.textSecondary)
                         OutlinedTextField(
+                            value = manualEndpointInput,
+                            onValueChange = { manualEndpointInput = it },
+                            label = { Text(stringResource(R.string.ts_dialog_endpoint_hint)) },
+                            singleLine = true,
+                            modifier = Modifier.fillMaxWidth(),
+                        )
+                        OutlinedTextField(
+                            value = numericPairingIdInput,
+                            onValueChange = { numericPairingIdInput = it },
+                            label = { Text(stringResource(R.string.ts_pairing_id_hint)) },
+                            singleLine = true,
+                            modifier = Modifier.fillMaxWidth(),
+                        )
+                        OutlinedTextField(
                             value = numericCodeInput,
-                            onValueChange = { numericCodeInput = it },
+                            onValueChange = { if (it.length <= NumericPairingCode.REQUIRED_LENGTH) numericCodeInput = it },
                             label = { Text(stringResource(R.string.ts_dialog_numeric_hint)) },
                             singleLine = true,
                             modifier = Modifier.fillMaxWidth(),
@@ -453,10 +484,18 @@ fun TowerStudioScreen(graph: AppGraph, onOpenScanner: (() -> Unit)? = null) {
                 },
                 confirmButton = {
                     Button(onClick = {
-                        numericDialogOpen = false
-                        scope.launch {
-                            val outcome = pairingEntryExecutor.pairNumeric(numericCodeInput, manualEndpointInput.ifBlank { "https://hermestower.local" })
-                            message = pairingEntryMessage(outcome)
+                        val endpoint = manualEndpointInput.trim()
+                        val pairingId = numericPairingIdInput.trim()
+                        val code = NumericPairingCode.normalize(numericCodeInput)
+                        if (endpoint.isEmpty() || pairingId.isEmpty() || code == null) {
+                            message = context.getString(
+                                R.string.ts_msg_pairing_entry_rejected_fmt,
+                                StateLabels.label(TowerPairingState.QR_NOT_RECOGNIZED.name, com.hermestower.voiceconsole.locale.AppLanguage.effectiveTag(context)),
+                                context.getString(R.string.ts_msg_pairing_input_invalid),
+                            )
+                        } else {
+                            numericDialogOpen = false
+                            scope.launch { runProductionPairing(endpoint, pairingId, code) }
                         }
                     }) { Text(stringResource(R.string.ts_dialog_confirm)) }
                 },
@@ -479,14 +518,36 @@ fun TowerStudioScreen(graph: AppGraph, onOpenScanner: (() -> Unit)? = null) {
                             singleLine = true,
                             modifier = Modifier.fillMaxWidth(),
                         )
+                        OutlinedTextField(
+                            value = numericPairingIdInput,
+                            onValueChange = { numericPairingIdInput = it },
+                            label = { Text(stringResource(R.string.ts_pairing_id_hint)) },
+                            singleLine = true,
+                            modifier = Modifier.fillMaxWidth(),
+                        )
+                        OutlinedTextField(
+                            value = numericCodeInput,
+                            onValueChange = { if (it.length <= NumericPairingCode.REQUIRED_LENGTH) numericCodeInput = it },
+                            label = { Text(stringResource(R.string.ts_dialog_numeric_hint)) },
+                            singleLine = true,
+                            modifier = Modifier.fillMaxWidth(),
+                        )
                     }
                 },
                 confirmButton = {
                     Button(onClick = {
-                        endpointDialogOpen = false
-                        scope.launch {
-                            val outcome = pairingEntryExecutor.pairManualEndpoint(manualEndpointInput)
-                            message = pairingEntryMessage(outcome)
+                        val endpoint = manualEndpointInput.trim()
+                        val pairingId = numericPairingIdInput.trim()
+                        val code = NumericPairingCode.normalize(numericCodeInput)
+                        if (endpoint.isEmpty() || pairingId.isEmpty() || code == null) {
+                            message = context.getString(
+                                R.string.ts_msg_pairing_entry_rejected_fmt,
+                                StateLabels.label(TowerPairingState.QR_NOT_RECOGNIZED.name, com.hermestower.voiceconsole.locale.AppLanguage.effectiveTag(context)),
+                                context.getString(R.string.ts_msg_pairing_input_invalid),
+                            )
+                        } else {
+                            endpointDialogOpen = false
+                            scope.launch { runProductionPairing(endpoint, pairingId, code) }
                         }
                     }) { Text(stringResource(R.string.ts_dialog_confirm)) }
                 },

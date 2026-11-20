@@ -1,0 +1,135 @@
+{
+  "schema": "a4r.a_to_b_port_matrix/1.0",
+  "produced_utc": "2026-11-20T11:45:13Z",
+  "mission": "GRAPH A4R CONTINUATION BLOCK C1-C4 (CP-A4R-C1-007, mission section 6)",
+  "direction": "Candidate B = architectural base (Tower authority lane); Candidate A = feature/product-maturity donor",
+  "decision_rule": "Port ONLY with an explicit decision: REUSE_AS_IS / REUSE_AND_EXTEND / WRAP_WITH_ADAPTER / DEFER / REJECT. Do not copy all A runtimes by default. Tower-first: pairing/voice/Archive/artifact download must NEVER require local LLM model downloads.",
+  "capabilities": [
+    {
+      "id": "P-01",
+      "capability": "QR scanner user experience (CameraX 1.4.2 + ML Kit bundled, runtime permission, contextual explanation, typed rejection states)",
+      "a_state": "production-wired (G4-C09 wave 2 + A3)",
+      "decision": "REUSE_AND_EXTEND",
+      "action": "scanner screen rewired onto TowerQrV2ScanFlow + controller (v2 contract); permission denial split into DENIED / PERMANENTLY_DENIED typed states",
+      "gate": "CP-A4R-C1-008"
+    },
+    {
+      "id": "P-02",
+      "capability": "Pairing entry UI (SCANSIONA IL QR DELLA TOWER / INSERISCI CODICE NUMERICO / INSERISCI ENDPOINT MANUALMENTE)",
+      "a_state": "A3 strings \u00d75 locales + Tower Studio actions + onboarding QR choice",
+      "decision": "REUSE_AND_EXTEND",
+      "action": "labels kept verbatim; the executors behind them switched from SIMULATED to the real Tower v2 lanes; numeric lane now 6 digits (mission \u00a77)",
+      "gate": "CP-A4R-C1-008"
+    },
+    {
+      "id": "P-03",
+      "capability": "Five-language infrastructure (it/en/es/fr/de, \u00a723 StateLabels, ResponseLocaleResolver)",
+      "a_state": "production authority",
+      "decision": "REUSE_AS_IS",
+      "action": "kept; 5 new mission typed states + 18 v2 pairing strings added \u00d75 locales; no destabilization of B (B's Italian-only strings replaced by the A 5-locale layer on the merged screens)",
+      "gate": "CP-A4R-C1-008"
+    },
+    {
+      "id": "P-04",
+      "capability": "Marble + Obsidian theme infrastructure",
+      "a_state": "HermesTheme authority (G4.14 repairs incl. LocalContentColor root)",
+      "decision": "REUSE_AS_IS",
+      "action": "kept untouched \u2014 no pairing-correctness coupling",
+      "gate": "CP-A4R-C1-009"
+    },
+    {
+      "id": "P-05",
+      "capability": "Accessibility (TalkBack labels, font scaling, 48dp touch targets, contrast, permission explanation)",
+      "a_state": "audit-clean (42-row contrast run, classified set)",
+      "decision": "REUSE_AS_IS",
+      "action": "kept; new pairing surfaces use SectionCard/HermesFilledButton/HermesOutlinedField components (same a11y base)",
+      "gate": "CP-A4R-C1-008"
+    },
+    {
+      "id": "P-06",
+      "capability": "Diagnostics (typed connection state, app version, package, contract version, last pairing status, NO secrets)",
+      "a_state": "BuildIdentity + RedactedDiagnosticsExporter",
+      "decision": "REUSE_AND_EXTEND",
+      "action": "TowerPairingController.diagnostics()/identityLine() added: paired state, contract version, typed failure history (enum names only) \u2014 never an endpoint/token",
+      "gate": "CP-A4R-C1-008"
+    },
+    {
+      "id": "P-07",
+      "capability": "Tower visual master canvas 680\u00d7963 (TowerLayerManifest + ReferenceTowerVisual + golden suite)",
+      "a_state": "integrated at d133087 (A4), Owner visual acceptance PENDING",
+      "decision": "REUSE_AS_IS",
+      "action": "carried unchanged into the merged build; no Xiaomi-specific offset (mission \u00a79); TOWER_VISUAL_GOLDEN_PASS = the d133087 golden suite stays green; OWNER acceptance stays Owner-controlled",
+      "gate": "CP-A4R-C1-009"
+    },
+    {
+      "id": "P-08",
+      "capability": "Keystore repair package (A2)",
+      "a_state": "prepared, not integrated",
+      "decision": "REUSE_AND_EXTEND",
+      "action": "APPLIED to the B authority lane with the two mission-typed states added (ANDROID_KEY_UNAVAILABLE, ENCRYPTED_STORE_AUTHENTICATION_FAILED) + PairingStateStore seam",
+      "gate": "CP-A4R-C1-005"
+    },
+    {
+      "id": "P-09",
+      "capability": "Mock pairing executor (MockTowerPairingClient + hermes-pair://v1 parser)",
+      "a_state": "was the production executor",
+      "decision": "REJECT (production) / RETAIN (tests + self-test battery)",
+      "action": "REMOVED from AppGraph and both production screens; retained in test source (PairingEntryExecutor tests) and the SIMULATED self-test diagnostics lane (SelfTestCenter pairingParserFactory), clearly labeled SIMULATED, unreachable from production pairing navigation",
+      "gate": "CP-A4R-C1-008 (NO_MOCK_PAIRING_IN_PRODUCTION_PATH)"
+    },
+    {
+      "id": "P-10",
+      "capability": "local llama.cpp runtime (Qwen 2.5 0.5B)",
+      "a_state": "verified optional runtime",
+      "decision": "DEFER",
+      "action": "kept OPTIONAL under the A7 resource envelope (bundled assets already in the APK catalog; no download required for pairing/voice/Archive); no new runtime work this block",
+      "gate": "A7"
+    },
+    {
+      "id": "P-11",
+      "capability": "Vosk / sherpa-onnx / openWakeWord / GTCRN runtimes",
+      "a_state": "verified optional runtimes",
+      "decision": "DEFER",
+      "action": "same as P-10 \u2014 Tower-first usability does not require them",
+      "gate": "A7"
+    },
+    {
+      "id": "P-12",
+      "capability": "Complete local model manager",
+      "a_state": "Model Sanctum + download manager",
+      "decision": "DEFER",
+      "action": "unchanged; not in the mini-gate path",
+      "gate": "A7"
+    },
+    {
+      "id": "P-13",
+      "capability": "B capture/voice/archive client lanes",
+      "b_state": "live protocol (dex)",
+      "decision": "WRAP_WITH_ADAPTER",
+      "action": "TowerApi implements the 18-route surface contract-completely; the production voice/archive SWITCH is the next physical block after the mini-gate; fixtures pin the contract at simulator level",
+      "gate": "CP-A4R-C1-010"
+    },
+    {
+      "id": "P-14",
+      "capability": "Onboarding first-run pairing path",
+      "a_state": "A3 wired the QR choice to DEMONSTRATE the scanner",
+      "decision": "REUSE_AS_IS",
+      "action": "unchanged routing; the demonstration now lands on the REAL v2 scanner",
+      "gate": "CP-A4R-C1-008"
+    }
+  ],
+  "deferred_summary": [
+    "local llama.cpp runtime",
+    "Qwen local model",
+    "complete local model manager",
+    "Vosk",
+    "sherpa-onnx",
+    "openWakeWord",
+    "large optional native runtimes"
+  ],
+  "tower_first_guarantee": {
+    "LOCAL_LLM_REQUIRED_FOR_PAIRING": false,
+    "LOCAL_LLM_REQUIRED_FOR_VOICE": false,
+    "LOCAL_LLM_REQUIRED_FOR_ARCHIVE": false
+  }
+}

@@ -264,7 +264,7 @@
     <string name="qr_result_ok_fmt">SIMULIERTES Ergebnis — Sitzung %1$s, Bestätigungsphrase %2$s. Es wurde kein echter Turm kontaktiert (Tower Graph 1.7 ausstehend).</string>
     <string name="qr_result_fail_fmt">SIMULIERTE Kopplung abgelehnt: %1$s — %2$s</string>
     <string name="qr_back">Zurück zu Tower Studio</string>
-    <string name="qr_replay_note">Hinweis: Das erneute Scannen desselben QR nach erfolgreichem Parsen wird wahrheitsgemäß als REPLAYED_NONCE abgelehnt — Kopplings-Nonces sind vertraglich einmalig.</string>
+    <string name="qr_replay_note">Hinweis: Denselben QR nach einer erfolgreichen Erkennung erneut zu scannen wird ehrlich abgelehnt — die nonce_ref ist vertraglich einmalig (Tower voice-console/v2).</string>
     <string name="voice_title">Sprache und Audio</string>
     <string name="voice_wake_card">Wake word</string>
     <string name="voice_provider_fmt">ANBIETER: %1$s KANDIDATEN</string>
@@ -407,7 +407,7 @@
     <string name="ts_action_pair_numeric">Numerischen Code eingeben</string>
     <string name="ts_action_manual_endpoint">Endpoint manuell eingeben</string>
     <string name="ts_dialog_numeric_title">Kopplung mit numerischem Code</string>
-    <string name="ts_dialog_numeric_hint">8-stelliger numerischer Code</string>
+    <string name="ts_dialog_numeric_hint">6-stelliger numerischer Code</string>
     <string name="ts_dialog_numeric_note">Gib den numerischen Code ein, den die Tower anzeigt. Der Code enthält niemals Geheimnisse.</string>
     <string name="ts_dialog_endpoint_title">Manueller Endpoint</string>
     <string name="ts_dialog_endpoint_hint">https://tower-host</string>
@@ -866,4 +866,22 @@ MANUAL_ADVANCED — unabhängige Auswahl pro Komponente, volle Sichtbarkeit, kei
     <string name="desc_bridge_local">Lokaler Bridge-Prozess aktiv — keine echte Tower verbunden.</string>
     <string name="app_theme_marble">MARMOR HELL</string>
     <string name="app_theme_obsidian">OBSIDIAN NACHT</string>
+    <string name="qr_v2_looking_fmt">Suche nach einem Tower-QR v2… (%1$d Frames analysiert)</string>
+    <string name="qr_v2_accepted">Payload vom v2-Parser akzeptiert:</string>
+    <string name="qr_v2_contract_note">Tower-Vertrag voice-console/v2. Kein Geheimnis reist im QR; den 6-stelligen Claim-Code geben Sie selbst ein.</string>
+    <string name="qr_v2_code_label">6-stelliger Tower-Code</string>
+    <string name="qr_v2_code_invalid">Der Code muss genau 6 Ziffern haben.</string>
+    <string name="qr_v2_pair_button">Bestätigen und koppeln</string>
+    <string name="qr_v2_paired_done">Diese Tower ist bereits gekoppelt</string>
+    <string name="qr_v2_progress">Kopplung läuft — folgen Sie der Tower-Konsole…</string>
+    <string name="qr_v2_awaiting_fmt">Bestätigungsphrase: %1$s — bestätigen Sie sie auf der Tower-Konsole…</string>
+    <string name="qr_v2_registered_fmt">Tower gekoppelt (Gerät %1$s). Der Zustand wird verschlüsselt gespeichert (AndroidKeyStore).</string>
+    <string name="qr_v2_manual_endpoint_action">Endpoint manuell eingeben (erweitert)</string>
+    <string name="qr_v2_manual_endpoint_label">Endpoint (https://…)</string>
+    <string name="qr_v2_perm_permanent_note">Die Berechtigung wurde dauerhaft verweigert: öffnen Sie die Systemeinstellungen, um sie zu erteilen, und wiederholen Sie den QR.</string>
+    <string name="ts_pairing_id_hint">Pairing-ID (aus dem QR; manuell nur falls bekannt)</string>
+    <string name="ts_msg_pairing_progress">Kopplung läuft über den Tower-v2-Vertrag…</string>
+    <string name="ts_msg_pairing_registered_fmt">Kopplung abgeschlossen — Gerät %1$s (Zustand verschlüsselt gespeichert).</string>
+    <string name="ts_msg_pairing_awaiting_fmt">Zeigen Sie diese Phrase zur Bestätigung auf der Tower-Konsole: %1$s — warte auf Bestätigung…</string>
+    <string name="ts_msg_pairing_input_invalid">Endpoint, Pairing-ID und sechsstelliger Code werden alle benötigt</string>
 </resources>

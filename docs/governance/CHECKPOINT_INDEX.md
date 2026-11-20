@@ -210,3 +210,19 @@ Graph A4R checkpoints (branch `graph-4/real-voice-pairing-archive-e2e`, this rep
 | Checkpoint | Content | Evidence added |
 | --- | --- | --- |
 | graph-4/a4r-two-candidate-reconciliation | NODE A0–A8: physical probes of both candidates, crash root cause bound, A2 keystore repair package, A3 pairing entry wiring + typed states, A4 master-canvas manifest + golden, A5 canonical recommendation, A6 contract delta, A7 resource truth, A8 ledger + runbook | A4R receipts under docs/a4r/ (13) + keystore repair package + offline golden renders + ledger; physical verdicts remain PENDING (no self-granted PASS) |
+
+| CP-A4R-C1-001 | Controlled resume: fresh reads (local + remote tips, all branches, d133087 present, worktree clean, receipts, fingerprints, contract, Tower SHA UNREACHABLE) | docs/a4r/c1/A4R_C1_CONTROLLED_RESUME.json | (this commit) |
+| CP-A4R-C1-002 | d133087 CI read-back: build 44719962661 SUCCESS; e2e 44719962547 RUNNING (recorded, not assumed; not duplicated) | docs/a4r/c1/A4R_C1_CI_READBACK.json | (this commit) |
+| CP-A4R-C1-003 | Source authority binding: A canonical (d133087) + B UNAVAILABLE (404 evidence) → RECONSTRUCTED-SOURCE path; CANDIDATE_B_SOURCE_MANIFEST.json with per-file SHA-256 | docs/a4r/c1/A4R_C1_SOURCE_AUTHORITY_BINDING.json + candidate-b-base/ | (this commit) |
+| CP-A4R-C1-004 | Isolated merge branch graph-a4r/merge-with-b-base from d133087 + candidate-b-base/ integration area compiled via srcDir | branch + candidate-b-base/README_LINEAGE.md | (this commit) |
+| CP-A4R-C1-005 | Keystore repair integrated into the B lane (7 mission typed states, atomic commit, no plaintext fallback, PairingStateStore seam) | candidate-b-base/data/TowerStore.kt + PairingPersistence.kt | unit 566/566 |
+| CP-A4R-C1-006 | Keystore suites live: BlobFramingTest 7 JVM + TowerStoreInstrumentedTest 9 + DeviceKeysInstrumentedTest 3; dedicated CI emulator lane; gate = SOFTWARE_ANDROID_KEYSTORE_TESTED | .github/workflows/android-keystore-instrumented.yml | local compile + CI lane |
+| CP-A4R-C1-007 | A-to-B selective port matrix (14 capabilities, explicit decisions, defer list honored, Tower-first flags) | docs/a4r/c1/A4R_A_TO_B_PORT_MATRIX.json + A4R_A_TO_B_PORT_REPORT.md | (this commit) |
+| CP-A4R-C1-008 | Production QR wiring: TowerQrV2ScanFlow + TowerPairingController in scanner + Tower Studio; mock executor REMOVED from production; 11 typed states ×5 locales | QrScannerScreen.kt, TowerStudioScreen.kt, AppGraph.kt, StateLabels.kt, strings ×5 | unit 566/566 |
+| CP-A4R-C1-009 | Visual manifest carried unchanged from d133087 (680×963, no device offsets); golden suite green | TowerLayerManifestTest in the green 566 | (this commit) |
+| CP-A4R-C1-010 | Tower contract fixtures: TowerContractSimulator (SIMULATED_CONTRACT_TEST) + 15 pairing/transport/archive fixtures + QR v2 fixtures + pairing machine suite | app/src/test/.../towercontract/ (4 files) | unit 566/566 |
+| CP-A4R-C1-011 | Clean CI build on the merged branch (build+unit+lint+secret-scan+identity+fingerprint+receipt) | .github/workflows/android-debug-build.yml updated | CI run at the tip |
+| CP-A4R-C1-012 | Emulator qualification = keystore instrumentation lane (SOFTWARE_ANDROID_KEYSTORE_TESTED) | android-keystore-instrumented.yml | CI lane |
+| CP-A4R-C1-013 | Repaired APK delivery package + download-back verification (post-CI) | download/A4R/ + A4R_REPAIRED_APK_* receipts | SHA-256 download-back |
+| CP-A4R-C1-014 | Owner mini-gate P1-P8 prepared (Italian, one step at a time, no secrets requested) | docs/a4r/c1/A4R_C1_OWNER_MINI_GATE_IT.md | (this commit) |
+| CP-A4R-C1-015 | Authority convergence (Rule Theta: truth/checkpoints/worklog/blocker/decision + IT guides + registries) | this wave | (this commit) |

@@ -1,0 +1,38 @@
+{
+  "schema": "a4r.signing_provenance_receipt/1.0",
+  "produced_utc": "2026-11-20T12:15:54Z",
+  "mission": "GRAPH A4R C1-C4 (mission section 10)",
+  "debug_ci_signing": {
+    "scheme": "v2 (single signer), Android Debug certificate",
+    "status": "NON-PRODUCTION \u2014 documented as such in the build receipt",
+    "local_build_cert_sha256": "e862c3bbb90d1bd68e364ad5175a33cbf4e9689b8fca76fba0ee5f529f9b7582 (LOCAL sandbox debug key \u2014 NOT the delivered build)",
+    "ci_build_cert_sha256": "recorded in the delivery receipt from the CI run (apksigner verify --print-certs in the workflow)",
+    "registration": "the CI debug fingerprint is registered per-run in the build_receipt.json artifact (APK_SIGNATURE_FINGERPRINT_RECORDED)"
+  },
+  "owner_release_keystore": {
+    "touched": false,
+    "committed": false,
+    "requested": false,
+    "decision": "commercial signing lineage EXPLICITLY UNDECIDED (mission section 16)"
+  },
+  "coexistence_matrix": [
+    {
+      "app": "Candidate A (installed)",
+      "applicationId": "com.hermestower.voiceconsole",
+      "versionCode": 12,
+      "conflict": "none (distinct applicationId)"
+    },
+    {
+      "app": "Candidate B (installed)",
+      "applicationId": "com.hermestower.voiceconsole.debug",
+      "versionCode": 1,
+      "conflict": "none (distinct applicationId)"
+    },
+    {
+      "app": "A4R repaired candidate",
+      "applicationId": "com.hermestower.voiceconsole.a4rdebug",
+      "versionCode": 13,
+      "conflict": "none"
+    }
+  ]
+}

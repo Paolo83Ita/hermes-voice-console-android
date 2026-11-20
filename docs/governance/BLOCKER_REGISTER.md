@@ -27,3 +27,15 @@ qualification runbook is now OWNER_POCO_XIAOMI_RETEST_PACKAGE_7_GRAPH414.md
 (real Tower API V0.4; scope freeze holds). New typed pending items (NOT
 blockers): LLM_PHYSICAL_QUALIFICATION_PENDING (Owner device legs B/C/D/F/K/L);
 E2E arbitration at the new tip (standing R-42..R-49 harness line).
+
+
+GRAPH A4R C1-C4 (2026-11-20): ONE new executor blocker, typed and evidence-bound:
+**B-A4R-001 CANDIDATE_B_ORIGINAL_SOURCE_UNAVAILABLE** — Paolo83Ita/Hermes-Tower
+is ABSENT from GitHub (GET /repos/... = 404, 2026-11-20 fresh read; the Owner
+account exposes exactly 2 repositories), no local checkout, no git bundle. The
+merge proceeded on the A5-M1 RECONSTRUCTED-SOURCE path; the blocker unblocks
+ONLY with an Owner action (upload the Tower git bundle or create the repo) so a
+later block can rebind candidate-b-base/ to the true original source and run
+the semantic diff. Everything else this block: no new executor blockers; the
+physical gates (Xiaomi mini-gate P1-P8, visual Owner acceptance, canonical
+base approval) remain pending OWNER ACTIONS, not executor blockers.

@@ -122,14 +122,38 @@ class AppGraph(
     val runtimeReceiptRecorder = com.hermestower.voiceconsole.models.ModelRuntimeReceiptRecorder()
     val modelResolver = DefaultVoicePackResolver()
 
-    // GRAPH 4 CP-G4-010 wave 2 (G4-C09 wave 2): QR pairing scan flow. The strict
-    // hermes-pair://v1 parser (CP-G4-012a) with a session-lifetime nonce store and
-    // the deterministic mock executor. Real Tower pairing stays deferred to Tower
-    // Graph 1.7: nothing here contacts an endpoint — the mock client is the only
-    // executor and every result it produces is labeled SIMULATED in the UI.
+    // GRAPH A4R C1-C4 (CP-A4R-C1-008): PRODUCTION Tower pairing — the B
+    // authority lane on the frozen v2 contract, wired as the ONLY production
+    // pairing executor (NO_MOCK_PAIRING_IN_PRODUCTION_PATH). The repaired
+    // TowerStore (explicit KeyGenParameterSpec, AES-256-GCM, atomic pairing
+    // commit) is the single pairing persistence authority; the EC-P256 device
+    // key lives in the AndroidKeyStore and never leaves it.
+    val towerPairingApi = com.hermestower.voiceconsole.net.TowerApi(
+        http = com.hermestower.voiceconsole.net.HttpUrlTowerHttp(),
+    )
+    val towerStore = com.hermestower.voiceconsole.data.TowerStore(context)
+    val towerDeviceKeys = com.hermestower.voiceconsole.pairing.DeviceKeys()
+    val towerPairingFlow = com.hermestower.voiceconsole.pairing.PairingFlow(
+        api = towerPairingApi,
+        store = towerStore,
+        deviceKeys = towerDeviceKeys,
+    )
+    val towerQrParser = com.hermestower.voiceconsole.pairing.QrPayload.Parser()
+    val towerPairingController = com.hermestower.voiceconsole.towerpair.TowerPairingController(
+        flow = towerPairingFlow,
+        store = towerStore,
+        qrParser = towerQrParser,
+        appVersionName = com.hermestower.voiceconsole.BuildConfig.VERSION_NAME,
+        packageName = context.packageName,
+    )
+
+    // GRAPH 4 CP-G4-010 wave 2: the v1 hermes-pair:// parser RETAINS ONLY the
+    // SIMULATED diagnostics lane (self-test battery pairingParserFactory) — it
+    // is NO LONGER reachable from any production pairing route; the mock
+    // executor is removed from the production graph entirely (mission §7:
+    // retained only in tests, clearly labeled SIMULATED).
     val pairingNonceStore = com.hermestower.voiceconsole.pairing.InMemoryPairingNonceStore()
     val pairingPayloadParser = com.hermestower.voiceconsole.pairing.PairingPayloadParser(nonceStore = pairingNonceStore)
-    val mockTowerPairingClient = com.hermestower.voiceconsole.pairing.MockTowerPairingClient()
 
     // GRAPH 4 CP-G4-009 (Owner §6 real model delivery): the four physically
     // verified ONNX artifacts ride INSIDE the APK (assets/models/bundled/) and

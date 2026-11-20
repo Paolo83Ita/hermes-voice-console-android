@@ -264,7 +264,7 @@
     <string name="qr_result_ok_fmt">SIMULATED result — session %1$s, match phrase %2$s. No real Tower was contacted (Tower Graph 1.7 pending).</string>
     <string name="qr_result_fail_fmt">SIMULATED pairing refused: %1$s — %2$s</string>
     <string name="qr_back">Back to Tower Studio</string>
-    <string name="qr_replay_note">Note: rescanning the same QR after a successful parse is honestly refused as REPLAYED_NONCE — pairing nonces are single-use by contract.</string>
+    <string name="qr_replay_note">Note: rescanning the same QR after a successful parse is honestly refused — the nonce_ref is single-use by contract (Tower voice-console/v2).</string>
     <string name="voice_title">Voice &amp; Audio</string>
     <string name="voice_wake_card">Wake word</string>
     <string name="voice_provider_fmt">PROVIDER: %1$s CANDIDATES</string>
@@ -866,4 +866,22 @@ MANUAL_ADVANCED — independent per-component selection, full visibility, no sil
     <string name="desc_bridge_local">Local bridge process healthy — no real Tower connected yet.</string>
     <string name="app_theme_marble">MARBLE LIGHT</string>
     <string name="app_theme_obsidian">OBSIDIAN NIGHT</string>
+    <string name="qr_v2_looking_fmt">Looking for a Tower QR v2… (%1$d frames analyzed)</string>
+    <string name="qr_v2_accepted">Payload accepted by the v2 parser:</string>
+    <string name="qr_v2_contract_note">Tower voice-console/v2 contract. No secret travels in the QR; the six-digit claim code is typed by you.</string>
+    <string name="qr_v2_code_label">Tower six-digit code</string>
+    <string name="qr_v2_code_invalid">The code must be exactly 6 digits.</string>
+    <string name="qr_v2_pair_button">Confirm and pair</string>
+    <string name="qr_v2_paired_done">This Tower is already paired</string>
+    <string name="qr_v2_progress">Pairing in progress — follow the Tower console…</string>
+    <string name="qr_v2_awaiting_fmt">Confirmation phrase: %1$s — confirm it on the Tower console…</string>
+    <string name="qr_v2_registered_fmt">Tower paired (device %1$s). The pairing state is stored encrypted (AndroidKeyStore).</string>
+    <string name="qr_v2_manual_endpoint_action">Enter the endpoint manually (advanced)</string>
+    <string name="qr_v2_manual_endpoint_label">Endpoint (https://…)</string>
+    <string name="qr_v2_perm_permanent_note">The permission was permanently denied: open system settings to grant it, then retry the QR.</string>
+    <string name="ts_pairing_id_hint">Pairing ID (from the QR; manual only if known)</string>
+    <string name="ts_msg_pairing_progress">Pairing in progress on the Tower v2 contract…</string>
+    <string name="ts_msg_pairing_registered_fmt">Pairing completed — device %1$s (state stored encrypted).</string>
+    <string name="ts_msg_pairing_awaiting_fmt">Show this phrase on the Tower console to confirm: %1$s — waiting for confirmation…</string>
+    <string name="ts_msg_pairing_input_invalid">endpoint, pairing id and six-digit code are all required</string>
 </resources>

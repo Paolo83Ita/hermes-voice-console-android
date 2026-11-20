@@ -57,19 +57,21 @@ class PairingEntryActionsTest {
     // ---- numeric code truth ----------------------------------------------------------
 
     @Test
-    fun `numeric code accepts exactly 8 digits with grouping separators`() {
-        assertEquals("12345678", NumericPairingCode.normalize("12345678"))
-        assertEquals("12345678", NumericPairingCode.normalize("1234-5678"))
-        assertEquals("12345678", NumericPairingCode.normalize("1234 5678"))
-        assertTrue(NumericPairingCode.isValid("1234 5678"))
+    fun `numeric code accepts exactly 6 digits with grouping separators`() {
+        assertEquals("123456", NumericPairingCode.normalize("123456"))
+        assertEquals("123456", NumericPairingCode.normalize("123-456"))
+        assertEquals("123456", NumericPairingCode.normalize("123 456"))
+        assertTrue(NumericPairingCode.isValid("123 456"))
     }
 
     @Test
     fun `numeric code rejects letters short codes and stray separators`() {
-        assertNull(NumericPairingCode.normalize("1234A678"))
+        assertNull(NumericPairingCode.normalize("123A456"))
+        assertNull(NumericPairingCode.normalize("12345"))
         assertNull(NumericPairingCode.normalize("1234567"))
-        assertNull(NumericPairingCode.normalize("123456789"))
-        assertNull(NumericPairingCode.normalize("1234.5678"))
+        assertNull(NumericPairingCode.normalize("12345678"))
+        assertNull(NumericPairingCode.normalize("1.2.3.4.5.6"))
+        assertNull(NumericPairingCode.normalize("123.456"))
         assertFalse(NumericPairingCode.isValid(""))
     }
 
@@ -90,7 +92,7 @@ class PairingEntryActionsTest {
     @Test
     fun `numeric lane accepts a valid code through the deterministic client`() = runTest {
         val executor = PairingEntryExecutor(MockTowerPairingClient(clockMs = { 1_000L }))
-        val outcome = executor.pairNumeric("1234-5678", "https://hermestower.aclclouds.online")
+        val outcome = executor.pairNumeric("123-456", "https://hermestower.aclclouds.online")
         assertTrue(outcome is PairingEntryOutcome.Accepted)
         val accepted = outcome as PairingEntryOutcome.Accepted
         assertEquals(PairingEntryOutcome.Lane.NUMERIC, accepted.lane)
@@ -101,8 +103,8 @@ class PairingEntryActionsTest {
     @Test
     fun `numeric lane rejects a bad code with a typed state`() = runTest {
         val executor = PairingEntryExecutor(MockTowerPairingClient())
-        val outcome = executor.pairNumeric("12A45678", "https://hermestower.aclclouds.online")
-        assertEquals(PairingEntryOutcome.Rejected(PairingEntryState.QR_NOT_RECOGNIZED, "numeric code must be exactly 8 digits"), outcome)
+        val outcome = executor.pairNumeric("12A456", "https://hermestower.aclclouds.online")
+        assertEquals(PairingEntryOutcome.Rejected(PairingEntryState.QR_NOT_RECOGNIZED, "numeric code must be exactly 6 digits"), outcome)
     }
 
     @Test
@@ -117,7 +119,7 @@ class PairingEntryActionsTest {
         // The mission merge rule: one executor, one client interface, two lanes.
         val client: TowerPairingClient = MockTowerPairingClient()
         val executor = PairingEntryExecutor(client)
-        val numeric = executor.pairNumeric("87654321", "https://tower.example")
+        val numeric = executor.pairNumeric("876543", "https://tower.example")
         val manual = executor.pairManualEndpoint("https://tower.example")
         assertTrue(numeric is PairingEntryOutcome.Accepted)
         assertTrue(manual is PairingEntryOutcome.Accepted)

@@ -1,0 +1,58 @@
+{
+  "schema": "a4r.tower_contract_delta_request/1.0",
+  "id": "CD-A4R-C1-001",
+  "produced_utc": "2026-11-20T11:45:13Z",
+  "from": "ANDROID executor (graph-a4r/merge-with-b-base)",
+  "to": "Tower account (via Owner handoff)",
+  "rule": "Tower server code is NOT modified; ambiguities become versioned contract delta requests with evidence; no client-side bypass (mission sections 12/1)",
+  "ambiguities": [
+    {
+      "id": "AMB-1",
+      "field": "numeric claim code length",
+      "android_implementation": "6 digits (mission section 7: 'six-digit numeric code')",
+      "prior_evidence": "the previous executor recorded an 8-digit 'Tower numeric-code shape'",
+      "request": "Tower confirms the canonical length; a mismatch becomes a versioned contract delta, not a silent client change"
+    },
+    {
+      "id": "AMB-2",
+      "field": "claim request body keys",
+      "android_implementation": "claim_code, device_label",
+      "evidence_class": "typed hypothesis (request bodies are NOT visible in the dex string pool)",
+      "request": "Tower confirms; simulator fixtures pin whichever shape is confirmed"
+    },
+    {
+      "id": "AMB-3",
+      "field": "attest request body keys",
+      "android_implementation": "claim_key, challenge, pop_signature, device_public_key_pem, device_key_algorithm, attestation_metadata",
+      "evidence_class": "pop_signature/device_public_key_pem/device_key_algorithm/attestation_metadata bound from the dex pool; claim_key/challenge bound from PairingFlow signatures",
+      "request": "Tower confirms exact casing"
+    },
+    {
+      "id": "AMB-4",
+      "field": "ack response shape",
+      "android_implementation": "GET /pairings/{id}/ack -> {state: PENDING|ACKED|REVOKED|EXPIRED, device_id, console_token, phrase_hint}",
+      "evidence_class": "is_pending/get_state/get_pending + console_token/phraseHint bound from dex; exact field casing is hypothesis",
+      "request": "Tower confirms; the client parser accepts ACKED|ACK|CONFIRMED and phrase_hint|phrase tolerance"
+    },
+    {
+      "id": "AMB-5",
+      "field": "challenge TTL",
+      "android_implementation": "client-enforced 120 s (mission section 7)",
+      "prior_evidence": "B's QR message says the QR TTL is '2-5 minuti'",
+      "request": "Tower confirms the challenge (not QR) TTL; 120 s is the client guard until confirmed"
+    },
+    {
+      "id": "AMB-6",
+      "field": "no ANDROID_TOWER_INTEGRATION_CONTRACT v1.0.0 document",
+      "android_implementation": "the frozen truth is bound as: dex string pool of the byte-exact B APK + CD-A4R-001 (docs/a4r/A4R_TOWER_CONTRACT_DELTA.json)",
+      "request": "Tower publishes the v1.0.0 contract document or confirms the dex-bound surface as v1.0.0"
+    },
+    {
+      "id": "AMB-7",
+      "field": "original B source tree",
+      "android_implementation": "RECONSTRUCTED-SOURCE path (candidate-b-base/CANDIDATE_B_SOURCE_MANIFEST.json)",
+      "request": "Owner uploads the Hermes-Tower git bundle / creates the repo so the reconstruction can be diffed against the true source in a later block"
+    }
+  ],
+  "client_side_bypass_created": false
+}

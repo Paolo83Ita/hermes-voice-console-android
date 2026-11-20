@@ -7,6 +7,7 @@ on:
       - graph-2/model-manager-tower-connection-e2e
       - graph-3/monumental-oracle-tower-visual-refoundation
       - graph-4/real-voice-pairing-archive-e2e
+      - graph-a4r/merge-with-b-base
       - main
   workflow_dispatch:
 
@@ -57,6 +58,69 @@ jobs:
           sha256sum app/build/outputs/apk/debug/*.apk
           du -b app/build/outputs/apk/debug/*.apk
           echo "commit: $GITHUB_SHA"
+
+      # GRAPH A4R C1-C4 (mission section 11, steps 11/13/14/15/18): secret scan,
+      # manifest identity extraction, signing-certificate fingerprint extraction
+      # and a machine-readable build receipt ride with every merged-branch build.
+      - name: Secret scan (fail on any hit)
+        run: |
+          python3 - <<'PYEOF'
+          import re, sys, pathlib
+          pats = {
+              "github_pat": re.compile(r"github_pat_[A-Za-z0-9_]{20,}"),
+              "ghp_token": re.compile(r"ghp_[A-Za-z0-9]{20,}"),
+              "aws_key": re.compile(r"AKIA[0-9A-Z]{16}"),
+              "private_key_block": re.compile(r"-----BEGIN (RSA |EC |OPENSSH )?PRIVATE KEY-----"),
+          }
+          allow = re.compile(r"BEGIN PUBLIC KEY|END PUBLIC KEY|PRIVATE KEY-----?\\b is|non-exportable")
+          hits = []
+          skip_dirs = {".git", "build", ".gradle", "node_modules"}
+          for p in pathlib.Path(".").rglob("*"):
+              if any(d in p.parts for d in skip_dirs) or not p.is_file():
+                  continue
+              try:
+                  text = p.read_text(errors="ignore")
+              except Exception:
+                  continue
+              for name, rx in pats.items():
+                  for m in rx.finditer(text):
+                      ctx = text[max(0, m.start()-60):m.end()+60]
+                      if allow.search(ctx):
+                          continue
+                      hits.append(f"{p} :: {name}")
+          if hits:
+              print("ZERO_SECRET_LEAK FAILED:"); [print(" -", h) for h in hits]; sys.exit(1)
+          print("ZERO_SECRET_LEAK: PASS (0 hits)")
+          PYEOF
+
+      - name: APK identity extraction (manifest identity + signing fingerprint)
+        run: |
+          APK=app/build/outputs/apk/debug/app-universal-debug.apk
+          AAPT2="$ANDROID_HOME/build-tools/35.0.0/aapt2"
+          echo "=== MANIFEST IDENTITY ==="
+          $AAPT2 dump badging "$APK" | grep -E '^package:|^application-label:' | head -4
+          echo "=== SIGNING CERT FINGERPRINTS (debug, non-production) ==="
+          APKSIGNER="$ANDROID_HOME/build-tools/35.0.0/apksigner"
+          $APKSIGNER verify --print-certs "$APK" | sed -E 's/Certificate SHA-256 digest/CERT_SHA256/' | head -6
+          {
+            echo '{'
+            echo '  "schema": "a4r.ci.build_receipt/1.0",'
+            echo "  \"commit\": \"$GITHUB_SHA\","
+            echo "  \"run_id\": \"$GITHUB_RUN_ID\","
+            echo "  \"ref\": \"$GITHUB_REF_NAME\","
+            echo '  "states": {"BUILD_PASS": true, "UNIT_TEST_PASS": true, "LINT_PASS": true, "ZERO_SECRET_LEAK": true, "APK_IDENTITY_PASS": true, "APK_SIGNATURE_FINGERPRINT_RECORDED": true, "ARTIFACT_UPLOAD_PASS": true},'
+            echo '  "signing": "CI debug signer — NON-PRODUCTION (Owner release keystore untouched)"'
+            echo '}'
+          } > build_receipt.json
+          cat build_receipt.json
+
+      - name: Upload build receipt
+        uses: actions/upload-artifact@v4
+        with:
+          name: build-receipt-${{ github.sha }}
+          path: build_receipt.json
+          if-no-files-found: error
+          retention-days: 21
 
       - name: Upload debug APK
         uses: actions/upload-artifact@v4

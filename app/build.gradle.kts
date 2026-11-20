@@ -20,8 +20,12 @@ android {
         // GRAPH 4.14 (§14, OWNER PHYSICAL RETEST round 2): OWNER RUNTIME THEME
         // TOWER PACKAGE 9 MUST exceed 0.3.8-alpha-graph4.14-owner-retest-repairs /
         // versionCode 11 (the fresh remote-tip identity at the round-2 read-back).
-        versionCode = 12
-        versionName = "0.3.9-alpha-graph4.14-round2-repairs"
+        // GRAPH A4R C1-C4 (§14 version truth): the merged B-base repair candidate
+        // continues the code lineage above Package 9 (versionCode 12). The
+        // COMMERCIAL package/signing decision stays explicitly OPEN (mission §16:
+        // no ANDROID_CANONICAL_BASE_SELECTED without Owner approval).
+        versionCode = 13
+        versionName = "0.4.0-alpha-grapha4r-merged-b-base"
         testInstrumentationRunner = "androidx.test.runner.AndroidJUnitRunner"
 
         // OWNER PHYSICAL RETEST §1 (build provenance): authoritative build
@@ -43,7 +47,7 @@ android {
         buildConfigField("String", "BUILD_TIMESTAMP_ISO8601", "\"$buildStamp\"")
         buildConfigField("String", "BUILD_WORKFLOW_RUN_ID", "\"$ciRun\"")
         buildConfigField("String", "BUILD_WORKFLOW_REF", "\"$ciRef\"")
-        buildConfigField("String", "BUILD_LABEL", "\"${project.findProperty("hermes.buildLabel") ?: "OWNER RUNTIME THEME TOWER PACKAGE 9"}\"")
+        buildConfigField("String", "BUILD_LABEL", "\"${project.findProperty("hermes.buildLabel") ?: "GRAPH A4R MERGED B-BASE REPAIR"}\"")
     }
 
     // GRAPH 4 FINAL §20: DUAL APK OUTPUT — the UNIVERSAL debug APK keeps every
@@ -63,6 +67,16 @@ android {
             isMinifyEnabled = false
             proguardFiles(getDefaultProguardFile("proguard-android-optimize.txt"), "proguard-rules.pro")
         }
+        // GRAPH A4R C1-C4 (§10 package strategy): the debug variant carries an
+        // ISOLATED applicationId suffix so the repaired candidate COEXISTS with
+        // the Owner's installed Candidate A (com.hermestower.voiceconsole) and
+        // the broken Candidate B (com.hermestower.voiceconsole.debug) for
+        // direct A/B/C physical comparison on the Xiaomi. This debug package is
+        // NOT the final canonical package (no commercial decision in this
+        // mission); the suffix is applied consistently through Gradle only.
+        getByName("debug") {
+            applicationIdSuffix = ".a4rdebug"
+        }
     }
     // CP-G4.9-003: onnxruntime-android (the app's ORT Java API, 1.20.0) and the
     // sherpa-onnx AAR both bundle lib/<abi>/libonnxruntime.so. The ORT C API the
@@ -80,6 +94,16 @@ android {
         buildConfig = true
     }
     sourceSets {
+        // GRAPH A4R C1-C4 (§3 isolated merge branch): the Candidate B authority
+        // lane (RECONSTRUCTED SOURCE, lineage documented in
+        // candidate-b-base/CANDIDATE_B_SOURCE_MANIFEST.json) lives in the
+        // visible integration area candidate-b-base/ and is compiled INTO the
+        // app module through this srcDir — the first integration preserves the
+        // visible source lineage (the area may later move into the canonical
+        // app module; the manifest records every file's provenance).
+        getByName("main") {
+            java.srcDir("../candidate-b-base/app/src/main/java")
+        }
         // GRAPH 4 NODE 1: expose the shipped asset catalog to JVM unit tests so
         // CatalogIntegrityTest can audit the REAL production manifest (not a copy).
         getByName("test") {
@@ -147,6 +171,12 @@ dependencies {
 
     testImplementation(libs.junit)
     testImplementation(libs.kotlinx.coroutines.test)
+    // GRAPH A4R C1-C4: the Tower v2 lane (TowerApi/QrPayload/contract simulator)
+    // uses org.json, which is STUBBED in android.jar (methods throw
+    // "not mocked" on the JVM). The real org.json artifact shadows the stub
+    // for the unit-test classpath only — production (device) code is
+    // untouched and keeps the platform org.json. Public Domain license.
+    testImplementation("org.json:json:20240303")
 
     androidTestImplementation(platform(libs.compose.bom))
     androidTestImplementation(libs.androidx.test.ext.junit)

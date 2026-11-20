@@ -62,9 +62,11 @@ fun PairingRejectKind.toPairingEntryState(): PairingEntryState = when (this) {
     -> PairingEntryState.PAIRING_ENDPOINT_UNREACHABLE
 }
 
-/** Numeric pairing code truth: exactly 8 digits (Tower numeric-code shape). */
+/** Numeric pairing code truth: exactly 6 digits (C1-C4 mission §7 —
+ *  "six-digit numeric code"; supersedes the prior 8-digit executor assumption,
+ *  recorded as a contract delta request pending Tower confirmation). */
 object NumericPairingCode {
-    const val REQUIRED_LENGTH = 8
+    const val REQUIRED_LENGTH = 6
 
     /** Strips grouping separators and whitespace; null when anything else remains. */
     fun normalize(raw: String): String? {

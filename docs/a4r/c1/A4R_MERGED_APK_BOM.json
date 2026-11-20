@@ -1,0 +1,96 @@
+{
+  "schema": "a4r.merged_apk_bom/1.0",
+  "produced_utc": "2026-11-20T12:15:54Z",
+  "application_id": "com.hermestower.voiceconsole.a4rdebug",
+  "version": {
+    "name": "0.4.0-alpha-grapha4r-merged-b-base",
+    "code": 13,
+    "label": "GRAPH A4R MERGED B-BASE REPAIR"
+  },
+  "source": {
+    "branch": "graph-a4r/merge-with-b-base",
+    "entry": "d133087",
+    "final": "recorded in the delivery receipt after push"
+  },
+  "agp": "8.7.3",
+  "kotlin": "2.0.21",
+  "compile_sdk": 35,
+  "min_sdk": 30,
+  "target_sdk": 35,
+  "modules": [
+    "app (+ candidate-b-base/ integration area compiled into :app via srcDir)"
+  ],
+  "runtime_dependencies": [
+    {
+      "artifact": "androidx.compose.bom 2024.12.01 (ui/material3/icons)",
+      "license": "Apache-2.0"
+    },
+    {
+      "artifact": "androidx.activity.compose 1.9.3",
+      "license": "Apache-2.0"
+    },
+    {
+      "artifact": "androidx.navigation.compose 2.8.5",
+      "license": "Apache-2.0"
+    },
+    {
+      "artifact": "androidx.lifecycle 2.8.7",
+      "license": "Apache-2.0"
+    },
+    {
+      "artifact": "org.jetbrains.kotlinx coroutines 1.9.0",
+      "license": "Apache-2.0"
+    },
+    {
+      "artifact": "org.jetbrains.kotlinx serialization-json 1.7.3",
+      "license": "Apache-2.0"
+    },
+    {
+      "artifact": "com.microsoft.onnxruntime onnxruntime-android 1.20.0",
+      "license": "MIT"
+    },
+    {
+      "artifact": "com.alphacephei vosk-android 0.3.75",
+      "license": "Apache-2.0"
+    },
+    {
+      "artifact": "com.github.k2-fsa sherpa-onnx v1.12.24",
+      "license": "Apache-2.0"
+    },
+    {
+      "artifact": "dev.ffmpegkit-maintained llama-android 0.1.1",
+      "license": "MIT"
+    },
+    {
+      "artifact": "androidx.camera 1.4.2 (camera2/lifecycle/view)",
+      "license": "Apache-2.0"
+    },
+    {
+      "artifact": "com.google.mlkit barcode-scanning 17.3.0 (bundled on-device)",
+      "license": "ML Kit Terms (on-device, no Play Services round-trip)"
+    }
+  ],
+  "test_only_dependencies": [
+    {
+      "artifact": "junit 4.13.2",
+      "license": "EPL-1.0"
+    },
+    {
+      "artifact": "org.jetbrains.kotlinx coroutines-test 1.9.0",
+      "license": "Apache-2.0"
+    },
+    {
+      "artifact": "org.json:json 20240303 (JVM unit-test classpath only \u2014 shadows the android.jar stub)",
+      "license": "Public Domain"
+    },
+    {
+      "artifact": "androidx.test ext-junit 1.2.1 / runner 1.6.2 / rules 1.6.1 / espresso 3.6.1 / uiautomator 2.3.0",
+      "license": "Apache-2.0"
+    }
+  ],
+  "new_in_this_block": [
+    "org.json:json 20240303 (testImplementation only)",
+    "no new production dependency: the Tower v2 lane uses platform org.json + java.net.HttpURLConnection + AndroidKeyStore"
+  ],
+  "bundled_optional_runtimes": "unchanged from Package 9 (defer list honored; Tower-first flags all false)"
+}

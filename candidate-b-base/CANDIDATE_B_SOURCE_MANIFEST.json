@@ -1,0 +1,154 @@
+{
+  "schema": "a4r.candidate_b_source_manifest/1.0",
+  "produced_utc": "2026-11-20T11:43:18Z",
+  "owner": "Paolo Lombisani",
+  "mission": "GRAPH A4R CONTINUATION BLOCK C1-C4 - CP-A4R-C1-003",
+  "gate": {
+    "name": "CANDIDATE_B_ORIGINAL_SOURCE_BOUND_PASS",
+    "result": "BLOCKED_WITH_TYPED_EVIDENCE",
+    "blocker": "CANDIDATE_B_ORIGINAL_SOURCE_UNAVAILABLE",
+    "evidence": [
+      "GET /repos/Paolo83Ita/Hermes-Tower -> 404 Not Found (fresh read 2026-11-20, protected token = Owner account Paolo83Ita)",
+      "GET /users/Paolo83Ita/repos -> exactly 2 repositories: hermes-voice-console-android, mia-dashboard-bi (no Tower repo)",
+      "GET /search/repositories?q=user:Paolo83Ita+hermes -> total_count 1 (hermes-voice-console-android only)",
+      "No local checkout of the Tower repository in the execution environment (filesystem search: no android-voice-console source tree, no .bundle, no bare clone)",
+      "The prior session's intake (487d2a9, GRAPH4_TOWER_VPS_HANDOFF_READBACK.md) recorded the same finding on 2026-11-10 and typed the Owner action: create the canonical Tower repo from a git-bundle upload - NOT yet performed"
+    ],
+    "consequence": "The merge proceeds on the RECONSTRUCTED-SOURCE path (B's architecture as the base, implemented as fresh canonical code bound to B's forensic contract surface + the A2 repair package). Decompiled code is NOT copied into the application (mission section 1 honored: decompilation used only for forensic confirmation / behavioral-spec binding / provenance validation).",
+    "owner_action_to_unblock": "Upload the Hermes-Tower git bundle (or create Paolo83Ita/Hermes-Tower) so a later block can REBIND the integration area to the true original source and diff it against this reconstruction (semantic diff -> typed delta)."
+  },
+  "provenance_chain": {
+    "candidate_b_apk": {
+      "name": "HERMES_VOICE_CONSOLE_g4_app-debug.apk",
+      "sha256": "908b289f (prefix; full hash in docs/a4r/A4R_APK_FINGERPRINT_MATRIX.json)",
+      "byte_exact_handoff_artifact": true,
+      "source_lineage_recorded": "Paolo83Ita/Hermes-Tower apps/android-voice-console, commit assessed by the Tower account: ff9544bc",
+      "dex_inventory": "182 classes (a4r-staging/dex_b.json), 19 Kotlin source files"
+    },
+    "decompilation_use": [
+      "forensic confirmation of the crash root cause (A4R-P1-001, TowerStore.kt:35)",
+      "behavioral-spec binding for QrPayload/PairingFlow/DeviceKeys/TowerApi reconstruction",
+      "provenance validation (byte-exact handoff artifact)"
+    ],
+    "decompiled_code_copied_into_canonical_source": false
+  },
+  "integration_area": {
+    "path": "candidate-b-base/",
+    "gradle_binding": "app/build.gradle.kts sourceSets main java.srcDir(../candidate-b-base/app/src/main/java)",
+    "package_namespace": "com.hermestower.voiceconsole.{data,pairing,net,towerpair} (B's own namespaces; no collision with A's packages)",
+    "import_timestamp_utc": "2026-11-20T11:43:18Z",
+    "import_method": "fresh canonical implementation from the forensic contract surface + A2 repair package; files hashed at generation time"
+  },
+  "files": [
+    {
+      "path": "app/src/main/java/com/hermestower/voiceconsole/data/TowerStore.kt",
+      "sha256": "2d484769f4404996f06218a1fd53c33c5453ec37c6bb2750bd45a5d2ed3b2507",
+      "bytes": 19919,
+      "provenance_class": "A2_REPAIR_PACKAGE",
+      "forensic_evidence": "docs/a4r/keystore_repair/TowerStore.kt (A2, fresh executor-written repair, public-API-compatible replacement for B's crashed TowerStore.kt:35)",
+      "behavior_note": "Keystore A4R-P1-001 repair: explicit KeyGenParameterSpec, AES-256-GCM, randomized encryption, atomic commitPairing"
+    },
+    {
+      "path": "app/src/main/java/com/hermestower/voiceconsole/data/PairingPersistence.kt",
+      "sha256": "96e1ad20c3b54d664744ef9a2ca4e4a1afd03d44e61d028c726c936c3cefd697",
+      "bytes": 8602,
+      "provenance_class": "A2_REPAIR_PACKAGE_EXTENDED",
+      "forensic_evidence": "docs/a4r/keystore_repair/PairingPersistence.kt + C1-C4 mission section 4/5 typed states",
+      "behavior_note": "KeystoreFailure (7 mission states), TowerStoreKeystoreException, BlobFraming [len][iv][ct+tag], PairingStateStore seam + SIMULATED fake"
+    },
+    {
+      "path": "app/src/main/java/com/hermestower/voiceconsole/pairing/QrPayload.kt",
+      "sha256": "53a97daac0c18dc143de68fdae5aa60362883563a0b68e73994aaa24223e3f05",
+      "bytes": 8987,
+      "provenance_class": "RECONSTRUCTED_FROM_FORENSIC_SURFACE",
+      "forensic_evidence": "jadx_out/sources/com/hermestower/voiceconsole/pairing/QrPayload.java (behavioral spec only) + dex string pool (FORBIDDEN_FIELDS list, Italian messages)",
+      "behavior_note": "QR v2 parser: payload.signature shape, v==2, protocol_version voice-console/*, expires_at, resolveEndpoint, 10 forbidden fields"
+    },
+    {
+      "path": "app/src/main/java/com/hermestower/voiceconsole/pairing/DeviceKeys.kt",
+      "sha256": "7ff5ec3f82120abc666a928cd4577c051ace406fc503d0732e16e3b16afa8b0b",
+      "bytes": 4923,
+      "provenance_class": "RECONSTRUCTED_FROM_FORENSIC_SURFACE",
+      "forensic_evidence": "jadx_out/sources/com/hermestower/voiceconsole/pairing/DeviceKeys.java (behavioral spec only)",
+      "behavior_note": "EC-P256 AndroidKeyStore identity: alias hermes_voice_console_device_key, secp256r1, SHA256withECDSA, attestation metadata"
+    },
+    {
+      "path": "app/src/main/java/com/hermestower/voiceconsole/pairing/PairingFlow.kt",
+      "sha256": "eb0d7be6ee8681b3d9ac67916ea8b8d697591a54a144c2d229d3e304b9f8282b",
+      "bytes": 11418,
+      "provenance_class": "RECONSTRUCTED_FROM_FORENSIC_SURFACE+PATCH_NOTES",
+      "forensic_evidence": "jadx_out/.../PairingFlow.java (Step machine, signatures, freshPop) + docs/a4r/keystore_repair/PATCH_NOTES_PairingFlow.md",
+      "behavior_note": "Claimed/PendingOwnerAck/Registered/Failed state machine, hmacSha256Hex, claim->attest->owner-ack, REPAIRED persistence mapping, 120s challenge TTL"
+    },
+    {
+      "path": "app/src/main/java/com/hermestower/voiceconsole/net/TowerApi.kt",
+      "sha256": "2c77cb9769fbacad05d4d53b4795e90873e8d8e7e7534af0580911a9fefcdc9e",
+      "bytes": 14030,
+      "provenance_class": "RECONSTRUCTED_FROM_FORENSIC_SURFACE",
+      "forensic_evidence": "B dex string pool (18 live /api/tower/voice-console/v2/* routes, response keys claim_key/challenge/device_id/console_token/phrase) + CD-A4R-001",
+      "behavior_note": "18-endpoint v2 client with TowerHttp seam; pairing lanes production-real; capture/voice/archive lanes contract-complete"
+    },
+    {
+      "path": "app/src/main/java/com/hermestower/voiceconsole/towerpair/TowerPairingController.kt",
+      "sha256": "653c93cf484a6ace3d833cddcf3f25d1b40dcc7d9b27f3c9730443f85c4b111b",
+      "bytes": 8566,
+      "provenance_class": "MERGE_INTEGRATION_LAYER",
+      "forensic_evidence": "C1-C4 mission sections 7/8 (11 typed states) + A3 PairingEntryActions mapping",
+      "behavior_note": "Production orchestrator: resolveQr/resolveParsed/pair/awaitOwnerAcknowledgement/unpair + diagnostics (no secrets)"
+    },
+    {
+      "path": "app/src/main/java/com/hermestower/voiceconsole/pairing/TowerQrV2ScanFlow.kt",
+      "sha256": "95438141bbec3e9766616712ce16207461117575b608a226d3e5e6cfb2fa4ba2",
+      "bytes": 2746,
+      "provenance_class": "REUSE_AND_EXTEND",
+      "forensic_evidence": "canonical QrPairingScanFlow.kt semantics (Graph 4 proven state machine) bound to the v2 parser",
+      "behavior_note": "Debounce/terminal-detection/non-terminal-rejection scan machine for the production scanner"
+    }
+  ],
+  "contract_binding": {
+    "frozen_contract": "Tower voice-console/v2 (18 routes bound from the dex string pool + CD-A4R-001)",
+    "qr_v2_keys": [
+      "v",
+      "protocol_version",
+      "tower_instance_id",
+      "endpoint",
+      "pairing_id",
+      "scope",
+      "expires_at",
+      "transport_hint",
+      "nonce_ref"
+    ],
+    "forbidden_fields": [
+      "password",
+      "api_key",
+      "apikey",
+      "secret",
+      "token_secret",
+      "private_key",
+      "credential",
+      "bearer",
+      "refresh_token",
+      "access_token"
+    ],
+    "typed_pairing_states_B": [
+      "CLAIM_FAILED",
+      "CLAIM_REJECTED",
+      "CLAIM_RESPONSE_INCOMPLETE",
+      "ATTEST_FAILED",
+      "ATTEST_REJECTED",
+      "ATTEST_RESPONSE_INCOMPLETE"
+    ],
+    "typed_keystore_states_mission": [
+      "ANDROID_KEYSTORE_INITIALIZATION_FAILED",
+      "ANDROID_KEY_INVALIDATED",
+      "ANDROID_KEY_UNAVAILABLE",
+      "ENCRYPTED_STORE_CORRUPT",
+      "ENCRYPTED_STORE_AUTHENTICATION_FAILED",
+      "PAIRING_PERSISTENCE_FAILED",
+      "PAIRING_ABORTED_NO_STATE_COMMITTED"
+    ],
+    "numeric_code": "6 digits (mission section 7 supersedes the prior 8-digit executor claim - ANDROID_TOWER_CONTRACT_DELTA_REQUEST.json)",
+    "challenge_ttl_seconds": 120,
+    "open_field_hypotheses": "request-body keys (claim_code/device_label/pop_signature/device_public_key_pem/attestation_metadata) and ack response shape are typed hypotheses pinned by SIMULATED_CONTRACT_TEST and listed in ANDROID_TOWER_CONTRACT_DELTA_REQUEST.json for Tower confirmation"
+  }
+}

@@ -21,6 +21,7 @@ import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.rememberScrollState
 import androidx.compose.foundation.verticalScroll
 import androidx.compose.material3.Button
+import androidx.compose.material3.OutlinedTextField
 import androidx.compose.material3.Text
 import androidx.compose.material3.TextButton
 import androidx.compose.runtime.Composable
@@ -43,8 +44,11 @@ import com.google.mlkit.vision.barcode.BarcodeScanning
 import com.google.mlkit.vision.barcode.common.Barcode
 import com.google.mlkit.vision.common.InputImage
 import com.hermestower.voiceconsole.app.AppGraph
-import com.hermestower.voiceconsole.pairing.QrPairingScanFlow
-import com.hermestower.voiceconsole.pairing.toPairingEntryState
+import com.hermestower.voiceconsole.pairing.NumericPairingCode
+import com.hermestower.voiceconsole.pairing.TowerQrV2ScanFlow
+import com.hermestower.voiceconsole.towerpair.TowerPairingOutcome
+import com.hermestower.voiceconsole.towerpair.TowerPairingState
+import com.hermestower.voiceconsole.towerpair.toTowerPairingState
 import com.hermestower.voiceconsole.locale.StateLabels
 import com.hermestower.voiceconsole.ui.components.ResponsiveScreenHeader
 import com.hermestower.voiceconsole.ui.components.SectionCard
@@ -72,9 +76,17 @@ import com.hermestower.voiceconsole.ui.components.HermesFilledButton
  *  - every failure is a typed, visible state (permission denied,
  *    CAMERA_UNAVAILABLE) — no silent fallback, no pretend scanning.
  *
- * Pairing truth: a parsed payload pairs through the deterministic MOCK client
- * only; the result is labeled SIMULATED in the UI. Real pairing is Tower
- * Graph 1.7 authority — no endpoint is contacted from here.
+ * GRAPH A4R C1-C4 (CP-A4R-C1-008): the scanner is the PRODUCTION Tower
+ * pairing entry — it consumes the frozen voice-console/v2 contract through
+ * [TowerQrV2ScanFlow] + [TowerPairingController] (the B authority lane). The
+ * SIMULATED v1 candidate-scheme path is gone from production navigation: a
+ * parsed QR is claimed with the Tower's six-digit code, the Owner confirms
+ * the three-word phrase on the Tower console, and the pairing state is
+ * committed atomically by the repaired AndroidKeyStore-backed store.
+ *
+ * Typed states are EXACTLY the mission section 8 list; camera permission
+ * denial (including permanently-denied) and camera unavailability are typed,
+ * never silent. No stack trace ever reaches this screen.
  */
 @Composable
 fun QrScannerScreen(graph: AppGraph, onBack: () -> Unit) {
@@ -88,16 +100,46 @@ fun QrScannerScreen(graph: AppGraph, onBack: () -> Unit) {
             context.checkSelfPermission(Manifest.permission.CAMERA) == PackageManager.PERMISSION_GRANTED,
         )
     }
-    var permissionDenied by remember { mutableStateOf(false) }
+    // Mission §8 typed camera states (not booleans): DENIED vs PERMANENTLY_DENIED
+    // (the OS stopped showing the rationale = "don't ask again"), rendered via
+    // the §23 localized StateLabels table.
+    var permissionDeniedPermanent by remember { mutableStateOf(false) }
     val permissionLauncher = rememberLauncherForActivityResult(ActivityResultContracts.RequestPermission()) { granted ->
         hasPermission = granted
-        permissionDenied = !granted
+        if (!granted) {
+            val activity = context as? android.app.Activity
+            val showsRationale = activity?.let {
+                androidx.core.app.ActivityCompat.shouldShowRequestPermissionRationale(it, Manifest.permission.CAMERA)
+            } == true
+            // After a refusal: rationale visible => plain denial; rationale gone
+            // => the OS marked it permanent ("never ask again").
+            permissionDeniedPermanent = !showsRationale
+        }
     }
 
-    val scanFlow = remember { QrPairingScanFlow(graph.pairingPayloadParser) }
-    var scanState by remember { mutableStateOf<QrPairingScanFlow.ScanState>(QrPairingScanFlow.ScanState.Idle) }
+    val scanFlow = remember { TowerQrV2ScanFlow(graph.towerQrParser) }
+    var scanState by remember { mutableStateOf<TowerQrV2ScanFlow.ScanState>(TowerQrV2ScanFlow.ScanState.Idle) }
     var cameraError by remember { mutableStateOf<String?>(null) }
+    // ---- production pairing state (Tower v2 contract) ----
+    var resolvedEndpoint by remember { mutableStateOf<String?>(null) }
+    var resolvedPairingId by remember { mutableStateOf<String?>(null) }
+    var manualEndpointInput by remember { mutableStateOf("") }
+    var manualEndpointVisible by remember { mutableStateOf(false) }
+    var numericCodeInput by remember { mutableStateOf("") }
+    var numericCodeInvalid by remember { mutableStateOf(false) }
+    var pairingBusy by remember { mutableStateOf(false) }
     var pairingLine by remember { mutableStateOf<String?>(null) }
+    var awaitingAck by remember { mutableStateOf(false) }
+    var registeredDeviceId by remember { mutableStateOf<String?>(null) }
+    var typedReject by remember { mutableStateOf<TowerPairingState?>(null) }
+    var typedRejectDetail by remember { mutableStateOf<String?>(null) }
+
+    val localeTag = com.hermestower.voiceconsole.locale.AppLanguage.effectiveTag(context)
+    fun typedStateLine(state: TowerPairingState): String = context.getString(
+        com.hermestower.voiceconsole.R.string.qr_typed_state_fmt,
+        StateLabels.label(state.name, localeTag),
+    )
+
 
     Column(
         Modifier
@@ -122,10 +164,18 @@ fun QrScannerScreen(graph: AppGraph, onBack: () -> Unit) {
                     stringResource(com.hermestower.voiceconsole.R.string.qr_permission_note),
                     style = HermesType.bodySecondary, color = c.textSecondary,
                 )
-                if (permissionDenied) {
+                // Mission §8: BOTH denial states are typed and surfaced.
+                Text(
+                    typedStateLine(
+                        if (permissionDeniedPermanent) TowerPairingState.CAMERA_PERMISSION_PERMANENTLY_DENIED
+                        else TowerPairingState.CAMERA_PERMISSION_DENIED,
+                    ),
+                    style = HermesType.body, color = c.textPrimary,
+                )
+                if (permissionDeniedPermanent) {
                     Text(
-                        stringResource(com.hermestower.voiceconsole.R.string.qr_permission_refused),
-                        style = HermesType.body, color = c.textInfo,
+                        stringResource(com.hermestower.voiceconsole.R.string.qr_v2_perm_permanent_note),
+                        style = HermesType.bodySecondary, color = c.textSecondary,
                     )
                 }
                 HermesFilledButton(onClick = { permissionLauncher.launch(Manifest.permission.CAMERA) }) {
@@ -194,27 +244,20 @@ fun QrScannerScreen(graph: AppGraph, onBack: () -> Unit) {
 
                 SectionCard(title = stringResource(com.hermestower.voiceconsole.R.string.qr_result_card)) {
                     when (val s = scanState) {
-                        is QrPairingScanFlow.ScanState.Idle, is QrPairingScanFlow.ScanState.Scanning ->
+                        is TowerQrV2ScanFlow.ScanState.Idle, is TowerQrV2ScanFlow.ScanState.Scanning ->
                             Text(
-                                stringResource(com.hermestower.voiceconsole.R.string.qr_looking_fmt, scanFlow.framesAnalyzed),
+                                stringResource(com.hermestower.voiceconsole.R.string.qr_v2_looking_fmt, scanFlow.framesAnalyzed),
                                 style = HermesType.bodySecondary, color = c.textSecondary,
                             )
 
-                        is QrPairingScanFlow.ScanState.Rejected -> {
+                        is TowerQrV2ScanFlow.ScanState.Rejected -> {
+                            val missionState = s.reject.kind.toTowerPairingState()
                             Text(
                                 stringResource(com.hermestower.voiceconsole.R.string.qr_refused_fmt, s.reject.kind, s.reject.detail),
                                 style = HermesType.body, color = c.textInfo,
                             )
-                            // A4R NODE A3: the mission typed state, surfaced explicitly
-                            // (§23 discipline: localized label, never a raw enum).
                             Text(
-                                stringResource(
-                                    com.hermestower.voiceconsole.R.string.qr_typed_state_fmt,
-                                    StateLabels.label(
-                                        s.reject.kind.toPairingEntryState().name,
-                                        com.hermestower.voiceconsole.locale.AppLanguage.effectiveTag(context),
-                                    ),
-                                ),
+                                typedStateLine(missionState),
                                 style = HermesType.body, color = c.textPrimary,
                             )
                             Text(
@@ -223,32 +266,121 @@ fun QrScannerScreen(graph: AppGraph, onBack: () -> Unit) {
                             )
                             TextButton(onClick = {
                                 scanFlow.reset()
-                                scanState = QrPairingScanFlow.ScanState.Idle
+                                scanState = TowerQrV2ScanFlow.ScanState.Idle
                             }) { Text(stringResource(com.hermestower.voiceconsole.R.string.qr_scan_again)) }
                         }
 
-                        is QrPairingScanFlow.ScanState.Detected -> {
-                            Text(stringResource(com.hermestower.voiceconsole.R.string.qr_accepted), style = HermesType.body, color = c.textPrimary)
-                            Text(s.summary, style = HermesType.bodySecondary, color = c.textSecondary)
-                            Text(
-                                stringResource(com.hermestower.voiceconsole.R.string.qr_mock_note),
-                                style = HermesType.bodySecondary, color = c.textSecondary,
-                            )
-                            HermesFilledButton(
-                                onClick = {
-                                    scope.launch {
-                                        pairingLine = context.getString(com.hermestower.voiceconsole.R.string.qr_pairing_progress)
-                                        val phrase = "OWNER-CONSOLE"
-                                        pairingLine = when (val r = graph.mockTowerPairingClient.pair(s.payload, phrase)) {
-                                            is com.hermestower.voiceconsole.pairing.PairingResult.Success ->
-                                                context.getString(com.hermestower.voiceconsole.R.string.qr_result_ok_fmt, r.sessionId, r.matchPhrase)
-                                            is com.hermestower.voiceconsole.pairing.PairingResult.Failure ->
-                                                context.getString(com.hermestower.voiceconsole.R.string.qr_result_fail_fmt, r.kind, r.detail)
+                        is TowerQrV2ScanFlow.ScanState.Detected -> {
+                            // GRAPH A4R C1-C4: REAL pairing — no SIMULATED label
+                            // anywhere on this path (NO_MOCK_PAIRING_IN_PRODUCTION_PATH).
+                            val manualEndpoint = manualEndpointInput.trim().takeIf { it.isNotEmpty() }
+                            when (val r = graph.towerPairingController.resolveParsed(s.parsed, manualEndpoint)) {
+                                is com.hermestower.voiceconsole.towerpair.TowerQrResolution.Rejected -> {
+                                    Text(typedStateLine(r.state), style = HermesType.body, color = c.textPrimary)
+                                    Text(r.detail, style = HermesType.body, color = c.textInfo)
+                                    // Mission §8 advanced fallback: manual endpoint entry.
+                                    if (!manualEndpointVisible) {
+                                        TextButton(onClick = { manualEndpointVisible = true }) {
+                                            Text(stringResource(com.hermestower.voiceconsole.R.string.qr_v2_manual_endpoint_action))
                                         }
+                                    } else {
+                                        OutlinedTextField(
+                                            value = manualEndpointInput,
+                                            onValueChange = { manualEndpointInput = it },
+                                            label = { Text(stringResource(com.hermestower.voiceconsole.R.string.qr_v2_manual_endpoint_label)) },
+                                            singleLine = true,
+                                            modifier = Modifier.fillMaxWidth(),
+                                        )
                                     }
-                                },
-                            ) { Text(stringResource(com.hermestower.voiceconsole.R.string.qr_pair_button)) }
-                            pairingLine?.let { Text(it, style = HermesType.body, color = c.textInfo) }
+                                }
+                                is com.hermestower.voiceconsole.towerpair.TowerQrResolution.Resolved -> {
+                                    Text(stringResource(com.hermestower.voiceconsole.R.string.qr_v2_accepted), style = HermesType.body, color = c.textPrimary)
+                                    Text(r.summary, style = HermesType.bodySecondary, color = c.textSecondary)
+                                    Text(
+                                        stringResource(com.hermestower.voiceconsole.R.string.qr_v2_contract_note),
+                                        style = HermesType.bodySecondary, color = c.textSecondary,
+                                    )
+                                    OutlinedTextField(
+                                        value = numericCodeInput,
+                                        onValueChange = { if (it.length <= NumericPairingCode.REQUIRED_LENGTH) numericCodeInput = it },
+                                        label = { Text(stringResource(com.hermestower.voiceconsole.R.string.qr_v2_code_label)) },
+                                        isError = numericCodeInvalid,
+                                        singleLine = true,
+                                        keyboardOptions = androidx.compose.foundation.text.KeyboardOptions(
+                                            keyboardType = androidx.compose.ui.text.input.KeyboardType.NumberPassword,
+                                        ),
+                                        modifier = Modifier.fillMaxWidth(),
+                                    )
+                                    if (numericCodeInvalid) {
+                                        Text(
+                                            stringResource(com.hermestower.voiceconsole.R.string.qr_v2_code_invalid),
+                                            style = HermesType.body, color = c.textInfo,
+                                        )
+                                    }
+                                    val alreadyRegistered = registeredDeviceId != null
+                                    HermesFilledButton(
+                                        enabled = !pairingBusy && !alreadyRegistered,
+                                        onClick = {
+                                            val normalized = NumericPairingCode.normalize(numericCodeInput)
+                                            if (normalized == null) {
+                                                numericCodeInvalid = true
+                                            } else {
+                                                numericCodeInvalid = false
+                                                pairingBusy = true
+                                                pairingLine = null
+                                                typedReject = null
+                                                typedRejectDetail = null
+                                                scope.launch {
+                                                    try {
+                                                        var outcome = graph.towerPairingController.pair(r.endpoint, r.pairingId, normalized, null)
+                                                        if (outcome is TowerPairingOutcome.AwaitingOwnerAck) {
+                                                            awaitingAck = true
+                                                            outcome.phraseHint?.let { phrase ->
+                                                                pairingLine = context.getString(
+                                                                    com.hermestower.voiceconsole.R.string.qr_v2_awaiting_fmt, phrase,
+                                                                )
+                                                            }
+                                                            outcome = graph.towerPairingController.awaitOwnerAcknowledgement()
+                                                            awaitingAck = false
+                                                        }
+                                                        when (outcome) {
+                                                            is TowerPairingOutcome.Registered -> {
+                                                                registeredDeviceId = outcome.deviceId
+                                                                pairingLine = context.getString(
+                                                                    com.hermestower.voiceconsole.R.string.qr_v2_registered_fmt, outcome.deviceId,
+                                                                )
+                                                            }
+                                                            is TowerPairingOutcome.Rejected -> {
+                                                                typedReject = outcome.state
+                                                                typedRejectDetail = outcome.detail
+                                                            }
+                                                            else -> Unit
+                                                        }
+                                                    } finally {
+                                                        pairingBusy = false
+                                                    }
+                                                }
+                                            }
+                                        },
+                                    ) {
+                                        Text(stringResource(
+                                            if (alreadyRegistered) com.hermestower.voiceconsole.R.string.qr_v2_paired_done
+                                            else com.hermestower.voiceconsole.R.string.qr_v2_pair_button,
+                                        ))
+                                    }
+                                    if (pairingBusy || awaitingAck) {
+                                        Text(
+                                            stringResource(com.hermestower.voiceconsole.R.string.qr_v2_progress),
+                                            style = HermesType.bodySecondary, color = c.textSecondary,
+                                        )
+                                    }
+                                    pairingLine?.let { Text(it, style = HermesType.body, color = c.textInfo) }
+                                    typedReject?.let { state ->
+                                        Text(typedStateLine(state), style = HermesType.body, color = c.textPrimary)
+                                        typedRejectDetail?.let { Text(it, style = HermesType.body, color = c.textInfo) }
+                                    }
+                                }
+                            }
                         }
                     }
                 }
