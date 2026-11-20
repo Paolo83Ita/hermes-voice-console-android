@@ -2211,3 +2211,15 @@ this session, evidence-first, icon never trusted:
   68/501/0, lint 0e/73w, 3 APKs 0.3.9/12 ×3 — convergence record folded
   into GRAPH414_PACKAGE9_CONTINUATION_READBACK.md; E2E #197 recorded
   honestly as the standing-family carry-over (docs-only tip, §17/§31).
+
+## 2026-11-20 — HANDOFF-TOWER-VPS-001 intake (Tower VPS migration contract)
+
+Fresh reads: Tower endpoint UP (auth-gated), canonical Tower GitHub remote
+ABSENT under the Owner account (4 probes), commit 296dd83e unreachable, VPS
+plane unverified (no channel). Third Android-client fingerprint typed
+(handoff 908b289f… vs Package 9 bc79ced6…90e8 vs v0.1 f7a76735…) — no
+component reclassified, no code changed. Owner steps: bundle upload for the
+canonical push; Xiaomi install/open/first-screen evidence. Docs-only.
+(Intake initially landed on a stale recycled-sandbox base afefd3d — push
+honestly rejected as non-FF; re-applied on the remote authority e574112,
+ff-only, no force-push.)
