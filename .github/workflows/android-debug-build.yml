@@ -37,6 +37,17 @@ jobs:
       - name: Set up Gradle caching
         uses: gradle/actions/setup-gradle@v4
 
+      # GRAPH A4R C1-C4 infra repair (typed evidence: runs 44734438148 +
+      # 44745512302 both failed with 'Could not find org.jetbrains.kotlin:
+      # kotlin-reflect:1.9.23' — an artifact that EXISTS on Maven Central;
+      # Gradle caches missing-module resolution state for 24h, so a network
+      # blip during the first failure poisons the saved cache and every
+      # restored cache inherits it instantly (~27s failure, zero network
+      # attempts). Bounded honest repair: clear ONLY the resolution-metadata
+      # cache after restore — the artifact binary cache stays.
+      - name: Clear poisoned missing-module resolution state (infra repair)
+        run: rm -rf ~/.gradle/caches/modules-2/metadata-* 2>/dev/null || true
+
       - name: Build debug APK and run unit tests
         # R-27 (run #143 @ afefd3d — BOTH lanes died in 4 min, death #14, on
         # `ItalianGateSupport.kt:412:38 Unresolved reference 'click'`): the
