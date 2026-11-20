@@ -125,7 +125,7 @@ class PairingEntryExecutor(
                 PairingEntryState.QR_NOT_RECOGNIZED,
                 "numeric code must be exactly ${NumericPairingCode.REQUIRED_LENGTH} digits",
             )
-        val validated = ManualEndpoint.validate(endpoint)
+        val validated = ManualEndpoint.validate(endpoint).getOrNull()
             ?: return PairingEntryOutcome.Rejected(
                 PairingEntryState.PAIRING_ENDPOINT_UNREACHABLE,
                 "endpoint shape rejected (https://host required)",
@@ -134,7 +134,7 @@ class PairingEntryExecutor(
     }
 
     suspend fun pairManualEndpoint(endpoint: String): PairingEntryOutcome {
-        val validated = ManualEndpoint.validate(endpoint)
+        val validated = ManualEndpoint.validate(endpoint).getOrNull()
             ?: return PairingEntryOutcome.Rejected(
                 PairingEntryState.PAIRING_ENDPOINT_UNREACHABLE,
                 "endpoint shape rejected (https://host required)",

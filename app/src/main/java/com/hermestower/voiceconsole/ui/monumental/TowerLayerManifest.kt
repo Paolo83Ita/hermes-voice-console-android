@@ -66,7 +66,7 @@ object TowerLayerManifest {
 
     val architecture = TowerLayerSpec("tower414_architecture", 0, 0, 680, 963, 340, 481, Z_ARCHITECTURE, "tower414_architecture", Anchor.TOP_START)
     val crownSign = TowerLayerSpec("tower414_crown_sign", 102, 29, 476, 187, 340, 122, Z_CROWN_SIGN, "tower414_crown_sign", Anchor.TOP_START)
-    val ringOuter = TowerLayerSpec("tower414_ring_outer", 122, 289, 435, 298, 340, 438, Z_RING_OUTER, "tower414_ring_outer", Anchor.TOP_START)
+    val ringOuter = TowerLayerSpec("tower414_ring_outer", 122, 289, 435, 298, 339, 438, Z_RING_OUTER, "tower414_ring_outer", Anchor.TOP_START)
     val ringMiddle = TowerLayerSpec("tower414_ring_middle", 180, 327, 320, 226, 340, 440, Z_RING_MIDDLE, "tower414_ring_middle", Anchor.TOP_START)
     val ringInner = TowerLayerSpec("tower414_ring_inner", 252, 371, 177, 149, 340, 445, Z_RING_INNER, "tower414_ring_inner", Anchor.TOP_START)
     val portal = TowerLayerSpec("tower414_portal", 204, 679, 272, 212, 340, 785, Z_PORTAL, "tower414_portal", Anchor.TOP_START)
