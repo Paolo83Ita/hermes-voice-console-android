@@ -1,0 +1,33 @@
+{
+ "schema": "a4r.qwen25_artifact_provenance/1.0",
+ "produced_utc": "2026-11-21T05:05:00Z",
+ "identity": {
+  "model_id": "org.qwen.qwen2.5-0.5b-instruct.q5-k-m",
+  "display_name": "Qwen2.5 0.5B Instruct (GGUF q5_k_m)",
+  "version": "q5_k_m@9217f5db",
+  "exact_repository": "https://huggingface.co/Qwen/Qwen2.5-0.5B-Instruct-GGUF",
+  "revision": "commit 9217f5db79a29953eb74d5343926648285ec7e67",
+  "filename": "qwen2.5-0.5b-instruct-q5_k_m.gguf",
+  "format": "gguf",
+  "quantization": "q5_k_m",
+  "download_size_bytes": 522186592,
+  "sha256": "041474553fcabfc2a2d67903f9d2c2e50bd92528e670da4f33b5d0ce6e59fd55",
+  "license": "Apache-2.0",
+  "provider": "Qwen (Alibaba) — Qwen2.5 series",
+  "runtime": "dev.ffmpegkit-maintained:llama-android:0.1.1 (llama.cpp b9878, arm64-v8a, MIT) — INTEGRATED (CP-G4.14-005)",
+  "classification": "VERIFIED_DOWNLOADABLE, OPTIONAL (TOWER_FIRST/HYBRID; never auto-loaded)"
+ },
+ "binding_evidence": {
+  "catalog": "app/src/main/assets/models/voice_pack_catalog.json entry org.qwen.qwen2.5-0.5b-instruct.q5-k-m (manifestVersion 2.0.0)",
+  "size_binding": "catalog downloadSizeBytes 522186592 == live x-linked-size response header 522186592 (exact match)",
+  "hash_binding": "catalog sha256 == SHA-256 read from Hugging Face LFS metadata for the pinned commit (recorded 2026-11-02 in the app's own provenance note; re-derivation from a full download belongs to the M6 gate)",
+  "license": "Apache-2.0 (LICENSE blob at the pinned commit; URL carried in the catalog)",
+  "runtime_binding": "llama-android 0.1.1 AAR sha256 fdccf04c…7501 inspected (CP-G4.14-005); on-device RUNTIME_RESOLVED → RUNTIME_AVAILABLE ladder still pending (recorded in the app UI)"
+ },
+ "minimum_free_storage": "522186592 bytes (download gate) ; preflight requires free >= 522186592 + max(INSTALL_RESERVE_BYTES, 15% of free)",
+ "temporary_peak_storage": "522186592 (temp .part) + 522186592 (installed copy after atomic promotion) ≈ 1.04 GB peak before cleanup",
+ "destination": "filesDir/models/llm/qwen25-05b/",
+ "download_mechanism": "in-app HttpURLConnection pipeline (no DownloadManager), resumable via positioned-channel partial (.part), bounded retry + one mirror fallback",
+ "rollback_path": "partial quarantined on hash mismatch; atomic install preserves previous version; removal releases storage (catalog field removal supported)",
+ "provenance_class": "VERIFIED_DOWNLOADABLE (upstream public, revision-bound URL, license known)"
+}

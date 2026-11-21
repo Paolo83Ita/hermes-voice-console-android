@@ -1,0 +1,15 @@
+{
+ "schema": "a4r.qwen25_resource_envelope/1.0",
+ "produced_utc": "2026-11-21T05:05:00Z",
+ "download_bytes": 522186592,
+ "installed_bytes": 522186592,
+ "peak_bytes": 1044373184,
+ "ram_estimate_bytes": 1073741824,
+ "preflight_formula": "required = download_bytes + max(reserveBytes, floor(free/100*15)) ; reserveBytes = INSTALL_RESERVE_BYTES (DefaultVoicePackResolver)",
+ "gatekeeper_formula": "block if 0 <= freeStorageBytes < download_bytes (reserve excluded; final check at preflight)",
+ "untested_items": {
+  "device_free_storage_at_failure": "OWNER_REPORTED_PENDING",
+  "cdn_edge_behavior_on_device_network": "NOT_EXPOSED (device-side)",
+  "full_download_sha256_rederivation": "NOT_EXERCISED_LANESIDE (probe-only; full-fetch belongs to M6)"
+ }
+}

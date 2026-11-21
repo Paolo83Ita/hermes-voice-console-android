@@ -1,0 +1,79 @@
+{
+ "schema": "a4r.tower_handoff_request/1.0",
+ "id": "HR-A4R-PHYS-001",
+ "produced_utc": "2026-11-21T05:05:00Z",
+ "from": "Android executor lane (graph-a4r/merge-with-b-base)",
+ "to": "Tower account (via Owner handoff)",
+ "secrets_included": "NONE",
+ "context": "Owner-reported P1 failures on the installed A4R debug APK (QR pairing endpoint unreachable from the phone; recorded separately: Qwen optional-model download lane). Lane probes are read-only; no pairing was created; no QR content is included.",
+ "answers_requested": [
+  {
+   "id": "HQ-1",
+   "question": "What endpoint does the live Tower wizard embed in the QR payload 'endpoint' field (scheme + host class only, e.g. https://public-host / http://LAN-IP:port / Tailscale host)?",
+   "why": "Decides the pairing reachability repair class (LAN vs tailnet vs public plane); no secret values needed"
+  },
+  {
+   "id": "HQ-2",
+   "question": "Confirm the live runtime serves GET /api/tower/voice-console/v2/pairings/{id}/ack. Lane probe on 2026-11-21 returned catch-all 404 'No such API endpoint' — the Android client implements this route for PendingOwnerAck.",
+   "why": "AMB-8 contract delta decision; without it the bilateral-confirmation lane cannot work"
+  },
+  {
+   "id": "HQ-3",
+   "question": "Confirm the claim/attest success response envelope: top-level {ok:true, claim_key, challenge, device_id, phrase_hint}? Lane probe showed failures are returned as HTTP 200 {ok:false,error:'PAIRING_NOT_FOUND_OR_EXPIRED'}.",
+   "why": "AMB-9: the Android client reads top-level claim_key/device_id directly and would mislabel ok:false responses as incomplete"
+  },
+  {
+   "id": "HQ-4",
+   "question": "Tower-side trace patterns to request when the Owner retries pairing after the V2 repair (request route + correlation id field), so a phone-side transport failure can be separated from a server-side rejection",
+   "why": "Safe diagnostics alignment; no challenge or secret values"
+  },
+  {
+   "id": "HQ-5",
+   "question": "Tower runtime version/commit currently serving hermestower.aclclouds.online (last lane record: ff9544bc)",
+   "why": "Contract surface binding"
+  }
+ ],
+ "observed_server_surface": [
+  {
+   "probe": "DNS hermestower.aclclouds.online",
+   "result": "141.11.237.119",
+   "verdict": "RESOLVES"
+  },
+  {
+   "probe": "TLS https://hermestower.aclclouds.online",
+   "result": "Let's Encrypt cert CN=hermestower.aclclouds.online, valid 2026-11-12 → 2027-02-10, verify=0",
+   "verdict": "TLS HEALTHY"
+  },
+  {
+   "probe": "GET /",
+   "result": "302 → /login?next=%2F",
+   "verdict": "PLANE ALIVE"
+  },
+  {
+   "probe": "GET /api/tower/voice-console/v2/pairings/a4r-probe-nonexistent/ack",
+   "result": "404 {\"detail\":\"No such API endpoint: /api/tower/voice-console/v2/pairings/a4r-probe-nonexistent/ack\"}",
+   "verdict": "ROUTE ABSENT (catch-all 404)"
+  },
+  {
+   "probe": "POST /api/tower/voice-console/v2/pairings/a4r-probe-nonexistent/claim body {}",
+   "result": "200 {\"ok\":false,\"error\":\"PAIRING_NOT_FOUND_OR_EXPIRED\"}",
+   "verdict": "ROUTE EXISTS (validation reached; fake id rejected in-band)"
+  },
+  {
+   "probe": "POST /api/tower/voice-console/v2/pairings/a4r-probe-nonexistent/attest body {}",
+   "result": "200 {\"ok\":false,\"error\":\"PAIRING_NOT_FOUND_OR_EXPIRED\"}",
+   "verdict": "ROUTE EXISTS"
+  },
+  {
+   "probe": "GET /openapi.json, /docs",
+   "result": "302 → /login",
+   "verdict": "SCHEMA NOT PUBLIC"
+  },
+  {
+   "probe": "GET /api/openapi.json",
+   "result": "401 {\"error\":\"unauthenticated\",\"reason\":\"no_cookie\",\"login_url\":\"/login\"}",
+   "verdict": "SCHEMA AUTH-GATED"
+  }
+ ],
+ "rule": "Tower server code is NOT modified from the Android account; all divergences are versioned contract delta requests (CD-A4R-C1-001 style)"
+}

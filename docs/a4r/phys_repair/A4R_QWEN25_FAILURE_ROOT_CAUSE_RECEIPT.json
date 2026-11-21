@@ -1,0 +1,35 @@
+{
+ "schema": "a4r.qwen25_failure_root_cause_receipt/1.0",
+ "produced_utc": "2026-11-21T05:05:00Z",
+ "finding_id": "A4R-PHYS-MODEL-002",
+ "priority": "P1",
+ "typed_state_on_device": "MODEL_DOWNLOAD_FAILED (immediate; exact app error string pending Owner evidence)",
+ "gate_reclassification": {
+  "QWEN_2_5_MODEL_DOWNLOAD_PASS": "FAIL"
+ },
+ "root_cause_statement": "The exact artifact is public, revision-bound, size- and hash-consistent (lane-proven). The device-side failure is immediate (no visible progress per Owner report). Two evidence-ranked candidates survive: (A) HF/CDN edge rejection on the device network (the lane itself received HTTP 429 challenge pages from the same edge), or (B) storage preflight/gate (needed 522,186,592 bytes + reserve). The app writes a DISTINCT typed error string for each path — the Owner's exact error text completes the proof without any guessing.",
+ "evidence": {
+  "lane_probe": {
+   "resolve_url": "https://huggingface.co/Qwen/Qwen2.5-0.5B-Instruct-GGUF/resolve/9217f5db79a29953eb74d5343926648285ec7e67/qwen2.5-0.5b-instruct-q5_k_m.gguf",
+   "redirect_chain": "huggingface.co → us.aws.cdn.hf.co/xet-bridge-us (signed GET, Expires parameter)",
+   "x_linked_size": 522186592,
+   "anonymous_access": true,
+   "note": "repeated lane HEAD probes received HTTP 429 HTML challenge from the HF edge — edge throttling/challenge on this route is REAL (supports SURVIVING_CANDIDATE_A)"
+  },
+  "client_static": [
+   "ModelDownloadManager.kt (preflight IOException; redirect walk; HTTP <code> mapping; mirror fallback)",
+   "ModelStorageManager.kt (reserve = max(reserveBytes, 15% of free))",
+   "DownloadGatekeeper.kt (offline/thermal/storage gates)",
+   "ModelManagerScreen.kt (DOWNLOAD action passes entry.sourceUri directly)"
+  ],
+  "prior_physical_history": "same download failed on POCO X6 Pro in an earlier block ('errore di connessione'); repairs then: UA added, explicit redirect walk, true-offset resume, mirror fallback — the A4R APK inherits those repairs"
+ },
+ "repair_plan": [
+  "R1: ONCE the error class is proven — targeted fix: (A) CDN-edge: retry policy already bounded; add typed 429/403 message + guidance (network change) and probe-test alternative mirror ordering; (B) storage: keep the typed message, add free-space display in the model card before download",
+  "R2: extend the secret-clean diagnostics export with model manifest ID, filename, expected size/hash, URL host/path classification, HTTP status, DownloadManager/client state, destination authority, checksum state, retry state, available storage (mission section 2 list)",
+  "R3: contract fixtures + unit tests for the proven class; instrumentation for interrupt/resume/hash gates",
+  "R4: NO simulated progress, NO pre-declared downloaded state, NO silent model fallback"
+ ],
+ "tower_first_note": "failure does NOT block Tower pairing or voice (OPTIONAL component) — but it is a P1 finding for the model library lane",
+ "blocked_until": "Owner evidence → targeted repair → V2 APK → M1-M9 mini-gate"
+}

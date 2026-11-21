@@ -1,0 +1,83 @@
+{
+ "schema": "a4r.qr_failure_root_cause_receipt/1.0",
+ "produced_utc": "2026-11-21T05:05:00Z",
+ "finding_id": "A4R-PHYS-QR-001",
+ "priority": "P1",
+ "typed_state_on_device": "PAIRING_ENDPOINT_UNREACHABLE",
+ "gate_reclassification": {
+  "QR_V2_SCAN_PASS": "NOT_PROVEN (parse observed working on device; gate not certified)",
+  "PAIRING_CLAIM_START_PASS": "FAIL_OR_BLOCKED",
+  "XIAOMI_KEYSTORE_PAIRING_REPAIR_PASS": "NOT_DERIVABLE (persistence layer never reached)",
+  "GRAPH_A4R_PASS": false
+ },
+ "root_cause_statement": "The pairing claim request failed at the TRANSPORT layer before any HTTP response (typed IOException → NETWORK_UNREACHABLE → PAIRING_ENDPOINT_UNREACHABLE). The live Tower public plane (hermestower.aclclouds.online) is healthy and serves the v2 claim and attest routes, so the endpoint carried by the QR was not reachable from the phone (4G cellular at failure time). Surviving classes: LAN-only endpoint, Tailscale-only endpoint, cleartext-http endpoint (blocked by Android NSC), private-TLS endpoint. Exact class pending one piece of Owner/Tower evidence.",
+ "evidence": {
+  "owner_screenshots": [
+   "Screenshot_2026-11-20-16-51-35-674_com.hermestower.voiceconsole.a4rdebug.jpg",
+   "Screenshot_2026-11-20-16-53-36-260_com.hermestower.voiceconsole.a4rdebug.jpg"
+  ],
+  "client_static": [
+   "candidate-b-base/.../net/TowerApi.kt (IOException→NETWORK_UNREACHABLE)",
+   "candidate-b-base/.../pairing/PairingFlow.kt (mapApiException→PAIRING_ENDPOINT_UNREACHABLE, detail 'Tower non raggiungibile')",
+   "candidate-b-base/.../pairing/QrPayload.kt (endpoint verbatim, no https enforcement)",
+   "app network_security_config.xml (cleartext only loopback)"
+  ],
+  "lane_probes": [
+   {
+    "probe": "DNS hermestower.aclclouds.online",
+    "result": "141.11.237.119",
+    "verdict": "RESOLVES"
+   },
+   {
+    "probe": "TLS https://hermestower.aclclouds.online",
+    "result": "Let's Encrypt cert CN=hermestower.aclclouds.online, valid 2026-11-12 → 2027-02-10, verify=0",
+    "verdict": "TLS HEALTHY"
+   },
+   {
+    "probe": "GET /",
+    "result": "302 → /login?next=%2F",
+    "verdict": "PLANE ALIVE"
+   },
+   {
+    "probe": "GET /api/tower/voice-console/v2/pairings/a4r-probe-nonexistent/ack",
+    "result": "404 {\"detail\":\"No such API endpoint: /api/tower/voice-console/v2/pairings/a4r-probe-nonexistent/ack\"}",
+    "verdict": "ROUTE ABSENT (catch-all 404)"
+   },
+   {
+    "probe": "POST /api/tower/voice-console/v2/pairings/a4r-probe-nonexistent/claim body {}",
+    "result": "200 {\"ok\":false,\"error\":\"PAIRING_NOT_FOUND_OR_EXPIRED\"}",
+    "verdict": "ROUTE EXISTS (validation reached; fake id rejected in-band)"
+   },
+   {
+    "probe": "POST /api/tower/voice-console/v2/pairings/a4r-probe-nonexistent/attest body {}",
+    "result": "200 {\"ok\":false,\"error\":\"PAIRING_NOT_FOUND_OR_EXPIRED\"}",
+    "verdict": "ROUTE EXISTS"
+   },
+   {
+    "probe": "GET /openapi.json, /docs",
+    "result": "302 → /login",
+    "verdict": "SCHEMA NOT PUBLIC"
+   },
+   {
+    "probe": "GET /api/openapi.json",
+    "result": "401 {\"error\":\"unauthenticated\",\"reason\":\"no_cookie\",\"login_url\":\"/login\"}",
+    "verdict": "SCHEMA AUTH-GATED"
+   }
+  ],
+  "ui_text_match": "UI detail link 'Tower non raggiungibile' == B-bound NETWORK_UNREACHABLE detail string (BAD_ENDPOINT would have shown 'Nessun endpoint disponibile')"
+ },
+ "qr_failure_root_cause_proven": "TRANSPORT_LAYER_PROVEN__EXACT_ENDPOINT_CLASS_PENDING",
+ "repair_plan": [
+  "R1 (client, V2): transport-failure classification — typed sub-states DNS_FAILED / TCP_CONNECT_FAILED / TLS_HANDSHAKE_FAILED / CLEARTEXT_BLOCKED / HTTP_STATUS(status) in TowerHttp, surfaced in the secret-clean diagnostics export and the pairing failure detail (redaction-safe, no host secrets)",
+  "R2 (client, V2): read the Tower ok/error envelope before DTO parsing (AMB-9 adapter, contract fixture pinned)",
+  "R3 (client, V2): Owner-triggered EXPORT SECRET-CLEAN DIAGNOSTICS extended to pairing boundaries (mission section 2 field list)",
+  "R4 (contract): versioned delta request for AMB-8 (ack route) and AMB-10 (endpoint emission policy); NO client-side bypass",
+  "R5 (environment, Owner guidance): pairing requires the phone on a network that reaches the QR endpoint (same LAN as Tower PC, or the tailnet with the Tower present) — documented in the V2 install guide; never hardcoding any endpoint"
+ ],
+ "blocked_until": "V2 APK + Q1-Q8 mini-gate",
+ "not_claimed": [
+  "VOICE_CONSOLE_PAIRED_AND_VERIFIED",
+  "GRAPH_A4R_PASS",
+  "ANDROID_CANONICAL_BASE_SELECTED"
+ ]
+}

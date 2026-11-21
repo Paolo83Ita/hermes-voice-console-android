@@ -1,0 +1,408 @@
+{
+ "schema": "a4r.owner_physical_ledger/1.2",
+ "produced_utc": "2026-11-20T12:20:00Z",
+ "owner": "Paolo Lombisani",
+ "mission": "GRAPH A4R — PHYSICAL MINI-GATE CONTINUATION (supersedes the A8 rows below; those rows are preserved as historical evidence)",
+ "device": {
+  "model": "Xiaomi 11 Lite 5G NE",
+  "panel": "1080x2400 portrait",
+  "note": "OS build read at R0 of the runbook"
+ },
+ "fields_per_row": [
+  "test_id",
+  "timestamp",
+  "device",
+  "os",
+  "app_identity",
+  "version",
+  "app_hash",
+  "source_SHA",
+  "Tower_SHA",
+  "runtime_SHA",
+  "expected",
+  "observed",
+  "evidence",
+  "verdict",
+  "finding",
+  "repair",
+  "retest"
+ ],
+ "rows": [
+  {
+   "test_id": "A4R-P1-001",
+   "timestamp": "2026-11-20T09:50:20+02:00 (screenshots)",
+   "device": "Xiaomi 11 Lite 5G NE",
+   "os": "MIUI (bug report screen visible)",
+   "app_identity": "com.hermestower.voiceconsole.debug",
+   "version": "1.0.0-g4 (code 1)",
+   "app_hash": "908b289f8edc65d970aec3ca406c1fb0306dd78f0fe7448bf69264eb3bf66f56",
+   "source_SHA": "Hermes-Tower/apps/android-voice-console @ ff9544bc (Tower record)",
+   "Tower_SHA": "hermestower.aclclouds.online runtime @ ff9544bc (Tower record)",
+   "runtime_SHA": "n/a (crash before runtime use)",
+   "expected": "QR pairing starts and persists the endpoint",
+   "observed": "java.lang.UnsupportedOperationException: Cannot initialize without a android.security.keystore.KeyGenParameterSpec parameter - TowerStore$Keystore.key(TowerStore.kt:35) <- encrypt(42) <- putEncrypted(59) <- setEndpoint(75) <- PairingFlow.pairFromQr(54) <- PairingScreen.kt:148",
+   "evidence": "3 MIUI feedback screenshots (full stack + UI continuation + suppressed context)",
+   "verdict": "CONFIRMED_PHYSICAL_CRASH",
+   "finding": "A4R-P1-001 ANDROID_KEYSTORE_PAIRING_CRASH + A4R-P1-002 JVM_TEST_FAILED_TO_REPRESENT_ANDROID_KEYSTORE",
+   "repair": "A2 drop-in package delivered: explicit KeyGenParameterSpec AES-256-GCM + typed failure states + atomic commitPairing + 9 instrumented tests (docs/a4r/keystore_repair/)",
+   "retest": "PENDING - Owner repeats ONLY the QR pairing step on the repaired build"
+  },
+  {
+   "test_id": "A8-01-verify-apk-hash",
+   "verdict": "PENDING",
+   "expected": "installed APK hash matches the delivered qualified build",
+   "evidence": "Owner reads hash in-app or via adb; executor cross-checks the fingerprint matrix"
+  },
+  {
+   "test_id": "A8-02-install-update",
+   "verdict": "PENDING",
+   "expected": "install (or update-in-place for same-keystore builds) completes"
+  },
+  {
+   "test_id": "A8-03-open-no-crash",
+   "verdict": "PENDING",
+   "expected": "cold open, first screen rendered, no crash"
+  },
+  {
+   "test_id": "A8-04-scan-qr",
+   "verdict": "PENDING",
+   "expected": "Tower QR scanned and parsed (v2 schema accepted)"
+  },
+  {
+   "test_id": "A8-05-numeric-pair",
+   "verdict": "PENDING",
+   "expected": "numeric code lane completes"
+  },
+  {
+   "test_id": "A8-06-bilateral-phrase",
+   "verdict": "PENDING",
+   "expected": "confirmation phrase matches on both sides"
+  },
+  {
+   "test_id": "A8-07-voice-request",
+   "verdict": "PENDING",
+   "expected": "push-to-talk captures, streams, transcript returns"
+  },
+  {
+   "test_id": "A8-08-italian-date",
+   "verdict": "PENDING",
+   "expected": "correct Italian date handling in transcript/response"
+  },
+  {
+   "test_id": "A8-09-percentage",
+   "verdict": "PENDING",
+   "expected": "percentage phrasing correct"
+  },
+  {
+   "test_id": "A8-10-product-code",
+   "verdict": "PENDING",
+   "expected": "product code preserved verbatim"
+  },
+  {
+   "test_id": "A8-11-long-phrase",
+   "verdict": "PENDING",
+   "expected": "long utterance handled end-to-end"
+  },
+  {
+   "test_id": "A8-12-interrupt",
+   "verdict": "PENDING",
+   "expected": "TTS interruption honored mid-sentence"
+  },
+  {
+   "test_id": "A8-13-network-loss-resume",
+   "verdict": "PENDING",
+   "expected": "network loss mid-turn; resume completes the turn"
+  },
+  {
+   "test_id": "A8-14-background-foreground",
+   "verdict": "PENDING",
+   "expected": "background/foreground keeps session state"
+  },
+  {
+   "test_id": "A8-15-archive",
+   "verdict": "PENDING",
+   "expected": "Archive lists real Tower artifacts"
+  },
+  {
+   "test_id": "A8-16-pdf-download",
+   "verdict": "PENDING",
+   "expected": "PDF artifact downloads and opens via FileProvider"
+  },
+  {
+   "test_id": "A8-17-xlsx-download",
+   "verdict": "PENDING",
+   "expected": "XLSX artifact downloads and opens"
+  },
+  {
+   "test_id": "A8-18-sha-verification",
+   "verdict": "PENDING",
+   "expected": "on-device SHA-256 matches server-recomputed hash"
+  },
+  {
+   "test_id": "A8-19-revoke",
+   "verdict": "PENDING",
+   "expected": "revocation from Tower reflects on the client"
+  },
+  {
+   "test_id": "A8-20-replay-rejected",
+   "verdict": "PENDING",
+   "expected": "replayed pairing/challenge rejected"
+  },
+  {
+   "test_id": "A8-21-re-pair",
+   "verdict": "PENDING",
+   "expected": "re-pairing after revocation completes"
+  },
+  {
+   "test_id": "A8-22-app-restart",
+   "verdict": "PENDING",
+   "expected": "state rehydrates after app restart (A2 persistence)"
+  },
+  {
+   "test_id": "A8-23-tower-restart",
+   "verdict": "PENDING",
+   "expected": "session resumes after Tower restart"
+  },
+  {
+   "test_id": "A8-24-lan",
+   "verdict": "PENDING",
+   "expected": "LAN endpoint pairing works (NSD/manual)"
+  },
+  {
+   "test_id": "A8-25-tailscale",
+   "verdict": "PENDING",
+   "expected": "Tailscale endpoint works where available"
+  },
+  {
+   "test_id": "A4R-TOWER-VISUAL-OWNER-ACCEPTED",
+   "verdict": "PENDING",
+   "expected": "Owner accepts the manifest-composited portal alignment on the Xiaomi (light+dark, 100%/130% font, gesture insets, three widths)",
+   "evidence": "golden offline renders + on-device screenshots"
+  },
+  {
+   "test_id": "A4R-RUNTIME-ENVELOPE",
+   "verdict": "PENDING",
+   "expected": "R1..R10 measurement rows of A4R_RESOURCE_TRUTH_RECEIPT.json filled"
+  },
+  {
+   "test_id": "P1-LANE-DELIVERY-001",
+   "timestamp": "2026-11-20T15:33:00Z",
+   "timezone": "Europe/Rome",
+   "device": "NOT_APPLICABLE (executor lane)",
+   "android_version": "NOT_APPLICABLE",
+   "miui_version": "NOT_APPLICABLE",
+   "app_package": "com.hermestower.voiceconsole.a4rdebug",
+   "app_version": "0.4.0-alpha-grapha4r-merged-b-base (code 13)",
+   "app_hash": "26dbad0c5f0fe7700fc51cea1db8dacba4a34cd105ee88a29113c00be480922e",
+   "source_sha": "a58c63068929ba8bb8415f0443c0bcd399b8218f",
+   "tower_sha_if_applicable": "NOT_APPLICABLE",
+   "expected": "qualified CI APK uploaded to an Owner-accessible plane; download-back byte-identical",
+   "observed": "GitHub draft release 452862523 asset 772332157 uploaded (122891305 B) and downloaded back: size, sha256, package, version, v2 signer cert, ZIP integrity all match",
+   "evidence": "download/A4R/p1_delivery/A4R_P1_UPLOAD_RECEIPT.json + A4R_P1_DOWNLOAD_BACK_RECEIPT.json + A4R_P1_DELIVERY_INTEGRITY_RECEIPT.json",
+   "verdict": "PASS",
+   "finding_id": "NONE",
+   "repair": "NOT_APPLICABLE",
+   "retest_required": false,
+   "next_step": "Owner Step P1"
+  },
+  {
+   "test_id": "P1-OWNER-DOWNLOAD-001",
+   "timestamp": "2026-11-20T15:36:00Z",
+   "timezone": "Europe/Rome",
+   "device": "Xiaomi 11 Lite 5G NE",
+   "android_version": "NOT_EXPOSED",
+   "miui_version": "NOT_EXPOSED",
+   "app_package": "com.hermestower.voiceconsole.a4rdebug",
+   "app_version": "0.4.0-alpha-grapha4r-merged-b-base (code 13)",
+   "app_hash": "26dbad0c5f0fe7700fc51cea1db8dacba4a34cd105ee88a29113c00be480922e",
+   "source_sha": "a58c63068929ba8bb8415f0443c0bcd399b8218f",
+   "tower_sha_if_applicable": "NOT_APPLICABLE",
+   "expected": "Owner opens the link, download completes, displayed/downloaded size ~122.9 MB (122891305 bytes)",
+   "observed": "OWNER_REPORTED (pending)",
+   "evidence": "Owner report in chat; lane download-back already verified cryptographically",
+   "verdict": "PENDING_OWNER_REPORT",
+   "finding_id": "NONE",
+   "repair": "NOT_APPLICABLE",
+   "retest_required": false,
+   "next_step": "wait for Owner Step P1 result; on PASS emit OWNER_APK_DOWNLOAD_PASS and send Step P2 (parallel installation)"
+  },
+  {
+   "test_id": "A4R-PHYS-QR-001",
+   "priority": "P1",
+   "timestamp": "2026-11-20T16:51:00+01:00 / 16:53:00+01:00 (two attempts)",
+   "timezone": "Europe/Rome",
+   "device": "Xiaomi 11 Lite 5G NE",
+   "android_version": "NOT_EXPOSED",
+   "miui_version": "NOT_EXPOSED",
+   "app_package": "com.hermestower.voiceconsole.a4rdebug",
+   "app_version": "0.4.0-alpha-grapha4r-merged-b-base (code 13)",
+   "app_hash": "26dbad0c5f0fe7700fc51cea1db8dacba4a34cd105ee88a29113c00be480922e",
+   "source_sha": "a58c63068929ba8bb8415f0443c0bcd399b8218f",
+   "tower_sha_if_applicable": "hermestower.aclclouds.online runtime (last record ff9544bc) — TOWER_REPOSITORY_ACCESS_FROM_ANDROID_ACCOUNT = UNAVAILABLE_OR_NOT_AUTHORIZED",
+   "expected": "QR v2 scan → claim request reaches the Tower endpoint → Claimed",
+   "observed": "OWNER_REPORTED: QR recognized and parser-v2-accepted twice (expiresIn 230s/278s; tower=hermes-t…; proto=voice-console/2; scopes=voice.capture,voice.tts,tower.status.read); numeric codes 521021/563783 typed; both attempts → typed 'Endpoint di pairing non raggiungibile' + detail 'Tower non raggiungibile'; app stayed open, no crash, no stack trace; phone on 4G+ cellular, Tailscale chip '1 dispositivo'",
+   "evidence": "2 Owner screenshots (sha256 recorded in phys_repair receipts); lane probes: public plane healthy (DNS/TLS LE-cert valid to 2027-02-10), claim+attest routes EXIST (200 {ok:false,PAIRING_NOT_FOUND_OR_EXPIRED} on fake ids), GET ack route ABSENT (404 catch-all)",
+   "verdict": "PHYSICAL_FAIL",
+   "finding_id": "A4R-PHYS-QR-001 (+ candidates A4R-PHYS-CONTRACT-003)",
+   "repair": "REPAIR_REQUIRED: V2 transport classification + ok/error envelope adapter + diagnostics export + contract delta (AMB-8/9/10); environment guidance (phone must reach the QR-carried endpoint)",
+   "retest_required": true,
+   "next_step": "Owner environment answer + wizard screenshot → close endpoint class → V2 repair"
+  },
+  {
+   "test_id": "A4R-PHYS-MODEL-002",
+   "priority": "P1",
+   "timestamp": "2026-11-21T05:32:00+01:00 (screenshots)",
+   "timezone": "Europe/Rome",
+   "device": "Xiaomi 11 Lite 5G NE",
+   "android_version": "NOT_EXPOSED",
+   "miui_version": "NOT_EXPOSED",
+   "app_package": "com.hermestower.voiceconsole.a4rdebug",
+   "app_version": "0.4.0-alpha-grapha4r-merged-b-base (code 13)",
+   "app_hash": "26dbad0c5f0fe7700fc51cea1db8dacba4a34cd105ee88a29113c00be480922e",
+   "source_sha": "a58c63068929ba8bb8415f0443c0bcd399b8218f",
+   "tower_sha_if_applicable": "NOT_APPLICABLE",
+   "expected": "Scarica on Qwen2.5 0.5B (GGUF q5_k_m) downloads 522,186,592 bytes with visible progress",
+   "observed": "OWNER_REPORTED: download fails immediately; model card state 'non installato'/DISCOVERED/'Non ancora utilizzabile: il componente non è stato scaricato'; exact error text, progress behaviour and free storage NOT YET PROVIDED",
+   "evidence": "3 Owner screenshots (sha256 recorded); lane probe: artifact EXISTS at pinned commit (302→us.aws.cdn.hf.co, x-linked-size 522186592 exact match, anonymous); lane itself received HTTP 429 challenge from HF edge on repeated HEADs (edge throttling is real); client pipeline static analysis complete",
+   "verdict": "PHYSICAL_FAIL",
+   "finding_id": "A4R-PHYS-MODEL-002 (+ candidate A4R-PHYS-STORAGE-004)",
+   "repair": "REPAIR_REQUIRED (targeted once error class proven): CDN-edge typed messaging/mirror ordering OR storage preflight UX; diagnostics export extension (mission section 2)",
+   "retest_required": true,
+   "next_step": "Owner error-text screenshot + free-storage value → close cause class → targeted repair"
+  },
+  {
+   "test_id": "A4R-PHYS-CONTRACT-003",
+   "priority": "P1-candidate",
+   "timestamp": "2026-11-21T05:05:00Z",
+   "timezone": "Europe/Rome",
+   "device": "lane probe (no device)",
+   "android_version": "NOT_APPLICABLE",
+   "miui_version": "NOT_APPLICABLE",
+   "app_package": "com.hermestower.voiceconsole.a4rdebug",
+   "app_version": "0.4.0-alpha-grapha4r-merged-b-base",
+   "app_hash": "26dbad0c5f0fe7700fc51cea1db8dacba4a34cd105ee88a29113c00be480922e",
+   "source_sha": "a58c63068929ba8bb8415f0443c0bcd399b8218f",
+   "tower_sha_if_applicable": "live runtime route surface probed 2026-11-21",
+   "expected": "live Tower serves the dex-bound v2 client surface (claim, attest, GET ack) with the response envelope the client parses",
+   "observed": "claim+attest routes PRESENT (200 {ok:false,error:...} on fake ids); GET ack route ABSENT (404 catch-all); failure envelope HTTP-200-in-band not read by client (AMB-8 + AMB-9 proven; AMB-10 endpoint policy open)",
+   "evidence": "lane probes (read-only, fake ids, no state created) + client static binding",
+   "verdict": "POSSIBLE_ANDROID_TOWER_CONTRACT_DIVERGENCE (AMB-8/9 PROVEN as divergences; QR-endpoint class still the primary P1)",
+   "finding_id": "A4R-PHYS-CONTRACT-003",
+   "repair": "versioned contract delta request HR-A4R-PHYS-001 + client envelope adapter in V2",
+   "retest_required": true,
+   "next_step": "Tower handoff answers"
+  },
+  {
+   "test_id": "A4R-PHYS-STORAGE-004",
+   "priority": "P1-candidate",
+   "timestamp": "2026-11-21T05:05:00Z",
+   "timezone": "Europe/Rome",
+   "device": "Xiaomi 11 Lite 5G NE",
+   "android_version": "NOT_EXPOSED",
+   "miui_version": "NOT_EXPOSED",
+   "app_package": "com.hermestower.voiceconsole.a4rdebug",
+   "app_version": "0.4.0-alpha-grapha4r-merged-b-base",
+   "app_hash": "26dbad0c5f0fe7700fc51cea1db8dacba4a34cd105ee88a29113c00be480922e",
+   "source_sha": "a58c63068929ba8bb8415f0443c0bcd399b8218f",
+   "tower_sha_if_applicable": "NOT_APPLICABLE",
+   "expected": "model manifest URL/hash/storage binding consistent; free space ≥ download + reserve",
+   "observed": "manifest URL/hash/size binding PROVEN consistent (catalog == live x-linked-size == HF LFS oid); device free storage NOT_YET_REPORTED; storage preflight fails instantly with a typed message when free < needed + max(reserve, 15% of free) — surviving candidate",
+   "evidence": "catalog json + lane probe + static preflight analysis",
+   "verdict": "POSSIBLE_MODEL_MANIFEST_URL_HASH_OR_STORAGE_BINDING_FAILURE (URL/hash half DISPROVEN; storage half OPEN)",
+   "finding_id": "A4R-PHYS-STORAGE-004",
+   "repair": "pending Owner storage value + error text",
+   "retest_required": true,
+   "next_step": "Owner evidence"
+  }
+ ],
+ "terminality_gate_states": {
+  "ANDROID_CANONICAL_BASE_SELECTED": "PENDING_OWNER (A5 recommendation MERGE_WITH_B_AS_BASE, conditions C1..C5)",
+  "ANDROID_KEYSTORE_PASS": "PENDING (C1 retest)",
+  "QR_CAMERA_USER_PATH_PASS": "PENDING",
+  "NUMERIC_PAIRING_PASS": "PENDING",
+  "BILATERAL_CONFIRMATION_PASS": "PENDING",
+  "VOICE_STREAMING_PASS": "PENDING",
+  "STT_PASS": "PENDING",
+  "RESPONSE_STREAMING_PASS": "PENDING",
+  "TTS_PASS": "PENDING",
+  "ARCHIVE_PASS": "PENDING",
+  "ARTIFACT_HASH_PASS": "PENDING",
+  "REVOCATION_PASS": "PENDING",
+  "REPLAY_REJECTION_PASS": "PENDING",
+  "REPAIRING_PASS": "PENDING",
+  "APP_RESTART_PASS": "PENDING",
+  "TOWER_RESTART_REHYDRATION_PASS": "PENDING",
+  "TOWER_VISUAL_ALIGNMENT_OWNER_ACCEPTED": "PENDING",
+  "ZERO_SECRET_LEAK": "UNCLAIMED_UNTIL_FULL_GATE (secret scan clean this session: no secrets in any produced artifact)",
+  "OPEN_P0": 0,
+  "OPEN_P1": 3,
+  "open_p1_detail": [
+   "A4R-P1-001 (repair delivered, retest pending)",
+   "A4R-P1-002 (instrumented suite delivered, run pending)",
+   "A4R-P1-003 (wiring delivered, physical demonstration pending)"
+  ],
+  "open_p2_detail": [
+   "A4R-P2-004 (repair delivered, Owner acceptance pending)",
+   "A4R-P2-006 (release discipline OPEN by design)"
+  ]
+ },
+ "terminal_state": {
+  "VOICE_CONSOLE_PAIRED_AND_VERIFIED": "NOT_REACHED (correctly) - no PASS is declared without Xiaomi physical evidence"
+ },
+ "verdict": "A4R_OWNER_PHYSICAL_LEDGER_INITIALIZED - 1 confirmed row, 28 pending rows, terminal state honestly NOT_REACHED",
+ "mini_gate": {
+  "opened_utc": "2026-11-20T15:36:00Z",
+  "device": "Xiaomi 11 Lite 5G NE",
+  "timezone": "Europe/Rome",
+  "apk": {
+   "name": "HERMES_VOICE_CONSOLE_A4R_REPAIRED_DEBUG.apk",
+   "bytes": 122891305,
+   "sha256": "26dbad0c5f0fe7700fc51cea1db8dacba4a34cd105ee88a29113c00be480922e",
+   "package": "com.hermestower.voiceconsole.a4rdebug",
+   "version_name": "0.4.0-alpha-grapha4r-merged-b-base",
+   "version_code": 13,
+   "cert_sha256": "56e00e406895d355356faebe7c6b95de6e8777858c77564d8f5c7dbdaa1faa1f"
+  },
+  "source_sha": "a58c63068929ba8bb8415f0443c0bcd399b8218f",
+  "tower_sha_if_applicable": "NOT_EXPOSED (Tower repository access from Android account UNAVAILABLE_OR_NOT_AUTHORIZED)",
+  "current_truth": "PHYSICAL MINI-GATE STOPPED AT SAFE BOUNDARY. Two Owner-reported P1 physical failures on the installed A4R APK: (1) QR pairing — camera + v2 parse worked twice, numeric codes typed, both attempts ended in typed PAIRING_ENDPOINT_UNREACHABLE ('Tower non raggiungibile'); lane forensics prove the live Tower public plane healthy and the v2 claim/attest routes PRESENT, GET ack route ABSENT (AMB-8), so the failure is transport-level to the QR-carried endpoint (class pending one evidence item). (2) Qwen2.5 0.5B download — fails immediately; artifact proven public/revision-bound/size+hash-consistent; surviving causes: CDN edge rejection vs storage preflight (discriminated by the Owner's exact error text). Gates reclassified per Owner directive; GRAPH_A4R_PASS = false; no reinstall of the same APK; no V2 build until both root causes complete.",
+  "next_exact_action": "Collect the MINIMUM Owner evidence: Qwen error text + progress behaviour + free storage; QR environment answer (Wi-Fi vs 4G) + one Tower wizard screenshot showing endpoint text (QR excluded). Then complete both root-cause proofs, repair, and build HERMES_VOICE_CONSOLE_A4R_REPAIRED_DEBUG_V2.apk (new versionCode/versionName) with the secret-clean diagnostics export; two separate mini-gates (Q1-Q8, M1-M9).",
+  "checkpoint_policy": "one checkpoint after P1-P4; one after P5-P6; one terminal after P7-P8; immediate commit after any material failure/repair",
+  "blocker_registry": [
+   {
+    "id": "A4R-BLK-PROV-001",
+    "finding": "TOWER_REPOSITORY_ACCESS_FROM_ANDROID_ACCOUNT = UNAVAILABLE_OR_NOT_AUTHORIZED",
+    "state": "CANDIDATE_B_ORIGINAL_SOURCE_BOUND_PASS = BLOCKED",
+    "classification": "B_BEHAVIORAL_CLEAN_ROOM_REIMPLEMENTATION",
+    "blocks": [
+     "ANDROID_CANONICAL_BASE_SELECTED",
+     "FINAL_RELEASE_SIGNING",
+     "GRAPH_A4R_PASS"
+    ],
+    "does_not_block": [
+     "P1-P8 mini-gate"
+    ]
+   }
+  ],
+  "reclassification": {
+   "QR_V2_SCAN_PASS": "NOT_PROVEN",
+   "PAIRING_CLAIM_START_PASS": "FAIL_OR_BLOCKED",
+   "XIAOMI_KEYSTORE_PAIRING_REPAIR_PASS": "NOT_DERIVABLE",
+   "QWEN_2_5_MODEL_DOWNLOAD_PASS": "FAIL",
+   "GRAPH_A4R_PASS": false
+  },
+  "stop_boundary": {
+   "owner_must_not_continue_to": [
+    "bilateral confirmation",
+    "process restart and persistence",
+    "voice",
+    "Archive",
+    "revocation",
+    "replay",
+    "final canonical selection"
+   ],
+   "no_reinstall_of_same_apk": true,
+   "v2_build_blocked_until": "QR_FAILURE_ROOT_CAUSE_PROVEN and QWEN_DOWNLOAD_FAILURE_ROOT_CAUSE_PROVEN"
+  }
+ }
+}

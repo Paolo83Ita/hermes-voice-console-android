@@ -1,0 +1,207 @@
+{
+ "schema": "a4r.qwen25_download_differential/1.0",
+ "produced_utc": "2026-11-21T05:05:00Z",
+ "finding": "A4R-PHYS-MODEL-002 (P1)",
+ "apk": {
+  "name": "HERMES_VOICE_CONSOLE_A4R_REPAIRED_DEBUG.apk",
+  "sha256": "26dbad0c5f0fe7700fc51cea1db8dacba4a34cd105ee88a29113c00be480922e",
+  "package": "com.hermestower.voiceconsole.a4rdebug",
+  "version_name": "0.4.0-alpha-grapha4r-merged-b-base",
+  "version_code": 13,
+  "source_sha": "a58c63068929ba8bb8415f0443c0bcd399b8218f"
+ },
+ "artifact": {
+  "model_id": "org.qwen.qwen2.5-0.5b-instruct.q5-k-m",
+  "display_name": "Qwen2.5 0.5B Instruct (GGUF q5_k_m)",
+  "version": "q5_k_m@9217f5db",
+  "exact_repository": "https://huggingface.co/Qwen/Qwen2.5-0.5B-Instruct-GGUF",
+  "revision": "commit 9217f5db79a29953eb74d5343926648285ec7e67",
+  "filename": "qwen2.5-0.5b-instruct-q5_k_m.gguf",
+  "format": "gguf",
+  "quantization": "q5_k_m",
+  "download_size_bytes": 522186592,
+  "sha256": "041474553fcabfc2a2d67903f9d2c2e50bd92528e670da4f33b5d0ce6e59fd55",
+  "license": "Apache-2.0",
+  "provider": "Qwen (Alibaba) — Qwen2.5 series",
+  "runtime": "dev.ffmpegkit-maintained:llama-android:0.1.1 (llama.cpp b9878, arm64-v8a, MIT) — INTEGRATED (CP-G4.14-005)",
+  "classification": "VERIFIED_DOWNLOADABLE, OPTIONAL (TOWER_FIRST/HYBRID; never auto-loaded)"
+ },
+ "lane_probe": {
+  "resolve_url": "https://huggingface.co/Qwen/Qwen2.5-0.5B-Instruct-GGUF/resolve/9217f5db79a29953eb74d5343926648285ec7e67/qwen2.5-0.5b-instruct-q5_k_m.gguf",
+  "redirect_chain": "huggingface.co → us.aws.cdn.hf.co/xet-bridge-us (signed GET, Expires parameter)",
+  "x_linked_size": 522186592,
+  "anonymous_access": true,
+  "note": "repeated lane HEAD probes received HTTP 429 HTML challenge from the HF edge — edge throttling/challenge on this route is REAL (supports SURVIVING_CANDIDATE_A)"
+ },
+ "client_pipeline": [
+  "DownloadGatekeeper (connectivity/thermal/storage) — only on installComponent path",
+  "DefaultModelDownloadManager.start → storage preflight (needed + max(reserveBytes, 15% of free))",
+  "explicit redirect walk (UA, Range, no scheme downgrade, ≤5 hops)",
+  "32 KiB streaming to <identity>.part (positioned channel, true-offset resume)",
+  "bounded retries (budget 2) + ONE hf-mirror.com fallback for pinned HF sources",
+  "verifyHash → mismatch quarantines partial",
+  "atomic install → registry read-back → qualification → activation"
+ ],
+ "cause_matrix": [
+  {
+   "n": 1,
+   "cause": "placeholder or stale URL",
+   "expected": "catalog sourceUri pinned at commit 9217f5db79a29953eb74d5343926648285ec7e67",
+   "observed": "URL is revision-bound and the artifact responds (302→CDN, x-linked-size 522186592)",
+   "verdict": "DISPROVEN"
+  },
+  {
+   "n": 2,
+   "cause": "repository/file does not exist",
+   "observed": "Qwen/Qwen2.5-0.5B-Instruct-GGUF @ pinned commit serves the file (resolve redirect chain healthy)",
+   "verdict": "DISPROVEN"
+  },
+  {
+   "n": 3,
+   "cause": "private or gated model",
+   "observed": "public download, no auth required (anonymous 200/302 from lane)",
+   "verdict": "DISPROVEN"
+  },
+  {
+   "n": 4,
+   "cause": "incorrect revision",
+   "observed": "pinned commit resolves; UI shows the same commit",
+   "verdict": "DISPROVEN"
+  },
+  {
+   "n": 5,
+   "cause": "incorrect filename or capitalization",
+   "observed": "qwen2.5-0.5b-instruct-q5_k_m.gguf resolves with content-disposition carrying the exact filename",
+   "verdict": "DISPROVEN"
+  },
+  {
+   "n": 6,
+   "cause": "HTTP 401/403 from CDN edge (device network/UA)",
+   "observed": "lane itself received HTTP 429 (HTML challenge) on repeated HEAD probes — CDN edge throttling/challenge is REAL on this route; a mobile-carrier IP or the custom UA could receive 403/429; app maps any non-2xx to IOException('HTTP <code> while downloading …') after bounded retries + one mirror attempt",
+   "verdict": "SURVIVING_CANDIDATE_A (needs Owner error text)"
+  },
+  {
+   "n": 7,
+   "cause": "HTTP 404",
+   "observed": "artifact exists",
+   "verdict": "DISPROVEN"
+  },
+  {
+   "n": 8,
+   "cause": "redirect not followed",
+   "observed": "explicit redirect walk (5 hops max, UA+Range preserved, no scheme downgrade); lane followed the same chain to 200",
+   "verdict": "DISPROVEN (as configured)"
+  },
+  {
+   "n": 9,
+   "cause": "Android cleartext/TLS rejection",
+   "observed": "URL is https; NSC permits https; no cleartext hop (no-downgrade guard)",
+   "verdict": "DISPROVEN"
+  },
+  {
+   "n": 10,
+   "cause": "certificate or hostname mismatch",
+   "observed": "huggingface.co + us.aws.cdn.hf.co public CAs",
+   "verdict": "DISPROVEN"
+  },
+  {
+   "n": 11,
+   "cause": "missing INTERNET permission",
+   "observed": "manifest holds INTERNET (Tower QR lane and prior model downloads on POCO used it)",
+   "verdict": "DISPROVEN"
+  },
+  {
+   "n": 12,
+   "cause": "missing destination/storage permission",
+   "observed": "destination filesDir (app-private, no permission needed on API 30+)",
+   "verdict": "DISPROVEN"
+  },
+  {
+   "n": 13,
+   "cause": "unsupported DownloadManager URI",
+   "observed": "DownloadManager NOT used — in-app HttpURLConnection pipeline (DefaultModelDownloadManager)",
+   "verdict": "DISPROVEN"
+  },
+  {
+   "n": 14,
+   "cause": "insufficient free space (gatekeeper or preflight)",
+   "observed": "gate blocks when freeStorageBytes < 522186592; preflight throws IOException('Storage preflight failed: X bytes free, Y required…') when free < needed + max(reserveBytes, 15% of free) — BOTH fail instantly with zero visible progress; device free storage NOT YET REPORTED",
+   "verdict": "SURVIVING_CANDIDATE_B (needs Owner storage value)"
+  },
+  {
+   "n": 15,
+   "cause": "storage path unavailable",
+   "observed": "filesDir/models/llm/qwen25-05b/ standard app-private path",
+   "verdict": "UNLIKELY (would need Owner error text to rule out fully)"
+  },
+  {
+   "n": 16,
+   "cause": "manifest/hash disagreement",
+   "observed": "catalog sha256 041474553fcabfc2a2d67903f9d2c2e50bd92528e670da4f33b5d0ce6e59fd55 == HF LFS oid recorded in provenance note; size 522186592 == x-linked-size header",
+   "verdict": "DISPROVEN (binding consistent)"
+  },
+  {
+   "n": 17,
+   "cause": "ABI/runtime compatibility rejected before download",
+   "observed": "runtime INTEGRATED (CP-G4.14-005); entryClassification VERIFIED_DOWNLOADABLE; qualification ladder stops at DISCOVERED only because the component is not downloaded — download is not pre-blocked by runtime",
+   "verdict": "DISPROVEN"
+  },
+  {
+   "n": 18,
+   "cause": "model downloadable but no qualified runtime",
+   "observed": "same as 17 — runtime present in APK",
+   "verdict": "DISPROVEN"
+  },
+  {
+   "n": 19,
+   "cause": "offline/local-only policy incorrectly active",
+   "observed": "device shows Wi-Fi connected + active traffic in screenshots; the Scarica path (ModelPrimaryAction.DOWNLOAD) does NOT consult the connectivity gate (only installComponent does); an offline gate WOULD be instant-block — cannot fully exclude without the Owner's exact message",
+   "verdict": "LOW_PROBABILITY_SURVIVOR (discriminated by error text)"
+  },
+  {
+   "n": 20,
+   "cause": "networking coroutine cancelled by lifecycle",
+   "observed": "cancellation lands in DOWNLOAD_PAUSED with partial retained, not instant FAILED; Owner reports instant failure",
+   "verdict": "UNLIKELY"
+  }
+ ],
+ "owner_evidence": [
+  {
+   "file": "Screenshot_2026-11-21-05-32-49-738_com.hermestower.voiceconsole.a4rdebug.jpg",
+   "sha256": "b6ba8998439166a41135af73b7b205987ae3202b7c2d4da046d1209f39f9b784",
+   "taken": "2026-11-21T05:32+01:00",
+   "finding": "QWEN",
+   "note": "model card: Qwen2.5 0.5B Instruct (GGUF q5_k_m), 498.0 MB, runtime INTEGRATED (CP-G4.14-005), install state 'non installato', qualification DISCOVERED, 'Non ancora utilizzabile: il componente non è stato scaricato', badge 'Scaricato' top-right, Wi-Fi connected, battery 85%"
+  },
+  {
+   "file": "Screenshot_2026-11-21-05-32-56-786_com.hermestower.voiceconsole.a4rdebug.jpg",
+   "sha256": "61cf88d0558431021c7a6e59750077cafda4fa6b6f2c09f613f16e08bf3991ba",
+   "taken": "2026-11-21T05:32+01:00",
+   "finding": "QWEN",
+   "note": "model card upstream details: HF repo + pinned commit 9217f5db79a29953eb74d5343926648285ec7e67, SHA-256 041474553fcabfc2a2d67903f9d2c2e50bd92528e670da4f33b5d0ce6e59fd55, destination filesDir/models/llm/qwen25-05b/, OPTIONAL/TOWER_FIRST"
+  },
+  {
+   "file": "Screenshot_2026-11-21-05-33-04-598_com.hermestower.voiceconsole.a4rdebug.jpg",
+   "sha256": "3da2c2f48197d56b9dd7f81ed07177d962788a256aea4929cc82959ad01e108f",
+   "taken": "2026-11-21T05:33+01:00",
+   "finding": "QWEN",
+   "note": "'Scarica' button visible in 'Altre azioni'; download-failure screen NOT captured (requested from Owner)"
+  }
+ ],
+ "missing_owner_evidence": [
+  "exact error message shown right after tapping Scarica (error state screenshot)",
+  "progress behaviour: stays 0% / briefly advances / never appears",
+  "available free device storage (Android Settings > Storage, number only)"
+ ],
+ "root_cause": {
+  "proven": "artifact identity/reachability/hash-binding are CORRECT; the failure is client-side and immediate (before visible byte progress or at 0%)",
+  "surviving": [
+   "A: CDN edge rejection/challenge on the device network (HTTP 403/429 class) → typed error 'HTTP <code> while downloading …'",
+   "B: storage preflight/gate (free space below needed+reserve) → typed error 'Storage preflight failed: …' / 'Storage gate: …'",
+   "(low) C: connectivity gate offline classification on installComponent path — not on the Scarica/DOWNLOAD path"
+  ],
+  "discriminator": "the exact Owner-visible error text names the cause class (every path writes a typed error string); no guessing, no code change before the class is proven",
+  "qwen_download_failure_root_cause_proven": "PENDING_OWNER_EVIDENCE (one screenshot + storage value completes the proof)"
+ },
+ "tower_first_impact": "NONE — the model is OPTIONAL; Tower-first pairing and voice do not depend on it (catalog knownLimitations + mission section 4)"
+}

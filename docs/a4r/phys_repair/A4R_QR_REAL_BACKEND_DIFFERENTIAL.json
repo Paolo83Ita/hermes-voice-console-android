@@ -1,0 +1,301 @@
+{
+ "schema": "a4r.qr_real_backend_differential/1.0",
+ "produced_utc": "2026-11-21T05:05:00Z",
+ "produced_rome": "2026-11-21T06:05:00+01:00",
+ "finding": "A4R-PHYS-QR-001 (P1)",
+ "apk": {
+  "name": "HERMES_VOICE_CONSOLE_A4R_REPAIRED_DEBUG.apk",
+  "sha256": "26dbad0c5f0fe7700fc51cea1db8dacba4a34cd105ee88a29113c00be480922e",
+  "package": "com.hermestower.voiceconsole.a4rdebug",
+  "version_name": "0.4.0-alpha-grapha4r-merged-b-base",
+  "version_code": 13,
+  "source_sha": "a58c63068929ba8bb8415f0443c0bcd399b8218f"
+ },
+ "device_context": {
+  "model": "Xiaomi 11 Lite 5G NE",
+  "app_package": "com.hermestower.voiceconsole.a4rdebug",
+  "network_at_failure": "4G+ cellular (status bar), Tailscale chip '1 dispositivo' (VPN connected, 1 device in tailnet)",
+  "attempts": "two pairing attempts (16:51 + 16:53, 2026-11-20), numeric codes typed both times, identical typed failure"
+ },
+ "live_tower_probes": [
+  {
+   "probe": "DNS hermestower.aclclouds.online",
+   "result": "141.11.237.119",
+   "verdict": "RESOLVES"
+  },
+  {
+   "probe": "TLS https://hermestower.aclclouds.online",
+   "result": "Let's Encrypt cert CN=hermestower.aclclouds.online, valid 2026-11-12 → 2027-02-10, verify=0",
+   "verdict": "TLS HEALTHY"
+  },
+  {
+   "probe": "GET /",
+   "result": "302 → /login?next=%2F",
+   "verdict": "PLANE ALIVE"
+  },
+  {
+   "probe": "GET /api/tower/voice-console/v2/pairings/a4r-probe-nonexistent/ack",
+   "result": "404 {\"detail\":\"No such API endpoint: /api/tower/voice-console/v2/pairings/a4r-probe-nonexistent/ack\"}",
+   "verdict": "ROUTE ABSENT (catch-all 404)"
+  },
+  {
+   "probe": "POST /api/tower/voice-console/v2/pairings/a4r-probe-nonexistent/claim body {}",
+   "result": "200 {\"ok\":false,\"error\":\"PAIRING_NOT_FOUND_OR_EXPIRED\"}",
+   "verdict": "ROUTE EXISTS (validation reached; fake id rejected in-band)"
+  },
+  {
+   "probe": "POST /api/tower/voice-console/v2/pairings/a4r-probe-nonexistent/attest body {}",
+   "result": "200 {\"ok\":false,\"error\":\"PAIRING_NOT_FOUND_OR_EXPIRED\"}",
+   "verdict": "ROUTE EXISTS"
+  },
+  {
+   "probe": "GET /openapi.json, /docs",
+   "result": "302 → /login",
+   "verdict": "SCHEMA NOT PUBLIC"
+  },
+  {
+   "probe": "GET /api/openapi.json",
+   "result": "401 {\"error\":\"unauthenticated\",\"reason\":\"no_cookie\",\"login_url\":\"/login\"}",
+   "verdict": "SCHEMA AUTH-GATED"
+  }
+ ],
+ "probe_policy": "read-only lane probes only: GET/HEAD everywhere; POST only on FAKE pairing ids with empty bodies (validation-only; PAIRING_NOT_FOUND_OR_EXPIRED, no server state created); NO real pairing attempts; NO secrets sent; no QR content persisted",
+ "boundaries": [
+  {
+   "boundary": "camera detection",
+   "expected": "ML Kit analyzer delivers raw QR text to TowerQrV2ScanFlow",
+   "observed": "Owner evidence: QR recognized and parsed twice (two separate wizard sessions, 16:51 and 16:53)",
+   "typed_failure": "NONE",
+   "server_evidence": "NOT_APPLICABLE",
+   "client_evidence": "Screenshots 1-2: 'Payload accettato dal parser v2'",
+   "verdict": "OK_ON_DEVICE"
+  },
+  {
+   "boundary": "QR raw framing payloadBase64url.signatureBase64url",
+   "expected": "exactly two dot-separated base64url parts (QrPayload.parse)",
+   "observed": "parse succeeded on device (framing accepted)",
+   "typed_failure": "NONE",
+   "server_evidence": "NOT_OBSERVED_LANESIDE",
+   "client_evidence": "UI 'Payload accettato dal parser v2'",
+   "verdict": "OK_ON_DEVICE"
+  },
+  {
+   "boundary": "base64url payload extraction + JSON parse",
+   "expected": "Base64.getUrlDecoder → JSONObject",
+   "observed": "fields surfaced in UI (tower, proto, scopes, expiresIn)",
+   "typed_failure": "NONE",
+   "server_evidence": "NOT_OBSERVED_LANESIDE",
+   "client_evidence": "UI summary",
+   "verdict": "OK_ON_DEVICE"
+  },
+  {
+   "boundary": "signature extraction",
+   "expected": "second part captured; client-side signature NOT verified in B lineage (Tower verifies possession at claim); preserved verbatim, no bypass created",
+   "observed": "parse accepted",
+   "typed_failure": "NONE",
+   "server_evidence": "NOT_OBSERVED_LANESIDE",
+   "client_evidence": "static (QrPayload.kt:21-40)",
+   "verdict": "OK_STATIC_PRESERVED"
+  },
+  {
+   "boundary": "protocol version",
+   "expected": "v==2 and protocol_version startswith voice-console/",
+   "observed": "proto=voice-console/2 accepted",
+   "typed_failure": "NONE",
+   "server_evidence": "Tower emits v2 payload",
+   "client_evidence": "UI",
+   "verdict": "OK_ON_DEVICE"
+  },
+  {
+   "boundary": "expiry and clock skew",
+   "expected": "expires_at epoch-seconds in the future; no client-issued TTL cap in v2 (B bound: Tower owns issuance, 2-5 min)",
+   "observed": "expiresIn=230s / 278s accepted; Tower wizard countdown 4:29 ⇒ Tower-side QR TTL ≈ 5 min (contract delta AMB-5 said client challenge TTL 120 s — separate object, unaffected)",
+   "typed_failure": "NONE",
+   "server_evidence": "wizard screenshot 'Scadenza: 4:29'",
+   "client_evidence": "UI expiresIn",
+   "verdict": "OK_ON_DEVICE"
+  },
+  {
+   "boundary": "forbidden-field scan",
+   "expected": "10 banned field names rejected FAIL-CLOSED before any use",
+   "observed": "payload passed the gate",
+   "typed_failure": "NONE",
+   "server_evidence": "Tower QR carries no secrets (UI note 'Nessun segreto viaggia nel QR')",
+   "client_evidence": "UI",
+   "verdict": "OK_ON_DEVICE"
+  },
+  {
+   "boundary": "endpoint resolution",
+   "expected": "QR endpoint used verbatim when it starts with http; manual endpoint is the only fallback; NO default invented",
+   "observed": "endpoint RESOLVED (no BAD_ENDPOINT rejection — UI detail was 'Tower non raggiungibile', not 'Nessun endpoint disponibile'); VALUE NOT DISPLAYED (redaction-safe UI) — exact scheme/host class UNOBSERVED",
+   "typed_failure": "NONE_AT_THIS_BOUNDARY",
+   "server_evidence": "Tower wizard emits endpoint in QR (value not captured; capture requested via wizard screenshot / V2 diagnostics export)",
+   "client_evidence": "static resolveEndpoint (QrPayload.kt:170-176) + absence of BAD_ENDPOINT UI text",
+   "verdict": "RESOLVED_VALUE_UNOBSERVED"
+  },
+  {
+   "boundary": "TLS/cleartext policy",
+   "expected": "network_security_config: cleartext permitted ONLY for 127.0.0.1/localhost; every other destination https-only (platform default blocked)",
+   "observed": "device typed state = PAIRING_ENDPOINT_UNREACHABLE with detail 'Tower non raggiungibile' = TowerApiException.Kind.NETWORK_UNREACHABLE = IOException raised by HttpUrlTowerHttp.execute BEFORE any HTTP response (DNS/TCP/TLS/cleartext-block)",
+   "typed_failure": "PAIRING_ENDPOINT_UNREACHABLE (transport class)",
+   "server_evidence": "public plane healthy from lane (DNS+TLS+routes) ⇒ the attempted endpoint was NOT the public https plane, or was https on a host the phone could not reach",
+   "client_evidence": "UI typed state + detail string; static TowerApi.kt:109-115 maps IOException→NETWORK_UNREACHABLE",
+   "verdict": "FAIL_HERE (transport, pre-HTTP)"
+  },
+  {
+   "boundary": "claim route",
+   "expected": "POST /api/tower/voice-console/v2/pairings/{id}/claim",
+   "observed": "ROUTE EXISTS on live Tower (lane probe: 200 {\"ok\":false,\"error\":\"PAIRING_NOT_FOUND_OR_EXPIRED\"} for fake id)",
+   "typed_failure": "NOT_REACHED_FROM_DEVICE",
+   "server_evidence": "lane probe 2026-11-21",
+   "client_evidence": "TowerApi.claim",
+   "verdict": "ROUTE_PRESENT"
+  },
+  {
+   "boundary": "claim request DTO",
+   "expected": "{claim_code, device_label} (typed hypothesis CD-A4R-C1-001 AMB-2)",
+   "observed": "POST body {} reached route validation on live Tower (no 404, no 422 HTML) — route accepts JSON POSTs; exact key validation not observable without a real pairing",
+   "typed_failure": "OPEN (AMB-2 unconfirmed)",
+   "server_evidence": "probe",
+   "client_evidence": "static",
+   "verdict": "ROUTE_OK_DTO_UNVERIFIED"
+  },
+  {
+   "boundary": "claim response DTO",
+   "expected": "client reads top-level claim_key+challenge; treats missing keys as MALFORMED_RESPONSE; client does NOT read an ok/error envelope",
+   "observed": "live Tower signals failures IN-BAND with HTTP 200 {\"ok\":false,\"error\":...} — a Tower-side claim failure (wrong code, expired pairing) would surface to the Owner as 'risposta claim incompleta' (CLAIM_RESPONSE_INCOMPLETE) instead of the precise Tower reason",
+   "typed_failure": "DTO ENVELOPE DIVERGENCE (proven class, wrong-label risk)",
+   "server_evidence": "probe response shape",
+   "client_evidence": "TowerApi.kt:92-99+147-158 (no ok/error handling)",
+   "verdict": "DIVERGENCE_RECORDED (AMB-9)"
+  },
+  {
+   "boundary": "HMAC claim-secret derivation",
+   "expected": "claim secret = the numeric code the Owner types; hmacSha256Hex retained as B public API helper, not used in claim path",
+   "observed": "static confirmation",
+   "typed_failure": "NOT_EXERCISED",
+   "server_evidence": "NOT_OBSERVED",
+   "client_evidence": "static PairingFlow.kt:91-95",
+   "verdict": "STATIC_ONLY"
+  },
+  {
+   "boundary": "EC-P256 proof-of-possession",
+   "expected": "DeviceKeys SPKI public PEM + pop_signature over single-use challenge",
+   "observed": "SPKI encode/decode repaired in C1-C4 (commit 5f7f23d) and pinned by instrumented tests; NOT exercised on device (claim never reached)",
+   "typed_failure": "NOT_EXERCISED",
+   "server_evidence": "NOT_OBSERVED",
+   "client_evidence": "CI run 44752839915 14/14",
+   "verdict": "NOT_EXERCISED_ON_DEVICE"
+  },
+  {
+   "boundary": "attest route",
+   "expected": "POST /api/tower/voice-console/v2/pairings/{id}/attest",
+   "observed": "ROUTE EXISTS on live Tower (probe 200 ok:false PAIRING_NOT_FOUND_OR_EXPIRED)",
+   "typed_failure": "NOT_REACHED_FROM_DEVICE",
+   "server_evidence": "lane probe",
+   "client_evidence": "TowerApi.attest",
+   "verdict": "ROUTE_PRESENT"
+  },
+  {
+   "boundary": "PendingOwnerAck (GET ack)",
+   "expected": "GET /api/tower/voice-console/v2/pairings/{id}/ack → {state, device_id, console_token, phrase_hint}",
+   "observed": "ROUTE ABSENT on live Tower — catch-all 404 {\"detail\":\"No such API endpoint: ...\"}; even after a successful claim+attest the bilateral-acknowledgement poll would fail",
+   "typed_failure": "CONTRACT DIVERGENCE (proven, server-side surface)",
+   "server_evidence": "lane probe 404 catch-all",
+   "client_evidence": "TowerApi.ownerAck (GET)",
+   "verdict": "PROVEN_DIVERGENCE (AMB-8)"
+  },
+  {
+   "boundary": "local encrypted persistence",
+   "expected": "atomic commitPairing, AES-256-GCM AndroidKeyStore, typed 7-state failure matrix",
+   "observed": "repaired in C1-C4; instrumented 14/14 (SOFTWARE_ANDROID_KEYSTORE_TESTED); NOT exercised on device (failure occurred before persistence)",
+   "typed_failure": "NOT_EXERCISED",
+   "server_evidence": "NOT_APPLICABLE",
+   "client_evidence": "CI keystore run",
+   "verdict": "NOT_EXERCISED_ON_DEVICE"
+  }
+ ],
+ "owner_evidence": [
+  {
+   "file": "Screenshot_2026-11-20-16-51-35-674_com.hermestower.voiceconsole.a4rdebug.jpg",
+   "sha256": "69d5b39cde83fbd79e920f80a627f060b3201d282578aba3649ae73f4b51de16",
+   "taken": "2026-11-20T16:51+01:00",
+   "finding": "QR",
+   "note": "scan result card: parser v2 accepted, expiresIn=230s, numeric code 521021 entered, typed state 'Endpoint di pairing non raggiungibile', detail link 'Tower non raggiungibile'; app open; status bar 4G+, Tailscale chip '1 dispositivo', battery 96%"
+  },
+  {
+   "file": "Screenshot_2026-11-20-16-53-36-260_com.hermestower.voiceconsole.a4rdebug.jpg",
+   "sha256": "bcbd2b0bb5d66bb6261233180fde0538c6eec872b41b684151f892ae13162618",
+   "taken": "2026-11-20T16:53+01:00",
+   "finding": "QR",
+   "note": "second attempt: Tower wizard visible on PC screen (PAIRING READY, scadenza 4:29), QR frame in photo area (EXPIRED single-use nonce — Owner asked to delete), parser v2 accepted expiresIn=278s, code 563783, same typed state",
+   "hygiene": "contains QR image — do not persist QR content in any receipt; deletion requested"
+  }
+ ],
+ "root_cause": {
+  "proven_layer": "TRANSPORT_PRE_HTTP — the phone never received an HTTP response from the QR-carried endpoint (IOException class: DNS / TCP connect / TLS handshake / Android cleartext block), typed on device as PAIRING_ENDPOINT_UNREACHABLE with B-bound detail 'Tower non raggiungibile'",
+  "proven_non_causes": [
+   "QR framing/format divergence (device parsed the payload twice)",
+   "schema-name divergence (v=2, protocol_version, scope, expires_at all accepted)",
+   "expiry/clock divergence (expiresIn 230s/278s accepted)",
+   "forbidden-field rejection (passed)",
+   "claim/attest route absence on live Tower (routes PROVEN present by lane probe)",
+   "public-plane outage or TLS invalidity (plane healthy, LE cert valid to 2027-02-10)",
+   "BAD_ENDPOINT (UI would have shown 'Nessun endpoint disponibile'; it showed 'Tower non raggiungibile')"
+  ],
+  "surviving_endpoint_classes": [
+   {
+    "class": "LAN-only endpoint (e.g. http://192.168.x.x:port in QR)",
+    "fit": "phone on 4G cellular cannot reach RFC1918; also cleartext-blocked by NSC even on Wi-Fi",
+    "plausibility": "HIGH"
+   },
+   {
+    "class": "Tailscale-only endpoint (100.x.y.z or MagicDNS host)",
+    "fit": "phone Tailscale chip shows '1 dispositivo' — if the Tower PC is not in the same tailnet/online, unreachable from cellular; MagicDNS unresolved → IOException",
+    "plausibility": "MEDIUM-HIGH"
+   },
+   {
+    "class": "cleartext http:// public host",
+    "fit": "Android NSC (cleartext only loopback) throws IOException before connect — would fail on ANY network",
+    "plausibility": "MEDIUM"
+   },
+   {
+    "class": "private-CA/self-signed https endpoint",
+    "fit": "TLS handshake failure → IOException",
+    "plausibility": "LOWER (public plane uses valid LE)"
+   }
+  ],
+  "decisive_missing_evidence": "the endpoint SCHEME/CLASS the live Tower wizard embeds in the QR — three evidence paths: (1) Owner screenshot of the full Tower wizard window showing any endpoint/URL text (QR excluded); (2) V2 APK secret-clean diagnostics export with transport classification; (3) Tower-account handoff answer",
+  "qr_failure_root_cause_proven": "TRANSPORT_LAYER_PROVEN; EXACT_ENDPOINT_CLASS_PENDING_EVIDENCE"
+ },
+ "contract_divergences_found": [
+  {
+   "id": "AMB-8",
+   "severity": "MUST_FIX_BEFORE_Q6_Q7",
+   "finding": "GET /pairings/{id}/ack absent on live runtime (catch-all 404); client implements it",
+   "action": "versioned contract delta request to Tower account; backward-compatible client adapter impossible for a missing route"
+  },
+  {
+   "id": "AMB-9",
+   "severity": "SHOULD_FIX",
+   "finding": "live Tower returns failures as HTTP 200 {ok:false,error:...}; client reads neither ok nor error → Tower-side reasons would be mislabeled as CLAIM_RESPONSE_INCOMPLETE",
+   "action": "client adapter: read ok/error envelope first, keep HTTP status handling; pinned in contract fixtures"
+  },
+  {
+   "id": "AMB-10",
+   "severity": "OPEN",
+   "finding": "QR endpoint emission policy of the live Tower (scheme/host class) unknown; decides LAN/Tailscale/cleartext handling",
+   "action": "Tower handoff question + wizard screenshot; V2 diagnostics export classifies transport failures"
+  }
+ ],
+ "repair_discipline_check": {
+  "no_schema_change_to_make_one_sample_pass": true,
+  "no_signature_validation_added_or_removed": true,
+  "no_ttl_change": true,
+  "no_replay_bypass": true,
+  "no_forbidden_field_acceptance": true,
+  "no_plaintext_persistence": true,
+  "no_hardcoded_owner_endpoint": true,
+  "no_credentials_embedded": true
+ }
+}
