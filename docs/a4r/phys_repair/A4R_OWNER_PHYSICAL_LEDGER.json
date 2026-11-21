@@ -251,7 +251,7 @@
   {
    "test_id": "A4R-PHYS-MODEL-002",
    "priority": "P1",
-   "timestamp": "2026-11-21T05:32:00+01:00 (screenshots)",
+   "timestamp": "2026-11-21T05:32:49+01:00 .. 07:34:04+01:00 (5 screenshots across two captures)",
    "timezone": "Europe/Rome",
    "device": "Xiaomi 11 Lite 5G NE",
    "android_version": "NOT_EXPOSED",
@@ -261,14 +261,14 @@
    "app_hash": "26dbad0c5f0fe7700fc51cea1db8dacba4a34cd105ee88a29113c00be480922e",
    "source_sha": "a58c63068929ba8bb8415f0443c0bcd399b8218f",
    "tower_sha_if_applicable": "NOT_APPLICABLE",
-   "expected": "Scarica on Qwen2.5 0.5B (GGUF q5_k_m) downloads 522,186,592 bytes with visible progress",
-   "observed": "OWNER_REPORTED: download fails immediately; model card state 'non installato'/DISCOVERED/'Non ancora utilizzabile: il componente non è stato scaricato'; exact error text, progress behaviour and free storage NOT YET PROVIDED",
-   "evidence": "3 Owner screenshots (sha256 recorded); lane probe: artifact EXISTS at pinned commit (302→us.aws.cdn.hf.co, x-linked-size 522186592 exact match, anonymous); lane itself received HTTP 429 challenge from HF edge on repeated HEADs (edge throttling is real); client pipeline static analysis complete",
-   "verdict": "PHYSICAL_FAIL",
-   "finding_id": "A4R-PHYS-MODEL-002 (+ candidate A4R-PHYS-STORAGE-004)",
-   "repair": "REPAIR_REQUIRED (targeted once error class proven): CDN-edge typed messaging/mirror ordering OR storage preflight UX; diagnostics export extension (mission section 2)",
+   "expected": "Scarica on Qwen2.5 0.5B (GGUF q5_k_m) downloads 522,186,592 bytes with visible progress and completes to INSTALLED/usable",
+   "observed": "OWNER_REPORTED + PROVEN (lane): download never becomes usable ('fails immediately' per Owner). DEVICE STATE (5 screenshots, stable 05:32->07:33): pill 'Scaricato' (progress DOWNLOADED, error==null) + install 'non installato' (registry record ABSENT) + qualification DISCOVERED + compat 'il componente non è stato scaricato' + NO typed error row + primary action still 'Scarica'. ROOT CAUSE PROVEN (code identity a58c630 + edge probe): promotion dead-end — registry.mutate() no-ops without a record, resolvers gate everything on recordState and ignore progressState=DOWNLOADED, no product path wires DOWNLOADED->verifyHash->install; a REAL full 522 MB transfer completed once (zero-byte shortcut disproven: Range-at-EOF = HTTP 416 empty on primary+mirror); every re-click DELETES the complete partial (416 branch) and restarts from byte 0. Historical failure classes DEMOTED: HF-edge 429 (real, intermittent — lane 429 again 2026-11-21) and storage preflight (typed failures would render an error row, absent on device)",
+   "evidence": "5 Owner screenshots (sha256 recorded in A4R_QWEN25_DOWNLOAD_DIFFERENTIAL.json; on-device SHA-256 + pinned revision match the lane records byte-for-byte); edge_probe evidence files (416-empty at EOF, primary+mirror; 429 challenge on lane); static proof with code-identity check (git diff a58c630..HEAD empty on the involved paths)",
+   "verdict": "PHYSICAL_FAIL (primary root cause PROVEN: promotion dead-end; historical A/B demoted to secondary)",
+   "finding_id": "A4R-PHYS-MODEL-002 (primary cause PROVEN; candidates A4R-PHYS-STORAGE-004 storage half demoted, kept open for the envelope)",
+   "repair": "REPAIR_REQUIRED R1-R7: registry upsert for record-less identities; wire DOWNLOADED->verifyHash->install->qualify (activation stays explicit); resolvers honor progressState; Range-416 with full partial -> verify-and-promote instead of delete+restart; secret-clean diagnostics export extension; JVM+instrumentation test rows; no simulated progress, no pre-declared downloaded state",
    "retest_required": true,
-   "next_step": "Owner error-text screenshot + free-storage value → close cause class → targeted repair"
+   "next_step": "implement R1-R7 on graph-a4r + tests -> V2 APK (new versionCode/Name, isolated install) -> M1-M9 mini-gate (separate from Q1-Q8)"
   },
   {
    "test_id": "A4R-PHYS-CONTRACT-003",
@@ -306,7 +306,7 @@
    "source_sha": "a58c63068929ba8bb8415f0443c0bcd399b8218f",
    "tower_sha_if_applicable": "NOT_APPLICABLE",
    "expected": "model manifest URL/hash/storage binding consistent; free space ≥ download + reserve",
-   "observed": "manifest URL/hash/size binding PROVEN consistent (catalog == live x-linked-size == HF LFS oid); device free storage NOT_YET_REPORTED; storage preflight fails instantly with a typed message when free < needed + max(reserve, 15% of free) — surviving candidate",
+   "observed": "manifest URL/hash/size binding PROVEN consistent (catalog == live x-linked-size == HF LFS oid == on-device visible SHA-256); storage half DEMOTED-OPEN: a full 522 MB transfer completed on the device at least once and typed storage-failure strings are absent from the captured device state; device free storage still unreported (kept for the resource envelope only)",
    "evidence": "catalog json + lane probe + static preflight analysis",
    "verdict": "POSSIBLE_MODEL_MANIFEST_URL_HASH_OR_STORAGE_BINDING_FAILURE (URL/hash half DISPROVEN; storage half OPEN)",
    "finding_id": "A4R-PHYS-STORAGE-004",
@@ -365,8 +365,8 @@
   },
   "source_sha": "a58c63068929ba8bb8415f0443c0bcd399b8218f",
   "tower_sha_if_applicable": "NOT_EXPOSED (Tower repository access from Android account UNAVAILABLE_OR_NOT_AUTHORIZED)",
-  "current_truth": "PHYSICAL MINI-GATE STOPPED AT SAFE BOUNDARY. Two Owner-reported P1 physical failures on the installed A4R APK: (1) QR pairing — camera + v2 parse worked twice, numeric codes typed, both attempts ended in typed PAIRING_ENDPOINT_UNREACHABLE ('Tower non raggiungibile'); lane forensics prove the live Tower public plane healthy and the v2 claim/attest routes PRESENT, GET ack route ABSENT (AMB-8), so the failure is transport-level to the QR-carried endpoint (class pending one evidence item). (2) Qwen2.5 0.5B download — fails immediately; artifact proven public/revision-bound/size+hash-consistent; surviving causes: CDN edge rejection vs storage preflight (discriminated by the Owner's exact error text). Gates reclassified per Owner directive; GRAPH_A4R_PASS = false; no reinstall of the same APK; no V2 build until both root causes complete.",
-  "next_exact_action": "Collect the MINIMUM Owner evidence: Qwen error text + progress behaviour + free storage; QR environment answer (Wi-Fi vs 4G) + one Tower wizard screenshot showing endpoint text (QR excluded). Then complete both root-cause proofs, repair, and build HERMES_VOICE_CONSOLE_A4R_REPAIRED_DEBUG_V2.apk (new versionCode/versionName) with the secret-clean diagnostics export; two separate mini-gates (Q1-Q8, M1-M9).",
+  "current_truth": "PHYSICAL MINI-GATE STOPPED AT SAFE BOUNDARY. Two Owner-reported P1 physical failures on the installed A4R APK. (1) QR pairing — camera + v2 parse worked twice, numeric codes typed, both attempts ended in typed PAIRING_ENDPOINT_UNREACHABLE ('Tower non raggiungibile'); lane forensics prove the live Tower public plane healthy and the v2 claim/attest routes PRESENT, GET ack route ABSENT (AMB-8): failure is transport-level to the QR-carried endpoint (exact endpoint class pending one Owner/Tower evidence item). (2) Qwen2.5 0.5B download — PRIMARY ROOT CAUSE NOW PROVEN: promotion dead-end (registry record never created for record-less identities; resolvers ignore progressState=DOWNLOADED; no DOWNLOADED->verifyHash->install wiring; Range-416 deletes the complete 522 MB partial on every re-click) — a REAL full download completed on the device and was never promoted; historical classes (HF-edge 429, storage preflight) demoted to secondary. Gates reclassified per Owner directive; GRAPH_A4R_PASS = false; no reinstall of the same APK; no V2 build until both repairs are implemented with their test rows (QR endpoint-class evidence may arrive in parallel).",
+  "next_exact_action": "Lane: implement Qwen repair R1-R7 with JVM+instrumentation test rows; keep the QR transport classification + AMB-8/9 adapter work queued. Owner (single remaining minimum set): QR wizard screenshot showing the endpoint text (QR/codes redacted) + environment answer (Wi-Fi vs 4G at pairing time); optionally the Qwen free-storage value and any exact error text ever shown right after a tap. Then: HERMES_VOICE_CONSOLE_A4R_REPAIRED_DEBUG_V2.apk (new versionCode/Name, isolated package) with the secret-clean diagnostics export; two separate mini-gates Q1-Q8 (QR) and M1-M9 (model).",
   "checkpoint_policy": "one checkpoint after P1-P4; one after P5-P6; one terminal after P7-P8; immediate commit after any material failure/repair",
   "blocker_registry": [
    {

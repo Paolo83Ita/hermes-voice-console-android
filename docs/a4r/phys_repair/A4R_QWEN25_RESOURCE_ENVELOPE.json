@@ -11,5 +11,12 @@
   "device_free_storage_at_failure": "OWNER_REPORTED_PENDING",
   "cdn_edge_behavior_on_device_network": "NOT_EXPOSED (device-side)",
   "full_download_sha256_rederivation": "NOT_EXERCISED_LANESIDE (probe-only; full-fetch belongs to M6)"
+ },
+ "updated_utc": "2026-11-21T07:02:31Z",
+ "proven_facts": {
+  "full_transfer_completed_on_device": "PROVEN (state DOWNLOADED with error==null reachable only with written==total; 5 screenshots)",
+  "edge_range_at_eof": "HTTP 416 content-length 0 (primary + mirror) — no zero-byte success shortcut",
+  "re_click_cost_until_repaired": "the complete 522 MB partial is DELETED (416 branch) and the download restarts from byte 0 on every re-click",
+  "peak_storage_estimated": "1044373184 bytes (temp .part + installed copy before cleanup) — unchanged"
  }
 }

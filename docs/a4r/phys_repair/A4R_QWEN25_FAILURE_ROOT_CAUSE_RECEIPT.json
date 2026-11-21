@@ -3,33 +3,90 @@
  "produced_utc": "2026-11-21T05:05:00Z",
  "finding_id": "A4R-PHYS-MODEL-002",
  "priority": "P1",
- "typed_state_on_device": "MODEL_DOWNLOAD_FAILED (immediate; exact app error string pending Owner evidence)",
+ "typed_state_on_device": "DOWNLOAD_DEAD_END__DOWNLOADED_WITH_NO_RECORD (pill 'Scaricato', install 'non installato', qualification DISCOVERED, compat 'il componente non è stato scaricato', NO typed error row) — the Owner-visible 'immediate failure' is the promotion dead-end, not a network error",
  "gate_reclassification": {
   "QWEN_2_5_MODEL_DOWNLOAD_PASS": "FAIL"
  },
- "root_cause_statement": "The exact artifact is public, revision-bound, size- and hash-consistent (lane-proven). The device-side failure is immediate (no visible progress per Owner report). Two evidence-ranked candidates survive: (A) HF/CDN edge rejection on the device network (the lane itself received HTTP 429 challenge pages from the same edge), or (B) storage preflight/gate (needed 522,186,592 bytes + reserve). The app writes a DISTINCT typed error string for each path — the Owner's exact error text completes the proof without any guessing.",
+ "root_cause_statement": "PROVEN: the app completed a REAL full download (522,186,592 bytes — the DOWNLOADED-with-error==null state is reachable only with written==total; the zero-byte 206 shortcut is disproven by the edge probe: Range-at-EOF answers HTTP 416 with an EMPTY body on both huggingface.co and hf-mirror.com) and then had NO path to promote it: (1) the installation registry silently no-ops for record-less identities, so no record ever exists until a successful atomic install; (2) the compatibility and action resolvers key every post-download verdict and primary action on the record state and ignore the in-memory progress state; (3) no product code connects DOWNLOADED to hash-verify/install for the local-LLM component; (4) each further click on 'Scarica' sends a Range-at-EOF request, gets 416, DELETES the complete 522 MB partial and restarts from byte 0. The Owner therefore experiences 'the download fails immediately / the model never becomes usable' while the card permanently shows the contradictory state captured in five screenshots ('Scaricato' + 'non installato' + 'il componente non è stato scaricato'). The historical first-click failure classes (HF-edge 429 challenge; storage preflight) are REAL but DEMOTED to secondary: typed failures would render an error row + 'Non riuscito', which the device state excludes, and a full transfer completed at least once.",
  "evidence": {
-  "lane_probe": {
-   "resolve_url": "https://huggingface.co/Qwen/Qwen2.5-0.5B-Instruct-GGUF/resolve/9217f5db79a29953eb74d5343926648285ec7e67/qwen2.5-0.5b-instruct-q5_k_m.gguf",
-   "redirect_chain": "huggingface.co → us.aws.cdn.hf.co/xet-bridge-us (signed GET, Expires parameter)",
-   "x_linked_size": 522186592,
-   "anonymous_access": true,
-   "note": "repeated lane HEAD probes received HTTP 429 HTML challenge from the HF edge — edge throttling/challenge on this route is REAL (supports SURVIVING_CANDIDATE_A)"
+  "owner_screenshots": [
+   {
+    "file": "Screenshot_2026-11-21-05-32-49-738_com.hermestower.voiceconsole.a4rdebug.jpg",
+    "sha256": "b6ba8998439166a41135af73b7b205987ae3202b7c2d4da046d1209f39f9b784",
+    "taken": "2026-11-21T05:32:49+01:00"
+   },
+   {
+    "file": "Screenshot_2026-11-21-05-32-56-786_com.hermestower.voiceconsole.a4rdebug.jpg",
+    "sha256": "61cf88d0558431021c7a6e59750077cafda4fa6b6f2c09f613f16e08bf3991ba",
+    "taken": "2026-11-21T05:32:56+01:00"
+   },
+   {
+    "file": "Screenshot_2026-11-21-05-33-04-598_com.hermestower.voiceconsole.a4rdebug.jpg",
+    "sha256": "3da2c2f48197d56b9dd7f81ed07177d962788a256aea4929cc82959ad01e108f",
+    "taken": "2026-11-21T05:33:04+01:00"
+   },
+   {
+    "file": "Screenshot_2026-11-21-07-33-56-070_com.hermestower.voiceconsole.a4rdebug.jpg",
+    "sha256": "3707de21379848f794fa6c739d406085d5ac129ae21b7fe6eb44718b08472321",
+    "taken": "2026-11-21T07:33:56+01:00"
+   },
+   {
+    "file": "Screenshot_2026-11-21-07-34-04-127_com.hermestower.voiceconsole.a4rdebug.jpg",
+    "sha256": "f2815a85e02befcdec23c1f44b3b14de49fb503fa754b4e53f509dd13d8f10e4",
+    "taken": "2026-11-21T07:34:04+01:00"
+   }
+  ],
+  "state_reachability_proof": [
+   "FileInstallationRegistry.mutate() (ModelInstallationRegistry.kt:127-134) silently NO-OPs when no record exists; records are created ONLY by markInstalled (after a successful atomic install) => record==null for the ENTIRE download lifecycle of a never-installed component => card row 'Stato di installazione: non installato' (both screenshot batches, stable 05:32->07:33)",
+   "ModelUxComponents/ModelManagerScreen.kt:392 ModelStatePill(record?.state ?: progress?.state?.name ?: entry.state): with record==null the pill renders the PROGRESS state => 'Scaricato' (DOWNLOADED) — exactly the Owner's screenshots",
+   "CompatVerdictResolver.resolve (ModelUxSemantics.kt:66-109) checks only QUARANTINED/FAILED on progressState and keys every other verdict on recordState; runtimeRequirement!=null && recordState==null => NOT_DOWNLOADED regardless of progress=DOWNLOADED => compat stays 'il componente non è stato scaricato'",
+   "ModelActionResolver.resolve (ModelUxSemantics.kt:136-163) maps every post-download primary action from recordState (DOWNLOADED->VERIFY, HASH_VERIFIED->INSTALL); with recordState==null and entryClassification==VERIFIED_DOWNLOADABLE the primary stays DOWNLOAD forever",
+   "grep over the delivered source tree (identity verified: git diff a58c630..HEAD EMPTY for models/, locale/, ModelManagerScreen.kt): modelDownloads is touched ONLY by ModelManagerScreen actions and AppGraph wiring (VoicePackInstaller for VOICE packs); verifyHash/install for LOCAL_LLM are reachable ONLY via the record-gated INSTALL branch and selftests => NO product path connects DOWNLOADED -> verifyHash -> install",
+   "ModelDownloadManager.kt:313-314: on byte completion the flow is set DOWNLOADED and registry.markState(DOWNLOADED) is called — the registry call NO-OPs (no record) — matching pill 'Scaricato' + row 'non installato' simultaneously",
+   "Every failure path (HTTP non-2xx, preflight, incomplete body, hash mismatch) sets progress.error AND state FAILED => the card would render the 'Ultimo evento di download' error row + pill 'Non riuscito' — the Owner's screenshots show NEITHER => the last attempt in the process ended DOWNLOADED (bytes==total, error==null)"
+  ],
+  "lane_edge_probe": {
+   "probe_script": "scripts/a4r_qwen_edge_probe.sh",
+   "executed_utc": "2026-11-21T07:02:31Z",
+   "user_agent_sent_as_app": "HermesTowerConsole-ModelDownload/1.0 (Android)",
+   "p1_get_range_0_1023": "HTTP 429 text/html content-length 3138 (lane-IP edge challenge again — throttle real, intermittent)",
+   "p2_get_range_at_eof_bytes_522186592": "huggingface.co: 302 -> HTTP 416 content-length 0 (empty body)",
+   "p2m_mirror_same_shape": "hf-mirror.com: 308 -> 302 -> HTTP 416 content-length 0 (identical)",
+   "p3_single_head": "HTTP 429 (challenge)",
+   "conclusion": "the edge NEVER returns a 206-empty/zero-total success for a range at EOF: doDownload's 416 branch DELETES the full partial and restarts from byte 0 on both primary and mirror; therefore flow state DOWNLOADED with error==null is reachable ONLY by a real full 522,186,592-byte transfer",
+   "evidence_files": [
+    "edge_probe/p1_headers.txt",
+    "edge_probe/p2_headers.txt",
+    "edge_probe/p2m_headers.txt",
+    "edge_probe/p3_headers.txt"
+   ]
   },
   "client_static": [
-   "ModelDownloadManager.kt (preflight IOException; redirect walk; HTTP <code> mapping; mirror fallback)",
-   "ModelStorageManager.kt (reserve = max(reserveBytes, 15% of free))",
-   "DownloadGatekeeper.kt (offline/thermal/storage gates)",
-   "ModelManagerScreen.kt (DOWNLOAD action passes entry.sourceUri directly)"
-  ],
-  "prior_physical_history": "same download failed on POCO X6 Pro in an earlier block ('errore di connessione'); repairs then: UA added, explicit redirect walk, true-offset resume, mirror fallback — the A4R APK inherits those repairs"
+   "ModelDownloadManager.kt (start/resume/doDownload/verifyHash/install; DOWNLOADED at 313-314; 416 delete-and-restart at 263-272; failure paths set error+FAILED)",
+   "ModelInstallationRegistry.kt (mutate() no-op without record; markInstalled the only record creator)",
+   "ModelUxSemantics.kt (CompatVerdictResolver + ModelActionResolver recordState-only gating)",
+   "ModelManagerScreen.kt:392 (pill precedence) + :596-633 (DOWNLOAD/VERIFY/INSTALL action branches) + :609 (start(entry, entry.sourceUri))",
+   "ModelStorageManager.kt (preflight formula; tmp/staging/quarantine roots; cleanupFailedTempFiles on final failure)",
+   "AppGraph.kt:106/228/250 (singleton manager wiring; VoicePackInstaller receives downloads for VOICE packs only)",
+   "code identity: git diff a58c630..HEAD EMPTY for models/, locale/, ModelManagerScreen.kt (a58c630 = delivered APK build head)"
+  ]
  },
  "repair_plan": [
-  "R1: ONCE the error class is proven — targeted fix: (A) CDN-edge: retry policy already bounded; add typed 429/403 message + guidance (network change) and probe-test alternative mirror ordering; (B) storage: keep the typed message, add free-space display in the model card before download",
-  "R2: extend the secret-clean diagnostics export with model manifest ID, filename, expected size/hash, URL host/path classification, HTTP status, DownloadManager/client state, destination authority, checksum state, retry state, available storage (mission section 2 list)",
-  "R3: contract fixtures + unit tests for the proven class; instrumentation for interrupt/resume/hash gates",
-  "R4: NO simulated progress, NO pre-declared downloaded state, NO silent model fallback"
+  "R1 registry record lifecycle: markState UPSERTS a record for record-less identities (DOWNLOADING/DOWNLOADED/FAILED/HASH_*), so the persistent ledger reflects the truth and the pill/rows stop contradicting; no pre-declared 'downloaded' state is ever written without bytes on disk",
+  "R2 promotion wiring: when bytes reach total (DOWNLOADED), the manager continuation runs verifyHash -> install() -> qualification read-back; ACTIVATION stays an explicit Owner action (Tower-first preserved; no auto-activate, no silent fallback)",
+  "R3 resolvers honor progressState: with record==null, progressState DOWNLOADED => VERIFICATION_REQUIRED + primary VERIFY; HASH_VERIFIED => INSTALL_READY + primary INSTALL (pure JVM-testable rows added to the §26 matrix)",
+  "R4 re-click semantics with a full-size partial: on Range-416 do NOT delete-and-restart blindly — first hash-verify the complete partial and PROMOTE when valid; honest restart-from-zero only when verification fails; mirror fallback unchanged",
+  "R5 diagnostics export extension (mission section 2): manifest ID, filename, expected size+hash, URL host/path class, HTTP status class, download state, registry record state, tmp/staging/quarantine usage, free storage, retry/mirror state — secret-clean (no tokens, no full URL query)",
+  "R6 tests: JVM rows for registry upsert; DOWNLOADED->INSTALLED promotion on the pipeline; 416-with-full-partial -> verify-and-promote; 429/403 typed error rendering; resolver matrix rows for progressState; instrumentation for interrupt/resume/hash gates",
+  "R7 repair discipline: NO simulated progress, NO schema whitewashing of the QR findings, NO signature/TTL/replay changes, NO Tower core modification"
  ],
  "tower_first_note": "failure does NOT block Tower pairing or voice (OPTIONAL component) — but it is a P1 finding for the model library lane",
- "blocked_until": "Owner evidence → targeted repair → V2 APK → M1-M9 mini-gate"
+ "blocked_until": "repair R1-R7 implemented + JVM/instrumentation tests green -> HERMES_VOICE_CONSOLE_A4R_REPAIRED_DEBUG_V2.apk (new versionCode/Name) -> M1-M9 mini-gate",
+ "updated_utc": "2026-11-21T07:02:31Z",
+ "not_claimed": [
+  "VOICE_CONSOLE_PAIRED_AND_VERIFIED",
+  "GRAPH_A4R_PASS",
+  "ANDROID_CANONICAL_BASE_SELECTED",
+  "XIAOMI_QWEN25_DOWNLOAD_PASS"
+ ]
 }
