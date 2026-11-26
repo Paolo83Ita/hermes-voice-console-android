@@ -46,7 +46,6 @@ import com.google.mlkit.vision.common.InputImage
 import com.hermestower.voiceconsole.app.AppGraph
 import com.hermestower.voiceconsole.pairing.NumericPairingCode
 import com.hermestower.voiceconsole.pairing.TowerQrV2ScanFlow
-import com.hermestower.voiceconsole.towerpair.TowerPairingOutcome
 import com.hermestower.voiceconsole.towerpair.TowerPairingState
 import com.hermestower.voiceconsole.towerpair.toTowerPairingState
 import com.hermestower.voiceconsole.locale.StateLabels
@@ -89,7 +88,7 @@ import com.hermestower.voiceconsole.ui.components.HermesFilledButton
  * never silent. No stack trace ever reaches this screen.
  */
 @Composable
-fun QrScannerScreen(graph: AppGraph, onBack: () -> Unit) {
+fun QrScannerScreen(graph: AppGraph, onBack: () -> Unit, onPaired: () -> Unit = {}) {
     val c = hermesColors
     val context = androidx.compose.ui.platform.LocalContext.current
     val lifecycleOwner = LocalLifecycleOwner.current
@@ -120,19 +119,17 @@ fun QrScannerScreen(graph: AppGraph, onBack: () -> Unit) {
     val scanFlow = remember { TowerQrV2ScanFlow(graph.towerQrParser) }
     var scanState by remember { mutableStateOf<TowerQrV2ScanFlow.ScanState>(TowerQrV2ScanFlow.ScanState.Idle) }
     var cameraError by remember { mutableStateOf<String?>(null) }
-    // ---- production pairing state (Tower v2 contract) ----
-    var resolvedEndpoint by remember { mutableStateOf<String?>(null) }
-    var resolvedPairingId by remember { mutableStateOf<String?>(null) }
+    // ANDROID REPAIR CP-005: the raw QR text is retained so the CANONICAL session
+    // machine (envelope v2+v3, multi-candidate resolver) can re-parse and drive
+    // the full flow — the old single-endpoint resolution is retired.
+    var lastRawQr by remember { mutableStateOf<String?>(null) }
+    // ---- production pairing state (Tower v2/v3 contract, session machine) ----
     var manualEndpointInput by remember { mutableStateOf("") }
     var manualEndpointVisible by remember { mutableStateOf(false) }
     var numericCodeInput by remember { mutableStateOf("") }
     var numericCodeInvalid by remember { mutableStateOf(false) }
     var pairingBusy by remember { mutableStateOf(false) }
-    var pairingLine by remember { mutableStateOf<String?>(null) }
-    var awaitingAck by remember { mutableStateOf(false) }
-    var registeredDeviceId by remember { mutableStateOf<String?>(null) }
-    var typedReject by remember { mutableStateOf<TowerPairingState?>(null) }
-    var typedRejectDetail by remember { mutableStateOf<String?>(null) }
+    var sessionSnap by remember { mutableStateOf<com.hermestower.voiceconsole.pairing.PairingSessionController.Snapshot?>(null) }
 
     val localeTag = com.hermestower.voiceconsole.locale.AppLanguage.effectiveTag(context)
     fun typedStateLine(state: TowerPairingState): String = context.getString(
@@ -214,7 +211,10 @@ fun QrScannerScreen(graph: AppGraph, onBack: () -> Unit) {
 
                 DisposableEffect(cameraProvider, lifecycleOwner) {
                     val provider = cameraProvider
-                    val analyzer = QrBarcodeAnalyzer { raw -> scanState = scanFlow.onRawScan(raw) }
+                    val analyzer = QrBarcodeAnalyzer { raw ->
+                        if (!raw.isNullOrBlank()) lastRawQr = raw
+                        scanState = scanFlow.onRawScan(raw)
+                    }
                     if (provider != null) {
                         try {
                             val preview = Preview.Builder().build().also { it.setSurfaceProvider(previewView.surfaceProvider) }
@@ -271,14 +271,38 @@ fun QrScannerScreen(graph: AppGraph, onBack: () -> Unit) {
                         }
 
                         is TowerQrV2ScanFlow.ScanState.Detected -> {
-                            // GRAPH A4R C1-C4: REAL pairing — no SIMULATED label
-                            // anywhere on this path (NO_MOCK_PAIRING_IN_PRODUCTION_PATH).
-                            val manualEndpoint = manualEndpointInput.trim().takeIf { it.isNotEmpty() }
-                            when (val r = graph.towerPairingController.resolveParsed(s.parsed, manualEndpoint)) {
-                                is com.hermestower.voiceconsole.towerpair.TowerQrResolution.Rejected -> {
-                                    Text(typedStateLine(r.state), style = HermesType.body, color = c.textPrimary)
-                                    Text(r.detail, style = HermesType.body, color = c.textInfo)
-                                    // Mission §8 advanced fallback: manual endpoint entry.
+                            // ANDROID REPAIR CP-005: the CANONICAL session machine drives
+                            // the pairing (envelope v2+v3 -> multi-candidate resolver ->
+                            // claim/attest -> phrase gate -> ack -> commit). The old
+                            // single-endpoint dead-end (tower.local on 4G) is retired:
+                            // every candidate is classified, LAN is skipped honestly on
+                            // cellular, manual fallback is the same pipeline (no bypass).
+                            val rawQr = lastRawQr
+                            val snap = sessionSnap
+                            when {
+                                rawQr == null -> {
+                                    Text(
+                                        stringResource(com.hermestower.voiceconsole.R.string.qr_refused_note),
+                                        style = HermesType.bodySecondary, color = c.textSecondary,
+                                    )
+                                    TextButton(onClick = {
+                                        scanFlow.reset()
+                                        scanState = TowerQrV2ScanFlow.ScanState.Idle
+                                    }) { Text(stringResource(com.hermestower.voiceconsole.R.string.qr_scan_again)) }
+                                }
+                                snap != null -> {
+                                    PairingSessionStateView(
+                                        graph = graph,
+                                        snap = snap,
+                                        onPaired = onPaired,
+                                        onRestartScan = {
+                                            sessionSnap = null
+                                            scanFlow.reset()
+                                            scanState = TowerQrV2ScanFlow.ScanState.Idle
+                                        },
+                                    )
+                                }
+                                else -> {
                                     if (!manualEndpointVisible) {
                                         TextButton(onClick = { manualEndpointVisible = true }) {
                                             Text(stringResource(com.hermestower.voiceconsole.R.string.qr_v2_manual_endpoint_action))
@@ -292,14 +316,6 @@ fun QrScannerScreen(graph: AppGraph, onBack: () -> Unit) {
                                             modifier = Modifier.fillMaxWidth(),
                                         )
                                     }
-                                }
-                                is com.hermestower.voiceconsole.towerpair.TowerQrResolution.Resolved -> {
-                                    Text(stringResource(com.hermestower.voiceconsole.R.string.qr_v2_accepted), style = HermesType.body, color = c.textPrimary)
-                                    Text(r.summary, style = HermesType.bodySecondary, color = c.textSecondary)
-                                    Text(
-                                        stringResource(com.hermestower.voiceconsole.R.string.qr_v2_contract_note),
-                                        style = HermesType.bodySecondary, color = c.textSecondary,
-                                    )
                                     OutlinedTextField(
                                         value = numericCodeInput,
                                         onValueChange = { if (it.length <= NumericPairingCode.REQUIRED_LENGTH) numericCodeInput = it },
@@ -317,9 +333,14 @@ fun QrScannerScreen(graph: AppGraph, onBack: () -> Unit) {
                                             style = HermesType.body, color = c.textInfo,
                                         )
                                     }
-                                    val alreadyRegistered = registeredDeviceId != null
+                                    if (pairingBusy) {
+                                        Text(
+                                            stringResource(com.hermestower.voiceconsole.R.string.qr_v2_progress),
+                                            style = HermesType.bodySecondary, color = c.textSecondary,
+                                        )
+                                    }
                                     HermesFilledButton(
-                                        enabled = !pairingBusy && !alreadyRegistered,
+                                        enabled = !pairingBusy,
                                         onClick = {
                                             val normalized = NumericPairingCode.normalize(numericCodeInput)
                                             if (normalized == null) {
@@ -327,58 +348,27 @@ fun QrScannerScreen(graph: AppGraph, onBack: () -> Unit) {
                                             } else {
                                                 numericCodeInvalid = false
                                                 pairingBusy = true
-                                                pairingLine = null
-                                                typedReject = null
-                                                typedRejectDetail = null
                                                 scope.launch {
                                                     try {
-                                                        var outcome = graph.towerPairingController.pair(r.endpoint, r.pairingId, normalized, null)
-                                                        if (outcome is TowerPairingOutcome.AwaitingOwnerAck) {
-                                                            awaitingAck = true
-                                                            outcome.phraseHint?.let { phrase ->
-                                                                pairingLine = context.getString(
-                                                                    com.hermestower.voiceconsole.R.string.qr_v2_awaiting_fmt, phrase,
-                                                                )
+                                                        val manualCandidates = manualEndpointInput.trim()
+                                                            .takeIf { it.isNotEmpty() }
+                                                            ?.let {
+                                                                com.hermestower.voiceconsole.pairing.ManualEndpointParser.parse(it).candidate
                                                             }
-                                                            outcome = graph.towerPairingController.awaitOwnerAcknowledgement()
-                                                            awaitingAck = false
-                                                        }
-                                                        when (outcome) {
-                                                            is TowerPairingOutcome.Registered -> {
-                                                                registeredDeviceId = outcome.deviceId
-                                                                pairingLine = context.getString(
-                                                                    com.hermestower.voiceconsole.R.string.qr_v2_registered_fmt, outcome.deviceId,
-                                                                )
-                                                            }
-                                                            is TowerPairingOutcome.Rejected -> {
-                                                                typedReject = outcome.state
-                                                                typedRejectDetail = outcome.detail
-                                                            }
-                                                            else -> Unit
-                                                        }
+                                                            ?.let { listOf(it) } ?: emptyList()
+                                                        sessionSnap = graph.pairingSessionController.startFromEnvelope(
+                                                            qrText = rawQr,
+                                                            claimCode = normalized,
+                                                            label = "Console vocale Android",
+                                                            manualCandidates = manualCandidates,
+                                                        )
                                                     } finally {
                                                         pairingBusy = false
                                                     }
                                                 }
                                             }
                                         },
-                                    ) {
-                                        Text(stringResource(
-                                            if (alreadyRegistered) com.hermestower.voiceconsole.R.string.qr_v2_paired_done
-                                            else com.hermestower.voiceconsole.R.string.qr_v2_pair_button,
-                                        ))
-                                    }
-                                    if (pairingBusy || awaitingAck) {
-                                        Text(
-                                            stringResource(com.hermestower.voiceconsole.R.string.qr_v2_progress),
-                                            style = HermesType.bodySecondary, color = c.textSecondary,
-                                        )
-                                    }
-                                    pairingLine?.let { Text(it, style = HermesType.body, color = c.textInfo) }
-                                    typedReject?.let { state ->
-                                        Text(typedStateLine(state), style = HermesType.body, color = c.textPrimary)
-                                        typedRejectDetail?.let { Text(it, style = HermesType.body, color = c.textInfo) }
-                                    }
+                                    ) { Text(stringResource(com.hermestower.voiceconsole.R.string.qr_v2_pair_button)) }
                                 }
                             }
                         }

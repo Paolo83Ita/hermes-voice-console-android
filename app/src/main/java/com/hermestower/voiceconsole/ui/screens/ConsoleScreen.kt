@@ -103,6 +103,7 @@ fun ConsoleScreen(
     graph: AppGraph,
     onOpenHistory: () -> Unit,
     onOpenNavigation: () -> Unit = {},
+    onOpenPairing: () -> Unit = {},
 ) {
     val m = monumentalColors
     val state by graph.store.state.collectAsStateWithLifecycle()
@@ -258,6 +259,39 @@ fun ConsoleScreen(
                         },
                     )
                 }
+                }
+            }
+
+            // ANDROID REPAIR CP-005 (mission section 4): the UNPAIRED HOME CARD —
+            // pairing discoverability is a P0 property. When the console is not
+            // paired, the FIRST content under the frieze is the primary
+            // "Connetti alla Tower" card: one tap to the pairing flow
+            // (PAIRING_HOME_DISCOVERABILITY gate), monumental styling, Marble/Dark aware.
+            if (!graph.towerStore.isPaired()) {
+                androidx.compose.material3.Surface(
+                    shape = androidx.compose.foundation.shape.RoundedCornerShape(18.dp),
+                    color = m.obsidianSheen,
+                    border = androidx.compose.foundation.BorderStroke(1.dp, m.bronzeLight),
+                    modifier = Modifier
+                        .fillMaxWidth()
+                        .padding(horizontal = 12.dp, vertical = 4.dp),
+                ) {
+                    Column(Modifier.padding(14.dp)) {
+                        Text(
+                            stringResource(com.hermestower.voiceconsole.R.string.home_unpaired_card_title),
+                            style = MonumentalType.sectionTitle,
+                            color = m.gold,
+                        )
+                        Text(
+                            stringResource(com.hermestower.voiceconsole.R.string.home_unpaired_card_body),
+                            style = com.hermestower.voiceconsole.ui.theme.HermesType.bodySecondary,
+                            color = m.bronzeLight,
+                            modifier = Modifier.padding(vertical = 6.dp),
+                        )
+                        androidx.compose.material3.Button(onClick = onOpenPairing) {
+                            Text(stringResource(com.hermestower.voiceconsole.R.string.home_unpaired_card_button))
+                        }
+                    }
                 }
             }
 

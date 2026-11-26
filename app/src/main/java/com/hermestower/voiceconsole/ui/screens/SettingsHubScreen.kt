@@ -20,6 +20,7 @@ import androidx.compose.material.icons.outlined.Mic
 import androidx.compose.material.icons.outlined.Memory
 import androidx.compose.material.icons.outlined.Palette
 import androidx.compose.material.icons.outlined.Psychology
+import androidx.compose.material.icons.outlined.Router
 import androidx.compose.material.icons.outlined.Settings
 import androidx.compose.material.icons.outlined.Tune
 import androidx.compose.material3.Icon
@@ -102,6 +103,20 @@ fun SettingsHubScreen(
                 sub = stringResource(R.string.settings_tower_status_sub),
                 icon = Icons.Outlined.Link,
                 onClick = { onOpen(AppRoutes.CONNECTION) },
+            )
+            // ANDROID REPAIR CP-005 (mission section 4, PAIRING_SETTINGS_PASS):
+            // pairing and devices reachable from Settings — "Pairing e dispositivi".
+            SettingsRow(
+                label = stringResource(R.string.dest_pairing),
+                sub = stringResource(R.string.subtitle_pairing),
+                icon = Icons.Outlined.Link,
+                onClick = { onOpen(AppRoutes.PAIRING) },
+            )
+            SettingsRow(
+                label = stringResource(R.string.dest_tower_home),
+                sub = stringResource(R.string.subtitle_tower_home),
+                icon = Icons.Outlined.Router,
+                onClick = { onOpen(AppRoutes.TOWER_HOME) },
             )
             SettingsRow(
                 label = stringResource(R.string.settings_tower_studio),

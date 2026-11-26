@@ -147,6 +147,13 @@ interface PairingStateStore {
     fun pairedDeviceId(): String? = null
 
     /**
+     * ANDROID REPAIR CP-005 — the stored endpoint for the post-restart REAL
+     * connection test (decrypted, host only is used for display). Null when
+     * absent. The endpoint is NOT a secret (it travels in the QR).
+     */
+    fun storedEndpoint(): String? = null
+
+    /**
      * TEST fixture ONLY (SIMULATED_CONTRACT_TEST): an in-memory implementation
      * with the SAME typed contract. It is compiled beside the interface so the
      * JVM suite can exercise the pairing state machine deterministically; it
@@ -198,5 +205,6 @@ interface PairingStateStore {
         private var turnSeq = 0
         override fun nextTurnSeq(): Int = ++turnSeq
         override fun pairedDeviceId(): String? = data["device_id"]
+        override fun storedEndpoint(): String? = data["endpoint"]
     }
 }

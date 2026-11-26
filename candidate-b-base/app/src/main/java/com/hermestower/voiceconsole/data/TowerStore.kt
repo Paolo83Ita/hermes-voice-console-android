@@ -379,6 +379,9 @@ class TowerStore(context: Context, private val encryptInterceptor: ((ByteArray) 
     /** ANDROID REPAIR CP-005 — restart read-back (decrypted, public id, no secret). */
     override fun pairedDeviceId(): String? = getDeviceId()
 
+    /** ANDROID REPAIR CP-005 — the stored endpoint for the post-restart connection test. */
+    override fun storedEndpoint(): String? = getEndpoint()
+
     override fun clear() {
         prefs.edit().clear().commit()
         clearFailureState()

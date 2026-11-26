@@ -19,6 +19,12 @@ object AppRoutes {
     const val ARCHIVE = "archive"
     const val QR_SCANNER = "qr_scanner"
 
+    /** ANDROID REPAIR CP-005 (mission section 4): the TOWER primary surface and
+     *  the PAIRING flow — pairing is a first-class destination, reachable within
+     *  two taps from every primary screen (PAIRING_MAX_TWO_TAPS_PASS). */
+    const val TOWER_HOME = "tower_home"
+    const val PAIRING = "pairing"
+
     /** CP-G4-017 (directive §5): the Settings hub — the fifth and only new
      *  primary destination. General/voice/tower/models/display categories and
      *  the diagnostics group are reached FROM here; the drawer lists only the
@@ -28,6 +34,6 @@ object AppRoutes {
     val all: Set<String> = setOf(
         CONSOLE, HISTORY, CONNECTION, VOICE, INTELLIGENCE, APPEARANCE,
         DIAGNOSTICS, ABOUT, MODEL_MANAGER, TOWER_STUDIO, SELF_TEST, ARCHIVE,
-        QR_SCANNER, SETTINGS,
+        QR_SCANNER, SETTINGS, TOWER_HOME, PAIRING,
     )
 }

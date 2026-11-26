@@ -372,8 +372,8 @@ class PairingSessionController(
         sessionStore.save(null) // the durable encrypted store IS the state now
         at(State.CONNECTION_VERIFYING)
         val started = clockMs()
-        val connectionOk: Boolean
-        val latencyMs: Long
+        var connectionOk = false
+        var latencyMs = 0L
         try {
             val res = api.rawGet("$selectedBaseUrl/")
             latencyMs = clockMs() - started
@@ -457,6 +457,23 @@ class PairingSessionController(
         selectedCandidate = null
         remainingCandidates = emptyList()
         return at(State.REVOKED) { it.copy(typedCode = "REVOKED", humanDetail = "console scollegata e credenziali revocate") }
+    }
+
+    /**
+     * ANDROID REPAIR CP-005 — the REAL connection test for the TOWER surface
+     * (mission section 4; the APP-P1-07 repair: never a hardcoded 'SIMULATED'
+     * value). Falls back to the STORED endpoint after a restart. Returns
+     * (ok, latencyMs) or null when no endpoint is known at all.
+     */
+    fun testConnection(): Pair<Boolean, Long>? {
+        val base = selectedBaseUrl.ifEmpty { store.storedEndpoint()?.trimEnd('/') ?: return null }
+        val started = clockMs()
+        return try {
+            val status = api.rawGet("$base/")
+            (status in 200..599) to (clockMs() - started)
+        } catch (e: TowerApiException) {
+            false to (clockMs() - started)
+        }
     }
 
     /** Re-pair: revoke + back to UNPAIRED (the UI chains revoke + a new scan). */

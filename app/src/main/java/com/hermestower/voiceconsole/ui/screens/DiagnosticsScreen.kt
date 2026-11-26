@@ -66,6 +66,65 @@ fun DiagnosticsScreen(graph: AppGraph, onOpenStudio: () -> Unit = {}, onOpenSelf
             TextButton(onClick = onOpenSelfTest) { Text(stringResource(Res.string.diag_selftest_link)) }
         }
 
+        // ANDROID REPAIR CP-005 (mission section 11): PAIRING DIAGNOSTICS —
+        // payload/evidence/typed failures/retry/revoke, reachable directly
+        // from Diagnostics (PAIRING_DIAGNOSTICS_PASS). Secret-clean by
+        // construction: the snapshot carries codes and hosts only.
+        SectionCard(title = stringResource(Res.string.diagnostics_pairing_title)) {
+            val snap = graph.pairingSessionController.snapshot
+            if (snap.evidence.isEmpty() && snap.typedCode == null) {
+                Text(
+                    stringResource(Res.string.diagnostics_pairing_empty),
+                    style = HermesType.bodySecondary, color = c.textSecondary,
+                )
+            } else {
+                Text(
+                    stringResource(Res.string.diagnostics_pairing_row_fmt, "state", snap.state.name),
+                    style = HermesType.body, color = c.textPrimary,
+                )
+                snap.typedCode?.let {
+                    Text(
+                        stringResource(Res.string.diagnostics_pairing_row_fmt, "code", it),
+                        style = HermesType.body, color = c.textPrimary,
+                    )
+                }
+                snap.failedStage?.let {
+                    Text(
+                        stringResource(Res.string.diagnostics_pairing_row_fmt, "stage", it),
+                        style = HermesType.body, color = c.textPrimary,
+                    )
+                }
+                snap.candidateClass?.let {
+                    Text(
+                        stringResource(Res.string.diagnostics_pairing_row_fmt, "endpoint", it),
+                        style = HermesType.bodySecondary, color = c.textSecondary,
+                    )
+                }
+                snap.evidence.forEach { ev ->
+                    Text(
+                        stringResource(
+                            Res.string.diagnostics_pairing_row_fmt,
+                            ev.transportClass.name,
+                            "${ev.status.name}${ev.typedCode?.let { c2 -> \"/$c2\" } ?: \"\"} (${ev.hostView})",
+                        ),
+                        style = HermesType.bodySecondary, color = c.textSecondary,
+                    )
+                }
+                BadgeFlowRow(horizontalSpacing = 8.dp) {
+                    TextButton(onClick = {
+                        scope.launch {
+                            val after = graph.pairingSessionController.retry()
+                            testResult = "pairing retry -> ${after.state.name} ${after.typedCode ?: \"\"}"
+                        }
+                    }) { Text(stringResource(Res.string.diagnostics_pairing_retry)) }
+                    TextButton(onClick = {
+                        graph.pairingSessionController.revoke()
+                        testResult = "pairing revoked"
+                    }) { Text(stringResource(Res.string.diagnostics_pairing_revoke)) }
+                }
+            }
+        }
+
         SectionCard(title = stringResource(Res.string.diag_device_card)) {
             // DeviceHealth fields are nullable — the platform may not expose them;
             // the localized 'unavailable' fallback keeps the honest-rendering rule.

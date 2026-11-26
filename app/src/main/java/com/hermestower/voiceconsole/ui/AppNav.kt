@@ -101,6 +101,10 @@ private val destinations = listOf(
     Destination(AppRoutes.ARCHIVE, com.hermestower.voiceconsole.R.string.dest_archive, Icons.Outlined.History),
     Destination(AppRoutes.CONNECTION, com.hermestower.voiceconsole.R.string.dest_connection, Icons.Outlined.Link),
     Destination(AppRoutes.TOWER_STUDIO, com.hermestower.voiceconsole.R.string.dest_connect, Icons.Outlined.Router),
+    // ANDROID REPAIR CP-005 (mission section 4): the TOWER primary surface and
+    // the PAIRING flow — pairing is never buried in Tower Studio or developer menus.
+    Destination(AppRoutes.TOWER_HOME, com.hermestower.voiceconsole.R.string.dest_tower_home, Icons.Outlined.Router),
+    Destination(AppRoutes.PAIRING, com.hermestower.voiceconsole.R.string.dest_pairing, Icons.Outlined.Link),
     Destination(AppRoutes.VOICE, com.hermestower.voiceconsole.R.string.dest_voice_audio, Icons.Outlined.Mic),
     Destination(AppRoutes.MODEL_MANAGER, com.hermestower.voiceconsole.R.string.dest_models, Icons.Outlined.Memory),
     Destination(AppRoutes.INTELLIGENCE, com.hermestower.voiceconsole.R.string.dest_intelligence, Icons.Outlined.Psychology),
@@ -117,9 +121,12 @@ private val destinations = listOf(
  *  which keeps the ordinary product feeling like a dedicated Hermes console
  *  rather than a developer control panel. The compact side-panel policy
  *  (G4-C07: 60% preferred, 2/3 hard max, 248–360dp) is unchanged. */
+// ANDROID REPAIR CP-005 (mission section 4): the canonical primary navigation
+// HOME / VOICE / TOWER / ARCHIVE / SETTINGS — Tower Studio, Model Manager and
+// the rest stay reachable as secondary destinations from the drawer and Settings.
 private val primaryDestinations = listOf(
-    AppRoutes.CONSOLE, AppRoutes.ARCHIVE, AppRoutes.TOWER_STUDIO,
-    AppRoutes.MODEL_MANAGER, AppRoutes.SETTINGS,
+    AppRoutes.CONSOLE, AppRoutes.VOICE, AppRoutes.TOWER_HOME,
+    AppRoutes.ARCHIVE, AppRoutes.SETTINGS,
 )
 
 private fun subtitleFor(route: String): Int = when (route) {
@@ -127,6 +134,8 @@ private fun subtitleFor(route: String): Int = when (route) {
     AppRoutes.HISTORY -> com.hermestower.voiceconsole.R.string.subtitle_history
     AppRoutes.ARCHIVE -> com.hermestower.voiceconsole.R.string.subtitle_archive
     AppRoutes.CONNECTION -> com.hermestower.voiceconsole.R.string.subtitle_connection
+    AppRoutes.TOWER_HOME -> com.hermestower.voiceconsole.R.string.subtitle_tower_home
+    AppRoutes.PAIRING -> com.hermestower.voiceconsole.R.string.subtitle_pairing
     AppRoutes.TOWER_STUDIO -> com.hermestower.voiceconsole.R.string.subtitle_tower_studio
     AppRoutes.VOICE -> com.hermestower.voiceconsole.R.string.subtitle_voice
     AppRoutes.MODEL_MANAGER -> com.hermestower.voiceconsole.R.string.subtitle_model_manager
@@ -395,13 +404,16 @@ fun AppNav(graph: AppGraph) {
                         graph,
                         onOpenHistory = { navController.navigate(AppRoutes.HISTORY) { launchSingleTop = true } },
                         onOpenNavigation = { scope.launch { drawerState.open() } },
+                        onOpenPairing = { navController.navigate(AppRoutes.PAIRING) { launchSingleTop = true } },
                     )
                 }
                 composable(AppRoutes.HISTORY) { HistoryScreen(graph) }
                 composable(AppRoutes.ARCHIVE) { ArchiveScreen(graph.towerArchive) }
                 composable(AppRoutes.CONNECTION) { ConnectionScreen(graph, onOpenStudio = { navController.navigate(AppRoutes.TOWER_STUDIO) { launchSingleTop = true } }) }
                 composable(AppRoutes.TOWER_STUDIO) { TowerStudioScreen(graph, onOpenScanner = { navController.navigate(AppRoutes.QR_SCANNER) { launchSingleTop = true } }) }
-                composable(AppRoutes.QR_SCANNER) { QrScannerScreen(graph, onBack = { navController.popBackStack() }) }
+                composable(AppRoutes.QR_SCANNER) { QrScannerScreen(graph, onBack = { navController.popBackStack() }, onPaired = { navController.navigate(AppRoutes.TOWER_HOME) { launchSingleTop = true } }) }
+                composable(AppRoutes.TOWER_HOME) { TowerHomeScreen(graph, onOpenPairing = { navController.navigate(AppRoutes.PAIRING) { launchSingleTop = true } }, onOpenDiagnostics = { navController.navigate(AppRoutes.DIAGNOSTICS) { launchSingleTop = true } }) }
+                composable(AppRoutes.PAIRING) { PairingFlowScreen(graph, onBack = { navController.popBackStack() }, onOpenQrScanner = { navController.navigate(AppRoutes.QR_SCANNER) { launchSingleTop = true } }, onPaired = { navController.navigate(AppRoutes.TOWER_HOME) { launchSingleTop = true } }) }
                 composable(AppRoutes.VOICE) { VoiceAudioScreen(graph) }
                 composable(AppRoutes.SETTINGS) { SettingsHubScreen(onOpen = { route -> navLog("hub row navigate route=$route"); navController.navigate(route) { launchSingleTop = true } }) }
                 composable(AppRoutes.MODEL_MANAGER) { ModelManagerScreen(graph) }

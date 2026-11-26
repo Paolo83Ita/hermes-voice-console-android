@@ -146,23 +146,24 @@ fun OnboardingScreen(graph: AppGraph, onFinish: (pendingRoute: String?) -> Unit)
                 OnboardingContinue(onContinue = { step = 1 })
             }
 
-            // ---- STEP 2: Tower connect ----
+            // ---- STEP 2: WHY CONNECT + CONNECT TO HERMES TOWER ----
+            // ANDROID REPAIR CP-005 (mission section 4, first-run flow): the old
+            // QR-vs-simulation choice is RETIRED (the simulation branch was the
+            // discoverability dead-end). The step now explains WHY to connect and
+            // offers the REAL pairing flow — 'Connetti ora' finishes onboarding
+            // straight into the PAIRING route; 'Più tardi' continues offline.
             1 -> {
-                SectionCard(title = stringResource(R.string.ob_s2_title)) {
+                SectionCard(title = stringResource(R.string.onboarding_connect_step_title)) {
                     Text(stringResource(R.string.ob_s2_body), style = HermesType.body, color = c.textPrimary)
+                    Text(stringResource(R.string.onboarding_connect_step_body), style = HermesType.bodySecondary, color = c.textSecondary)
                     Row(horizontalArrangement = Arrangement.spacedBy(8.dp), modifier = Modifier.padding(top = 8.dp)) {
-                        HermesOutlinedButton(onClick = { towerChoiceQr = true; step = 2 }) {
-                            Text(stringResource(R.string.ob_s2_scan_qr))
+                        HermesFilledButton(onClick = { towerChoiceQr = true; step = 2 }) {
+                            Text(stringResource(R.string.onboarding_connect_now))
                         }
                         HermesOutlinedButton(onClick = { towerChoiceQr = false; step = 2 }) {
-                            Text(stringResource(R.string.ob_s2_simulation))
+                            Text(stringResource(R.string.onboarding_connect_later))
                         }
                     }
-                    Text(
-                        if (towerChoiceQr) stringResource(R.string.ob_s2_chosen_qr)
-                        else stringResource(R.string.ob_s2_chosen_sim),
-                        style = HermesType.bodySecondary, color = c.textSecondary,
-                    )
                 }
             }
 
@@ -260,10 +261,10 @@ fun OnboardingScreen(graph: AppGraph, onFinish: (pendingRoute: String?) -> Unit)
                     onFinish(
                         when {
                             openModelsAfter -> com.hermestower.voiceconsole.ui.AppRoutes.MODEL_MANAGER
-                            // A4R NODE A3 (A4R-P1-003): the QR choice DEMONSTRATES the
-                            // scanner path — the wizard hands the user straight to the
-                            // live QR pairing screen instead of only recording a flag.
-                            towerChoiceQr -> com.hermestower.voiceconsole.ui.AppRoutes.QR_SCANNER
+                            // ANDROID REPAIR CP-005: the QR choice now lands on the REAL
+                            // pairing flow (method chooser: QR / numeric / LAN / Tailscale /
+                            // manual) — the old 'demonstrates the scanner' shortcut is retired.
+                            towerChoiceQr -> com.hermestower.voiceconsole.ui.AppRoutes.PAIRING
                             else -> null
                         },
                     )
