@@ -177,7 +177,7 @@ class ModelPromotionController(
     fun isInstalledOnDisk(entry: ModelCatalogEntry): Boolean {
         val rec = registry.record(entry.identity) ?: return false
         val path = rec.installedPath ?: return false
-        return Files.exists(Path.of(path))
+        return java.io.File(path).exists()
     }
 }
 
