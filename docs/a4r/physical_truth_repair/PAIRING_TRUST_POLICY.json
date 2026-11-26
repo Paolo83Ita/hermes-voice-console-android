@@ -1,0 +1,24 @@
+{
+ "schema": "android_repair.pairing_trust_policy/1.0",
+ "produced_utc": "2026-11-26T11:21:55Z",
+ "measured_trust_anchors": {
+  "public_endpoint": "https://hermestower.aclclouds.online",
+  "cert_subject_cn": "hermestower.aclclouds.online",
+  "cert_sans": [
+   "hermestower.aclclouds.online"
+  ],
+  "issuer_class": "PUBLIC_CA (Let's Encrypt)",
+  "validity": "2026-11-12 13:34:48 UTC -> 2027-02-10 13:34:47 UTC",
+  "hostname_verification": "PASS (probe P1, 2026-11-26)",
+  "measured_source": "PAIRING_TLS_NETWORK_EVIDENCE.json P1"
+ },
+ "policy_rules": [
+  "TRUST-1: certificate verification is NEVER disabled as a repair. There is no code path that sets a trust-all TrustManager, an SSLContext bypass, or hostname verifier that returns true.",
+  "TRUST-2: CA_VALIDATED and TAILSCALE_LE candidates use the platform default trust store with hostname verification ON. A TLS failure is a typed failure (TLS_CA_UNTRUSTED / TLS_HOSTNAME_MISMATCH / TLS_CERTIFICATE_EXPIRED / TLS_HANDSHAKE_FAILED), surfaced with remediation guidance.",
+  "TRUST-3: LAN_SELF_SIGNED_EXPECTED candidates (a LAN Tower serving a self-signed cert) FAIL CLOSED by default with TLS_CA_UNTRUSTED.",
+  "TRUST-4: DEVELOPMENT TRUST PATH — if the Owner explicitly enables 'Sviluppo: fidati del certificato locale della Tower' (Settings > Tower > Advanced), a SEPARATE app-scoped trust store receives the Owner-imported LAN cert (never a blanket bypass; the pin is scoped to the exact candidate host+port and stored as a flagged preference). The UI permanently badges the app 'Modalità sviluppo TLS attiva' and the diagnostics export records DEV_TRUST_ACTIVE=true. This path CANNOT ship as production trust: it is a user-installed, user-revocable, per-host pin, off by default, and never enabled by any code default.",
+  "TRUST-5: certificate_trust_metadata from the envelope is used for VERIFICATION AND DIAGNOSTICS ONLY: a public_cert_sha256 mismatch is recorded as evidence; it never adds trust.",
+  "TRUST-6: cleartext http:// endpoints are rejected by policy (network_security_config permits cleartext ONLY for loopback); the typed class is CLEARTEXT_BLOCKED.",
+  "TRUST-7: the console token travels only in the Authorization header over TLS and is never logged, never exported, never written to the QR."
+ ]
+}

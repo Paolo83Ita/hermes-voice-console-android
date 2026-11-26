@@ -1,0 +1,58 @@
+{
+ "schema": "android_repair.rehydration_receipt/1.0",
+ "produced_utc": "2026-11-26T11:15:31Z",
+ "expected_remote_tip": "67eba19",
+ "fresh_read": {
+  "branch": "graph-a4r/physical-truth-repair",
+  "head": "67eba1925403990fcfcad216a8c7650f9dd5797f",
+  "remote_origin_graph_a4r_physical_truth_repair": "67eba1925403990fcfcad216a8c7650f9dd5797f",
+  "worktree_status": "CLEAN (no unrecorded mutation)",
+  "git_fetch_result": "up to date (no divergence between local and origin)"
+ },
+ "verification_gates": {
+  "REMOTE_TIP_MATCH_PASS": "PASS — HEAD == origin/graph-a4r/physical-truth-repair == 67eba1925403990fcfcad216a8c7650f9dd5797f",
+  "CHECKPOINT_SET_COMPLETE_PASS": "PASS — CP-001/002/003 + CP-006-ANALYSIS artifacts present and hash-bound below",
+  "SOURCE_APK_BINDING_PASS": "PASS — ANDROID_SOURCE_APK_BINDING.json stands (device APK 1744e173… ≡ CI 44878382926 @ 8863b61 ≡ release asset 26dbad0c… @ a58c630; source tree unchanged since)",
+  "NO_PARALLEL_APP_PASS": "PASS — the only application tree is the bound dual-srcDir structure (app/ + candidate-b-base/); no second application created; branch is the recorded graph-a4r/physical-truth-repair",
+  "NO_UNRECORDED_MUTATION_PASS": "PASS — git status clean at rehydration; the first mutation of this segment is the CP-004 commit itself"
+ },
+ "checkpoint_artifact_hashes": {
+  "ANDROID_COMPLETE_INTERACTION_INVENTORY.json": "c5343d65347f00c9b9e505c23d68e74b3f35caefafe5509667882e19db397ee6",
+  "ANDROID_DEAD_OR_UNBOUND_CONTROL_REGISTER.json": "dd969b4e7ba3026b9579c03a72b30a1f7864dff7de7327dc786d71422d7d5715",
+  "ANDROID_FAILED_BASELINE_RECEIPT.json": "354e1a4f74df6195d83b130fc183480bf219797eaa9e081d534f9c0aedbe84f2",
+  "ANDROID_REPAIR_INPUT_MANIFEST.json": "b1fe55d190037331f74be7f24011b4cbbf13941a3062e74069f22277b2862677",
+  "ANDROID_RUNTIME_INTEGRATION_GRAPH.json": "ed0ceddf74aca3bd95961fa04f80b5d5cbf2b119aa7bb60841ab49cc2d778952",
+  "ANDROID_SOURCE_APK_BINDING.json": "650d5665f3568c3145b2a5786999d07f195f563344e6b28ff57978a2aeccab53",
+  "CHECKPOINT_RECEIPT.json": "2ff988f5e9aae951252d81c1da98574e051cbc9ed9b82e9fbcbd27a56678d5b1",
+  "GLM53_ANDROID_BOOTSTRAP_QUALIFICATION.json": "512cdf793c9da17428339fe6915908b5cdc6798aaf7e34bbef2c143757e76816",
+  "GLM54_ANDROID_BOOTSTRAP_QUALIFICATION.json": "be40175ba7a7d043563f8713f5de69de3affe21346921a6caf10e41edefad5fb",
+  "PAIRING_NETWORK_DIAGNOSTIC.json": "24b8ef7ef7d38a21541e6468b37b2d8d77b872b19bf111378480df528d0d7d62",
+  "PAIRING_PROTOCOL_DIFF.json": "a8ee8e81756f4b806e42ca2902eb0ee4ce5c47f8535ca36a79d3471f12e8a603",
+  "PAIRING_ROOT_CAUSE_REPORT.md": "9af49aacc6168aa21ee207d515b3fda20a9ded7cd34094284d23a7c0d7b2d13e",
+  "PAIRING_STATE_MACHINE.json": "3fe3d8caae0428534df16faeb580141a49994e999c4f7f0e99cf9599dec10cfd",
+  "QWEN_RUNTIME_ROOT_CAUSE_RECEIPT.json": "91f526762fad0e31ad8b15ce89913cb77481695eaabe65b02b198b749ce6f83a",
+  "README.md": "f71f0e9090d9dc7e0dc34b0f251fc0e45a719ecb57b6cff0485a9c6b70a73184"
+ },
+ "failed_apk_identity": {
+  "owner_uploaded": "upload/app-arm64-v8a-debug.apk sha256 1744e173f6a2340651fe508c4984471d98881d48ec9bf16f1708692ef518ae97 (122,891,305 B)",
+  "release_asset": "HERMES_VOICE_CONSOLE_A4R_REPAIRED_DEBUG.apk sha256 26dbad0c5f0fe7700fc51cea1db8dacba4a34cd105ee88a29113c00be480922e (122,891,305 B)",
+  "equivalence": "entry-wise 597/597; 595 identical; classes11/14.dex byte-differ with IDENTICAL class sets (same-source nondeterministic rebuild)",
+  "source_head": "8863b6189868db1eddd93862b69d6da4f55a219d (app/ unchanged a58c630..8863b61)"
+ },
+ "state_fresh_read": {
+  "pairing_state_machine": "docs/a4r/physical_truth_repair/PAIRING_STATE_MACHINE.json — 8 transitions, failing transition 4 (claim transport), typed failures enumerated",
+  "pairing_root_cause": "docs/a4r/physical_truth_repair/PAIRING_ROOT_CAUSE_REPORT.md — QR emits https://tower.local only; 4G cannot resolve mDNS; TLS mismatch layered",
+  "runtime_integration_graph": "docs/a4r/physical_truth_repair/ANDROID_RUNTIME_INTEGRATION_GRAPH.json",
+  "dead_or_unbound_register": "docs/a4r/physical_truth_repair/ANDROID_DEAD_OR_UNBOUND_CONTROL_REGISTER.json — 12 entries",
+  "qwen_runtime_chain": "docs/a4r/physical_truth_repair/QWEN_RUNTIME_ROOT_CAUSE_RECEIPT.json — stages 1-3 working, 4-7 dead-end, 8-25 unreachable",
+  "navigation_inventory": "docs/a4r/physical_truth_repair/ANDROID_COMPLETE_INTERACTION_INVENTORY.json — 14 routes, 24 screens, 62 controls",
+  "build_configuration": "settings.gradle.kts single module :app with candidate-b-base srcDir; AGP 8.7.3; ABI splits arm64-v8a/x86_64 + universal; CI android-debug-build = assembleDebug + testDebugUnitTest + compileDebugAndroidTestKotlin + lintDebug + secret scan",
+  "test_harness": "JVM unit suite (green at a58c630: 566/0) + instrumented lane (android-keystore-instrumented.yml, emulator) + E2E workflow",
+  "physical_ledger": "download/A4R/phys_repair/A4R_OWNER_PHYSICAL_LEDGER.json schema 1.3 (37 rows) — carried forward, not re-derived"
+ },
+ "corrections_applied_this_segment": {
+  "APP-P0-01": "reopened as ROOT_CAUSE_IDENTIFIED + REPAIR_PENDING (was recorded 'closed at class level' — class-level closure of the ROOT-CAUSE QUESTION is retained; the FINDING itself stays open until the physical completion chain passes)",
+  "APP-P0-02": "reaffirmed ROOT_CAUSE_IDENTIFIED + REPAIR_PENDING"
+ },
+ "continuation": "CP-ANDROID-REPAIR-004 (see ANDROID_REPAIR_NEXT_EXACT_ACTION.json)"
+}

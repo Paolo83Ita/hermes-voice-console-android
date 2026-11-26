@@ -1,0 +1,219 @@
+{
+ "schema": "android_repair.pairing_typed_failure_catalog/1.0",
+ "produced_utc": "2026-11-26T11:21:55Z",
+ "note": "Every pairing failure surfaced to the Owner carries: human explanation (it), technical code, failed stage, candidate endpoint (class, host only), safe retry semantics. No secret values ever appear in any field.",
+ "stages": [
+  "QR_SCAN",
+  "PAYLOAD_PARSE",
+  "ENDPOINT_RESOLUTION",
+  "CLAIM",
+  "ATTEST",
+  "OWNER_ACK",
+  "CREDENTIAL_COMMIT",
+  "CONNECTION_TEST",
+  "CAPABILITY_NEGOTIATION"
+ ],
+ "failures": [
+  {
+   "code": "QR_EMPTY",
+   "stage": "QR_SCAN",
+   "it": "Codice QR vuoto o illeggibile — riprova a inquadrare il codice mostrato dal wizard della Tower.",
+   "retry": "immediate rescan"
+  },
+  {
+   "code": "QR_MALFORMED",
+   "stage": "PAYLOAD_PARSE",
+   "it": "Il QR non è un payload di abbinamento valido.",
+   "retry": "rescan; if it persists, generate a new QR on the Tower wizard"
+  },
+  {
+   "code": "QR_FORBIDDEN_FIELD",
+   "stage": "PAYLOAD_PARSE",
+   "it": "Il QR contiene un campo vietato (nessun segreto può viaggiare nel QR).",
+   "retry": "new QR from the Tower"
+  },
+  {
+   "code": "QR_UNSUPPORTED_VERSION",
+   "stage": "PAYLOAD_PARSE",
+   "it": "Versione del protocollo QR non supportata da questa app.",
+   "retry": "update the app / new QR"
+  },
+  {
+   "code": "QR_UNSUPPORTED_PROTOCOL",
+   "stage": "PAYLOAD_PARSE",
+   "it": "Protocollo non riconosciuto.",
+   "retry": "new QR"
+  },
+  {
+   "code": "QR_EXPIRED",
+   "stage": "PAYLOAD_PARSE",
+   "it": "QR scaduto (vale 2-5 minuti dall'apertura del wizard). Riapri il wizard sulla Tower e ripeti la scansione.",
+   "retry": "new QR (the TTL is by design)"
+  },
+  {
+   "code": "QR_REPLAYED_NONCE",
+   "stage": "PAYLOAD_PARSE",
+   "it": "QR già utilizzato (monouso). Servono un nuovo wizard e un nuovo QR.",
+   "retry": "new QR"
+  },
+  {
+   "code": "OFFLINE_NO_NETWORK",
+   "stage": "ENDPOINT_RESOLUTION",
+   "it": "Nessuna rete attiva. Connettiti al Wi-Fi o ai dati e riprova.",
+   "retry": "retry after connectivity"
+  },
+  {
+   "code": "NO_ELIGIBLE_ENDPOINT",
+   "stage": "ENDPOINT_RESOLUTION",
+   "it": "Nessun endpoint utilizzabile nel contesto di rete attuale. Il QR espone solo endpoint raggiungibili dalla rete di casa; sei su rete cellulare. Rientra nel Wi-Fi di casa, oppure usa la configurazione manuale avanzata con l'indirizzo pubblico della Tower.",
+   "retry": "change network or manual advanced"
+  },
+  {
+   "code": "DNS_RESOLUTION_FAILED",
+   "stage": "ENDPOINT_RESOLUTION",
+   "it": "Nome host non risolvibile su questa rete (es. nome .local su rete cellulare).",
+   "retry": "next candidate; manual advanced with an IP/public host"
+  },
+  {
+   "code": "MDNS_UNAVAILABLE",
+   "stage": "ENDPOINT_RESOLUTION",
+   "it": "Scoperta mDNS non disponibile su questa rete.",
+   "retry": "next candidate"
+  },
+  {
+   "code": "LAN_ROUTE_UNAVAILABLE",
+   "stage": "ENDPOINT_RESOLUTION",
+   "it": "Rete di casa non raggiungibile da qui (endpoint solo-LAN).",
+   "retry": "join home Wi-Fi or use public endpoint"
+  },
+  {
+   "code": "CELLULAR_CANNOT_REACH_LAN_ENDPOINT",
+   "stage": "ENDPOINT_RESOLUTION",
+   "it": "Sei su rete cellulare e questo endpoint vive solo nella rete di casa.",
+   "retry": "skip recorded; next candidate / manual"
+  },
+  {
+   "code": "TCP_CONNECTION_FAILED",
+   "stage": "ENDPOINT_RESOLUTION",
+   "it": "Connessione TCP rifiutata o scaduta verso l'host.",
+   "retry": "bounded retry; check Tower online"
+  },
+  {
+   "code": "TLS_CA_UNTRUSTED",
+   "stage": "ENDPOINT_RESOLUTION",
+   "it": "Certificato della Tower non riconosciuto (autosfirmato sulla LAN). Verifica manuale richiesta: attiva il percorso di fiducia sviluppo SOLO se sei tu l'Owner e conosci il certificato.",
+   "retry": "dev trust path (explicit) or qualified candidate"
+  },
+  {
+   "code": "TLS_HOSTNAME_MISMATCH",
+   "stage": "ENDPOINT_RESOLUTION",
+   "it": "Il certificato non copre il nome con cui lo stai contattando.",
+   "retry": "use the qualified public hostname"
+  },
+  {
+   "code": "TLS_CERTIFICATE_EXPIRED",
+   "stage": "ENDPOINT_RESOLUTION",
+   "it": "Certificato della Tower scaduto.",
+   "retry": "Owner renews cert on Tower"
+  },
+  {
+   "code": "TLS_HANDSHAKE_FAILED",
+   "stage": "ENDPOINT_RESOLUTION",
+   "it": "Negoziazione TLS fallita (protocollo/cifrari).",
+   "retry": "bounded retry; report diagnostics"
+  },
+  {
+   "code": "CLEARTEXT_BLOCKED",
+   "stage": "ENDPOINT_RESOLUTION",
+   "it": "Endpoint http:// non consentito (solo https).",
+   "retry": "https candidate"
+  },
+  {
+   "code": "HTTP_PROTOCOL_ERROR",
+   "stage": "ENDPOINT_RESOLUTION",
+   "it": "Risposta non-HTTP o malformata dall'endpoint.",
+   "retry": "next candidate"
+  },
+  {
+   "code": "PAIRING_ROUTE_MISSING",
+   "stage": "CLAIM",
+   "it": "La rotta di abbinamento non esiste su questa versione della Tower (rotta ack assente: delta server pendente).",
+   "retry": "await Tower server delta; see server delta request"
+  },
+  {
+   "code": "PAIRING_ROUTE_REJECTED",
+   "stage": "CLAIM",
+   "it": "Richiesta rifiutata dalla Tower con motivo tipizzato.",
+   "retry": "per in-band reason"
+  },
+  {
+   "code": "CLAIM_REJECTED",
+   "stage": "CLAIM",
+   "it": "Codice numerico rifiutato dalla Tower.",
+   "retry": "re-enter code (bounded attempts; rate limit applies)"
+  },
+  {
+   "code": "CLAIM_RESPONSE_INCOMPLETE",
+   "stage": "CLAIM",
+   "it": "Risposta claim incompleta.",
+   "retry": "bounded retry / new QR"
+  },
+  {
+   "code": "PAIRING_CHALLENGE_EXPIRED",
+   "stage": "ATTEST",
+   "it": "Challenge scaduta (TTL 120 s).",
+   "retry": "restart from new QR"
+  },
+  {
+   "code": "ATTEST_REJECTED",
+   "stage": "ATTEST",
+   "it": "Attestazione rifiutata dalla Tower.",
+   "retry": "new QR"
+  },
+  {
+   "code": "ATTEST_RESPONSE_INCOMPLETE",
+   "stage": "ATTEST",
+   "it": "Risposta attest incompleta.",
+   "retry": "bounded retry / new QR"
+  },
+  {
+   "code": "OWNER_ACK_TIMEOUT",
+   "stage": "OWNER_ACK",
+   "it": "Conferma del proprietario non arrivata nella finestra (5 min). Conferma la frase di tre parole sul wizard della Tower.",
+   "retry": "restart from new QR"
+  },
+  {
+   "code": "DEVICE_REVOKED",
+   "stage": "OWNER_ACK",
+   "it": "Dispositivo revocato o pairing non valido.",
+   "retry": "re-pair from new QR"
+  },
+  {
+   "code": "PAIRING_PERSISTENCE_FAILED",
+   "stage": "CREDENTIAL_COMMIT",
+   "it": "Salvataggio sicuro delle credenziali non riuscito (keystore). Nessuno stato è stato scritto.",
+   "retry": "retry pairing; check keystore diagnostics"
+  },
+  {
+   "code": "CONNECTION_TEST_FAILED",
+   "stage": "CONNECTION_TEST",
+   "it": "Abbinamento registrato ma il test di connessione non è passato.",
+   "retry": "test again / diagnostics; pairing state retained with DEGRADED"
+  },
+  {
+   "code": "CAPABILITY_NEGOTIATION_FAILED",
+   "stage": "CAPABILITY_NEGOTIATION",
+   "it": "Negoziazione capacità non riuscita; la connessione resta valida in modalità ridotta.",
+   "retry": "renegotiate later; state DEGRADED"
+  },
+  {
+   "code": "RATE_LIMITED",
+   "stage": "CLAIM",
+   "it": "Troppi tentativi errati: richiesta bloccata per un periodo.",
+   "retry": "wait; new QR"
+  }
+ ],
+ "in_band_envelope_adapter": {
+  "note": "AMB-9 fix: the Tower reports pairing errors as HTTP 200 {ok:false,error:...}; the client reads ok/error BEFORE DTO field parsing and maps error codes (PAIRING_NOT_FOUND_OR_EXPIRED etc.) onto this catalog (QR_EXPIRED / CLAIM_REJECTED classes); pinned JVM fixtures cover both envelope shapes."
+ }
+}

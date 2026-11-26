@@ -1,0 +1,30 @@
+{
+ "schema": "android_repair.next_exact_action/2.0",
+ "produced_utc": "2026-11-26T11:15:31Z",
+ "next_exact_action": "CP-ANDROID-REPAIR-004_PAIRING_PRIMARY_PATH_AND_CONTRACT",
+ "scope": [
+  "PAIRING_ENVELOPE_V3_SCHEMA.json — versioned pairing envelope with endpoint/transport candidates, no durable secret",
+  "PAIRING_ENDPOINT_RESOLUTION_CONTRACT.json — Android resolver contract: parse, classify, qualify, bounded attempts, typed failures, manual fallback",
+  "PAIRING_TOWER_SERVER_DELTA_REQUEST.md — bounded versioned server delta for the main Tower account (endpoint candidates in QR v3, ack route, envelope)",
+  "PAIRING_COMPATIBILITY_MATRIX.csv — v2/v3 client x server compatibility truth",
+  "PAIRING_TLS_NETWORK_EVIDENCE.json + PAIRING_TRUST_POLICY.json + PAIRING_TYPED_FAILURE_CATALOG.json (sections 3)",
+  "first-run UX contract: WELCOME→CONNECT→WHY→METHOD→SCAN→RESOLUTION→PHRASE→CONFIRM→CREDENTIAL→TEST→CAPABILITY→PAIRED; Home unpaired card; primary nav HOME/VOICE/TOWER/ARCHIVE/SETTINGS; TOWER surface duties; pairing reachability gates"
+ ],
+ "followed_by": [
+  "CP-ANDROID-REPAIR-005 pairing client implementation",
+  "CP-ANDROID-REPAIR-006 Qwen promotion repair",
+  "CP-ANDROID-REPAIR-007 Qwen real inference implementation",
+  "CP-ANDROID-REPAIR-008 diagnostics and Tower-first routing",
+  "CP-ANDROID-REPAIR-009 navigation and full visual convergence",
+  "CP-ANDROID-REPAIR-010 automated regression and fault injection",
+  "CP-ANDROID-REPAIR-011 APK build, provenance and installability",
+  "CP-ANDROID-REPAIR-012 Owner Retest Package"
+ ],
+ "discipline": [
+  "no new branch; no parallel application",
+  "no repeat of CP-001/002/003 discovery",
+  "no hardcoded replacement endpoint in Android source",
+  "no Tower mutation from the Android account",
+  "commit + push + fresh remote read-back at every checkpoint"
+ ]
+}

@@ -1,0 +1,5 @@
+client_envelope,server_emission,endpoint_candidates_in_qr,ack_route_get,in_band_envelope_read,pairing_outcome,notes
+client-v3 (CP-005+),server-v3 (delta applied),yes (multi-candidate),yes,read + mapped,FULL (pending physical retest),target state; server delta required
+client-v3 (CP-005+),server-v2 (today live),no (single tower.local endpoint),no (404 catch-all),read + mapped,TRANSPORT REPAIRED up to OWNER_ACK; ack stage typed PAIRING_ROUTE_MISSING,manual advanced + public endpoint can carry claim/attest; final ack needs the delta
+client-v3 (CP-005+),server-v2 + public endpoint in QR (interim),no (single public endpoint),no,read + mapped,as above; transport fully usable from cellular,"interim mitigation the Tower Owner can apply by hand TODAY (choose the public endpoint in the wizard), zero code"
+client-v2 (installed baseline),any,no,n/a (client polls),not read,DEAD-END at claim transport (the physical failure),the failed baseline; replaced by client-v3

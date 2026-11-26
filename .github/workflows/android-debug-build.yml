@@ -8,6 +8,7 @@ on:
       - graph-3/monumental-oracle-tower-visual-refoundation
       - graph-4/real-voice-pairing-archive-e2e
       - graph-a4r/merge-with-b-base
+      - graph-a4r/physical-truth-repair
       - main
   workflow_dispatch:
 

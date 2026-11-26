@@ -1,0 +1,125 @@
+{
+ "schema": "android_repair.pairing_primary_ux_contract/1.0",
+ "produced_utc": "2026-11-26T11:22:28Z",
+ "principle": "The pairing user path is designed BEFORE hidden technical fallbacks. Discoverability is a P0 property: pairing must be findable by an Owner who has never read a manual.",
+ "first_run_flow": [
+  {
+   "step": "WELCOME",
+   "it_title": "Benvenuto nella Console Vocale Hermes",
+   "content": "what the console is; the Tower is the Owner's own server; nothing leaves the device until pairing; SKIP is available (app usable offline)"
+  },
+  {
+   "step": "CONNECT_TO_HERMES_TOWER",
+   "it_title": "Collega la Console alla Tower",
+   "content": "primary card: what pairing enables (voce, archivio, missioni sulla Tower personale); 'Connetti ora' primary button; 'Più tardi' secondary"
+  },
+  {
+   "step": "WHY_CONNECT",
+   "it_title": "Perché collegarla",
+   "content": "three concrete benefits + privacy statement (i tuoi dati restano sulla TUA Tower; nessun cloud di terze parti); 'Continua'"
+  },
+  {
+   "step": "CHOOSE_OR_AUTO_DETECT_METHOD",
+   "it_title": "Scegli come collegarti",
+   "content": "auto-detect first (LAN discovery + last endpoint test), then methods: SCANSIONE QR (consigliata) / CODICE NUMERICO / RETE LOCALE (LAN) / TAILSCALE (MagicDNS) / CONFIGURAZIONE MANUALE (avanzata)"
+  },
+  {
+   "step": "SCAN_QR",
+   "it_title": "Inquadra il QR",
+   "content": "camera scanner (existing QrScannerScreen engine); live state: inquadratura → payload letto → verifica scadenza"
+  },
+  {
+   "step": "ENDPOINT_RESOLUTION",
+   "it_title": "Ricerca della Tower",
+   "content": "visible candidate-by-candidate progress (per-class rows: pubblico / LAN / tailnet / manuale) with skip reasons; bounded 45 s; manual fallback offered inline on NO_ELIGIBLE_ENDPOINT"
+  },
+  {
+   "step": "VERIFY_PHRASE",
+   "it_title": "Verifica la frase",
+   "content": "the three-word phrase hint from attest is shown; the Owner matches it against the Tower wizard screen; PHRASE_MATCH_REQUIRED gate: 'Confermo che le frasi coincidono' checkbox enabled only after both words sets are displayed"
+  },
+  {
+   "step": "OWNER_CONFIRMATION",
+   "it_title": "Conferma del proprietario",
+   "content": "the Owner confirms on the TOWER wizard (PASSO 3/4); the phone polls the ack route with visible countdown (window 300 s); AMB-8 honest state shown if the ack route is absent: 'Questa versione della Tower non espone ancora la rotta di conferma: aggiorna la Tower (delta server) oppure usa il codice numerico completo'"
+  },
+  {
+   "step": "DEVICE_CREDENTIAL",
+   "it_title": "Credenziale del dispositivo",
+   "content": "the device key is generated in the Android Keystore (non-exportable); the credential is committed atomically; NO secret is shown or stored outside the keystore"
+  },
+  {
+   "step": "CONNECTION_TEST",
+   "it_title": "Test di connessione",
+   "content": "real v2 route test (capture open/commit or capability route); real latency; NO 'SIMULATED' value anywhere (P1-07 repair)"
+  },
+  {
+   "step": "CAPABILITY_NEGOTIATION",
+   "it_title": "Capacità disponibili",
+   "content": "the negotiated capability set is displayed (voice, archive, streaming …) with the capability_negotiation_version"
+  },
+  {
+   "step": "PAIRED",
+   "it_title": "Console collegata",
+   "content": "paired state with endpoint class + transport + device label; primary CTA goes to VOICE; Diagnostics always reachable"
+  }
+ ],
+ "home_when_unpaired": {
+  "primary_card": {
+   "it_title": "Connetti alla Tower",
+   "it_body": "La console non è ancora collegata alla tua Tower. Colleghila per usare voce, archivio e missioni.",
+   "primary_action": "Connetti ora",
+   "secondary_action": "Come funziona",
+   "visual": "monumental Tower imagery anchor (Immagine_Hermes_Tower), Dark Monumental / Marble Light aware, 2-tap-free: the card itself opens pairing"
+  },
+  "rule": "the card is the FIRST content on unpaired Home, above any offline content; it disappears only when paired=true"
+ },
+ "primary_navigation": [
+  "HOME",
+  "VOICE",
+  "TOWER",
+  "ARCHIVE",
+  "SETTINGS"
+ ],
+ "tower_surface_duties": {
+  "route": "TOWER (replaces the old TowerStudio drawer entry as the primary Tower destination; Tower Studio remains as an advanced sub-surface)",
+  "exposes": [
+   "connection status (paired/unpaired/degraded/expired/revoked + endpoint class + transport + last successful connection + latency)",
+   "pairing entry (primary when unpaired: 'Connetti la Console')",
+   "endpoint and transport display (current + candidates + how selected)",
+   "test connection (real route, real latency)",
+   "diagnostics entry (full pairing diagnostics surface)",
+   "retry (re-run endpoint resolution + connection test)",
+   "revoke ('Scollega e revoca questa console' with confirm dialog + typed outcome)",
+   "pair again (after revoke or on demand)",
+   "advanced manual configuration (ADVANCED_MANUAL endpoint entry + dev trust path + numeric code entry)"
+  ]
+ },
+ "reachability_contract": {
+  "from_first_run_onboarding": "1 tap (the onboarding IS a pairing path)",
+  "from_unpaired_home": "1 tap (the primary card)",
+  "from_any_primary_screen": "<= 2 taps (primary nav -> TOWER -> Connetti; or nav -> SETTINGS -> Connessione Tower)",
+  "from_diagnostics": "Diagnostics -> Tower Connection -> 'Riprova collegamento'",
+  "from_settings": "Settings -> Connessione alla Tower -> Pairing e dispositivi",
+  "gates": [
+   "PAIRING_HOME_DISCOVERABILITY_PASS — unpaired Home shows the primary card as first content",
+   "PAIRING_FIRST_RUN_PASS — first run walks the full flow to PAIRED or an honest typed stop",
+   "PAIRING_MAX_TWO_TAPS_PASS — pairing reachable within 2 taps from every primary screen",
+   "PAIRING_SETTINGS_PASS — Settings entry present",
+   "PAIRING_DIAGNOSTICS_PASS — Diagnostics entry present with retry/revoke"
+  ]
+ },
+ "required_methods": {
+  "SCAN_QR": "primary; existing camera engine; envelope v2+v3",
+  "NUMERIC_CODE": "Owner types the 6-digit code + (advanced) the public endpoint or a previously discovered one; works without camera",
+  "LAN_DISCOVERY": "NSD service discovery on the home Wi-Fi (service type _hermes-tower._tcp); discovered Towers listed with host:port; TLS validated the same way",
+  "TAILSCALE_MAGICDNS": "Owner-entered or QR-carried *.ts.net candidate; guided ('attiva Tailscale sul telefono e incolla il nome MagicDNS della Tower')",
+  "ADVANCED_MANUAL": "explicit advanced sheet: full URL entry, validation, classification, dev trust path toggle — same typed contract, never a bypass"
+ },
+ "forbidden": [
+  "pairing buried in Tower Studio or Developer menus only",
+  "hardcoded replacement endpoints in source",
+  "silent TLS weakening",
+  "mock or null results presented as pairing outcomes"
+ ]
+}

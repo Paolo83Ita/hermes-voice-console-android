@@ -1,0 +1,152 @@
+{
+ "schema": "android_repair.pairing_tls_network_evidence/1.0",
+ "produced_utc": "2026-11-26T11:16:14Z",
+ "probe_context": {
+  "environment": "executor sandbox (Linux), NOT the Owner phone — network-context classification is per-context; the Owner's 4G context evidence is the 2026-11-20/26 device screenshots",
+  "discipline": "read-only probes with fake pairing ids; no state created on the Tower; no secret values captured or stored",
+  "purpose": "distinguish DNS_RESOLUTION_FAILED / TCP_CONNECTION_FAILED / TLS_* / HTTP_* / PAIRING_ROUTE_* classes with measured data (section 3)"
+ },
+ "probes": [
+  {
+   "target": "https://hermestower.aclclouds.online",
+   "class": "QUALIFIED_PUBLIC_ENDPOINT",
+   "dns": {
+    "resolved_addresses": [
+     "141.11.237.119"
+    ],
+    "family": "AF_INET/AF_INET6 per getaddrinfo"
+   },
+   "tcp": {
+    "tcp_connect": "OK",
+    "peer": "141.11.237.119"
+   },
+   "tls": {
+    "tls_handshake": "OK (default trust store, hostname verification ON)",
+    "subject": {
+     "commonName": "hermestower.aclclouds.online"
+    },
+    "issuer": {
+     "countryName": "US",
+     "organizationName": "Let's Encrypt",
+     "commonName": "YE1"
+    },
+    "san_dns": [
+     "hermestower.aclclouds.online"
+    ],
+    "valid_from": "Nov 12 13:34:48 2026 GMT",
+    "valid_until": "Feb 10 13:34:47 2027 GMT",
+    "hostname_verification": "PASS (server_hostname=hermestower.aclclouds.online)",
+    "cert_sha256_fingerprint": "0d802a7d45d1a17505db9845745f2c480e827d3b7df21c61ce3c5f09285dc144",
+    "serial_hex": "05929EF368B94C0667FC7F3E81476DE8E2CF"
+   },
+   "http": {
+    "claim_fake_id": {
+     "http_status": 200,
+     "body_shape": "{\"ok\":false,\"error\":\"PAIRING_NOT_FOUND_OR_EXPIRED\"}"
+    },
+    "ack_fake_id": {
+     "http_status_GET": 404,
+     "body_shape_GET": "{\"detail\":\"No such API endpoint: /api/tower/voice-console/v2/pairings/cp004-probe-fake/ack\"}",
+     "http_status_POST": 405,
+     "body_shape_POST": "{\"detail\":\"Method Not Allowed\"}",
+     "verdict": "ACK ROUTE ABSENT (AMB-8 CONFIRMED with sharper evidence): GET hits the app catch-all 404; the POST 405 is an artifact of a GET-only catch-all route partially matching every path — Starlette-style routing. The client contract (GET ack poll) has no live server route."
+    },
+    "attest_fake_id": {
+     "http_status": 200,
+     "body_shape": "{\"ok\":false,\"error\":\"PAIRING_NOT_FOUND_OR_EXPIRED\"}"
+    },
+    "nonexistent_route": {
+     "http_status": 401,
+     "body_shape": "{\"error\":\"unauthenticated\",\"detail\":\"Unauthorized\",\"reason\":\"no_cookie\",\"login_url\":\"/login\"}"
+    },
+    "nonexistent_route_note": "POST to an unknown /g4/…-style path answers 401 unauthenticated (an authenticated router prefix), NOT the pairing 404 class — the pairing router and the authenticated g4 router are distinct planes"
+   },
+   "typed_conclusion": "public plane RESOLVES, CONNECTS, handshakes with a CA-valid cert whose SANs cover the hostname, and serves the v2 claim/attest routes (in-band envelope); the ack route answers 404 catch-all (AMB-8 re-confirmed)",
+   "probe": "P1_public_qualified_endpoint",
+   "ok": true
+  },
+  {
+   "target": "tower.local",
+   "class": "LAN_MDNS",
+   "dns": {
+    "result": "DNS_RESOLUTION_FAILED",
+    "detail": "getaddrinfo error -2: Name or service not known",
+    "class": "the exact class the Owner's phone hit on 4G"
+   },
+   "android_truth": "Android standard resolver (bionic getaddrinfo / HttpURLConnection) does not resolve .local mDNS names in app processes; NSD discovers SERVICES, not hostnames usable in the socket API; on cellular the mDNS link-local multicast domain is not even present",
+   "probe": "P2_tower_local_resolution",
+   "ok": true
+  },
+  {
+   "target": "TCP to hermestower.aclclouds.online:443 with SNI/hostname tower.local",
+   "outcome": {
+    "result": "SSLError: [SSL: TLSV1_ALERT_INTERNAL_ERROR] tlsv1 alert internal error (_ssl.c:1011)"
+   },
+   "probe": "P3_hostname_mismatch_demonstration",
+   "ok": true
+  },
+  {
+   "cleartext_check": {
+    "http_status": "308",
+    "note": "cleartext HTTP to the public host — Android network_security_config permits cleartext ONLY for loopback, so an http:// endpoint is rejected by policy at transport level on device"
+   },
+   "probe": "P4_cleartext_policy_context",
+   "ok": true
+  }
+ ],
+ "typed_failure_classification_table": [
+  {
+   "code": "DNS_RESOLUTION_FAILED",
+   "measured_when": "tower.local via standard resolver (P2); UnknownHostException on device 4G (both 2026-11-20 attempts)"
+  },
+  {
+   "code": "MDNS_UNAVAILABLE",
+   "measured_when": "Android app-process resolver does not consume mDNS; NSD is service-discovery only (P2 android_truth)"
+  },
+  {
+   "code": "LAN_ROUTE_UNAVAILABLE",
+   "measured_when": "cellular context: no route to the LAN subnet at all (Owner 4G status bar in all captures)"
+  },
+  {
+   "code": "CELLULAR_CANNOT_REACH_LAN_ENDPOINT",
+   "measured_when": "the stacked class of the Owner's failing attempts: LAN-scoped endpoint emitted to a cellular context"
+  },
+  {
+   "code": "TCP_CONNECTION_FAILED",
+   "measured_when": "distinguishable class when DNS resolves but connect times out/refused (no instance on the public plane: P1 TCP OK)"
+  },
+  {
+   "code": "TLS_CA_UNTRUSTED",
+   "measured_when": "self-signed tower.local cert class (P3 demonstrates the CA path is fine for the public host)"
+  },
+  {
+   "code": "TLS_HOSTNAME_MISMATCH",
+   "measured_when": "P3: SNI tower.local against the public cert fails verification (cert SANs do not cover tower.local)"
+  },
+  {
+   "code": "TLS_CERTIFICATE_EXPIRED",
+   "measured_when": "validity window measured in P1 (valid to 2027-02-10 at probe time); expiry class instrumented, no live instance"
+  },
+  {
+   "code": "TLS_HANDSHAKE_FAILED",
+   "measured_when": "generic handshake class distinct from CA/hostname/expiry (instrumented; no live instance on the public plane)"
+  },
+  {
+   "code": "HTTP_PROTOCOL_ERROR",
+   "measured_when": "non-HTTP response or malformed status line (instrumented; no live instance)"
+  },
+  {
+   "code": "PAIRING_ROUTE_MISSING",
+   "measured_when": "P1 ack_fake_id: 404 catch-all body 'No such API endpoint' — AMB-8 re-confirmed this session"
+  },
+  {
+   "code": "PAIRING_ROUTE_REJECTED",
+   "measured_when": "P1 claim_fake_id: in-band rejection envelope shape captured (ok:false + typed reason class)"
+  },
+  {
+   "code": "HTTP_STATUS_OTHER",
+   "measured_when": "any other non-2xx/404/429/403/410 status (instrumented)"
+  }
+ ],
+ "produced_utc_note": "ack-verb refinement applied after initial capture; all other fields unchanged"
+}

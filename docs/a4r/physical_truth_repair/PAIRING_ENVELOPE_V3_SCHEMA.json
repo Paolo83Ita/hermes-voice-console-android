@@ -1,0 +1,220 @@
+{
+ "schema": "android_repair.pairing_envelope_v3/1.0",
+ "produced_utc": "2026-11-26T11:21:55Z",
+ "purpose": "A versioned pairing envelope carrying ONLY safe, temporary information: enough for the phone to reach the Tower through the network context it is actually in, without ever carrying a durable credential. Defines the QR payload contract the Tower emits (v3) and the Android client consumes; v2 remains parseable (compatibility matrix below).",
+ "design_rules": [
+  "R-ENVELOPE-1: the QR carries a signed, short-lived (120-300 s) envelope; nothing durable",
+  "R-ENVELOPE-2: every field is either public (ids, endpoints) or a REFERENCE (nonce_ref, phrase REFERENCE — never the phrase itself)",
+  "R-ENVELOPE-3: forbidden-secret gate runs BEFORE any other parsing (fail closed, inherited from v2)",
+  "R-ENVELOPE-4: at least one endpoint candidate SHOULD be reachable from a cellular context for the envelope to be universally usable; the Tower SHOULD emit every physically-available class",
+  "R-ENVELOPE-5: no endpoint is ever hardcoded in the Android source; the ONLY endpoint sources are the envelope, Owner-configured alternates (manual advanced), LAN discovery (NSD), and MagicDNS names entered/guided by the Owner"
+ ],
+ "envelope_fields": {
+  "v": {
+   "type": "int",
+   "required": true,
+   "value": 3,
+   "note": "envelope schema version; v2 payloads remain accepted (single-endpoint compat)"
+  },
+  "protocol_version": {
+   "type": "string",
+   "required": true,
+   "pattern": "^voice-console/[0-9]+$",
+   "note": "protocol family; e.g. voice-console/2"
+  },
+  "tower_public_id": {
+   "type": "string",
+   "required": true,
+   "note": "stable public instance identifier (was tower_instance_id in v2); safe to display"
+  },
+  "challenge_id": {
+   "type": "string",
+   "required": true,
+   "note": "the pairing session identifier == pairings/{id} path segment (was pairing_id)"
+  },
+  "nonce_hash_or_reference": {
+   "type": "string",
+   "required": true,
+   "note": "opaque single-use nonce REFERENCE (v2: nonce_ref); the raw nonce never travels; client replays-protection keys on this"
+  },
+  "single_use_binding": {
+   "type": "object",
+   "required": true,
+   "fields": {
+    "max_claims": {
+     "type": "int",
+     "note": "how many claim attempts the Tower allows (bounded attempts)"
+    },
+    "replay_policy": {
+     "type": "string",
+     "const": "REJECT_ON_REPLAY"
+    },
+    "binding_scope": {
+     "type": "string",
+     "note": "e.g. 'one-device-one-claim'"
+    }
+   }
+  },
+  "issued_at": {
+   "type": "long",
+   "required": true,
+   "note": "epoch seconds; client rejects future-dated envelopes beyond clock skew tolerance (300 s)"
+  },
+  "expires_at": {
+   "type": "long",
+   "required": true,
+   "note": "epoch seconds; TTL 120-300 s; client rejects expired before ANY network attempt"
+  },
+  "verification_phrase_reference": {
+   "type": "object",
+   "required": true,
+   "fields": {
+    "kind": {
+     "type": "string",
+     "const": "REFERENCE_ONLY"
+    },
+    "word_count": {
+     "type": "int",
+     "note": "3 for the Italian three-word phrase"
+    },
+    "language": {
+     "type": "string",
+     "note": "it"
+    },
+    "note": "the phrase itself is NEVER in the QR — the Tower shows it, the Owner matches it on the phone screen against the phrase_hint returned by attest (bilateral confirmation)"
+   }
+  },
+  "endpoint_candidates": {
+   "type": "array",
+   "required": true,
+   "min_items": 1,
+   "item_fields": {
+    "transport_class": {
+     "type": "string",
+     "enum": [
+      "LAN_MDNS",
+      "LAN_IP",
+      "TAILSCALE_MAGICDNS",
+      "QUALIFIED_PUBLIC_ENDPOINT"
+     ],
+     "note": "MANUAL_ADVANCED is never IN the QR — it is a client-side Owner fallback method"
+    },
+    "url_or_host": {
+     "type": "string",
+     "required": true,
+     "note": "https URL or bare host; LAN_MDNS carries host.local, LAN_IP carries https://192.168.x.y:port, TAILSCALE_MAGICDNS carries https://<host>.<tailnet>.ts.net, QUALIFIED_PUBLIC_ENDPOINT carries the CA-covered public URL"
+    },
+    "priority": {
+     "type": "int",
+     "required": true,
+     "note": "lower = preferred; Tower orders by its own reachability expectation"
+    },
+    "network_requirement": {
+     "type": "string",
+     "enum": [
+      "LAN_SAME_SUBNET",
+      "TAILNET_MEMBERSHIP",
+      "INTERNET_ANY"
+     ],
+     "required": true
+    },
+    "tls_requirement": {
+     "type": "string",
+     "enum": [
+      "CA_VALIDATED",
+      "TAILSCALE_LE",
+      "LAN_SELF_SIGNED_EXPECTED"
+     ],
+     "required": true,
+     "note": "LAN_SELF_SIGNED_EXPECTED candidates are NEVER auto-trusted — they require the explicit Owner development-trust path or fail closed"
+    },
+    "freshness": {
+     "type": "string",
+     "enum": [
+      "AT_ISSUE"
+     ],
+     "note": "candidate measured at envelope issuance"
+    },
+    "expiry": {
+     "type": "long",
+     "required": true,
+     "note": "epoch seconds; candidate-level expiry (<= envelope expires_at)"
+    },
+    "source": {
+     "type": "string",
+     "enum": [
+      "TOWER_QR"
+     ],
+     "note": "provenance of the candidate"
+    },
+    "qualification_state": {
+     "type": "string",
+     "enum": [
+      "QUALIFIED",
+      "UNQUALIFIED"
+     ],
+     "required": true,
+     "note": "Tower-side qualification; the client re-verifies locally (freshness, TLS, reachability) and NEVER trusts the server qualification alone"
+    }
+   }
+  },
+  "transport_candidates": {
+   "type": "array",
+   "required": false,
+   "note": "allowed transports, e.g. ['HTTPS_POST','HTTPS_GET_POLL']; default HTTPS"
+  },
+  "certificate_trust_metadata": {
+   "type": "object",
+   "required": true,
+   "fields": {
+    "public_cert_sha256": {
+     "type": "string",
+     "note": "SHA-256 of the DER cert the public endpoint serves — pinning REFERENCE for diagnostics (comparison only, never silent trust)"
+    },
+    "public_cert_sans": {
+     "type": "array",
+     "note": "expected SANs of the qualified public endpoint"
+    },
+    "issuer_class": {
+     "type": "string",
+     "enum": [
+      "PUBLIC_CA",
+      "LETSENCRYPT",
+      "SELF_SIGNED_LAN",
+      "UNKNOWN"
+     ]
+    },
+    "note": "metadata is for VERIFICATION and DIAGNOSTICS; a mismatch is a typed TLS_HOSTNAME_MISMATCH / TLS_CA_UNTRUSTED failure, never a reason to weaken TLS"
+   }
+  },
+  "scope_request": {
+   "type": "array",
+   "required": true,
+   "note": "minimal scopes requested, e.g. ['voice','archive:read']; displayed to the Owner before confirmation"
+  },
+  "capability_negotiation_version": {
+   "type": "string",
+   "required": true,
+   "note": "e.g. 'capneg/1'; the post-pairing capability negotiation contract id"
+  }
+ },
+ "forbidden_fields_unchanged_from_v2": [
+  "password",
+  "api_key",
+  "apikey",
+  "secret",
+  "token_secret",
+  "private_key",
+  "credential",
+  "bearer",
+  "refresh_token",
+  "access_token",
+  "console_token",
+  "claim_key"
+ ],
+ "signature": {
+  "format": "<base64url(payload JSON)>.<base64url(signature)>",
+  "note": "unchanged from v2; the client does not verify the signature locally (the Tower proves possession at claim time); the signature makes the envelope tamper-evident for later audit"
+ },
+ "qr_text_example_shape": "base64url({v:3, protocol_version:'voice-console/2', tower_public_id:'…', challenge_id:'…', nonce_hash_or_reference:'…', single_use_binding:{…}, issued_at:…, expires_at:…, verification_phrase_reference:{…}, endpoint_candidates:[…], transport_candidates:['HTTPS_POST','HTTPS_GET_POLL'], certificate_trust_metadata:{…}, scope_request:['voice','archive:read'], capability_negotiation_version:'capneg/1'}).base64url(sig)"
+}
