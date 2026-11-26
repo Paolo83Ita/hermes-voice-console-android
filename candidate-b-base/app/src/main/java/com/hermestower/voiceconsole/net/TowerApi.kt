@@ -69,10 +69,38 @@ class HttpUrlTowerHttp(private val connectTimeoutMs: Int = 10_000, private val r
     }
 }
 
-/** Typed transport failure mapped by the pairing flow (never a raw stack trace). */
-class TowerApiException(val kind: Kind, val httpStatus: Int?, detail: String, cause: Throwable? = null) :
-    Exception(detail, cause) {
-    enum class Kind { NETWORK_UNREACHABLE, SERVER_ERROR, REJECTED, REVOKED, RATE_LIMITED, MALFORMED_RESPONSE }
+/**
+ * Typed transport failure mapped by the pairing flow (never a raw stack trace).
+ *
+ * ANDROID REPAIR CP-005 additions (mission section 3 / AMB-8 / AMB-9):
+ *  - IN_BAND_ERROR: the Tower's error envelope {ok:false, error:CODE} read
+ *    BEFORE DTO parsing (the AMB-9 repair — the Tower's typed reason is never
+ *    lost into 'risposta claim incompleta');
+ *  - ROUTE_MISSING: HTTP 404 catch-all ('No such API endpoint') — the AMB-8
+ *    honest state: a route the client speaks that the server does not serve;
+ *  - transportCode: the classified TLS/network failure code when the failure
+ *    is transport-class (DNS/TCP/TLS/cleartext), for the pairing diagnostics.
+ */
+class TowerApiException(
+    val kind: Kind,
+    val httpStatus: Int?,
+    detail: String,
+    cause: Throwable? = null,
+    val inBandError: String? = null,
+    val transportCode: String? = null,
+) : Exception(detail, cause) {
+    enum class Kind {
+        NETWORK_UNREACHABLE,
+        SERVER_ERROR,
+        REJECTED,
+        REVOKED,
+        RATE_LIMITED,
+        MALFORMED_RESPONSE,
+        /** The server answered in-band {ok:false,error:CODE} — the typed reason is in [inBandError]. */
+        IN_BAND_ERROR,
+        /** HTTP 404 catch-all: the route does not exist on this server version (AMB-8). */
+        ROUTE_MISSING,
+    }
 }
 
 class TowerApi(
@@ -91,10 +119,32 @@ class TowerApi(
 
     private fun call(method: String, path: String, body: JSONObject?, bearer: String?): JSONObject {
         val res = rawCall(method, path, body, bearer)
-        return try {
+        val obj = try {
             JSONObject(res)
         } catch (e: Exception) {
             throw TowerApiException(TowerApiException.Kind.MALFORMED_RESPONSE, null, "risposta non leggibile", e)
+        }
+        readInBandEnvelope(obj)
+        return obj
+    }
+
+    /**
+     * AMB-9 ENVELOPE ADAPTER (mission section 3): the live Tower reports errors
+     * as HTTP 200 {ok:false, error:CODE}. The envelope is read BEFORE any DTO
+     * field parsing so the Tower's typed reason reaches the UI catalog instead
+     * of the generic 'risposta incompleta'. Success envelopes ({ok:true} or no
+     * ok field) pass through unchanged. Pinned by JVM fixtures for BOTH shapes.
+     */
+    private fun readInBandEnvelope(obj: JSONObject) {
+        if (obj.has("ok") && !obj.optBoolean("ok", true)) {
+            val code = obj.optString("error", "UNKNOWN_IN_BAND_ERROR")
+            throw TowerApiException(
+                TowerApiException.Kind.IN_BAND_ERROR,
+                200,
+                "Tower: $code",
+                null,
+                inBandError = code,
+            )
         }
     }
 
@@ -116,6 +166,12 @@ class TowerApi(
         if (res.statusCode == 429) throw TowerApiException(TowerApiException.Kind.RATE_LIMITED, 429, "troppi tentativi (blocco tentativi errati)")
         if (res.statusCode == 403 || res.statusCode == 410) {
             throw TowerApiException(TowerApiException.Kind.REVOKED, res.statusCode, "dispositivo revocato o pairing non valido")
+        }
+        if (res.statusCode == 404) {
+            // AMB-8: the catch-all 'No such API endpoint' — the route does not
+            // exist on this server version (e.g. the ack route on the live
+            // Tower today). Typed as ROUTE_MISSING, never a generic rejection.
+            throw TowerApiException(TowerApiException.Kind.ROUTE_MISSING, 404, "rotta non presente su questa versione della Tower")
         }
         if (res.statusCode < 200 || res.statusCode >= 300) {
             throw TowerApiException(TowerApiException.Kind.REJECTED, res.statusCode, "richiesta rifiutata dalla Tower")
@@ -223,6 +279,28 @@ class TowerApi(
             .put("scope", JSONArray(scope))
         return call("POST", "/api/tower/voice-console/v2/pairings", body, null)
     }
+
+    /**
+     * ANDROID REPAIR CP-005 — raw GET for the CONNECTION_TEST stage (mission
+     * section 4): a REAL transport probe (TCP+TLS+HTTP, real latency), never a
+     * hardcoded 'SIMULATED' capability value (APP-P1-07 repair).
+     */
+    fun rawGet(url: String): Int {
+        val res = try {
+            http.execute(TowerHttp.Request(method = "GET", url = url, body = null, bearerToken = null))
+        } catch (e: java.io.IOException) {
+            throw TowerApiException(TowerApiException.Kind.NETWORK_UNREACHABLE, null, "Tower non raggiungibile", e)
+        }
+        return res.statusCode
+    }
+
+    /**
+     * ANDROID REPAIR CP-005 — capability negotiation route (capneg/1, pending
+     * the Tower-side delta HR-A4R-PHYS-002 DELTA-D). ROUTE_MISSING on the live
+     * Tower today → the client degrades honestly to DEGRADED/un-negotiated.
+     */
+    fun capabilities(bearer: String?): JSONObject =
+        call("POST", "/api/tower/voice-console/v2/g4/capabilities", JSONObject(), bearer)
 
     // ------------------------------------------------------------------
     // Capture / voice / archive lanes (contract-complete surface; the

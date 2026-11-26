@@ -98,7 +98,7 @@ class PairingFlow(
 
     private fun mapApiException(e: TowerApiException, claimPhase: Boolean): Step = when (e.kind) {
         TowerApiException.Kind.NETWORK_UNREACHABLE ->
-            fail("PAIRING_ENDPOINT_UNREACHABLE", "Tower non raggiungibile")
+            fail("PAIRING_ENDPOINT_UNREACHABLE", e.transportCode ?: "Tower non raggiungibile")
         TowerApiException.Kind.RATE_LIMITED ->
             fail("PAIRING_CHALLENGE_REJECTED", "troppi tentativi errati: richiesta bloccata dalla Tower")
         TowerApiException.Kind.REVOKED ->
@@ -108,6 +108,15 @@ class PairingFlow(
                 if (claimPhase) "CLAIM_REJECTED" else "ATTEST_REJECTED",
                 "richiesta rifiutata dalla Tower",
             )
+        TowerApiException.Kind.ROUTE_MISSING ->
+            // AMB-8 honest state: the route does not exist on this server
+            // version (e.g. the ack route on the live Tower). NEVER a bypass.
+            fail("PAIRING_ROUTE_MISSING", "rotta non presente su questa versione della Tower: aggiornamento server richiesto")
+        TowerApiException.Kind.IN_BAND_ERROR ->
+            // AMB-9 repair: the Tower's typed reason (PAIRING_NOT_FOUND_OR_EXPIRED,
+            // CLAIM_CODE_INVALID, …) reaches the user instead of the generic
+            // 'risposta incompleta'.
+            fail(inBandReason(e, claimPhase), "Tower: ${e.inBandError}")
         TowerApiException.Kind.MALFORMED_RESPONSE ->
             fail(
                 if (claimPhase) "CLAIM_RESPONSE_INCOMPLETE" else "ATTEST_RESPONSE_INCOMPLETE",
@@ -115,6 +124,17 @@ class PairingFlow(
             )
         TowerApiException.Kind.SERVER_ERROR ->
             fail(if (claimPhase) "CLAIM_FAILED" else "ATTEST_FAILED", "errore della Tower")
+    }
+
+    /** In-band Tower reason -> pairing reason (the AMB-9 catalog mapping). */
+    private fun inBandReason(e: TowerApiException, claimPhase: Boolean): String = when (e.inBandError) {
+        "PAIRING_NOT_FOUND_OR_EXPIRED", "PAIRING_EXPIRED" -> "PAIRING_CHALLENGE_EXPIRED"
+        "PAIRING_REVOKED", "DEVICE_REVOKED" -> "DEVICE_REVOKED"
+        "PAIRING_ALREADY_CLAIMED" -> "CLAIM_REJECTED"
+        "CLAIM_CODE_INVALID", "CLAIM_EXHAUSTED" -> "CLAIM_REJECTED"
+        "ATTEST_INVALID" -> "ATTEST_REJECTED"
+        "RATE_LIMITED" -> "PAIRING_CHALLENGE_REJECTED"
+        else -> if (claimPhase) "CLAIM_REJECTED" else "ATTEST_REJECTED"
     }
 
     /**

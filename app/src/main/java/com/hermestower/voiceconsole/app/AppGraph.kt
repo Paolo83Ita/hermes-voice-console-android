@@ -147,6 +147,31 @@ class AppGraph(
         packageName = context.packageName,
     )
 
+    // ANDROID REPAIR CP-005 — the CANONICAL pairing session state machine
+    // (mission sections 4/5): envelope v2+v3 parser, multi-candidate endpoint
+    // resolver with typed transport classification, the 21-state session
+    // machine with resume/revoke/re-pair, the ConnectivityManager network
+    // context, the non-secret session store, and the NSD LAN discovery
+    // surface. This is the PRIMARY pairing path from CP-005 on; the
+    // TowerPairingController above remains wired for the legacy scanner screen
+    // during the visual convergence pass (CP-009) and is NOT removed mid-flight.
+    val towerHttpTransport = com.hermestower.voiceconsole.net.HttpUrlTowerHttp()
+    val androidNetworkContext = com.hermestower.voiceconsole.pairing.AndroidNetworkContext(context)
+    val pairingSessionStore = com.hermestower.voiceconsole.pairing.PrefsPairingSessionStore(context)
+    val pairingEndpointResolver = com.hermestower.voiceconsole.pairing.EndpointResolver(
+        http = towerHttpTransport,
+        networkContext = { androidNetworkContext.current() },
+    )
+    val pairingSessionController = com.hermestower.voiceconsole.pairing.PairingSessionController(
+        api = towerPairingApi,
+        store = towerStore,
+        flow = towerPairingFlow,
+        resolver = pairingEndpointResolver,
+        sessionStore = pairingSessionStore,
+        deviceKeys = towerDeviceKeys,
+    )
+    val nsdTowerDiscovery = com.hermestower.voiceconsole.pairing.NsdTowerDiscovery(context)
+
     // GRAPH 4 CP-G4-010 wave 2: the v1 hermes-pair:// parser RETAINS ONLY the
     // SIMULATED diagnostics lane (self-test battery pairingParserFactory) — it
     // is NO LONGER reachable from any production pairing route; the mock

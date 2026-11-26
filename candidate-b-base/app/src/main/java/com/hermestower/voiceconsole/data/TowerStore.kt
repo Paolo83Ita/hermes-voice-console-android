@@ -376,6 +376,9 @@ class TowerStore(context: Context, private val encryptInterceptor: ((ByteArray) 
     override fun isPaired(): Boolean =
         !getDeviceId().isNullOrEmpty() && !getConsoleToken().isNullOrEmpty() && !getEndpoint().isNullOrEmpty()
 
+    /** ANDROID REPAIR CP-005 — restart read-back (decrypted, public id, no secret). */
+    override fun pairedDeviceId(): String? = getDeviceId()
+
     override fun clear() {
         prefs.edit().clear().commit()
         clearFailureState()

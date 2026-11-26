@@ -140,6 +140,13 @@ interface PairingStateStore {
     fun nextTurnSeq(): Int
 
     /**
+     * ANDROID REPAIR CP-005 — the paired device id for the restart read-back
+     * (mission section 5), or null when not paired. Redaction note: the
+     * device id is a Tower-assigned public identifier, not a secret.
+     */
+    fun pairedDeviceId(): String? = null
+
+    /**
      * TEST fixture ONLY (SIMULATED_CONTRACT_TEST): an in-memory implementation
      * with the SAME typed contract. It is compiled beside the interface so the
      * JVM suite can exercise the pairing state machine deterministically; it
@@ -190,5 +197,6 @@ interface PairingStateStore {
         override fun failureHistory(): List<KeystoreFailure> = history.toList()
         private var turnSeq = 0
         override fun nextTurnSeq(): Int = ++turnSeq
+        override fun pairedDeviceId(): String? = data["device_id"]
     }
 }
