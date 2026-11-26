@@ -5,8 +5,8 @@
   {
    "control": "Console conversation (composer send + voice answers)",
    "surface": "ConsoleScreen",
-   "class": "FAKE_ENABLED (SIMULATED executor, no Tower executor)",
-   "evidence": "AppGraph.kt:465 localEngine=MockLocalConversationEngine; towerExecutor={ _ -> null }",
+   "class": "REPAIRED CP-008 (real executors + route trace)",
+   "evidence": "AppGraph: boundedLocalResponder + localLlmEngine.prompt (verified model only) + TowerApi.v2 voice/submit when paired; RouteDecisionLog per decision",
    "repair": "CP-011 Tower-first routing: real v2 Tower executor when paired + real LocalLlmEngine when enabled + truthful offline state"
   },
   {
@@ -19,70 +19,70 @@
   {
    "control": "Pairing numeric-code entry + manual-endpoint entry (A3 PairingEntryActions)",
    "surface": "not reachable (was TowerStudio dialogs in candidate A)",
-   "class": "DEAD CODE (SIMULATED TowerPairingClient; superseded by B v2 lane; no navigation entry)",
+   "class": "REPAIRED CP-005 (real v2/v3 numeric + manual + LAN + MagicDNS lanes on the session machine)",
    "evidence": "PairingEntryActions.kt:22 'only wired executor is the deterministic TowerPairingClient (mock)'; no navigation reference",
    "repair": "replace with REAL numeric + manual lanes on the v2 contract (charter section 6 visible methods)"
   },
   {
    "control": "TowerApi.ownerAck poll (GET /pairings/{id}/ack)",
    "surface": "PairingFlow.awaitOwnerAcknowledgement",
-   "class": "UNBOUND BACKEND (route ABSENT on live Tower — AMB-8)",
+   "class": "UNBOUND BACKEND — typed client state REPAIR_AVAILABLE (AMB-8; server delta HR-A4R-PHYS-002 DELTA-B pending)",
    "evidence": "lane probe 404 catch-all on fake id while claim/attest answer in-band",
    "repair": "versioned Tower-side contract decision request HR-A4R-PHYS-001 (no client bypass; no Tower core change)"
   },
   {
    "control": "Tower ok/error envelope handling",
    "surface": "TowerApi.call",
-   "class": "UNBOUND CONTRACT (in-band {ok:false,error} misread as MALFORMED_RESPONSE — AMB-9)",
+   "class": "REPAIRED CP-005 (in-band envelope adapter, AMB-9 closed client-side)",
    "evidence": "claim() reads claim_key/challenge only; live Tower returns 200 {ok:false,PAIRING_NOT_FOUND_OR_EXPIRED}",
    "repair": "envelope adapter in V2 (contract fixture pinned)"
   },
   {
    "control": "Qwen card primary action 'Scarica' after a completed download",
    "surface": "ModelManagerScreen",
-   "class": "DESTRUCTIVE DEAD-END (re-click sends Range-at-EOF -> 416 -> DELETES the complete 522 MB partial -> restart from 0)",
+   "class": "REPAIRED CP-006 (416 full-partial recovery: verify-and-promote, never delete)",
    "evidence": "ModelDownloadManager.kt:263-272 416 branch; edge probe p2/p2m",
    "repair": "R4: verify-and-promote complete partials; R2: auto promotion DOWNLOADED->verify->install"
   },
   {
    "control": "Qwen 'Installa/Verifica' for LOCAL_LLM components",
    "surface": "ModelManagerScreen action resolver",
-   "class": "UNREACHABLE (record-gated INSTALL branch; registry never creates a record before install; no DOWNLOADED->install wiring)",
+   "class": "REPAIRED CP-006 (ensureRecord upsert + resolvers honor progressState + promotion chain)",
    "evidence": "A4R-PHYS-MODEL-002 static proof (git-identity-verified)",
    "repair": "R1-R3 registry upsert + resolver honoring progressState + promotion wiring"
   },
   {
    "control": "'Test local model' deterministic diagnostic (charter section 9)",
    "surface": "ABSENT",
-   "class": "MISSING SURFACE",
+   "class": "REPAIRED CP-007 (QwenDeterministicTestController + result card)",
    "evidence": "no prompt/test surface for the local LLM in any screen",
    "repair": "CP-007: new diagnostic with 'Rispondi soltanto con OK', temp 0, 8 tokens, full result screen + secret-clean export"
   },
   {
    "control": "TowerConnectionTester.streamingCapability",
    "surface": "ConnectionScreen",
-   "class": "HARD-CODED SIMULATED VALUE",
+   "class": "REPAIRED CP-005 (real testConnection with latency; SIMULATED value removed from the TOWER surface)",
    "evidence": "TowerConnectionTester.kt:65 streamingCapability = \"SIMULATED\"",
    "repair": "derive from real capability negotiation post-pairing"
   },
   {
    "control": "LAN discovery / Tailscale MagicDNS / advanced manual pairing surfaces",
    "surface": "ABSENT",
-   "class": "MISSING SURFACE (charter section 6 required visible methods)",
+   "class": "REPAIRED CP-005 (NsdTowerDiscovery + method chooser + first-run redesign)",
    "evidence": "no NSD/MagicDNS code; no manual endpoint UI reachable",
    "repair": "CP-004/005 pairing path redesign"
   },
   {
    "control": "First-run pairing onboarding WELCOME->CONNECT->PAIRED",
    "surface": "OnboardingScreen",
-   "class": "MISSING SURFACE (scanner only demonstrated)",
+   "class": "REPAIRED CP-005 (onboarding step 2 = WHY+CONNECT -> PAIRING route; simulation choice retired)",
    "evidence": "onboarding QR choice 'demonstrates the scanner (finishes into QR_SCANNER)'",
    "repair": "CP-004 onboarding redesign"
   },
   {
    "control": "Owner secret-clean diagnostics export bundle (ZIP)",
    "surface": "RedactedDiagnosticsExporter exists but not Owner-reachable for pairing/model states",
-   "class": "PARTIALLY BOUND",
+   "class": "EXTENDED CP-005/008 (pairing diagnostics card + route trace; full secret-clean ZIP export at CP-008 delivery)",
    "evidence": "exporter wired to store only; no pairing transport classification; no download dead-end fields",
    "repair": "CP-008 diagnostics area + EXPORT_SECRET_CLEAN_DIAGNOSTIC_BUNDLE"
   }
@@ -90,5 +90,7 @@
  "gates": {
   "ZERO_UNACCOUNTED_INTERACTION_PASS": "PASS (census + register complete)",
   "ZERO_FAKE_ENABLED_CONTROL_PASS": "FAIL for the BASELINE (expected — this register IS the repair backlog; gate re-evaluated at CP-010 after the fixes)"
- }
+ },
+ "updated_utc": "2026-11-26T12:15:39Z",
+ "update_note": "CP-005..008 repair pass: console conversation mock executor REPLACED (BoundedLocalResponder + real paired Tower executor + route-decision trace); null Tower executor REPLACED (real v2 voice/submit when paired, typed TOWER_UNAVAILABLE otherwise); dead A3 pairing lanes superseded by the real v2/v3 session machine (QR + numeric + LAN NSD + MagicDNS + manual); ack route absent = typed REPAIR_AVAILABLE state (server delta HR-A4R-PHYS-002); Qwen promotion dead-end REPAIRED (ensureRecord + promotion chain + 416 recovery); deterministic test surface ADDED; TowerConnectionTester SIMULATED replaced by the real controller testConnection. Remaining: archive mock lane (CP-009 scope), first-run onboarding redesigned, full visual convergence adjudication (CP-009)."
 }

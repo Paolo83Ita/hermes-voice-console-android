@@ -42,6 +42,12 @@ class LocalLlmEngine(
     private val candidateIdentity: String = "org.qwen.qwen2.5-0.5b-instruct.q5-k-m",
     /** GRAPH 4.10 §4: resolved response-language tag for the system prompt. */
     private val localeTagProvider: () -> String = { "en" },
+    /**
+     * ANDROID REPAIR CP-007: resolves the PROMOTED artifact (the registry/
+     * storage path — the .pkg file the promotion controller installed). The
+     * legacy .gguf walk remains as a fallback for pre-repair deliveries.
+     */
+    private val installedArtifactResolver: (() -> File?)? = null,
 ) {
 
     enum class State { DISABLED, NOT_INSTALLED, LOADING, LOADED, ERROR }
@@ -96,14 +102,19 @@ class LocalLlmEngine(
     @Volatile
     private var loadedModelFile: File? = null
 
-    /** Resolves the installed GGUF file (delivery chain may nest one level deep). */
+    /** Resolves the installed GGUF artifact (promotion path first, legacy walk fallback). */
     fun resolveInstalledFile(): File? {
+        // CP-007: the PROMOTED artifact (registry/storage truth) wins.
+        installedArtifactResolver?.let { r ->
+            val promoted = r()
+            if (promoted != null && promoted.isFile) return promoted
+        }
         if (!modelRoot.isDirectory) return null
         val direct = File(modelRoot, "qwen2.5-0.5b-instruct-q5_k_m.gguf")
         if (direct.isFile) return direct
         return modelRoot.walkTopDown()
             .maxDepth(2)
-            .firstOrNull { it.isFile && it.name.endsWith(".gguf") }
+            .firstOrNull { it.isFile && (it.name.endsWith(".gguf") || it.name.endsWith(".pkg")) }
     }
 
     /** Real integrity check: file present, size equal, SHA-256 equal. */

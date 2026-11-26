@@ -76,6 +76,11 @@ fun ModelManagerScreen(graph: AppGraph) {
     var selectedProfile by remember { mutableStateOf(VoiceModelProfile.TOWER_FIRST) }
     var recommendation by remember { mutableStateOf<com.hermestower.voiceconsole.models.VoicePackRecommendation?>(null) }
     var statusNote by remember { mutableStateOf<String?>(null) }
+    // ANDROID REPAIR CP-007 (mission section 9): the deterministic local model
+    // test result — rendered as a full measured card dialog, honest PASS/FAIL.
+    var qwenTestResult by remember {
+        mutableStateOf<com.hermestower.voiceconsole.local.QwenDeterministicTestController.Result?>(null)
+    }
     var appliedProfile by remember {
         mutableStateOf(
             graph.keyValueStore.getString("voice_profile")?.let { name ->
@@ -720,6 +725,23 @@ fun ModelManagerScreen(graph: AppGraph) {
                                                 }
                                             }
                                         }
+                                        com.hermestower.voiceconsole.models.ModelComponentType.LOCAL_LLM -> {
+                                            // ANDROID REPAIR CP-007 (mission section 9): the
+                                            // DETERMINISTIC local model test — 'Rispondi soltanto
+                                            // con OK', temperature 0, max 8 tokens, context 512,
+                                            // ChatML; full measured result card; honest FAIL on
+                                            // any output mismatch.
+                                            scope.launch {
+                                                val result = graph.qwenDeterministicTest.run()
+                                                qwenTestResult = result
+                                                statusNote = if (result.passed) {
+                                                    context.getString(R.string.mm_qwen_test_passed)
+                                                } else {
+                                                    context.getString(R.string.mm_qwen_test_failed, result.errorCode ?: result.failedStage ?: "UNKNOWN")
+                                                }
+                                                registryTick++
+                                            }
+                                        }
                                         else -> expanded[entry.identity] = !isExpanded
                                     }
                                 }
@@ -950,6 +972,51 @@ fun ModelManagerScreen(graph: AppGraph) {
             },
             dismissButton = {
                 TextButton(onClick = { packConfirmOpen = false }) { Text(stringResource(R.string.mm_cancel)) }
+            },
+        )
+    }
+
+    // CP-007: the deterministic local model test result card (mission section 9
+    // display contract — every measured field, verbatim).
+    val testResult = qwenTestResult
+    if (testResult != null) {
+        AlertDialog(
+            onDismissRequest = { qwenTestResult = null },
+            title = {
+                Text(
+                    if (testResult.passed) stringResource(R.string.mm_qwen_test_passed)
+                    else stringResource(R.string.mm_qwen_test_failed, testResult.errorCode ?: "-")
+                )
+            },
+            text = {
+                Column {
+                    Text("${stringResource(R.string.mm_qwen_row_fmt, "identity", testResult.artifactIdentity)}\n" +
+                        "${stringResource(R.string.mm_qwen_row_fmt, "file", testResult.artifactFile ?: "-")}\n" +
+                        "${stringResource(R.string.mm_qwen_row_fmt, "sha256", if (testResult.hashVerified) "VERIFIED" else "NOT_VERIFIED")}\n" +
+                        "${stringResource(R.string.mm_qwen_row_fmt, "size", "${testResult.fileSizeBytes ?: -1} B")}\n" +
+                        "${stringResource(R.string.mm_qwen_row_fmt, "quant", testResult.quantization)}\n" +
+                        "${stringResource(R.string.mm_qwen_row_fmt, "abi", testResult.abi)}\n" +
+                        "${stringResource(R.string.mm_qwen_row_fmt, "native", testResult.nativeLibraryState)}\n" +
+                        "${stringResource(R.string.mm_qwen_row_fmt, "jni", testResult.jniState)}\n" +
+                        "${stringResource(R.string.mm_qwen_row_fmt, "gguf", testResult.ggufState)}\n" +
+                        "${stringResource(R.string.mm_qwen_row_fmt, "model", testResult.modelState)}\n" +
+                        "${stringResource(R.string.mm_qwen_row_fmt, "context", testResult.contextState)}\n" +
+                        "${stringResource(R.string.mm_qwen_row_fmt, "template", testResult.chatTemplate)}\n" +
+                        "${stringResource(R.string.mm_qwen_row_fmt, "load_ms", "${testResult.loadDurationMs ?: -1}")}\n" +
+                        "${stringResource(R.string.mm_qwen_row_fmt, "ttft_ms", "${testResult.promptEvalMs ?: -1}")}\n" +
+                        "${stringResource(R.string.mm_qwen_row_fmt, "gen_ms", "${testResult.generationDurationMs ?: -1}")}\n" +
+                        "${stringResource(R.string.mm_qwen_row_fmt, "tok_s", "${testResult.tokensPerSecond ?: -1f}")}\n" +
+                        "${stringResource(R.string.mm_qwen_row_fmt, "peak_rss", "${testResult.peakNativeHeapBytes ?: -1} B")}\n" +
+                        "${stringResource(R.string.mm_qwen_row_fmt, "thermal", testResult.thermalState)}\n" +
+                        "${stringResource(R.string.mm_qwen_row_fmt, "output", testResult.visibleOutput)}\n" +
+                        "${stringResource(R.string.mm_qwen_row_fmt, "unload", testResult.unloadResult)}\n" +
+                        "${stringResource(R.string.mm_qwen_row_fmt, "rss_after", "${testResult.postUnloadNativeHeapBytes ?: -1} B")}",
+                        style = androidx.compose.material3.MaterialTheme.typography.bodySmall,
+                    )
+                }
+            },
+            confirmButton = {
+                TextButton(onClick = { qwenTestResult = null }) { Text(stringResource(R.string.mm_close)) }
             },
         )
     }

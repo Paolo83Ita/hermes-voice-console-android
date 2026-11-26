@@ -973,4 +973,8 @@ MANUAL_ADVANCED — sélection indépendante par composant, visibilité totale, 
     <string name="diagnostics_pairing_empty">Pas encore de session d\'appairage. Les diagnostics apparaîtront ici.</string>
     <string name="mm_promotion_ok">%1$s installé et vérifié : prêt pour le test</string>
     <string name="mm_promotion_failed">Promotion de %1$s échouée (%2$s) : %3$s</string>
+    <string name="mm_qwen_test_passed">Test déterministe RÉUSSI : sortie = OK</string>
+    <string name="mm_qwen_test_failed">Test déterministe ÉCHOUÉ (%1$s) : voir la carte de résultat</string>
+    <string name="mm_qwen_row_fmt">%1$s : %2$s</string>
+    <string name="mm_close">Fermer</string>
 </resources>

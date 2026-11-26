@@ -973,4 +973,8 @@ MANUAL_ADVANCED — independent per-component selection, full visibility, no sil
     <string name="diagnostics_pairing_empty">No pairing session yet. Pairing diagnostics appear here.</string>
     <string name="mm_promotion_ok">%1$s installed and verified: ready for the test</string>
     <string name="mm_promotion_failed">Promotion of %1$s failed (%2$s): %3$s</string>
+    <string name="mm_qwen_test_passed">Deterministic test PASSED: output = OK</string>
+    <string name="mm_qwen_test_failed">Deterministic test FAILED (%1$s): see the result card</string>
+    <string name="mm_qwen_row_fmt">%1$s: %2$s</string>
+    <string name="mm_close">Close</string>
 </resources>

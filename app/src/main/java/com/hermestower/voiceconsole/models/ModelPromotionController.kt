@@ -39,7 +39,7 @@ import java.nio.file.StandardCopyOption
 class ModelPromotionController(
     private val storage: ModelStorageManager,
     private val registry: ModelInstallationRegistry,
-    private val downloadManager: ModelDownloadManager,
+    private val downloadManager: DefaultModelDownloadManager,
 ) {
 
     /** The typed promotion outcome codes (surfaced to the card + diagnostics). */
@@ -119,7 +119,12 @@ class ModelPromotionController(
 
         // 5+6. fsync then atomic promotion.
         try {
-            RandomAccessFile(partial.toFile(), "rw").use { raf -> raf.channel.force(true) }
+            val raf = RandomAccessFile(partial.toFile(), "rw")
+            try {
+                raf.channel.force(true)
+            } finally {
+                raf.close()
+            }
         } catch (e: Exception) {
             return Result(Code.PROMOTION_IO_FAILED, detail = "fsync non riuscito: ${e.message}")
         }

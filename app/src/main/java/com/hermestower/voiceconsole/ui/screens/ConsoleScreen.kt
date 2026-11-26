@@ -279,7 +279,7 @@ fun ConsoleScreen(
                     Column(Modifier.padding(14.dp)) {
                         Text(
                             stringResource(com.hermestower.voiceconsole.R.string.home_unpaired_card_title),
-                            style = MonumentalType.sectionTitle,
+                            style = MonumentalType.friezeSubtitle,
                             color = m.gold,
                         )
                         Text(

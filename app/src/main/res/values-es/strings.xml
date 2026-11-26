@@ -973,4 +973,8 @@ MANUAL_ADVANCED — selección independiente por componente, visibilidad total, 
     <string name="diagnostics_pairing_empty">Aún sin sesión de emparejamiento. El diagnóstico aparece aquí.</string>
     <string name="mm_promotion_ok">%1$s instalado y verificado: listo para la prueba</string>
     <string name="mm_promotion_failed">Promoción de %1$s fallida (%2$s): %3$s</string>
+    <string name="mm_qwen_test_passed">Test determinístico SUPERADO: salida = OK</string>
+    <string name="mm_qwen_test_failed">Test determinístico FALLIDO (%1$s): ver la tarjeta de resultado</string>
+    <string name="mm_qwen_row_fmt">%1$s: %2$s</string>
+    <string name="mm_close">Cerrar</string>
 </resources>

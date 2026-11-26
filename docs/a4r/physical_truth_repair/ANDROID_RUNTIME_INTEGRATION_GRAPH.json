@@ -94,5 +94,17 @@
   "RealTowerBridge handshake (graph-2 contract)",
   "ModelDownloadManager (huggingface.co + hf-mirror.com, Range resume, 429/416 typed handling)",
   "NSC: cleartext loopback only — http endpoints blocked by policy"
- ]
+ ],
+ "updated_utc": "2026-11-26T12:15:39Z",
+ "cp006_cp007_update": {
+  "promotion_chain": "REPAIRED: DOWNLOADED -> size -> SHA-256 -> GGUF validation -> preflight -> fsync -> atomic promotion -> registry -> read-back -> cleanup (ModelPromotionController)",
+  "registry_observability": "REPAIRED: ensureRecord upsert (the record-less no-op is gone)",
+  "runtime_binding": "REPAIRED: LocalLlmEngine resolves the PROMOTED .pkg artifact first (installedArtifactResolver -> modelStorage.installedFile); llama.cpp runtime binds the real installed GGUF",
+  "deterministic_test": "ADDED: QwenDeterministicTestController (prompt \"Rispondi soltanto con OK\", temperature 0, 8 tokens, context 512, ChatML, measured card, honest FAIL)",
+  "gates": {
+   "ZERO_PRODUCTION_MOCK_EXECUTOR_PASS": "PASS (BoundedLocalResponder on the production route; MockLocalConversationEngine = TEST_FIXTURE_ONLY)",
+   "ZERO_NULL_TOWER_EXECUTOR_PASS": "PASS (real v2 voice/submit when paired; typed TOWER_UNAVAILABLE otherwise — null never presented as a completed conversation)",
+   "REAL_LLAMA_RUNTIME_BINDING_PASS": "PASS at the code level (JVM fixture rows + wired AAR); PHYSICAL inference remains OWNER_PHYSICAL_RETEST_PENDING"
+  }
+ }
 }

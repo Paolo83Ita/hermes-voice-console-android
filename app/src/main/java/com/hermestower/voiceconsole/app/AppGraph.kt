@@ -497,7 +497,18 @@ class AppGraph(
     val audioCaptureEngine = NoAudioCaptureEngine()
     val speechToTextEngine = InactiveSpeechToTextEngine()
 
-    val localEngine = MockLocalConversationEngine()
+    // ANDROID REPAIR CP-008: the route-decision trace (mission section 10) —
+    // every console/voice route decision is recorded with requested mode,
+    // effective mode, reason, executor, fallback, confidence, Tower connection
+    // state and local runtime state. Consumed by the console diagnostics.
+    val routeDecisionLog = com.hermestower.voiceconsole.core.routing.RouteDecisionLog()
+
+    // ANDROID REPAIR CP-007/008: the PRODUCTION bounded local responder
+    // (ZERO_PRODUCTION_MOCK_EXECUTOR — MockLocalConversationEngine is RETIRED
+    // from the production graph; it stays TEST_FIXTURE_ONLY for the JVM suites).
+    val boundedLocalResponder = com.hermestower.voiceconsole.local.BoundedLocalResponder()
+
+    val localEngine = boundedLocalResponder
 
     // GRAPH 4.10 CP-G4.10-002: the ONE response-locale authority (§4 precedence
     // chain). Every local text producer consumes the resolved tag from HERE —
@@ -526,8 +537,28 @@ class AppGraph(
             runtime = com.hermestower.voiceconsole.local.LlamaCppAndroidRuntime(
                 com.hermestower.voiceconsole.local.LlamaRealNativeBridge(),
             ),
+            // CP-007: the promoted .pkg artifact (registry/storage truth) resolves
+            // BEFORE the legacy .gguf walk — the runtime binds what the promotion
+            // controller actually installed.
+            installedArtifactResolver = { modelStorage.installedFile(qwen)?.toFile() },
         )
     }
+
+    // ANDROID REPAIR CP-007 (mission section 9): the Owner-accessible deterministic
+    // local model test ('Rispondi soltanto con OK', temperature 0, 8 tokens,
+    // context 512, ChatML) with the full measured result card.
+    val qwenDeterministicTest = com.hermestower.voiceconsole.local.QwenDeterministicTestController(
+        engine = localLlmEngine,
+        native = com.hermestower.voiceconsole.local.LlamaRealNativeBridge(),
+        deviceAbi = android.os.Build.SUPPORTED_ABIS.firstOrNull() ?: "unknown",
+        thermalStateProvider = {
+            runCatching {
+                val pm = context.getSystemService(android.content.Context.POWER_SERVICE) as? android.os.PowerManager
+                pm?.currentThermalStatus?.toString() ?: "-"
+            }.getOrDefault("-")
+        },
+        nativeHeapProvider = { runCatching { android.os.Debug.getNativeHeapAllocatedSize() }.getOrDefault(-1L) },
+    )
 
     // ---- GRAPH 4 G4-C02/C03: REAL voice path (Owner delta §5) ----
     // Microphone permission is checked physically before any hardware access.
@@ -985,8 +1016,76 @@ class AppGraph(
                 else -> com.hermestower.voiceconsole.core.routing.Connectivity.DISCONNECTED
             }
         },
-        localExecutor = { text -> localEngine.respond(text, { "" }, responseLocaleResolver.resolve().tag).text },
-        towerExecutor = { _ -> null },
+        // ANDROID REPAIR CP-008 (mission section 10): the REAL executors.
+        // LOCAL lane: Qwen first when enabled+LOADED (verified model only,
+        // labeled fromModel), else the bounded rule-based responder; a
+        // NOT_LOCAL intent returns null — the pipeline falls to the Tower
+        // honestly (typed error when it also cannot). NO MOCK anywhere.
+        localExecutor = { text ->
+            val localeTag = responseLocaleResolver.resolve().tag
+            val statusLine = "mode=${store.requestedMode.value.name} paired=${towerStore.isPaired()}"
+            val llmReply = if (store.settings.value.localLlmEnabled) {
+                localLlmEngine.prompt(text, { statusLine }, localeTag)
+            } else null
+            val answer = when {
+                llmReply != null && llmReply.fromModel -> llmReply.text
+                else -> {
+                    val bounded = boundedLocalResponder.respond(text, { statusLine }, localeTag)
+                    if (bounded.intent == "NOT_LOCAL") null else bounded.text
+                }
+            }
+            routeDecisionLog.record(
+                com.hermestower.voiceconsole.core.routing.RouteDecisionTrace(
+                    requestedMode = store.requestedMode.value.name,
+                    effectiveMode = com.hermestower.voiceconsole.core.routing.RoutingModePolicy
+                        .effectiveMode(store.requestedMode.value, towerStore.isPaired()).name,
+                    reason = if (llmReply?.fromModel == true) "LOCAL_LLM_VERIFIED_MODEL" else "LOCAL_BOUNDED_RULES",
+                    executor = if (llmReply?.fromModel == true) "qwen2.5-0.5b (llama.cpp)" else "BoundedLocalResponder",
+                    fallback = null,
+                    confidence = null,
+                    towerConnectionState = if (towerStore.isPaired()) "PAIRED" else "UNPAIRED",
+                    localRuntimeState = localLlmEngine.diagnostics().state.name,
+                ),
+            )
+            answer
+        },
+        // TOWER lane: the REAL paired v2 call; typed unavailable (null → the
+        // pipeline records TOWER_UNAVAILABLE) when not paired or the route
+        // fails. NEVER a silent null presented as a completed conversation.
+        towerExecutor = { text ->
+            val paired = towerStore.isPaired()
+            val deviceId = towerStore.pairedDeviceId()
+            val token = towerStore.getConsoleToken()
+            val endpoint = towerStore.getEndpoint()
+            val answer = if (!paired || deviceId == null || token == null || endpoint == null) {
+                null
+            } else {
+                try {
+                    towerPairingApi.setBaseUrl(endpoint)
+                    val body = org.json.JSONObject()
+                        .put("device_id", deviceId)
+                        .put("text", text)
+                    val res = towerPairingApi.voiceSubmit(deviceId, token, body)
+                    res.optString("reply", res.optString("text", "")).takeIf { it.isNotEmpty() }
+                } catch (e: Exception) {
+                    null // typed by the pipeline as TOWER_UNAVAILABLE; the trace records the class
+                }
+            }
+            routeDecisionLog.record(
+                com.hermestower.voiceconsole.core.routing.RouteDecisionTrace(
+                    requestedMode = store.requestedMode.value.name,
+                    effectiveMode = com.hermestower.voiceconsole.core.routing.RoutingModePolicy
+                        .effectiveMode(store.requestedMode.value, towerStore.isPaired()).name,
+                    reason = if (answer != null) "TOWER_V2_VOICE_SUBMIT" else "TOWER_UNAVAILABLE",
+                    executor = "TowerApi.v2/voice/submit",
+                    fallback = if (answer != null) null else "bounded-local (already attempted by the router order)",
+                    confidence = null,
+                    towerConnectionState = if (paired) "PAIRED" else "UNPAIRED",
+                    localRuntimeState = localLlmEngine.diagnostics().state.name,
+                ),
+            )
+            answer
+        },
     )
 
     val simulator = DeterministicTowerSimulator()

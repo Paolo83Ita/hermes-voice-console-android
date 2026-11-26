@@ -63,6 +63,9 @@ class LlamaCppAndroidRuntime(
             systemPrompt = null, // the safe-prompt contract carries the system context inline
             maxTokens = maxTokens,
         )
+        // CP-007: the measured completion facts are recorded on EVERY
+        // generation (load duration stays the caller's; TTFT ≈ promptEvalTimeMs).
+        lastStats = completion
         return completion.text
     }
 

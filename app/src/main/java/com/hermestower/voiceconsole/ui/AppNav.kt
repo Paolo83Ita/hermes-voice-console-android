@@ -75,6 +75,8 @@ import com.hermestower.voiceconsole.ui.screens.AboutSafetyScreen
 import com.hermestower.voiceconsole.ui.screens.ArchiveScreen
 import com.hermestower.voiceconsole.ui.screens.AppearanceScreen
 import com.hermestower.voiceconsole.ui.screens.ConsoleScreen
+import com.hermestower.voiceconsole.ui.screens.TowerHomeScreen
+import com.hermestower.voiceconsole.ui.screens.PairingFlowScreen
 import com.hermestower.voiceconsole.ui.screens.ConnectionScreen
 import com.hermestower.voiceconsole.ui.screens.DiagnosticsScreen
 import com.hermestower.voiceconsole.ui.screens.HistoryScreen
