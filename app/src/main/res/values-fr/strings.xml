@@ -977,4 +977,5 @@ MANUAL_ADVANCED — sélection indépendante par composant, visibilité totale, 
     <string name="mm_qwen_test_failed">Test déterministe ÉCHOUÉ (%1$s) : voir la carte de résultat</string>
     <string name="mm_qwen_row_fmt">%1$s : %2$s</string>
     <string name="mm_close">Fermer</string>
+    <string name="diagnostics_export_bundle">Exporter le bundle de diagnostics</string>
 </resources>

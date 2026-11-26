@@ -41,6 +41,7 @@ object RoutingModePolicy {
         OperatingMode.LOCAL -> RoutingMode.LOCAL_ONLY
         OperatingMode.TOWER -> if (paired) RoutingMode.TOWER_ONLY else RoutingMode.OFFLINE_SAFE
         OperatingMode.HYBRID -> if (paired) RoutingMode.TOWER_FIRST else RoutingMode.OFFLINE_SAFE
+        OperatingMode.DISCONNECTED_SAFE -> RoutingMode.OFFLINE_SAFE
     }
 
     /** The bounded local-risk classes Qwen/the rule lane may answer (mission section 10). */

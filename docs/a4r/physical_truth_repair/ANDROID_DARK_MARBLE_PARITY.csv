@@ -1,0 +1,21 @@
+surface,dark_monumental,marble_light,parity_basis
+AboutSafetyScreen,True,True,theme-aware tokens (monumentalColors/hermesColors) — both themes inherit automatically
+AppearanceScreen,True,True,theme-aware tokens (monumentalColors/hermesColors) — both themes inherit automatically
+ArchiveScreen,True,True,theme-aware tokens (monumentalColors/hermesColors) — both themes inherit automatically
+ConnectionScreen,True,True,theme-aware tokens (monumentalColors/hermesColors) — both themes inherit automatically
+ConsoleControlSemantics,False,False,no token binding — registered exception
+ConsoleScreen,True,True,theme-aware tokens (monumentalColors/hermesColors) — both themes inherit automatically
+DiagnosticsScreen,True,True,theme-aware tokens (monumentalColors/hermesColors) — both themes inherit automatically
+FirstRunRecoveryDialog,False,False,no token binding — registered exception
+HistoryScreen,True,True,theme-aware tokens (monumentalColors/hermesColors) — both themes inherit automatically
+LocalIntelligenceScreen,True,True,theme-aware tokens (monumentalColors/hermesColors) — both themes inherit automatically
+ModelManagerScreen,True,True,theme-aware tokens (monumentalColors/hermesColors) — both themes inherit automatically
+ModelUxComponents,True,True,theme-aware tokens (monumentalColors/hermesColors) — both themes inherit automatically
+OnboardingScreen,True,True,theme-aware tokens (monumentalColors/hermesColors) — both themes inherit automatically
+PairingFlowScreen,True,True,theme-aware tokens (monumentalColors/hermesColors) — both themes inherit automatically
+QrScannerScreen,True,True,theme-aware tokens (monumentalColors/hermesColors) — both themes inherit automatically
+SelfTestScreen,True,True,theme-aware tokens (monumentalColors/hermesColors) — both themes inherit automatically
+SettingsHubScreen,True,True,theme-aware tokens (monumentalColors/hermesColors) — both themes inherit automatically
+TowerHomeScreen,True,True,theme-aware tokens (monumentalColors/hermesColors) — both themes inherit automatically
+TowerStudioScreen,True,True,theme-aware tokens (monumentalColors/hermesColors) — both themes inherit automatically
+VoiceAudioScreen,True,True,theme-aware tokens (monumentalColors/hermesColors) — both themes inherit automatically

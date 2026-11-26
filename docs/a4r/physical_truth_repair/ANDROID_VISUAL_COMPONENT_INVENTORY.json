@@ -1,0 +1,272 @@
+{
+ "schema": "android_repair.visual_component_inventory/1.0",
+ "produced_utc": "2026-11-26T12:19:08Z",
+ "scope": "mission section 12: all menus, submenus, routes, screens, tabs, dialogs, sheets, cards, lists, forms, controls, loading/empty/error/disabled/permission/connection/model/voice/archive states",
+ "primary_navigation": [
+  "HOME(console)",
+  "VOICE(primary)",
+  "TOWER(primary)",
+  "ARCHIVE",
+  "SETTINGS(primary)"
+ ],
+ "routes_total": 16,
+ "surfaces": [
+  {
+   "surface": "AboutSafetyScreen",
+   "route": "ABOUT",
+   "monumental_refs": 16,
+   "overlays": 2,
+   "has_loading_state": false,
+   "has_empty_state": false,
+   "has_error_state": false,
+   "a11y_semantics": 41,
+   "touch_targets": 10,
+   "state_labels": true
+  },
+  {
+   "surface": "AppearanceScreen",
+   "route": "APPEARANCE",
+   "monumental_refs": 21,
+   "overlays": 0,
+   "has_loading_state": false,
+   "has_empty_state": false,
+   "has_error_state": false,
+   "a11y_semantics": 32,
+   "touch_targets": 1,
+   "state_labels": true
+  },
+  {
+   "surface": "ArchiveScreen",
+   "route": "ARCHIVE",
+   "monumental_refs": 22,
+   "overlays": 2,
+   "has_loading_state": false,
+   "has_empty_state": false,
+   "has_error_state": false,
+   "a11y_semantics": 37,
+   "touch_targets": 14,
+   "state_labels": true
+  },
+  {
+   "surface": "ConnectionScreen",
+   "route": "CONNECTION",
+   "monumental_refs": 11,
+   "overlays": 0,
+   "has_loading_state": false,
+   "has_empty_state": false,
+   "has_error_state": true,
+   "a11y_semantics": 23,
+   "touch_targets": 5,
+   "state_labels": true
+  },
+  {
+   "surface": "ConsoleControlSemantics",
+   "route": "shared semantics",
+   "monumental_refs": 0,
+   "overlays": 0,
+   "has_loading_state": false,
+   "has_empty_state": false,
+   "has_error_state": false,
+   "a11y_semantics": 14,
+   "touch_targets": 0,
+   "state_labels": false
+  },
+  {
+   "surface": "ConsoleScreen",
+   "route": "HOME(console)",
+   "monumental_refs": 41,
+   "overlays": 3,
+   "has_loading_state": false,
+   "has_empty_state": true,
+   "has_error_state": false,
+   "a11y_semantics": 92,
+   "touch_targets": 21,
+   "state_labels": true
+  },
+  {
+   "surface": "DiagnosticsScreen",
+   "route": "DIAGNOSTICS",
+   "monumental_refs": 33,
+   "overlays": 0,
+   "has_loading_state": false,
+   "has_empty_state": true,
+   "has_error_state": true,
+   "a11y_semantics": 64,
+   "touch_targets": 19,
+   "state_labels": true
+  },
+  {
+   "surface": "FirstRunRecoveryDialog",
+   "route": "FIRST_RUN_RECOVERY(dialog)",
+   "monumental_refs": 0,
+   "overlays": 3,
+   "has_loading_state": false,
+   "has_empty_state": false,
+   "has_error_state": false,
+   "a11y_semantics": 8,
+   "touch_targets": 6,
+   "state_labels": false
+  },
+  {
+   "surface": "HistoryScreen",
+   "route": "HISTORY",
+   "monumental_refs": 9,
+   "overlays": 2,
+   "has_loading_state": false,
+   "has_empty_state": true,
+   "has_error_state": true,
+   "a11y_semantics": 13,
+   "touch_targets": 10,
+   "state_labels": true
+  },
+  {
+   "surface": "LocalIntelligenceScreen",
+   "route": "INTELLIGENCE",
+   "monumental_refs": 15,
+   "overlays": 0,
+   "has_loading_state": false,
+   "has_empty_state": false,
+   "has_error_state": false,
+   "a11y_semantics": 32,
+   "touch_targets": 3,
+   "state_labels": true
+  },
+  {
+   "surface": "ModelManagerScreen",
+   "route": "MODEL_MANAGER",
+   "monumental_refs": 55,
+   "overlays": 3,
+   "has_loading_state": true,
+   "has_empty_state": true,
+   "has_error_state": true,
+   "a11y_semantics": 91,
+   "touch_targets": 12,
+   "state_labels": true
+  },
+  {
+   "surface": "ModelUxComponents",
+   "route": "shared components",
+   "monumental_refs": 20,
+   "overlays": 0,
+   "has_loading_state": false,
+   "has_empty_state": false,
+   "has_error_state": true,
+   "a11y_semantics": 36,
+   "touch_targets": 0,
+   "state_labels": true
+  },
+  {
+   "surface": "OnboardingScreen",
+   "route": "ONBOARDING(first-run)",
+   "monumental_refs": 19,
+   "overlays": 0,
+   "has_loading_state": true,
+   "has_empty_state": true,
+   "has_error_state": false,
+   "a11y_semantics": 29,
+   "touch_targets": 13,
+   "state_labels": false
+  },
+  {
+   "surface": "PairingFlowScreen",
+   "route": "PAIRING",
+   "monumental_refs": 35,
+   "overlays": 0,
+   "has_loading_state": true,
+   "has_empty_state": true,
+   "has_error_state": true,
+   "a11y_semantics": 61,
+   "touch_targets": 20,
+   "state_labels": false
+  },
+  {
+   "surface": "QrScannerScreen",
+   "route": "QR_SCANNER",
+   "monumental_refs": 17,
+   "overlays": 0,
+   "has_loading_state": false,
+   "has_empty_state": true,
+   "has_error_state": true,
+   "a11y_semantics": 24,
+   "touch_targets": 9,
+   "state_labels": true
+  },
+  {
+   "surface": "SelfTestScreen",
+   "route": "SELF_TEST",
+   "monumental_refs": 12,
+   "overlays": 0,
+   "has_loading_state": true,
+   "has_empty_state": true,
+   "has_error_state": true,
+   "a11y_semantics": 18,
+   "touch_targets": 13,
+   "state_labels": false
+  },
+  {
+   "surface": "SettingsHubScreen",
+   "route": "SETTINGS(primary)",
+   "monumental_refs": 14,
+   "overlays": 0,
+   "has_loading_state": false,
+   "has_empty_state": false,
+   "has_error_state": false,
+   "a11y_semantics": 39,
+   "touch_targets": 0,
+   "state_labels": false
+  },
+  {
+   "surface": "TowerHomeScreen",
+   "route": "TOWER(primary)",
+   "monumental_refs": 10,
+   "overlays": 2,
+   "has_loading_state": false,
+   "has_empty_state": false,
+   "has_error_state": false,
+   "a11y_semantics": 21,
+   "touch_targets": 14,
+   "state_labels": false
+  },
+  {
+   "surface": "TowerStudioScreen",
+   "route": "TOWER_STUDIO(secondary)",
+   "monumental_refs": 19,
+   "overlays": 3,
+   "has_loading_state": false,
+   "has_empty_state": true,
+   "has_error_state": true,
+   "a11y_semantics": 65,
+   "touch_targets": 11,
+   "state_labels": true
+  },
+  {
+   "surface": "VoiceAudioScreen",
+   "route": "VOICE(primary)",
+   "monumental_refs": 35,
+   "overlays": 0,
+   "has_loading_state": false,
+   "has_empty_state": false,
+   "has_error_state": false,
+   "a11y_semantics": 77,
+   "touch_targets": 22,
+   "state_labels": true
+  }
+ ],
+ "classification_rules": [
+  "CONVERGED: monumental visual system (colors+type), states typed, a11y semantics present",
+  "CONVERGED_WITH_EXCEPTIONS: converged with a registered, adjudicated exception",
+  "LEGACY: pre-refoundation styling without a monumental binding -> must be adjudicated in ANDROID_LEGACY_EXCEPTION_REGISTER"
+ ],
+ "notes": {
+  "theme_system": "Dark Monumental (obsidian/bronze/gold) + Marble Light are the two shipped themes (AppearanceScreen); monumentalColors/hermesColors are theme-aware tokens",
+  "visual_anchor": "ReferenceTowerVisual + drawTowerFrame + MeanderBand carry the Tower imagery on primary surfaces",
+  "new_surfaces_cp005_cp008": [
+   "TowerHomeScreen",
+   "PairingFlowScreen",
+   "PairingSessionStateView(shared)",
+   "unpaired Home card (ConsoleScreen)",
+   "pairing diagnostics card (DiagnosticsScreen)",
+   "Qwen deterministic test dialog (ModelManagerScreen)"
+  ]
+ }
+}

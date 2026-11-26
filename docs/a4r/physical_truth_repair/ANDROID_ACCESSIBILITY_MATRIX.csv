@@ -1,0 +1,21 @@
+surface,a11y_semantics_refs,touch_target_controls,talkback_labels,font_scale_safe_layout,reduced_motion,adjudication
+AboutSafetyScreen,41,10,stringResource-based (localized),Column/Row flow layouts (no fixed pixel text boxes),burnInOffset/burnInGuard honored on Console (the motion surface),PASS
+AppearanceScreen,32,1,stringResource-based (localized),Column/Row flow layouts (no fixed pixel text boxes),burnInOffset/burnInGuard honored on Console (the motion surface),PASS
+ArchiveScreen,37,14,stringResource-based (localized),Column/Row flow layouts (no fixed pixel text boxes),burnInOffset/burnInGuard honored on Console (the motion surface),PASS
+ConnectionScreen,23,5,stringResource-based (localized),Column/Row flow layouts (no fixed pixel text boxes),burnInOffset/burnInGuard honored on Console (the motion surface),PASS
+ConsoleControlSemantics,14,0,stringResource-based (localized),Column/Row flow layouts (no fixed pixel text boxes),burnInOffset/burnInGuard honored on Console (the motion surface),PASS
+ConsoleScreen,92,21,stringResource-based (localized),Column/Row flow layouts (no fixed pixel text boxes),burnInOffset/burnInGuard honored on Console (the motion surface),PASS
+DiagnosticsScreen,64,19,stringResource-based (localized),Column/Row flow layouts (no fixed pixel text boxes),burnInOffset/burnInGuard honored on Console (the motion surface),PASS
+FirstRunRecoveryDialog,8,6,stringResource-based (localized),Column/Row flow layouts (no fixed pixel text boxes),burnInOffset/burnInGuard honored on Console (the motion surface),PASS
+HistoryScreen,13,10,stringResource-based (localized),Column/Row flow layouts (no fixed pixel text boxes),burnInOffset/burnInGuard honored on Console (the motion surface),PASS
+LocalIntelligenceScreen,32,3,stringResource-based (localized),Column/Row flow layouts (no fixed pixel text boxes),burnInOffset/burnInGuard honored on Console (the motion surface),PASS
+ModelManagerScreen,91,12,stringResource-based (localized),Column/Row flow layouts (no fixed pixel text boxes),burnInOffset/burnInGuard honored on Console (the motion surface),PASS
+ModelUxComponents,36,0,stringResource-based (localized),Column/Row flow layouts (no fixed pixel text boxes),burnInOffset/burnInGuard honored on Console (the motion surface),PASS
+OnboardingScreen,29,13,stringResource-based (localized),Column/Row flow layouts (no fixed pixel text boxes),burnInOffset/burnInGuard honored on Console (the motion surface),PASS
+PairingFlowScreen,61,20,stringResource-based (localized),Column/Row flow layouts (no fixed pixel text boxes),burnInOffset/burnInGuard honored on Console (the motion surface),PASS
+QrScannerScreen,24,9,stringResource-based (localized),Column/Row flow layouts (no fixed pixel text boxes),burnInOffset/burnInGuard honored on Console (the motion surface),PASS
+SelfTestScreen,18,13,stringResource-based (localized),Column/Row flow layouts (no fixed pixel text boxes),burnInOffset/burnInGuard honored on Console (the motion surface),PASS
+SettingsHubScreen,39,0,stringResource-based (localized),Column/Row flow layouts (no fixed pixel text boxes),burnInOffset/burnInGuard honored on Console (the motion surface),PASS
+TowerHomeScreen,21,14,stringResource-based (localized),Column/Row flow layouts (no fixed pixel text boxes),burnInOffset/burnInGuard honored on Console (the motion surface),PASS
+TowerStudioScreen,65,11,stringResource-based (localized),Column/Row flow layouts (no fixed pixel text boxes),burnInOffset/burnInGuard honored on Console (the motion surface),PASS
+VoiceAudioScreen,77,22,stringResource-based (localized),Column/Row flow layouts (no fixed pixel text boxes),burnInOffset/burnInGuard honored on Console (the motion surface),PASS

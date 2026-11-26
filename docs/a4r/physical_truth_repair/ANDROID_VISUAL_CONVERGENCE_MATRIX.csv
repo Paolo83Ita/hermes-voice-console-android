@@ -1,0 +1,21 @@
+surface,route,primary_nav,visual_system,overlays,loading_state,empty_state,error_state,state_labels,adjudication
+AboutSafetyScreen,ABOUT,False,monumental,2,False,False,False,True,CONVERGED
+AppearanceScreen,APPEARANCE,False,monumental,0,False,False,False,True,CONVERGED
+ArchiveScreen,ARCHIVE,True,monumental,2,False,False,False,True,CONVERGED
+ConnectionScreen,CONNECTION,False,monumental,0,False,False,True,True,CONVERGED
+ConsoleControlSemantics,shared semantics,False,LEGACY,0,False,False,False,False,NEEDS_MAPPING
+ConsoleScreen,HOME(console),True,monumental,3,False,True,False,True,CONVERGED
+DiagnosticsScreen,DIAGNOSTICS,False,monumental,0,False,True,True,True,CONVERGED
+FirstRunRecoveryDialog,FIRST_RUN_RECOVERY(dialog),False,LEGACY,3,False,False,False,False,LEGACY_ADJUDICATED
+HistoryScreen,HISTORY,False,monumental,2,False,True,True,True,CONVERGED
+LocalIntelligenceScreen,INTELLIGENCE,False,monumental,0,False,False,False,True,CONVERGED
+ModelManagerScreen,MODEL_MANAGER,False,monumental,3,True,True,True,True,CONVERGED
+ModelUxComponents,shared components,False,monumental,0,False,False,True,True,CONVERGED
+OnboardingScreen,ONBOARDING(first-run),False,monumental,0,True,True,False,False,CONVERGED
+PairingFlowScreen,PAIRING,False,monumental,0,True,True,True,False,CONVERGED
+QrScannerScreen,QR_SCANNER,False,monumental,0,False,True,True,True,CONVERGED
+SelfTestScreen,SELF_TEST,False,monumental,0,True,True,True,False,CONVERGED
+SettingsHubScreen,SETTINGS(primary),True,monumental,0,False,False,False,False,CONVERGED
+TowerHomeScreen,TOWER(primary),True,monumental,2,False,False,False,False,CONVERGED
+TowerStudioScreen,TOWER_STUDIO(secondary),False,monumental,3,False,True,True,True,CONVERGED
+VoiceAudioScreen,VOICE(primary),True,monumental,0,False,False,False,True,CONVERGED

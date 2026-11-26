@@ -1025,7 +1025,7 @@ class AppGraph(
             val localeTag = responseLocaleResolver.resolve().tag
             val statusLine = "mode=${store.requestedMode.value.name} paired=${towerStore.isPaired()}"
             val llmReply = if (store.settings.value.localLlmEnabled) {
-                localLlmEngine.prompt(text, { statusLine }, localeTag)
+                localLlmEngine.prompt(text, { statusLine })
             } else null
             val answer = when {
                 llmReply != null && llmReply.fromModel -> llmReply.text
@@ -1087,6 +1087,11 @@ class AppGraph(
             answer
         },
     )
+
+    // ANDROID REPAIR CP-008 (mission section 11): the OWNER DIAGNOSTIC BUNDLE —
+    // pairing + Qwen + console-routing diagnostics in ONE secret-clean ZIP with
+    // manifest and SHA-256 (export from Diagnostics).
+    val ownerDiagnosticBundleExporter = com.hermestower.voiceconsole.store.OwnerDiagnosticBundleExporter(this)
 
     val simulator = DeterministicTowerSimulator()
     val bridge = MockTowerBridge(

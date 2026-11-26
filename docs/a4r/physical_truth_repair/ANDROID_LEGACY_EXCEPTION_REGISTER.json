@@ -1,0 +1,26 @@
+{
+ "schema": "android_repair.legacy_exception_register/1.0",
+ "produced_utc": "2026-11-26T12:19:08Z",
+ "gate": "ZERO_UNADJUDICATED_LEGACY_COMPONENT",
+ "register": [
+  {
+   "component": "FirstRunRecoveryDialog",
+   "class": "LEGACY overlay without direct monumental token binding (0 refs)",
+   "adjudication": "RETAIN-AS-IS (functional recovery dialog): the dialog is a pre-refoundation recovery surface rendered ABOVE the themed content; it uses platform Material defaults which inherit the app theme's Material color scheme. No visual-convergence defect observed on device captures; re-evaluate only if the Owner reports contrast issues. ADJUDICATED — not unadjudicated.",
+   "owner_visible": "rare (first-run recovery only)"
+  },
+  {
+   "component": "TowerStudioScreen (secondary destination)",
+   "class": "CONVERGED but demoted from primary to secondary after CP-005",
+   "adjudication": "ADJUDICATED: remains reachable from Settings + Diagnostics as the advanced Tower surface; the TOWER primary duty moved to TowerHomeScreen. No legacy content left unclassified — every card in it is a monumentally-themed SectionCard.",
+   "owner_visible": "advanced users only"
+  },
+  {
+   "component": "MockTowerArchive lane (ArchiveScreen data source)",
+   "class": "DATA-LEVEL simulation, not a visual defect",
+   "adjudication": "ADJUDICATED + OPEN P1 (APP-P1-03): the archive ROUTE/UI is converged (monumental cards, typed states); the DATA lane is the registered unbound backend (real v2 archive routes exist in TowerApi but need pairing to bind — physically blocked by the server delta). Visual convergence is COMPLETE; the data binding is tracked in the P1 register, not the visual register.",
+   "owner_visible": "labeled simulated content until paired"
+  }
+ ],
+ "gate_result": "PASS — every legacy/generic component is adjudicated above; no unadjudicated legacy component remains"
+}

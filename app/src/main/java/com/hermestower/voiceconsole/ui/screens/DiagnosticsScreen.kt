@@ -122,6 +122,19 @@ fun DiagnosticsScreen(graph: AppGraph, onOpenStudio: () -> Unit = {}, onOpenSelf
                         graph.pairingSessionController.revoke()
                         testResult = "pairing revoked"
                     }) { Text(stringResource(Res.string.diagnostics_pairing_revoke)) }
+                    // ANDROID REPAIR CP-008 (mission section 11): the secret-clean
+                    // OWNER DIAGNOSTIC BUNDLE export (pairing + Qwen + routing,
+                    // manifest + SHA-256, redaction on every line).
+                    TextButton(onClick = {
+                        scope.launch {
+                            runCatching {
+                                val file = graph.ownerDiagnosticBundleExporter.writeBundleZip(
+                                    java.io.File(context.filesDir, "diagnostics"),
+                                )
+                                testResult = "bundle: " + file.name
+                            }.onFailure { testResult = "bundle failed: " + (it.message ?: it.javaClass.simpleName) }
+                        }
+                    }) { Text(stringResource(Res.string.diagnostics_export_bundle)) }
                 }
             }
         }
