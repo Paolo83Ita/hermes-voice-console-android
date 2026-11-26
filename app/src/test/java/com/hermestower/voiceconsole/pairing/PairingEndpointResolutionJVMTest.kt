@@ -199,9 +199,12 @@ class PairingEndpointResolutionJVMTest {
     @Test
     fun `replayed nonce_ref is rejected - single use`() {
         val qrText = v3Qr(publicCandidate())
-        PairingEnvelope.Parser { nowSec }.parse(qrText)
+        // ONE parser instance: the nonce-ref store is per-parser (the same
+        // discipline as the production controller, which holds one parser).
+        val parser = PairingEnvelope.Parser { nowSec }
+        parser.parse(qrText)
         try {
-            PairingEnvelope.Parser { nowSec }.parse(qrText)
+            parser.parse(qrText)
             throw AssertionError("must reject replay")
         } catch (e: PairingEnvelope.EnvelopeRejectException) {
             assertEquals(PairingEnvelope.RejectKind.REPLAYED_NONCE_REF, e.reject.kind)

@@ -242,7 +242,9 @@ class ModelPromotionRepairTest {
 
     @Test
     fun `R2 - invalid GGUF is typed GGUF_INVALID, retained, never installed`() {
-        val notGguf = ByteArray(4096) { it.toByte() }
+        // Same SIZE as the valid artifact (so the chain reaches the GGUF check),
+        // but the bytes are not a GGUF (no magic).
+        val notGguf = ByteArray(ggufArtifact.size) { (it % 251).toByte() }
         val notGgufHash = ModelSha256.ofBytes(notGguf)
         val e = ggufEntry().copy(sha256 = notGgufHash)
         Files.createDirectories(storage.tempDir())

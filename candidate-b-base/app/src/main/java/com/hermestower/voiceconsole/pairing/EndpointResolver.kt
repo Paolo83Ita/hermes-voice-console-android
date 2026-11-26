@@ -71,6 +71,14 @@ class EndpointResolver(
                 evidence += skip(candidate, CandidateEvidence.CandidateStatus.SKIPPED_UNQUALIFIED, TransportFailureCode.PAIRING_ROUTE_REJECTED, "candidato non qualificato")
                 continue
             }
+            // LAN_MDNS is a DISCOVERY class: .local hosts are not socket-resolvable
+            // on Android AT ALL (any network) — the NSD discovery surface produces
+            // LAN_IP candidates. This check PRECEDES network eligibility because
+            // the unresolvability is the more fundamental typed reason.
+            if (candidate.transportClass == TransportClass.LAN_MDNS) {
+                evidence += skip(candidate, CandidateEvidence.CandidateStatus.SKIPPED_NOT_ELIGIBLE, TransportFailureCode.MDNS_UNAVAILABLE, "nome .local non risolvibile dal telefono: usa la scoperta LAN")
+                continue
+            }
             // R4: LAN-only on cellular (skip WITH the honest typed reason)
             if (!candidate.isEligibleOnNetwork(network)) {
                 val code = if (network == NetworkContextType.CELLULAR) {
@@ -79,12 +87,6 @@ class EndpointResolver(
                     TransportFailureCode.LAN_ROUTE_UNAVAILABLE
                 }
                 evidence += skip(candidate, CandidateEvidence.CandidateStatus.SKIPPED_NOT_ELIGIBLE, code, "endpoint ${candidate.transportClass} non raggiungibile su ${network.name}")
-                continue
-            }
-            // LAN_MDNS is a DISCOVERY class: .local hosts are not socket-resolvable
-            // on Android — the NSD discovery surface produces LAN_IP candidates.
-            if (candidate.transportClass == TransportClass.LAN_MDNS) {
-                evidence += skip(candidate, CandidateEvidence.CandidateStatus.SKIPPED_NOT_ELIGIBLE, TransportFailureCode.MDNS_UNAVAILABLE, "nome .local non risolvibile dal telefono: usa la scoperta LAN")
                 continue
             }
 
