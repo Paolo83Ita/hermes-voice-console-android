@@ -1,0 +1,114 @@
+{
+ "schema": "android_repair.input_manifest/1.0",
+ "mission": "HERMES VOICE CONSOLE ANDROID — FULL PHYSICAL-TRUTH REPAIR, TOWER PAIRING RECOVERY, LOCAL QWEN RUNTIME QUALIFICATION, PRIMARY USER-PATH REDESIGN AND TOWER VISUAL CONVERGENCE",
+ "owner": "Paolo Lombisani",
+ "executor": "GLM 5.3 (authorized fallback executor; see GLM54/GLM53 qualification files)",
+ "produced_utc": "2026-11-26T10:42:28Z",
+ "device": "Xiaomi 11 Lite 5G NE (2109119DG), Android arm64-v8a",
+ "supplied_files_this_session_2026_11_26": [
+  {
+   "file": "app-arm64-v8a-debug.zip",
+   "sha256": "dadf6c76bf3b07def37c1e4bd52c04ee3a30b7a77a505dd8e62db5259c9a9cc6",
+   "bytes": 40689295,
+   "role": "OWNER_UPLOADED_APK_ZP",
+   "inner": "app-arm64-v8a-debug.apk",
+   "inner_bytes": 122891305,
+   "inner_sha256": "1744e173f6a2340651fe508c4984471d98881d48ec9bf16f1708692ef518ae97",
+   "provenance": "byte-identical to CI run 44878382926 artifact (head 8863b61, branch graph-a4r/merge-with-b-base) — lane download-back verified this session"
+  },
+  {
+   "file": "Screenshot_2026-11-26-11-13-29-745_com.hermestower.voiceconsole.a4rdebug.jpg",
+   "sha256": "8330fd2e475db872d161d3571f8014b4f314a38553e14ac8339cbcbe80b5fabc",
+   "bytes": 1140621,
+   "role": "OWNER_SCREENSHOT_QWEN_MODEL_CARD",
+   "content_binding": "Qwen2.5 0.5B Instruct (GGUF q5_k_m) card: badge 'Scaricato' + install 'non installato' + compat 'componente non ancora scaricato' + qualification DISCOVERED + fallback Hermes Tower; phone on 4G, 100% battery",
+   "finding": "APP-P0-02 physical evidence (persistent promotion dead-end state, re-observed 5 days after first capture)"
+  },
+  {
+   "file": "Screenshot_2026-11-26-11-13-42-375_com.hermestower.voiceconsole.a4rdebug.jpg",
+   "sha256": "f253710a6d79df973a2c74e2e6411faeba47d41005ee6986193ce357b0bf3ac0",
+   "bytes": 1289450,
+   "role": "OWNER_SCREENSHOT_MODELS_PAGE_RUNTIME_INFO",
+   "content_binding": "Modelli e voce / Biblioteca dell'Oracolo: runtime llama-android 0.1.1 (llama.cpp b9878, arm64-v8a, MIT), Qwen2.5-0.5B-Instruct-GGUF pinned commit+sha, permitted/forbidden uses, Hermes Tower fallback"
+  },
+  {
+   "file": "Screenshot_2026-11-26-11-13-49-639_com.hermestower.voiceconsole.a4rdebug.jpg",
+   "sha256": "4099e743287d5b66500c6e7ddd199a86d8056cda545821f5b03841924967685c",
+   "bytes": 1029951,
+   "role": "OWNER_SCREENSHOT_STORAGE_DIAGNOSTICS",
+   "content_binding": "Scarica button + storage diagnostics: tmp 498.0 MB (the stranded 522,186,592-byte Qwen partial), staging/previous/quarantine/logs 0 B, receipts 11.9 KB (8 install receipts); bundled verified ONNX models (openWakeWord x3 + GTCRN) hash-gated, wake word OFF, denoiser bypassed until device verification",
+   "finding": "APP-P0-02 + APP-P1-05/06 physical evidence"
+  },
+  {
+   "file": "pasted_image_1795688551871.png",
+   "sha256": "a7a13a75ac70da1ea7f39cb20c5a9baadf9a81a5965b4d3928d9f56a8ca1a457",
+   "bytes": 147411,
+   "role": "OWNER_SCREENSHOT_TOWER_SIDE_PAIRING_WIZARD",
+   "content_binding": "Tower web UI 'WIZARD DI ABBINAMENTO CONSOLE VOCALE — PASSO 2 DI 4': QR (256x256, TTL ~269 s), pairing code wc2p-*** (REDACTED, expired ephemeral), numeric code ***372 (REDACTED, expired ephemeral), verification phrase (REDACTED, expired ephemeral), protocol voice-console/2 (v2), scopes voice.capture/voice.tts/tower_status_read, TEMPORARY ENDPOINT https://tower.local, transport TO_owner_ui_qr",
+   "finding": "CLOSES the last open QR evidence question (endpoint emission class): the Tower QR carries a LAN-scoped mDNS hostname, not the public plane",
+   "secret_handling": "expired ephemeral pairing values redacted in all lane artifacts; raw screenshot retained unmodified as Owner evidence only"
+  },
+  {
+   "file": "Immagine_Hermes_Tower.png",
+   "sha256": "bc49a6d9caa94fafcc05a7557ebb2c9906080bc673f13e8b8ff2b3dd1f4b3add",
+   "bytes": 3685783,
+   "role": "TOWER_VISUAL_ASSET",
+   "purpose": "Tower identity reference for full visual convergence (section 13)"
+  },
+  {
+   "file": "Filigrana.png",
+   "sha256": "2971df9a0379af6814dad7167800379384759e21578b534dbb6b496688f8a719",
+   "bytes": 9991389,
+   "role": "TOWER_VISUAL_ASSET",
+   "purpose": "Tower watermark/filigrana asset for visual convergence"
+  }
+ ],
+ "previously_bound_owner_evidence_still_authoritative": [
+  {
+   "file": "Screenshot_2026-11-20-16-51-35-674_com.hermestower.voiceconsole.a4rdebug.jpg",
+   "sha256": "69d5b39cde83fbd79e920f80a627f060b3201d282578aba3649ae73f4b51de16",
+   "role": "QR pairing failure attempt 1 (PAIRING_ENDPOINT_UNREACHABLE, 4G+)"
+  },
+  {
+   "file": "Screenshot_2026-11-20-16-53-36-260_com.hermestower.voiceconsole.a4rdebug.jpg",
+   "sha256": "bcbd2b0bb5d66bb6261233180fde0538c6eec872b41b684151f892ae13162618",
+   "role": "QR pairing failure attempt 2 (numeric code typed, typed failure detail 'Tower non raggiungibile')"
+  },
+  {
+   "file": "Screenshot_2026-11-21-05-32-49-738 .. 07-34-04-127 (5 files)",
+   "sha256": "b6ba8998…, 61cf88d0…, 3da2c2f4…, 3707de21…, f2815a85… (full values in A4R_QWEN25_DOWNLOAD_DIFFERENTIAL.json)",
+   "role": "Qwen promotion dead-end device state (stable across 2 hours)"
+  },
+  {
+   "file": "hermes-voice-console-debug-apk-ca8980b8….zip / test-results / lint-report",
+   "role": "graph-3 lineage CI evidence (historical)"
+  },
+  {
+   "file": "HERMES_VOICE_CONSOLE_g4_app-debug.zip",
+   "sha256_inner": "908b289f8edc65d970aec3ca406c1fb0306dd78f0fe7448bf69264eb3bf66f56",
+   "role": "Candidate B byte-exact handoff APK (FP-B-G4, the A4R-P1-001 keystore crash artifact)"
+  },
+  {
+   "file": "Photos-1-001.zip",
+   "role": "earlier Owner photo evidence set"
+  }
+ ],
+ "authoritative_prior_receipts_referenced_not_rehashed": [
+  "download/A4R/phys_repair/A4R_QR_FAILURE_ROOT_CAUSE_RECEIPT.json (QR transport-layer proof, lane probes)",
+  "download/A4R/phys_repair/A4R_QWEN25_FAILURE_ROOT_CAUSE_RECEIPT.json (promotion dead-end static + edge-probe proof)",
+  "download/A4R/phys_repair/A4R_QR_REAL_BACKEND_DIFFERENTIAL.json + .md (18-boundary differential vs live Tower)",
+  "download/A4R/phys_repair/A4R_QWEN25_DOWNLOAD_DIFFERENTIAL.json (20-class differential)",
+  "download/A4R/phys_repair/A4R_TOWER_HANDOFF_REQUEST_HR-A4R-PHYS-001.json (versioned Tower-side contract delta request)",
+  "download/A4R/A4R_OWNER_PHYSICAL_LEDGER.json + phys_repair copy (physical ledger, schema 1.2)",
+  "download/A4R/c1_delivery/* (7 P1 delivery receipts, custody chain)",
+  "download/A4R/A4R_APK_FINGERPRINT_MATRIX.json (4 registered APK identities)",
+  "docs/governance/* + docs/a4r/* in-repo (mission graph, current truth, checkpoint index)"
+ ],
+ "style_and_visual_inputs": [
+  "upload/Immagine_Hermes_Tower.png, upload/Filigrana.png (Tower identity assets, this session)",
+  "docs/graph3/MONUMENTAL_ORACLE_TOWER_VISUAL_SYSTEM.md, docs/VISUAL_DIRECTION.md, docs/tower/MONUMENTAL_TOWER_FINAL_REPORT.md (in-repo Tower visual system)",
+  "ui/monumental/* + ui/theme/* (current Android monumental styling)",
+  "design/monumental/preview/* + graph3-staging (Dark Monumental / Marble Light previews)"
+ ],
+ "binding_verdict": "INPUT_BINDING_COMPLETE — every supplied file hashed and classified; prior evidence cross-referenced by recorded sha256 (no re-hash churn); no supplied file modified in place."
+}

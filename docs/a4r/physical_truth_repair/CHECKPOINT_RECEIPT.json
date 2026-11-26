@@ -1,0 +1,37 @@
+{
+ "schema": "android_repair.checkpoint_receipt/1.0",
+ "checkpoint_ids": [
+  "CP-ANDROID-REPAIR-001 (input identity and failed baseline) — COMPLETE",
+  "CP-ANDROID-REPAIR-002 (architecture and interaction inventory) — COMPLETE",
+  "CP-ANDROID-REPAIR-003 (pairing root cause) — COMPLETE",
+  "CP-ANDROID-REPAIR-006 (Qwen runtime root cause) — ANALYSIS COMPLETE (implementation pending)"
+ ],
+ "produced_utc": "2026-11-26T10:49:34Z",
+ "files_changed_this_segment": "no application source modified (analysis phase; repairs begin at CP-004/005 and CP-006 implementation)",
+ "files_produced": [
+  "ANDROID_REPAIR_INPUT_MANIFEST.json",
+  "ANDROID_SOURCE_APK_BINDING.json",
+  "ANDROID_FAILED_BASELINE_RECEIPT.json",
+  "GLM54_ANDROID_BOOTSTRAP_QUALIFICATION.json",
+  "GLM53_ANDROID_BOOTSTRAP_QUALIFICATION.json",
+  "ANDROID_COMPLETE_INTERACTION_INVENTORY.json",
+  "ANDROID_RUNTIME_INTEGRATION_GRAPH.json",
+  "ANDROID_DEAD_OR_UNBOUND_CONTROL_REGISTER.json",
+  "PAIRING_STATE_MACHINE.json",
+  "PAIRING_PROTOCOL_DIFF.json",
+  "PAIRING_NETWORK_DIAGNOSTIC.json",
+  "PAIRING_ROOT_CAUSE_REPORT.md",
+  "QWEN_RUNTIME_ROOT_CAUSE_RECEIPT.json",
+  "CHECKPOINT_RECEIPT.json",
+  "README.md"
+ ],
+ "tests": "none required yet (no source change); CI evidence re-verified via API (build runs 44752839878 / 44878382926 SUCCESS)",
+ "evidence": "all artifacts in this directory + updated ledger download/A4R/phys_repair/A4R_OWNER_PHYSICAL_LEDGER.json (schema 1.3)",
+ "blockers": [
+  "AMB-8 (ack route absent on live Tower) — Tower-side versioned contract decision needed; client repair proceeds with the envelope adapter + classified polling, no bypass",
+  "TOWER_REPOSITORY_ACCESS_FROM_ANDROID_ACCOUNT = UNAVAILABLE_OR_NOT_AUTHORIZED (unchanged; contract deltas are filed as versioned requests)"
+ ],
+ "next_exact_action": "CP-004/005: pairing primary user path redesign + implementation (transport classification, envelope adapter, endpoint candidates, LAN discovery, Tailscale/MagicDNS + manual lanes, first-run onboarding, prominent Home card, <=2 taps) and CP-006/007 implementation (Qwen promotion repair R1-R8 + deterministic test), as COMPLETE files with JVM+instrumentation test rows, on branch graph-a4r/physical-truth-repair",
+ "resource_use": "single primary executor (GLM 5.3 fallback; GLM 5.4 unavailable); deterministic tools only (git, CI API, ZIP/dex diff scripts); delta-only context — prior receipts cross-referenced by hash, never re-derived",
+ "rollback": "analysis-only segment: no source change to roll back; the failed baseline stays frozen at a58c630/26dbad0c; branch graph-a4r/physical-truth-repair carries only docs/a4r/physical_truth_repair/* at this checkpoint"
+}

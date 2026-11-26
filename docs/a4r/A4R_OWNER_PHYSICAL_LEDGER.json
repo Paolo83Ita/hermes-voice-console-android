@@ -1,8 +1,8 @@
 {
- "schema": "a4r.owner_physical_ledger/1.2",
- "produced_utc": "2026-11-20T12:20:00Z",
+ "schema": "a4r.owner_physical_ledger/1.3",
+ "produced_utc": "2026-11-26T10:48:57Z",
  "owner": "Paolo Lombisani",
- "mission": "GRAPH A4R — PHYSICAL MINI-GATE CONTINUATION (supersedes the A8 rows below; those rows are preserved as historical evidence)",
+ "mission": "HERMES VOICE CONSOLE ANDROID — FULL PHYSICAL-TRUTH REPAIR, TOWER PAIRING RECOVERY, LOCAL QWEN RUNTIME QUALIFICATION, PRIMARY USER-PATH REDESIGN AND TOWER VISUAL CONVERGENCE (supersedes the DELTA mission; DELTA rows preserved as evidence)",
  "device": {
   "model": "Xiaomi 11 Lite 5G NE",
   "panel": "1080x2400 portrait",
@@ -251,7 +251,7 @@
   {
    "test_id": "A4R-PHYS-MODEL-002",
    "priority": "P1",
-   "timestamp": "2026-11-21T05:32:00+01:00 (screenshots)",
+   "timestamp": "2026-11-21T05:32:49+01:00 .. 07:34:04+01:00 (5 screenshots across two captures)",
    "timezone": "Europe/Rome",
    "device": "Xiaomi 11 Lite 5G NE",
    "android_version": "NOT_EXPOSED",
@@ -261,14 +261,14 @@
    "app_hash": "26dbad0c5f0fe7700fc51cea1db8dacba4a34cd105ee88a29113c00be480922e",
    "source_sha": "a58c63068929ba8bb8415f0443c0bcd399b8218f",
    "tower_sha_if_applicable": "NOT_APPLICABLE",
-   "expected": "Scarica on Qwen2.5 0.5B (GGUF q5_k_m) downloads 522,186,592 bytes with visible progress",
-   "observed": "OWNER_REPORTED: download fails immediately; model card state 'non installato'/DISCOVERED/'Non ancora utilizzabile: il componente non è stato scaricato'; exact error text, progress behaviour and free storage NOT YET PROVIDED",
-   "evidence": "3 Owner screenshots (sha256 recorded); lane probe: artifact EXISTS at pinned commit (302→us.aws.cdn.hf.co, x-linked-size 522186592 exact match, anonymous); lane itself received HTTP 429 challenge from HF edge on repeated HEADs (edge throttling is real); client pipeline static analysis complete",
-   "verdict": "PHYSICAL_FAIL",
-   "finding_id": "A4R-PHYS-MODEL-002 (+ candidate A4R-PHYS-STORAGE-004)",
-   "repair": "REPAIR_REQUIRED (targeted once error class proven): CDN-edge typed messaging/mirror ordering OR storage preflight UX; diagnostics export extension (mission section 2)",
+   "expected": "Scarica on Qwen2.5 0.5B (GGUF q5_k_m) downloads 522,186,592 bytes with visible progress and completes to INSTALLED/usable",
+   "observed": "OWNER_REPORTED + PROVEN (lane): download never becomes usable ('fails immediately' per Owner). DEVICE STATE (5 screenshots, stable 05:32->07:33): pill 'Scaricato' (progress DOWNLOADED, error==null) + install 'non installato' (registry record ABSENT) + qualification DISCOVERED + compat 'il componente non è stato scaricato' + NO typed error row + primary action still 'Scarica'. ROOT CAUSE PROVEN (code identity a58c630 + edge probe): promotion dead-end — registry.mutate() no-ops without a record, resolvers gate everything on recordState and ignore progressState=DOWNLOADED, no product path wires DOWNLOADED->verifyHash->install; a REAL full 522 MB transfer completed once (zero-byte shortcut disproven: Range-at-EOF = HTTP 416 empty on primary+mirror); every re-click DELETES the complete partial (416 branch) and restarts from byte 0. Historical failure classes DEMOTED: HF-edge 429 (real, intermittent — lane 429 again 2026-11-21) and storage preflight (typed failures would render an error row, absent on device)",
+   "evidence": "5 Owner screenshots (sha256 recorded in A4R_QWEN25_DOWNLOAD_DIFFERENTIAL.json; on-device SHA-256 + pinned revision match the lane records byte-for-byte); edge_probe evidence files (416-empty at EOF, primary+mirror; 429 challenge on lane); static proof with code-identity check (git diff a58c630..HEAD empty on the involved paths)",
+   "verdict": "PHYSICAL_FAIL (primary root cause PROVEN: promotion dead-end; historical A/B demoted to secondary)",
+   "finding_id": "A4R-PHYS-MODEL-002 (primary cause PROVEN; candidates A4R-PHYS-STORAGE-004 storage half demoted, kept open for the envelope)",
+   "repair": "REPAIR_REQUIRED R1-R7: registry upsert for record-less identities; wire DOWNLOADED->verifyHash->install->qualify (activation stays explicit); resolvers honor progressState; Range-416 with full partial -> verify-and-promote instead of delete+restart; secret-clean diagnostics export extension; JVM+instrumentation test rows; no simulated progress, no pre-declared downloaded state",
    "retest_required": true,
-   "next_step": "Owner error-text screenshot + free-storage value → close cause class → targeted repair"
+   "next_step": "implement R1-R7 on graph-a4r + tests -> V2 APK (new versionCode/Name, isolated install) -> M1-M9 mini-gate (separate from Q1-Q8)"
   },
   {
    "test_id": "A4R-PHYS-CONTRACT-003",
@@ -306,13 +306,79 @@
    "source_sha": "a58c63068929ba8bb8415f0443c0bcd399b8218f",
    "tower_sha_if_applicable": "NOT_APPLICABLE",
    "expected": "model manifest URL/hash/storage binding consistent; free space ≥ download + reserve",
-   "observed": "manifest URL/hash/size binding PROVEN consistent (catalog == live x-linked-size == HF LFS oid); device free storage NOT_YET_REPORTED; storage preflight fails instantly with a typed message when free < needed + max(reserve, 15% of free) — surviving candidate",
+   "observed": "manifest URL/hash/size binding PROVEN consistent (catalog == live x-linked-size == HF LFS oid == on-device visible SHA-256); storage half DEMOTED-OPEN: a full 522 MB transfer completed on the device at least once and typed storage-failure strings are absent from the captured device state; device free storage still unreported (kept for the resource envelope only)",
    "evidence": "catalog json + lane probe + static preflight analysis",
    "verdict": "POSSIBLE_MODEL_MANIFEST_URL_HASH_OR_STORAGE_BINDING_FAILURE (URL/hash half DISPROVEN; storage half OPEN)",
    "finding_id": "A4R-PHYS-STORAGE-004",
    "repair": "pending Owner storage value + error text",
    "retest_required": true,
    "next_step": "Owner evidence"
+  },
+  {
+   "test_id": "OWNER-VERDICT-REJECT-001",
+   "priority": "P0",
+   "timestamp": "2026-11-26T11:13:00+01:00 (screenshots) / charter received same day",
+   "timezone": "Europe/Rome",
+   "device": "Xiaomi 11 Lite 5G NE",
+   "android_version": "NOT_EXPOSED",
+   "miui_version": "NOT_EXPOSED",
+   "app_package": "com.hermestower.voiceconsole.a4rdebug",
+   "app_version": "0.4.0-alpha-grapha4r-merged-b-base (code 13)",
+   "app_hash": "26dbad0c5f0fe7700fc51cea1db8dacba4a34cd105ee88a29113c00be480922e",
+   "source_sha": "a58c63068929ba8bb8415f0443c0bcd399b8218f",
+   "tower_sha_if_applicable": "live public plane healthy (LE cert to 2027-02-10); Tower repo access UNAVAILABLE_OR_NOT_AUTHORIZED",
+   "expected": "a usable voice console on the physical phone",
+   "observed": "OWNER TERMINAL VERDICT: HERMES_VOICE_CONSOLE_ANDROID=FAIL, OWNER_ACCEPTANCE=REJECTED, CANONICAL_APK=NOT_QUALIFIED, CURRENT_APK=FAILED_EVIDENCE_BASELINE. Findings: APP-P0-01 (pairing), APP-P0-02 (Qwen), APP-P1-03..08 (discoverability, onboarding, optimistic states, diagnostics, recovery paths, visual convergence). Physical user-path evidence prevails over manifests.",
+   "evidence": "4 screenshots 2026-11-26 (3 app + 1 Tower wizard) + prior 7 screenshots + both root-cause receipts",
+   "verdict": "PHYSICAL_FAIL (P0 x2, P1 x6)",
+   "finding_id": "APP-P0-01 + APP-P0-02 + APP-P1-03..08",
+   "repair": "full repair mission CP-ANDROID-REPAIR-001..012 on branch graph-a4r/physical-truth-repair",
+   "retest_required": true,
+   "next_step": "Owner retest ONLY at the terminal package (charter section 17); no Owner testing during implementation"
+  },
+  {
+   "test_id": "A4R-PHYS-QR-001-ENDPOINT-CLASS-CLOSED",
+   "priority": "P1-closure",
+   "timestamp": "2026-11-26T10:48:57Z",
+   "timezone": "Europe/Rome",
+   "device": "lane analysis (Owner wizard screenshot 2026-11-26 11:13 +01:00)",
+   "android_version": "NOT_EXPOSED",
+   "miui_version": "NOT_EXPOSED",
+   "app_package": "com.hermestower.voiceconsole.a4rdebug",
+   "app_version": "0.4.0-alpha-grapha4r-merged-b-base (code 13)",
+   "app_hash": "26dbad0c5f0fe7700fc51cea1db8dacba4a34cd105ee88a29113c00be480922e",
+   "source_sha": "a58c63068929ba8bb8415f0443c0bcd399b8218f",
+   "tower_sha_if_applicable": "Tower wizard 'PASSO 2 DI 4' emits QR with endpoint https://tower.local (LAN mDNS), TTL ~269 s, protocol voice-console/2, transport TO_owner_ui_qr; pairing code/numeric code/phrase REDACTED (expired ephemeral)",
+   "expected": "the DELTA's open question: which endpoint class the QR carries",
+   "observed": "CLOSED: LAN_MDNS_ONLY — https://tower.local is unresolvable on 4G cellular (mDNS is link-local; Android standard API does not resolve .local even on Wi-Fi) and would fail TLS anyway (LE cert covers only hermestower.aclclouds.online). Stacked: DNS -> TLS -> no client endpoint candidates/fallback -> single unclassified 'Tower non raggiungibile'",
+   "evidence": "PAIRING_ROOT_CAUSE_REPORT.md + PAIRING_NETWORK_DIAGNOSTIC.json + PAIRING_STATE_MACHINE.json + PAIRING_PROTOCOL_DIFF.json (this mission dir)",
+   "verdict": "QR_FAILURE_ROOT_CAUSE_PROVEN (class closed; transport layer + AMB-8/9/10 divergences registered)",
+   "finding_id": "A4R-PHYS-QR-001 (root cause PROVEN; AMB-10 closed)",
+   "repair": "R1-R7 client repair (transport classification, envelope adapter, endpoint candidates, LAN discovery, MagicDNS, manual lane, first-run onboarding, <=2-tap paths) + versioned Tower contract delta update; no Tower core change, no hardcoded endpoints",
+   "retest_required": true,
+   "next_step": "CP-004/005 implementation"
+  },
+  {
+   "test_id": "A4R-PHYS-MODEL-002-RECONFIRMED",
+   "priority": "P1",
+   "timestamp": "2026-11-26T11:13:00+01:00",
+   "timezone": "Europe/Rome",
+   "device": "Xiaomi 11 Lite 5G NE",
+   "android_version": "NOT_EXPOSED",
+   "miui_version": "NOT_EXPOSED",
+   "app_package": "com.hermestower.voiceconsole.a4rdebug",
+   "app_version": "0.4.0-alpha-grapha4r-merged-b-base (code 13)",
+   "app_hash": "26dbad0c5f0fe7700fc51cea1db8dacba4a34cd105ee88a29113c00be480922e",
+   "source_sha": "a58c63068929ba8bb8415f0443c0bcd399b8218f",
+   "tower_sha_if_applicable": "NOT_APPLICABLE",
+   "expected": "the dead-end state disappears after app restart / time",
+   "observed": "RE-CONFIRMED 5 days later: tmp 498.0 MB still stranded; card still shows 'Scaricato' + 'non installato' + 'componente non ancora scaricato'; qualification still DISCOVERED; 8 install receipts (bundled voice models only). The promotion dead-end is persistent, not transient.",
+   "evidence": "QWEN_RUNTIME_ROOT_CAUSE_RECEIPT.json (this mission dir) + 3 screenshots 2026-11-26",
+   "verdict": "PHYSICAL_FAIL (persistent)",
+   "finding_id": "A4R-PHYS-MODEL-002",
+   "repair": "R1-R8 (registry upsert, promotion wiring, resolvers, 416-promote, typed runtime states, deterministic test, resource envelope, tests)",
+   "retest_required": true,
+   "next_step": "CP-006/007 implementation"
   }
  ],
  "terminality_gate_states": {
@@ -334,17 +400,26 @@
   "TOWER_RESTART_REHYDRATION_PASS": "PENDING",
   "TOWER_VISUAL_ALIGNMENT_OWNER_ACCEPTED": "PENDING",
   "ZERO_SECRET_LEAK": "UNCLAIMED_UNTIL_FULL_GATE (secret scan clean this session: no secrets in any produced artifact)",
-  "OPEN_P0": 0,
-  "OPEN_P1": 3,
+  "OPEN_P0": 2,
+  "OPEN_P1": 6,
   "open_p1_detail": [
-   "A4R-P1-001 (repair delivered, retest pending)",
-   "A4R-P1-002 (instrumented suite delivered, run pending)",
-   "A4R-P1-003 (wiring delivered, physical demonstration pending)"
+   "APP-P1-03 pairing discoverability",
+   "APP-P1-04 first-run onboarding",
+   "APP-P1-05 optimistic runtime status",
+   "APP-P1-06 insufficient diagnostics",
+   "APP-P1-07 recovery/revoke/re-pair paths",
+   "APP-P1-08 visual convergence"
   ],
   "open_p2_detail": [
    "A4R-P2-004 (repair delivered, Owner acceptance pending)",
    "A4R-P2-006 (release discipline OPEN by design)"
-  ]
+  ],
+  "open_p0_detail": [
+   "APP-P0-01 pairing (root cause proven; repair pending)",
+   "APP-P0-02 Qwen runtime path (root cause proven; repair pending)"
+  ],
+  "OWNER_ACCEPTANCE": "REJECTED (2026-11-26)",
+  "CURRENT_APK": "FAILED_EVIDENCE_BASELINE"
  },
  "terminal_state": {
   "VOICE_CONSOLE_PAIRED_AND_VERIFIED": "NOT_REACHED (correctly) - no PASS is declared without Xiaomi physical evidence"
@@ -365,9 +440,9 @@
   },
   "source_sha": "a58c63068929ba8bb8415f0443c0bcd399b8218f",
   "tower_sha_if_applicable": "NOT_EXPOSED (Tower repository access from Android account UNAVAILABLE_OR_NOT_AUTHORIZED)",
-  "current_truth": "PHYSICAL MINI-GATE STOPPED AT SAFE BOUNDARY. Two Owner-reported P1 physical failures on the installed A4R APK: (1) QR pairing — camera + v2 parse worked twice, numeric codes typed, both attempts ended in typed PAIRING_ENDPOINT_UNREACHABLE ('Tower non raggiungibile'); lane forensics prove the live Tower public plane healthy and the v2 claim/attest routes PRESENT, GET ack route ABSENT (AMB-8), so the failure is transport-level to the QR-carried endpoint (class pending one evidence item). (2) Qwen2.5 0.5B download — fails immediately; artifact proven public/revision-bound/size+hash-consistent; surviving causes: CDN edge rejection vs storage preflight (discriminated by the Owner's exact error text). Gates reclassified per Owner directive; GRAPH_A4R_PASS = false; no reinstall of the same APK; no V2 build until both root causes complete.",
-  "next_exact_action": "Collect the MINIMUM Owner evidence: Qwen error text + progress behaviour + free storage; QR environment answer (Wi-Fi vs 4G) + one Tower wizard screenshot showing endpoint text (QR excluded). Then complete both root-cause proofs, repair, and build HERMES_VOICE_CONSOLE_A4R_REPAIRED_DEBUG_V2.apk (new versionCode/versionName) with the secret-clean diagnostics export; two separate mini-gates (Q1-Q8, M1-M9).",
-  "checkpoint_policy": "one checkpoint after P1-P4; one after P5-P6; one terminal after P7-P8; immediate commit after any material failure/repair",
+  "current_truth": "OWNER REJECTED THE APK (P0 x2, P1 x6). New full-repair mission bound and baseline frozen: the failed APK's source is PROVEN (graph-a4r/merge-with-b-base @ a58c630 == 8863b61 app content; Owner's uploaded CI variant 1744e173 reconciled byte-variant-equivalent to the release asset 26dbad0c). BOTH P0 ROOT CAUSES NOW PROVEN: QR pairing = LAN mDNS endpoint https://tower.local unreachable from the phone's network context + client lacks candidates/classification (AMB-10 closed; AMB-8 ack route absent, AMB-9 envelope unread behind it); Qwen = promotion dead-end (download completes to tmp, never verified/installed, re-click deletes the 522 MB partial). Structural finding: the console conversation itself runs a MOCK local executor with a null Tower executor — Tower-first routing must be built for real. Executor: GLM 5.4 not available in session -> authorized fallback GLM 5.3 self-qualified (7/7 gates) and proceeds.",
+  "next_exact_action": "Lane: implement CP-004/005 (pairing path redesign: transport classification, envelope adapter, endpoint candidates, LAN discovery, MagicDNS + manual lanes, first-run onboarding, Home card, <=2 taps) and CP-006/007 (Qwen promotion repair R1-R8 + deterministic 'Rispondi soltanto con OK' test + typed runtime states) as COMPLETE files with JVM/instrumentation rows on branch graph-a4r/physical-truth-repair; then CP-008 diagnostics area, CP-009 visual convergence with the supplied Tower assets, CP-010 regression, CP-011 build, CP-012 Owner retest package (Italian). No Owner testing during implementation; no capability PASS without physical execution; terminal states stay unclaimed.",
+  "checkpoint_policy": "CP-ANDROID-REPAIR-001..012 per charter section 18; commit at every checkpoint; immediate commit after any material failure/repair; checkpoint before context pressure",
   "blocker_registry": [
    {
     "id": "A4R-BLK-PROV-001",
@@ -403,6 +478,15 @@
    ],
    "no_reinstall_of_same_apk": true,
    "v2_build_blocked_until": "QR_FAILURE_ROOT_CAUSE_PROVEN and QWEN_DOWNLOAD_FAILURE_ROOT_CAUSE_PROVEN"
+  },
+  "mission_state": {
+   "CP-ANDROID-REPAIR-001": "COMPLETE (input manifest + source binding + failed baseline frozen)",
+   "CP-ANDROID-REPAIR-002": "COMPLETE (interaction inventory + runtime graph + dead/unbound register; ZERO_UNACCOUNTED_INTERACTION=PASS, ZERO_FAKE_ENABLED=FAIL-as-audit-result -> repair backlog)",
+   "CP-ANDROID-REPAIR-003": "COMPLETE (pairing state machine + protocol diff + network diagnostic + root cause report; endpoint class CLOSED)",
+   "CP-ANDROID-REPAIR-004/005": "PENDING (pairing path redesign + implementation)",
+   "CP-ANDROID-REPAIR-006": "ANALYSIS COMPLETE (root cause proven + re-confirmed; implementation PENDING)",
+   "CP-ANDROID-REPAIR-007": "PENDING (Qwen inference implementation + deterministic test)",
+   "CP-ANDROID-REPAIR-008..012": "PENDING (diagnostics, visual convergence, regression, build, owner retest package)"
   }
  }
 }

@@ -1,0 +1,82 @@
+{
+ "schema": "android_repair.pairing_protocol_diff/1.0",
+ "produced_utc": "2026-11-26T10:46:41Z",
+ "comparison_basis": "client v2 implementation (bound source) vs live Tower evidence (lane probes 2026-11-20/21, read-only fake ids) vs Tower-side wizard screenshot (2026-11-26, Owner-supplied)",
+ "field_level_diff": [
+  {
+   "field": "QR envelope",
+   "client": "<base64url(payload JSON)>.<base64url(signature)>, v=2, protocol_version voice-console/*, expires_at epoch-s, tower_instance_id, endpoint, pairing_id, scope[], transport_hint, nonce_ref",
+   "tower_wizard_evidence": "QR rendered 256x256 with TTL countdown (~269 s), protocol voice-console/2 (v2), scopes voice.capture/voice.tts/tower_status_read, transport TO_owner_ui_qr",
+   "diff": "NONE OBSERVED (device parse accepted twice)"
+  },
+  {
+   "field": "endpoint",
+   "client": "used VERBATIM (accepts http or https — no scheme enforcement)",
+   "tower_wizard_evidence": "'Endpoint temporaneo: https://tower.local' — a LAN-scoped mDNS hostname",
+   "diff": "*** THE DEFECT ***: the emitted endpoint class is unreachable from the phone's network context (4G cellular; mDNS is link-local). The public plane https://hermestower.aclclouds.online is healthy but is NOT carried in the QR"
+  },
+  {
+   "field": "claim request",
+   "client": "POST /api/tower/voice-console/v2/pairings/{id}/claim {claim_code, device_label} — typed hypothesis",
+   "tower_live": "route EXISTS (200 {ok:false,error:PAIRING_NOT_FOUND_OR_EXPIRED} on fake id)",
+   "diff": "route present; request schema unverifiable without a live pairing (contract delta request already filed)"
+  },
+  {
+   "field": "claim response envelope",
+   "client": "reads claim_key + challenge from a 2xx JSON body; missing fields -> MALFORMED_RESPONSE",
+   "tower_live": "errors are IN-BAND: HTTP 200 {ok:false, error:...}",
+   "diff": "AMB-9 PROVEN: the ok/error envelope is not read — an expired/replayed pairing would surface as 'risposta claim incompleta' instead of the Tower's typed reason"
+  },
+  {
+   "field": "attest",
+   "client": "POST .../attest {claim_key, challenge, pop_signature, device_public_key_pem (SPKI PEM), device_key_algorithm EC, attestation_metadata}",
+   "tower_live": "route EXISTS (same in-band envelope on fake id)",
+   "diff": "same AMB-9 class; PoP/PKI encoding unverifiable until a live pairing reaches attest"
+  },
+  {
+   "field": "owner acknowledgement",
+   "client": "GET /api/tower/voice-console/v2/pairings/{id}/ack -> {state: PENDING|ACKED|REVOKED|EXPIRED, device_id, console_token, phrase_hint}",
+   "tower_live": "route ABSENT (404 catch-all 'No such API endpoint' — a missing pairing on an EXISTING route answers in-band like claim/attest, so this is a route-level absence)",
+   "diff": "AMB-8 PROVEN: contract divergence — the bilateral confirmation poll cannot succeed against the live Tower as-is"
+  },
+  {
+   "field": "TTL/clock",
+   "client": "QR expiry enforced (observed 230 s/278 s windows); challenge TTL 120 s client-enforced",
+   "tower_wizard": "QR TTL 2-5 min (countdown observed)",
+   "diff": "none observed"
+  },
+  {
+   "field": "replay",
+   "client": "nonce_ref single-use per session (in-memory store)",
+   "tower": "unknown (Tower-side)",
+   "diff": "none observed on device"
+  },
+  {
+   "field": "signature",
+   "client": "QR signature part NOT verified client-side (Tower verifies possession at claim) — preserved verbatim, no bypass created",
+   "tower": "n/a",
+   "diff": "by design"
+  }
+ ],
+ "divergences_register": [
+  {
+   "id": "AMB-8",
+   "class": "ROUTE ABSENT",
+   "item": "GET ack route",
+   "handling": "versioned Tower-side contract decision request (HR-A4R-PHYS-001) — NO client-side bypass, NO Tower core modification"
+  },
+  {
+   "id": "AMB-9",
+   "class": "ENVELOPE UNREAD",
+   "item": "HTTP-200 in-band {ok,error} envelope",
+   "handling": "client adapter in V2 (read ok/error before DTO parse; contract fixture pinned in JVM tests)"
+  },
+  {
+   "id": "AMB-10",
+   "class": "ENDPOINT EMISSION POLICY — NOW CLOSED",
+   "item": "QR carries only https://tower.local (LAN mDNS)",
+   "handling": "contract delta update: Tower should carry a REACHABLE endpoint (public HTTPS and/or tailnet MagicDNS name) or an endpoint candidate list; client V2 adds endpoint candidates + LAN discovery + manual lane so pairing is not hostage to one unreachable name"
+  }
+ ],
+ "verdict": "QR schema COMPATIBLE (parse proven on device); the failure is TRANSPORT + two contract divergences (AMB-8/9) + the endpoint emission policy (AMB-10, root cause)."
+}

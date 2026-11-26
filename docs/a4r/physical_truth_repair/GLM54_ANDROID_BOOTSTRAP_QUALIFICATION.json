@@ -1,0 +1,28 @@
+{
+ "schema": "android_repair.glm54_bootstrap_qualification/1.0",
+ "produced_utc": "2026-11-26T10:42:28Z",
+ "preferred_executor_requested": "GLM 5.4 (subject to Bootstrap Qualification)",
+ "authorized_fallback_executor": "GLM 5.3",
+ "execution_environment_truth": "The model executing this session IS GLM 5.3. No GLM 5.4 execution lane exists or is reachable in this environment (structural unavailability — not a comprehension failure).",
+ "required_gates": {
+  "SOURCE_COMPREHENSION_PASS": "NOT_EXECUTABLE_BY_GL54 (executor absent)",
+  "PAIRING_ARCHITECTURE_COMPREHENSION_PASS": "NOT_EXECUTABLE_BY_GL54 (executor absent)",
+  "QWEN_RUNTIME_ARCHITECTURE_COMPREHENSION_PASS": "NOT_EXECUTABLE_BY_GL54 (executor absent)",
+  "ANDROID_BUILD_CHAIN_PASS": "NOT_EXECUTABLE_BY_GL54 (executor absent)",
+  "COMPLETE_FILE_DELIVERY_CONTRACT_PASS": "NOT_EXECUTABLE_BY_GL54 (executor absent)",
+  "CHECKPOINT_CONTINUATION_PASS": "NOT_EXECUTABLE_BY_GL54 (executor absent)",
+  "NO_FALSE_RUNTIME_CLAIM_PASS": "NOT_EXECUTABLE_BY_GL54 (executor absent)"
+ },
+ "verdict": "GLM54_ANDROID_EXECUTOR_NOT_QUALIFIED (reason: PREFERRED_EXECUTOR_NOT_AVAILABLE_IN_SESSION — the qualification cannot be executed by a model that is not the executor)",
+ "handoff": {
+  "action": "Complete GLM 5.3 rehydration handoff generated (charter section 3) AND, because GLM 5.3 is the charter's AUTHORIZED FALLBACK EXECUTOR, the fallback immediately self-qualifies against the same seven gates (see GLM53_ANDROID_BOOTSTRAP_QUALIFICATION.json) and proceeds.",
+  "rehydration_inputs": [
+   "ANDROID_REPAIR_INPUT_MANIFEST.json / ANDROID_SOURCE_APK_BINDING.json / ANDROID_FAILED_BASELINE_RECEIPT.json (this directory)",
+   "source worktree /home/z/my-project/a4r-repair @ branch graph-a4r/physical-truth-repair (from 8863b61)",
+   "download/A4R/phys_repair/* (both proven root-cause receipts + differentials + Tower handoff request)",
+   "download/A4R/A4R_OWNER_PHYSICAL_LEDGER.json (physical ledger, schema 1.2, updated with the Owner verdict)",
+   "in-repo docs/governance/CURRENT_PROJECT_TRUTH.md + CHECKPOINT_INDEX.md + MISSION_GRAPH.yaml"
+  ],
+  "stop_checkpoint": "safe: no implementation started before qualification; no partial files exist."
+ }
+}

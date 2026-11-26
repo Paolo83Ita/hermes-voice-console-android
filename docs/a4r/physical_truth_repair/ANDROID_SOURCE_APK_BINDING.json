@@ -1,0 +1,59 @@
+{
+ "schema": "android_repair.source_apk_binding/1.0",
+ "produced_utc": "2026-11-26T10:42:28Z",
+ "question": "Can the complete source tree corresponding to the physically failed APK be proven?",
+ "answer": "YES — SOURCE_APK_IDENTITY_PROVEN (SOURCE_APK_IDENTITY_BLOCKED does NOT apply)",
+ "apk_identities": {
+  "device_app_identity": {
+   "application_id": "com.hermestower.voiceconsole.a4rdebug (debug suffix .a4rdebug, isolated coexistence package)",
+   "version_name": "0.4.0-alpha-grapha4r-merged-b-base",
+   "version_code": 13,
+   "min_sdk": 30,
+   "target_sdk": 35,
+   "compile_sdk": 35,
+   "label": "Hermes Console",
+   "signing_class": "DEBUG_CI_NON_PRODUCTION",
+   "v2_signer_cert_sha256": "56e00e406895d355356faebe7c6b95de6e8777858c77564d8f5c7dbdaa1faa1f"
+  },
+  "release_asset_P1_delivered": {
+   "name": "HERMES_VOICE_CONSOLE_A4R_REPAIRED_DEBUG.apk",
+   "bytes": 122891305,
+   "sha256": "26dbad0c5f0fe7700fc51cea1db8dacba4a34cd105ee88a29113c00be480922e",
+   "built_by": "CI run 44752839878 (android-debug-build) at head a58c630, branch graph-a4r/merge-with-b-base",
+   "delivery": "GitHub draft release 452862523 asset 772332157, download-back byte-identical (A4R_P1_DELIVERY_INTEGRITY_RECEIPT.json)"
+  },
+  "owner_uploaded_variant": {
+   "name": "app-arm64-v8a-debug.apk (inside upload/app-arm64-v8a-debug.zip)",
+   "bytes": 122891305,
+   "sha256": "1744e173f6a2340651fe508c4984471d98881d48ec9bf16f1708692ef518ae97",
+   "built_by": "CI run 44878382926 (android-debug-build) at head 8863b61 (branch tip), lane download-back verified this session"
+  },
+  "equivalence_proof": {
+   "method": "entry-wise ZIP comparison (scripts/a4r_apk_entry_diff.py): 597 entries vs 597 entries; 595 entries content-identical; 2 entries (classes11.dex, classes14.dex) differ in bytes ONLY; dex class-descriptor sets IDENTICAL (659/659 and 341/341, zero class only-in-either) => same compiled program, non-deterministic rebuild layout",
+   "conclusion": "Both byte-variants are builds of the SAME application source. Whichever variant is installed on the Xiaomi, the source truth is identical."
+  }
+ },
+ "source_authority": {
+  "repository": "https://github.com/Paolo83Ita/hermes-voice-console-android",
+  "branch_of_failed_baseline": "graph-a4r/merge-with-b-base",
+  "build_head_of_release_asset": "a58c63068929ba8bb8415f0443c0bcd399b8218f",
+  "branch_tip": "8863b6189868db1eddd93862b69d6da4f55a219d (app/ source UNCHANGED a58c630..8863b61 — git diff on app/ is empty; post-build commits are docs/governance only)",
+  "dual_source_layout": {
+   "app/src/main/java/": "Candidate-A lineage architecture (164 files): UI screens, model manager, voice pipeline, monumental visual system, tower profile stores",
+   "candidate-b-base/app/src/main/java/ (compiled INTO :app via java.srcDir)": "Candidate-B authority lane (8 files): pairing/QrPayload.kt (QR v2 parser), pairing/PairingFlow.kt (claim->attest->ack->commit state machine), pairing/DeviceKeys.kt (EC-P256), pairing/TowerQrV2ScanFlow.kt, net/TowerApi.kt (18 live v2 routes), data/TowerStore.kt (repaired AndroidKeyStore persistence), data/PairingPersistence.kt, towerpair/TowerPairingController.kt",
+   "provenance_note": "candidate-b-base is RECONSTRUCTED SOURCE (B's original tree unreachable: Tower GitHub repo 404 fresh-read 2026-11-20; lineage in candidate-b-base/CANDIDATE_B_SOURCE_MANIFEST.json) bound to B's byte-exact APK 908b289f… behavioral surface — it is the code that CI-built the installed APK, so it is the binding truth for THIS repair regardless of reconstruction origin."
+  },
+  "gradle_and_build_config_bound": {
+   "settings.gradle.kts": "single module :app; mirror-first Maven resolution (aliyun) with Maven Central fallback; sherpa-onnx via jitpack (k2-fsa only)",
+   "app/build.gradle.kts": "applicationId com.hermestower.voiceconsole + debug suffix .a4rdebug; versionCode 13 / versionName 0.4.0-alpha-grapha4r-merged-b-base; ABI splits arm64-v8a + x86_64 with universal APK; buildConfig identity injection (GIT_SHA_FULL, RUN_ID, timestamp — measured, never runtime-invented); lint abortOnError=true",
+   "gradle/libs.versions.toml": "pinned catalog (AGP 8.7.3, Compose BOM, onnxruntime-android 1.20.0, vosk-android, sherpa-onnx v1.12.24, llama-android 0.1.1, CameraX + ML Kit bundled barcode)",
+   "key_native_dependencies": "libllama (llama-android 0.1.1 = llama.cpp b9878), ONNX Runtime, sherpa-onnx, Vosk, ML Kit barcode (bundled, on-device)"
+  },
+  "manifest_and_network_policy_bound": {
+   "AndroidManifest.xml": "single activity MainActivity (Compose); RECORD_AUDIO/INTERNET/ACCESS_NETWORK_STATE/POST_NOTIFICATIONS/FOREGROUND_SERVICE(+MICROPHONE)/CAMERA declared; camera optional feature; networkSecurityConfig set; allowBackup=false",
+   "network_security_config.xml": "cleartext permitted ONLY for loopback — any http:// QR endpoint is rejected by policy at transport level",
+   "navigation_graph": "AppRoutes (14 routes) + AppNav: drawer primary destinations CONSOLE/ARCHIVE/TOWER_STUDIO/MODEL_MANAGER/SETTINGS; QR_SCANNER reachable only via TOWER_STUDIO; CONNECTION opens TOWER_STUDIO; onboarding demonstrates the scanner"
+  }
+ },
+ "binding_verdict": "SOURCE_APK_IDENTITY_PROVEN — the complete source tree of the physically failed APK is committed, fetched fresh, and CI-verifiable (two byte-variant builds reconciled by entry-wise + class-set equivalence). No decompilation-based reconstruction is needed or used as the development path: the repair continues from the bound, building source tree."
+}

@@ -1,0 +1,98 @@
+{
+ "schema": "android_repair.runtime_integration_graph/1.0",
+ "produced_utc": "2026-11-26T10:44:57Z",
+ "engines": [
+  {
+   "engine": "MockLocalConversationEngine",
+   "wired_to": "VoicePipelineController.localExecutor (console conversation)",
+   "truth": "SIMULATED responses; no SIMULATED label found inside the engine itself (labels live in ResponseCatalog strings)",
+   "repair_direction": "replace with real executors: RealTower v2 bridge (paired) / LocalLlmEngine (enabled) per charter section 11"
+  },
+  {
+   "engine": "towerExecutor lambda",
+   "wired_to": "VoicePipelineController.towerExecutor",
+   "truth": "{ _ -> null } — Tower conversation NOT IMPLEMENTED",
+   "repair_direction": "wire to the paired v2 lane (voice submit/response-stream) — Tower-first when paired"
+  },
+  {
+   "engine": "LocalLlmEngine + LlamaCppAndroidRuntime + LlamaRealNativeBridge",
+   "wired_to": "LocalIntelligenceScreen (load/unload) + diagnostics only",
+   "truth": "REAL llama.cpp b9878 runtime, DEFAULT OFF, requires installed+hash-verified GGUF (never installed due to promotion dead-end)",
+   "repair_direction": "CP-006/007: promote download->install, add deterministic test (charter section 9), wire as LOCAL executor for the router"
+  },
+  {
+   "engine": "RealTowerBridge (graph-2 handshake contract)",
+   "wired_to": "ConnectionScreen/TowerConnectionTester via profileStore",
+   "truth": "REAL HTTP handshake; separate contract from v2 pairing lane; streamingCapability reported SIMULATED",
+   "repair_direction": "converge with the v2 pairing lane into one Tower connection truth"
+  },
+  {
+   "engine": "TowerApi (v2, B lineage)",
+   "wired_to": "TowerPairingController/PairingFlow (QR lane)",
+   "truth": "REAL claim/attest routes (probed live); GET ack route ABSENT on live Tower (AMB-8); ok/error in-band envelope unread (AMB-9); endpoint from QR used verbatim",
+   "repair_direction": "envelope adapter + transport classification + endpoint candidates + versioned contract delta (no Tower core change)"
+  },
+  {
+   "engine": "VoskFrameSttEngine",
+   "wired_to": "VoicePipelineController.stt",
+   "truth": "REAL (verified vosk-it model via Model Sanctum)"
+  },
+  {
+   "engine": "SileroVadEngine / EnergyVadEngine",
+   "wired_to": "VoicePipelineController.vad",
+   "truth": "REAL (Silero when verified model installed, else energy baseline)"
+  },
+  {
+   "engine": "AndroidSystemTtsEngine / SherpaOnnxTtsEngine / TtsRouteSwitch",
+   "wired_to": "voiceTts + TtsReadbackStage",
+   "truth": "REAL (system TTS default; sherpa natural voice via downloaded packs)"
+  },
+  {
+   "engine": "OpenWakeWordEngine (bundled ONNX)",
+   "wired_to": "wake word pipeline",
+   "truth": "REAL but DEFAULT OFF (truthful)"
+  },
+  {
+   "engine": "GtcrnDenoiserEngine (bundled ONNX)",
+   "wired_to": "capture chain",
+   "truth": "REAL but bypassed until device verification (truthful)"
+  },
+  {
+   "engine": "MockTowerArchive",
+   "wired_to": "ArchiveScreen",
+   "truth": "SIMULATED data (visibly labeled); real v2 archive routes unwired"
+  },
+  {
+   "engine": "DeterministicTowerSimulator + MockTowerBridge",
+   "wired_to": "console bridge + selftest lanes",
+   "truth": "SIMULATED (labeled), test-only semantics"
+  },
+  {
+   "engine": "LocalTowerMockServer (serverFactory)",
+   "wired_to": "model qualification selftests",
+   "truth": "TEST-ONLY mock server"
+  },
+  {
+   "engine": "InactiveWakeWordEngine / InactiveVoiceActivityDetector / NoAudioCaptureEngine",
+   "wired_to": "AppGraph:460-462 defaults",
+   "truth": "INACTIVE stubs reporting NOT_INSTALLED (truthful placeholders superseded by real engines where delivered)"
+  },
+  {
+   "engine": "ModelDownloadManager + ModelStorageManager + ModelInstallationRegistry",
+   "wired_to": "ModelManagerScreen actions",
+   "truth": "REAL storage/preflight/Range-resume; registry record lifecycle no-ops for record-less identities (the proven dead-end)"
+  }
+ ],
+ "storage_and_secrets": [
+  "TowerStore (AndroidKeyStore AES-256-GCM, explicit KeyGenParameterSpec, atomic commitPairing — the A4R-P1-001 repair, never falsified)",
+  "TowerProfileStore (endpoint profiles, secret-clean export)",
+  "ModelStorageManager (tmp/staging/previous/quarantine roots; receipts 11.9 KB/8 receipts observed on device)",
+  "SharedPreferencesKeyValueStore + SettingsMigrator"
+ ],
+ "network_surfaces": [
+  "TowerApi v2 (18 routes, claim/attest live-proven)",
+  "RealTowerBridge handshake (graph-2 contract)",
+  "ModelDownloadManager (huggingface.co + hf-mirror.com, Range resume, 429/416 typed handling)",
+  "NSC: cleartext loopback only — http endpoints blocked by policy"
+ ]
+}

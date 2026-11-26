@@ -1,0 +1,46 @@
+{
+ "schema": "android_repair.pairing_network_diagnostic/1.0",
+ "produced_utc": "2026-11-26T10:46:41Z",
+ "endpoint_in_question": "https://tower.local (QR-carried temporary endpoint, Owner wizard screenshot 2026-11-26 11:13 Rome; pairing code/numeric code/phrase REDACTED as expired ephemeral values)",
+ "device_network_context_at_failure": "4G+ cellular (status bar in all three failure captures 2026-11-20 16:51/16:53 and 2026-11-26 11:13); Tailscale chip visible '1 dispositivo' (only the phone itself on the tailnet at that moment — the Tower is NOT a tailnet member or is unreachable there)",
+ "failure_layer_analysis": [
+  {
+   "layer": "DNS",
+   "analysis": "tower.local is an mDNS (multicast DNS, RFC 6762) link-local name. mDNS resolution is possible ONLY on the same L2 link (home Wi-Fi/LAN). On 4G cellular there is no multicast path: the name can never resolve. Even on the home Wi-Fi, Android's standard resolver (getaddrinfo/bionic, used by HttpURLConnection) does NOT resolve .local hostnames on the vast majority of Android builds, MIUI included — Android exposes NSD (NsdManager) for SERVICE discovery, not host-name resolution in the standard socket API.",
+   "verdict": "UNRESOLVABLE on cellular (definitionally); UNRELIABLE-to-UNRESOLVABLE on Wi-Fi via the standard API",
+   "observed_symptom": "UnknownHostException -> IOException -> typed NETWORK_UNREACHABLE -> 'Tower non raggiungibile'"
+  },
+  {
+   "layer": "TLS",
+   "analysis": "Even if the name resolved (e.g., a build that resolves mDNS, or /etc/hosts-style pinning) and the TCP connection opened, https://tower.local requires a server certificate VALID FOR tower.local trusted by Android. The Tower's known public certificate is Let's Encrypt CN=hermestower.aclclouds.online (valid 2026-11-12 -> 2027-02-10, lane-verified) — it does NOT cover tower.local. A self-signed tower.local cert would be rejected as untrusted.",
+   "verdict": "TLS WOULD FAIL (cert name mismatch / untrusted) — a SECOND stacked failure behind DNS"
+  },
+  {
+   "layer": "transport policy (NSC)",
+   "analysis": "app network_security_config permits cleartext ONLY for loopback; an http:// variant of the endpoint would be blocked by Android policy at the cleartext check. The current endpoint is https, so NSC is not the active blocker — recorded for completeness (no bypass is permitted or proposed).",
+   "verdict": "not active for https://tower.local; would block any http fallback"
+  },
+  {
+   "layer": "reachability of the Tower's OTHER plane",
+   "analysis": "the public plane https://hermestower.aclclouds.online is lane-proven healthy (DNS -> 141.11.237.119; TLS LE valid; claim+attest routes live). The QR does NOT carry it and the client has NO candidate/fallback mechanism, NO LAN discovery, NO MagicDNS surface, and the manual endpoint lane exists only as dead code (see interaction inventory).",
+   "verdict": "a reachable plane EXISTS but is unused by the pairing path"
+  },
+  {
+   "layer": "client transport classification",
+   "analysis": "TowerApi collapses every IOException into NETWORK_UNREACHABLE with no DNS/TCP/TLS subclassification, so the Owner cannot distinguish 'name does not resolve on this network' from 'Tower down'.",
+   "verdict": "diagnostic gap (APP-P1-06 class) — repair R1"
+  }
+ ],
+ "stacked_failure_summary": "DNS (unresolvable on 4G) -> [if resolved] TLS (cert mismatch) -> no alternate endpoint -> single typed message. The pairing was never going to complete from the phone's network context with this QR.",
+ "endpoint_class_verdict": "LAN_MDNS_ONLY__UNREACHABLE_FROM_CELLULAR__CERT_MISMATCHED_IF_RESOLVED (the DELTA's open endpoint-class question is CLOSED by the Owner's wizard screenshot)",
+ "repair_implications_no_tower_core_change": [
+  "R1 transport classification: typed sub-states DNS_FAILED / TCP_CONNECT_FAILED / TLS_HANDSHAKE_FAILED / CLEARTEXT_BLOCKED / HTTP_STATUS(n) surfaced in UI + diagnostics (redaction-safe)",
+  "R2 envelope adapter (AMB-9) before DTO parse",
+  "R3 endpoint CANDIDATES: QR endpoint first, then Owner-configured alternates (public HTTPS, MagicDNS name, LAN IP:port), each attempted with classified failures; manual lane VISIBLE (charter section 6 ADVANCED_MANUAL)",
+  "R4 LAN_DISCOVERY: NsdManager-based resolution for _hermes._tcp or mDNS hostname candidates (charter section 6 LAN_DISCOVERY)",
+  "R5 TAILSCALE_MAGICDNS: guidance + accept tailnet names (ts.net) as endpoint candidates when the Owner uses Tailscale (charter section 6)",
+  "R6 Tower-side versioned contract decision request updated with the CLOSED endpoint class (AMB-10): carry reachable endpoint(s) in the QR — no client-side hardcoding of any endpoint, no Tower core modification",
+  "R7 first-run onboarding + prominent Home card + <=2-tap paths (charter sections 6/14) so the Owner never needs a hidden developer path"
+ ],
+ "environment_truth_for_the_owner_it": "Al momento dell'abbinamento il telefono era su rete cellulare 4G+ e il QR conteneva l'endpoint 'https://tower.local' (nome LAN): impossibile da raggiungere dal telefono in quella rete, e anche sul Wi-Fi di casa Android non risolve i nomi .local con le API standard. La riparazione aggiunge endpoint alternativi, scoperta LAN, supporto Tailscale e inserimento manuale — senza mai fissare un endpoint nel codice."
+}

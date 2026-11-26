@@ -1,0 +1,48 @@
+{
+ "schema": "android_repair.qwen_runtime_root_cause_receipt/1.0",
+ "produced_utc": "2026-11-26T10:48:57Z",
+ "finding": "APP-P0-02 / A4R-PHYS-MODEL-002",
+ "prior_proof_carried_forward": "download/A4R/phys_repair/A4R_QWEN25_FAILURE_ROOT_CAUSE_RECEIPT.json (static proof with git-identity verification + edge probes) — NOT re-derived, re-verified against the bound tree",
+ "root_cause_statement": "PROVEN PROMOTION DEAD-END: a REAL full 522,186,592-byte download completes to tmp (state DOWNLOADED, error==null — the only reachable path to that state per the edge-probe 416-empty disproof), and then NO product path promotes it: the installation registry silently no-ops for record-less identities, the UX resolvers key every post-download verdict/action on the record state and ignore progressState, nothing wires DOWNLOADED -> verifyHash -> install for the LOCAL_LLM component, and every further 'Scarica' click sends Range-at-EOF, receives HTTP 416 and DELETES the complete partial to restart from zero. The Owner experiences 'downloads but never becomes usable' while the card shows the contradictory state 'Scaricato' + 'non installato' + 'il componente non è stato scaricato'.",
+ "re_confirmation_2026_11_26": {
+  "device_state": "storage diagnostics show tmp = 498.0 MB (the stranded partial, five days after first download), receipts 11.9 KB / 8 install receipts, staging/previous/quarantine/logs 0 B",
+  "card_state": "badge 'Scaricato' beside install 'non installato', compat 'non ancora disponibile: componente non ancora scaricato', qualification DISCOVERED — the dead-end state persists on the current install",
+  "evidence": "Screenshot_2026-11-26-11-13-29-745 (8330fd2e…), Screenshot_2026-11-26-11-13-49-639 (4099e743…), Screenshot_2026-11-26-11-13-42-375 (f253710a…)"
+ },
+ "charter_section_8_chain_position": {
+  "chain": "catalog selection(1) -> download(2) -> temporary storage(3) -> size verification(4) -> SHA-256 verification(5) -> final installation(6) -> registry update(7) -> runtime resolver(8) -> ABI validation(9) -> native library load(10) -> JNI bridge(11) -> GGUF open(12) -> metadata parse(13) -> model load(14) -> context allocation(15) -> chat template(16) -> tokenization(17) -> prompt evaluation(18) -> generation(19) -> UTF-8 output(20) -> visible UI output(21) -> cancellation(22) -> unload(23) -> RAM release(24) -> restart/read-back(25)",
+  "stages_proven_working": "1-3 (catalog pinned + real full transfer to tmp)",
+  "failing_stage": "4-7 (verification + installation + registry update NEVER RUN for the LOCAL_LLM component — the promotion dead-end)",
+  "stages_unreachable_consequently": "8-25 (the real llama.cpp runtime — LlamaCppAndroidRuntime/LlamaRealNativeBridge, verified AAR — is wired but can never bind because the GGUF is never installed)"
+ },
+ "typed_states_gap_vs_charter": {
+  "implemented": "NOT_DOWNLOADED / DOWNLOADING / DOWNLOADED / FAILED (progress) + registry record states + LOCAL_LLM engine states (load/unload typed)",
+  "missing_surface_states": "DOWNLOAD_VERIFIED / INSTALLED / RUNTIME_LIBRARY_AVAILABLE / JNI_AVAILABLE / MODEL_OPENED / CONTEXT_CREATED / INFERENCE_READY / INFERENCE_RUNNING / INFERENCE_SUCCEEDED / INFERENCE_FAILED / UNLOADED / RUNTIME_NOT_QUALIFIED — none of the runtime-chain states is exposed to the Owner (APP-P1-05: status more optimistic than truth)",
+  "rule": "a generic 'Installed' state is never used as proof that inference works (charter section 8)"
+ },
+ "repair_scope_cp006_cp007": [
+  "R1 registry record lifecycle: markState UPSERTS records for record-less identities (no pre-declared downloaded state without bytes on disk)",
+  "R2 promotion wiring: DOWNLOADED -> verifyHash -> install() -> qualification read-back; ACTIVATION stays an explicit Owner action (Tower-first preserved, optional + OFF by default)",
+  "R3 resolvers honor progressState (VERIFY/INSTALL primary actions reachable with record==null)",
+  "R4 re-click semantics: Range-416 with a full-size partial -> hash-verify and PROMOTE, never blind delete-and-restart",
+  "R5 typed runtime states surfaced (charter section 8 list) in the card + diagnostics",
+  "R6 deterministic Owner diagnostic (charter section 9): 'Rispondi soltanto con OK', temperature 0, max 8 tokens, smallest qualified context, concurrency 1; result screen with model identity/version/quantization/path/size/SHA status/ABI/native/JNI/GGUF/context/template/load time/TTFT/generation duration/token-s/peak RAM/output/unload/RAM release/error code; EXPORT_SECRET_CLEAN_DIAGNOSTIC_BUNDLE support",
+  "R7 resource envelope measurement (charter section 10) on the Xiaomi: RAM before/peak RSS/native allocations/context estimate/load time/TTFT/token-s/thermal/battery/unload/residual; RESOURCE_ENVELOPE_BLOCKED if unsafe — no silent model substitution",
+  "R8 tests: JVM rows for registry upsert/promotion/416-promote/resolver matrix + instrumentation for interrupt/resume/hash gates/restart read-back"
+ ],
+ "tower_first_note": "Qwen stays OPTIONAL and OFF by default; its failure never blocks Tower pairing or voice (permitted/forbidden uses per charter section 11)",
+ "gates": {
+  "QWEN_DOWNLOAD_PASS": "FAIL (baseline)",
+  "QWEN_HASH_PASS": "NOT_REACHED",
+  "QWEN_INSTALL_PASS": "NOT_REACHED",
+  "LLAMA_NATIVE_LOAD_PASS": "NOT_REACHED (runtime bundled+verified, never bound)",
+  "GGUF_OPEN_PASS": "NOT_REACHED",
+  "PROMPT_INFERENCE_PASS": "NOT_REACHED",
+  "VISIBLE_OUTPUT_PASS": "NOT_REACHED",
+  "QWEN_AUTOMATED_INFERENCE_PASS": "PENDING CP-007"
+ },
+ "not_claimed": [
+  "QWEN_PHYSICALLY_VERIFIED",
+  "XIAOMI_QWEN25_DOWNLOAD_PASS"
+ ]
+}

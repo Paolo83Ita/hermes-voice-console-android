@@ -1,0 +1,37 @@
+{
+ "schema": "android_repair.glm53_bootstrap_qualification/1.0",
+ "produced_utc": "2026-11-26T10:42:28Z",
+ "executor": "GLM 5.3 — AUTHORIZED FALLBACK EXECUTOR per charter header (GLM 5.4 not available in session; see GLM54 file)",
+ "gates": {
+  "SOURCE_COMPREHENSION_PASS": {
+   "evidence": "Dual-source architecture mapped: :app builds from app/src/main/java (164 files, A lineage) PLUS candidate-b-base/app/src/main/java (8 files, B authority lane) compiled in via java.srcDir — verified in settings.gradle.kts + app/build.gradle.kts. APK inventory 597 entries; two byte-variant builds reconciled by entry-wise (595/597 identical) + dex class-set equality (659/659, 341/341). Gradle catalog, manifest, NSC, navigation graph (14 routes), and both source dirs read fresh this session.",
+   "verdict": "PASS"
+  },
+  "PAIRING_ARCHITECTURE_COMPREHENSION_PASS": {
+   "evidence": "Full chain reconstructed from source: QrScannerScreen -> TowerQrV2ScanFlow -> QrPayload.Parser (v=2, voice-console/ prefix, forbidden-secret gate, expiry, nonce_ref replay store) -> resolveEndpoint (QR endpoint wins when http(s); manual the ONLY fallback; else typed BAD_ENDPOINT) -> numeric code = claim secret -> PairingFlow.pairFromQr (setBaseUrl -> typed persistEndpoint -> claim -> freshPop -> attest -> PendingOwnerAck -> ack poll 2 s / 300 s window -> atomic commitPairing at ACKED). Transport seam TowerHttp/HttpUrlTowerHttp (HttpURLConnection; IOException -> NETWORK_UNREACHABLE -> PAIRING_ENDPOINT_UNREACHABLE 'Tower non raggiungibile' — matches device text exactly). 18 v2 routes bound from dex. Failing transition IDENTIFIED WITH EVIDENCE (see PAIRING_ROOT_CAUSE_REPORT.md).",
+   "verdict": "PASS"
+  },
+  "QWEN_RUNTIME_ARCHITECTURE_COMPREHENSION_PASS": {
+   "evidence": "Chain mapped: VoiceModelCatalog -> ModelDownloadManager (Range resume, mirror fallback, preflight) -> ModelStorageManager (tmp/staging/previous/quarantine roots) -> ModelInstallationRegistry (record lifecycle; mutate() no-op without record — the proven dead-end) -> ModelUxSemantics resolvers (recordState-only gating) -> ModelManagerScreen actions -> (missing) DOWNLOADED->verifyHash->install wiring for LOCAL_LLM -> LlamaCppAndroidRuntime/LlamaRealNativeBridge (the ONLY dev.ffmpegkit.llama touchpoint; loadModel/complete/release typed) -> LocalLlmEngine (hash-verify BEFORE load; typed failures; no fabricated output). Owner P0-02 explained at code level and re-confirmed by 2026-11-26 device state.",
+   "verdict": "PASS"
+  },
+  "ANDROID_BUILD_CHAIN_PASS": {
+   "evidence": "CI chain exercised and verified end-to-end this session via API: android-debug-build runs 44752839878 (a58c630) and 44878382926 (8863b61) both SUCCESS with artifacts intact; keystore instrumented run 44752839915 14/14; artifact download-back hashed (1744e173… byte-identical to Owner upload). Build config: ABI splits + universal, debug suffix .a4rdebug, buildConfig identity injection, lint abortOnError.",
+   "verdict": "PASS"
+  },
+  "COMPLETE_FILE_DELIVERY_CONTRACT_PASS": {
+   "evidence": "Contract accepted: every repair ships as complete files (no patches/snippets), with build + installability + targeted regression evidence; terminal packages per charter section 20.",
+   "verdict": "PASS (contract accepted; delivery proven at terminal checkpoints)"
+  },
+  "CHECKPOINT_CONTINUATION_PASS": {
+   "evidence": "Session resumed from compressed context: re-hydrated by FRESH READS ONLY (git fetch/prune, branch tips, CI API, APK hashing, ledger + receipts re-read) — zero reliance on remembered state; two prior root-cause receipts verified against the current tree before reuse.",
+   "verdict": "PASS"
+  },
+  "NO_FALSE_RUNTIME_CLAIM_PASS": {
+   "evidence": "No capability claimed PASS without physical execution: pairing gates remain NOT_PROVEN/FAIL_OR_BLOCKED pending Owner retest; Qwen FAIL; GRAPH_A4R_PASS=false; terminal states (OWNER_ACCEPTED / CANONICAL_APK / PAIRING_PHYSICALLY_VERIFIED / QWEN_PHYSICALLY_VERIFIED) explicitly NOT claimed.",
+   "verdict": "PASS"
+  }
+ },
+ "verdict": "GLM53_ANDROID_EXECUTOR_QUALIFIED — the authorized fallback executor proceeds with implementation under the charter's hard rules.",
+ "budget_discipline": "single primary executor; deterministic tools first (git/CI API/ZIP-diff scripts); delta-only context (prior receipts cross-referenced by hash, not re-derived); checkpoint before context pressure (charter section 19)."
+}

@@ -1,0 +1,88 @@
+{
+ "schema": "android_repair.failed_baseline_receipt/1.0",
+ "produced_utc": "2026-11-26T10:42:28Z",
+ "owner_terminal_verdict": {
+  "HERMES_VOICE_CONSOLE_ANDROID": "FAIL",
+  "OWNER_ACCEPTANCE": "REJECTED",
+  "CANONICAL_APK": "NOT_QUALIFIED",
+  "CURRENT_APK": "FAILED_EVIDENCE_BASELINE",
+  "principle_recorded": "Physical user-path evidence prevails over manifests and narrative documentation; the existence of libllama/JNI/GGML/ONNX/sherpa/Vosk/barcode/manifests/GGUF/QR-UI proves NO operational capability by itself."
+ },
+ "baseline_fingerprints_frozen": {
+  "release_asset": "26dbad0c5f0fe7700fc51cea1db8dacba4a34cd105ee88a29113c00be480922e (122891305 B)",
+  "owner_uploaded_ci_variant": "1744e173f6a2340651fe508c4984471d98881d48ec9bf16f1708692ef518ae97 (122891305 B, same source)",
+  "source_head": "a58c630 (app/ content identical through 8863b61)",
+  "v2_signer_cert": "56e00e406895d355356faebe7c6b95de6e8777858c77564d8f5c7dbdaa1faa1f"
+ },
+ "owner_physical_findings_register": [
+  {
+   "id": "APP-P0-01",
+   "severity": "P0",
+   "finding": "Tower pairing does not work",
+   "lane_status": "ROOT_CAUSE_CLOSED_THIS_SESSION (endpoint class proven: QR carries https://tower.local — see PAIRING_ROOT_CAUSE_REPORT.md)",
+   "evidence": "2 failure screenshots 2026-11-20 + Tower wizard screenshot 2026-11-26 + lane probes"
+  },
+  {
+   "id": "APP-P0-02",
+   "severity": "P0",
+   "finding": "Qwen2.5 0.5B downloads but does not produce a working local inference path",
+   "lane_status": "ROOT_CAUSE_PROVEN (promotion dead-end; A4R-PHYS-MODEL-002) — re-confirmed on device 2026-11-26 (tmp 498 MB still stranded; contradictory card state persists)",
+   "evidence": "5 screenshots 2026-11-21 + 3 screenshots 2026-11-26 + static proof + edge probes"
+  },
+  {
+   "id": "APP-P1-03",
+   "severity": "P1",
+   "finding": "Pairing is hidden inside menus and is not easily discoverable",
+   "lane_status": "CONFIRMED_BY_SOURCE_MAP (QR scanner only via Settings->Connection->open-studio->Tower Studio->scanner = 4 taps; drawer has no pairing surface)",
+   "evidence": "AppNav/AppRoutes map + E2E gate-C route history"
+  },
+  {
+   "id": "APP-P1-04",
+   "severity": "P1",
+   "finding": "There is no obvious first-run pairing onboarding",
+   "lane_status": "CONFIRMED_BY_SOURCE_MAP (onboarding demonstrates the scanner but does not RUN pairing; no WELCOME->CONNECT->PAIRED first-run path)",
+   "evidence": "OnboardingScreen + onboarding flow"
+  },
+  {
+   "id": "APP-P1-05",
+   "severity": "P1",
+   "finding": "The Qwen runtime status is more optimistic than physical truth",
+   "lane_status": "CONFIRMED (badge 'Scaricato' vs 'componente non ancora scaricato' contradiction; qualification stuck DISCOVERED)",
+   "evidence": "screenshots 2026-11-21 + 2026-11-26"
+  },
+  {
+   "id": "APP-P1-06",
+   "severity": "P1",
+   "finding": "Owner-readable diagnostics are insufficient",
+   "lane_status": "CONFIRMED (no typed error rows for the dead-end; no transport classification; no secret-clean export bundle in reach)",
+   "evidence": "screenshots + source (RedactedDiagnosticsExporter exists but is not Owner-reachable for these states)"
+  },
+  {
+   "id": "APP-P1-07",
+   "severity": "P1",
+   "finding": "Retry, recovery, revoke and re-pair paths are unclear or unavailable",
+   "lane_status": "CONFIRMED (re-click deletes the complete 522 MB partial and restarts; no revoke/re-pair surface)",
+   "evidence": "ModelDownloadManager 416 branch + navigation map"
+  },
+  {
+   "id": "APP-P1-08",
+   "severity": "P1",
+   "finding": "The Android application is not yet visually and functionally converged with the current Hermes Tower identity",
+   "lane_status": "OPEN (visual convergence audit is CP-009; Tower assets Immagine_Hermes_Tower.png + Filigrana.png supplied this session)",
+   "evidence": "Owner verdict + supplied Tower identity assets"
+  }
+ ],
+ "what_remains_valid_in_the_baseline": [
+  "A4R-P1-001 keystore crash REPAIR (explicit KeyGenParameterSpec, atomic commitPairing) — never falsified physically (persistence layer was never reached: the failure moved to the transport stage)",
+  "AndroidKeyStore instrumented suite (14/14 green on emulator)",
+  "Monumental visual system + tower manifest (in-repo), bundled verified ONNX voice models (hash-gated, default-off)",
+  "CI build/keystore/e2e workflows and the delivery custody chain"
+ ],
+ "freeze_directives": [
+  "The frozen APK is EVIDENCE ONLY: it must not be re-delivered, re-installed over, or presented as any repair candidate.",
+  "All repairs continue on branch graph-a4r/physical-truth-repair (created from 8863b61).",
+  "Every repair ships as COMPLETE files with build + targeted regression test evidence (charter rule 10/18).",
+  "No claim of any capability PASS without physical execution (charter rule 4/19)."
+ ],
+ "verdict": "FAILED_BASELINE_FROZEN — CP-ANDROID-REPAIR-001 complete."
+}

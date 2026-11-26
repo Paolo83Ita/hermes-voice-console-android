@@ -1,0 +1,90 @@
+{
+ "schema": "android_repair.pairing_state_machine/1.0",
+ "produced_utc": "2026-11-26T10:46:41Z",
+ "finding": "APP-P0-01 / A4R-PHYS-QR-001",
+ "reconstruction_source": "bound source tree 8863b61: QrScannerScreen -> TowerQrV2ScanFlow -> QrPayload.Parser -> resolveEndpoint -> PairingFlow.pairFromQr -> TowerApi.claim/attest/ownerAck -> TowerStore.commitPairing",
+ "states_and_transitions": [
+  {
+   "transition": 1,
+   "from": "QR_SCANNING",
+   "to": "PAYLOAD_PARSED",
+   "guard": "QR text = <base64url(payload)>.<base64url(signature)>; v==2; protocol_version startsWith voice-console/; no forbidden secret field; expires_at > now; nonce_ref unseen",
+   "device_evidence": "PASSED twice on device (parse detail 'tower=hermes-t… proto=voice-console/2 expiresIn=230s/278s')",
+   "verdict": "OBSERVED_WORKING (gate stays NOT_PROVEN — not certified end-to-end)"
+  },
+  {
+   "transition": 2,
+   "from": "PAYLOAD_PARSED",
+   "to": "ENDPOINT_SELECTED",
+   "guard": "resolveEndpoint: QR endpoint verbatim when startsWith('http') (https NOT enforced); manual endpoint the ONLY fallback; else typed BAD_ENDPOINT",
+   "device_evidence": "QR endpoint = https://tower.local (Owner wizard screenshot 2026-11-26) selected verbatim",
+   "verdict": "WORKING AS CODED — the selected endpoint class is the defect carrier"
+  },
+  {
+   "transition": 3,
+   "from": "ENDPOINT_SELECTED",
+   "to": "ENDPOINT_PERSISTED",
+   "guard": "TowerStore.persistEndpoint (AndroidKeyStore AES-256-GCM, explicit KeyGenParameterSpec — the A4R-P1-001 repair)",
+   "device_evidence": "PASSED on device (no keystore crash; typed failure would say PAIRING_PERSISTENCE_FAILED)",
+   "verdict": "OBSERVED_WORKING"
+  },
+  {
+   "transition": 4,
+   "from": "ENDPOINT_PERSISTED",
+   "to": "CLAIMED",
+   "guard": "POST {endpoint}/api/tower/voice-console/v2/pairings/{id}/claim {claim_code: <numeric code>, device_label}",
+   "device_evidence": "*** FAILING TRANSITION *** — HttpURLConnection to https://tower.local throws IOException (UnknownHostException on 4G) -> TowerApiException.NETWORK_UNREACHABLE -> Step.Failed(PAIRING_ENDPOINT_UNREACHABLE, 'Tower non raggiungibile') — the exact typed state on both device attempts",
+   "verdict": "PHYSICALLY FAILED (root cause below)"
+  },
+  {
+   "transition": 5,
+   "from": "CLAIMED",
+   "to": "ATTESTED",
+   "guard": "freshPoP: EC-P256 sign of single-use challenge (client TTL 120 s) -> POST .../attest",
+   "device_evidence": "never reached",
+   "verdict": "UNREACHED — contract risk AMB-9: live Tower answers errors as HTTP 200 {ok:false,error} which the client does not read (would surface as MALFORMED_RESPONSE instead of the typed reason)"
+  },
+  {
+   "transition": 6,
+   "from": "ATTESTED",
+   "to": "PENDING_OWNER_ACK",
+   "guard": "attest response carries device_id + phrase hint; Owner confirms the three-word Italian phrase on the Tower wizard (PASSO 3/4)",
+   "device_evidence": "never reached",
+   "verdict": "UNREACHED"
+  },
+  {
+   "transition": 7,
+   "from": "PENDING_OWNER_ACK",
+   "to": "REGISTERED",
+   "guard": "poll GET /pairings/{id}/ack every 2 s (window 300 s); at ACKED the Tower releases console_token -> atomic commitPairing(endpoint, deviceId, token)",
+   "device_evidence": "never reached",
+   "verdict": "UNREACHED — contract risk AMB-8: the GET ack route is ABSENT on the live Tower (404 catch-all on lane probe while claim/attest exist) — this transition WILL fail even after transport repair, pending the versioned Tower-side contract decision (HR-A4R-PHYS-001)"
+  },
+  {
+   "transition": 8,
+   "from": "REGISTERED",
+   "to": "SESSION_ESTABLISHED",
+   "guard": "console token in Authorization header; capture/voice/archive v2 routes",
+   "device_evidence": "never reached",
+   "verdict": "UNREACHED (and the console conversation executor is separately NOT wired — see interaction inventory)"
+  }
+ ],
+ "typed_failure_states_implemented": [
+  "PAIRING_ENDPOINT_UNREACHABLE (observed on device)",
+  "PAIRING_PERSISTENCE_FAILED",
+  "PAIRING_CHALLENGE_EXPIRED",
+  "PAIRING_CHALLENGE_REJECTED (rate limit)",
+  "CLAIM_REJECTED",
+  "CLAIM_RESPONSE_INCOMPLETE",
+  "ATTEST_REJECTED",
+  "ATTEST_RESPONSE_INCOMPLETE",
+  "ATTEST_FAILED",
+  "DEVICE_REVOKED",
+  "OWNER_ACK_TIMEOUT",
+  "PAIRING_STATE_LOST",
+  "QR rejections: MALFORMED / FORBIDDEN_FIELD / UNSUPPORTED_VERSION / UNSUPPORTED_PROTOCOL / EXPIRED / BAD_ENDPOINT / REPLAYED_NONCE_REF"
+ ],
+ "charter_section_7_states_gap": "The implemented machine covers the claim-side states; the charter's UNPAIRED/DISCOVERING/QR_SCANNING/PAYLOAD_VALIDATED/CONNECTING/AWAITING_OWNER_CONFIRMATION/PHRASE_MATCH_REQUIRED/CREDENTIAL_ISSUED/PAIRED/CONNECTION_DEGRADED/CREDENTIAL_EXPIRED/REVOKED/PAIRING_FAILED/REPAIR_AVAILABLE surface states + recovery paths (revoked QR, wrong endpoint, TLS failure, LAN/Tailscale unavailable, Tower offline, re-pair) are CP-004/005 repair scope.",
+ "failing_transition": "TRANSITION 4 (claim transport)",
+ "root_cause_proven": "QR_ENDPOINT_EMISSION_CLASS_LAN_MDNS_UNREACHABLE_FROM_DEVICE_NETWORK_CONTEXT (see PAIRING_ROOT_CAUSE_REPORT.md)"
+}

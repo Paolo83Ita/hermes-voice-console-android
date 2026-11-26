@@ -1,0 +1,94 @@
+{
+ "schema": "android_repair.dead_or_unbound_control_register/1.0",
+ "produced_utc": "2026-11-26T10:44:57Z",
+ "register": [
+  {
+   "control": "Console conversation (composer send + voice answers)",
+   "surface": "ConsoleScreen",
+   "class": "FAKE_ENABLED (SIMULATED executor, no Tower executor)",
+   "evidence": "AppGraph.kt:465 localEngine=MockLocalConversationEngine; towerExecutor={ _ -> null }",
+   "repair": "CP-011 Tower-first routing: real v2 Tower executor when paired + real LocalLlmEngine when enabled + truthful offline state"
+  },
+  {
+   "control": "Archive list/detail/download",
+   "surface": "ArchiveScreen",
+   "class": "FAKE_ENABLED (SIMULATED mock data, labeled)",
+   "evidence": "MockTowerArchive wired; TowerApi archive routes unwired",
+   "repair": "wire real v2 archive lane after pairing"
+  },
+  {
+   "control": "Pairing numeric-code entry + manual-endpoint entry (A3 PairingEntryActions)",
+   "surface": "not reachable (was TowerStudio dialogs in candidate A)",
+   "class": "DEAD CODE (SIMULATED TowerPairingClient; superseded by B v2 lane; no navigation entry)",
+   "evidence": "PairingEntryActions.kt:22 'only wired executor is the deterministic TowerPairingClient (mock)'; no navigation reference",
+   "repair": "replace with REAL numeric + manual lanes on the v2 contract (charter section 6 visible methods)"
+  },
+  {
+   "control": "TowerApi.ownerAck poll (GET /pairings/{id}/ack)",
+   "surface": "PairingFlow.awaitOwnerAcknowledgement",
+   "class": "UNBOUND BACKEND (route ABSENT on live Tower — AMB-8)",
+   "evidence": "lane probe 404 catch-all on fake id while claim/attest answer in-band",
+   "repair": "versioned Tower-side contract decision request HR-A4R-PHYS-001 (no client bypass; no Tower core change)"
+  },
+  {
+   "control": "Tower ok/error envelope handling",
+   "surface": "TowerApi.call",
+   "class": "UNBOUND CONTRACT (in-band {ok:false,error} misread as MALFORMED_RESPONSE — AMB-9)",
+   "evidence": "claim() reads claim_key/challenge only; live Tower returns 200 {ok:false,PAIRING_NOT_FOUND_OR_EXPIRED}",
+   "repair": "envelope adapter in V2 (contract fixture pinned)"
+  },
+  {
+   "control": "Qwen card primary action 'Scarica' after a completed download",
+   "surface": "ModelManagerScreen",
+   "class": "DESTRUCTIVE DEAD-END (re-click sends Range-at-EOF -> 416 -> DELETES the complete 522 MB partial -> restart from 0)",
+   "evidence": "ModelDownloadManager.kt:263-272 416 branch; edge probe p2/p2m",
+   "repair": "R4: verify-and-promote complete partials; R2: auto promotion DOWNLOADED->verify->install"
+  },
+  {
+   "control": "Qwen 'Installa/Verifica' for LOCAL_LLM components",
+   "surface": "ModelManagerScreen action resolver",
+   "class": "UNREACHABLE (record-gated INSTALL branch; registry never creates a record before install; no DOWNLOADED->install wiring)",
+   "evidence": "A4R-PHYS-MODEL-002 static proof (git-identity-verified)",
+   "repair": "R1-R3 registry upsert + resolver honoring progressState + promotion wiring"
+  },
+  {
+   "control": "'Test local model' deterministic diagnostic (charter section 9)",
+   "surface": "ABSENT",
+   "class": "MISSING SURFACE",
+   "evidence": "no prompt/test surface for the local LLM in any screen",
+   "repair": "CP-007: new diagnostic with 'Rispondi soltanto con OK', temp 0, 8 tokens, full result screen + secret-clean export"
+  },
+  {
+   "control": "TowerConnectionTester.streamingCapability",
+   "surface": "ConnectionScreen",
+   "class": "HARD-CODED SIMULATED VALUE",
+   "evidence": "TowerConnectionTester.kt:65 streamingCapability = \"SIMULATED\"",
+   "repair": "derive from real capability negotiation post-pairing"
+  },
+  {
+   "control": "LAN discovery / Tailscale MagicDNS / advanced manual pairing surfaces",
+   "surface": "ABSENT",
+   "class": "MISSING SURFACE (charter section 6 required visible methods)",
+   "evidence": "no NSD/MagicDNS code; no manual endpoint UI reachable",
+   "repair": "CP-004/005 pairing path redesign"
+  },
+  {
+   "control": "First-run pairing onboarding WELCOME->CONNECT->PAIRED",
+   "surface": "OnboardingScreen",
+   "class": "MISSING SURFACE (scanner only demonstrated)",
+   "evidence": "onboarding QR choice 'demonstrates the scanner (finishes into QR_SCANNER)'",
+   "repair": "CP-004 onboarding redesign"
+  },
+  {
+   "control": "Owner secret-clean diagnostics export bundle (ZIP)",
+   "surface": "RedactedDiagnosticsExporter exists but not Owner-reachable for pairing/model states",
+   "class": "PARTIALLY BOUND",
+   "evidence": "exporter wired to store only; no pairing transport classification; no download dead-end fields",
+   "repair": "CP-008 diagnostics area + EXPORT_SECRET_CLEAN_DIAGNOSTIC_BUNDLE"
+  }
+ ],
+ "gates": {
+  "ZERO_UNACCOUNTED_INTERACTION_PASS": "PASS (census + register complete)",
+  "ZERO_FAKE_ENABLED_CONTROL_PASS": "FAIL for the BASELINE (expected — this register IS the repair backlog; gate re-evaluated at CP-010 after the fixes)"
+ }
+}

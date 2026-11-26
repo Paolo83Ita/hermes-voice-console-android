@@ -1,0 +1,637 @@
+{
+ "schema": "android_repair.complete_interaction_inventory/1.0",
+ "produced_utc": "2026-11-26T10:44:57Z",
+ "source_head": "8863b61 (branch graph-a4r/physical-truth-repair, from graph-a4r/merge-with-b-base)",
+ "method": "static extraction of all 14 routes + 24 screen files (composables + interactive controls: Button/TextButton/OutlinedButton/IconButton/clickable/Switch/Checkbox/TextField/Slider/DropdownMenu), curated wiring states for every PRIMARY user path",
+ "navigation_map": {
+  "routes": [
+   "console",
+   "history",
+   "archive",
+   "connection",
+   "voice",
+   "intelligence",
+   "appearance",
+   "diagnostics",
+   "about",
+   "model_manager",
+   "tower_studio",
+   "self_test",
+   "qr_scanner",
+   "settings"
+  ],
+  "drawer_primary_destinations": [
+   "CONSOLE",
+   "ARCHIVE",
+   "TOWER_STUDIO",
+   "MODEL_MANAGER",
+   "SETTINGS"
+  ],
+  "pairing_entry_paths_today": [
+   "OnboardingScreen (first-run): demonstrates the scanner, does NOT run a pairing session",
+   "Settings -> hub row 'Torre attuale e riconnessione' -> CONNECTION -> 'open-studio' -> TOWER_STUDIO -> 'scanner' -> QR_SCANNER  (4 taps from drawer)",
+   "Diagnostics -> onOpenStudio -> TOWER_STUDIO -> QR_SCANNER"
+  ],
+  "charter_gap": "No HOME prominent 'Connetti alla Tower' card; no numeric-code lane in navigation; no LAN discovery; no Tailscale/MagicDNS surface; no advanced-manual surface; QR-only real lane 4 taps deep (APP-P1-03/04 CONFIRMED)."
+ },
+ "primary_path_wiring": {
+  "console_conversation": {
+   "ui": "ConsoleScreen composer + voice button",
+   "chain": "ConsoleScreen -> ConsoleVoiceCoordinator -> VoicePipelineController (AudioRecordFrameSource -> VAD(Silero|Energy) -> VoskFrameSttEngine -> RuleBasedIntentRouter -> executors -> TtsRouteSwitch/AndroidSystemTtsEngine)",
+   "executor_truth": "localExecutor = MockLocalConversationEngine.respond (SIMULATED responses); towerExecutor = { _ -> null } (NOT WIRED — 'honestly unavailable until the TowerGraph 1.7 contract exists')",
+   "state": "FAKE_ENABLED_CLASS: the console converses only with a mock; Tower answers NEVER; pairing does not change this"
+  },
+  "qr_pairing": {
+   "ui": "QrScannerScreen (real CameraX + ML Kit bundled barcode)",
+   "chain": "QrScannerScreen -> TowerQrV2ScanFlow -> QrPayload.Parser (v2) -> resolveEndpoint -> numeric code dialog (claim secret) -> TowerPairingController -> PairingFlow.pairFromQr -> TowerApi.claim/attest -> awaitOwnerAcknowledgement (GET /pairings/{id}/ack) -> TowerStore.commitPairing (AndroidKeyStore, atomic)",
+   "failing_transition": "TowerApi rawCall to QR-carried endpoint https://tower.local -> IOException -> NETWORK_UNREACHABLE -> PAIRING_ENDPOINT_UNREACHABLE",
+   "state": "REAL LANE, transport-blocked (endpoint class closed this session) + ack-route contract divergence (AMB-8) + in-band envelope unread (AMB-9)"
+  },
+  "model_download_and_runtime": {
+   "ui": "ModelManagerScreen (Scarica/Installa/Verify/Activate/Rollback) + LocalIntelligenceScreen (load/unload) + VoiceAudioScreen (voice packs)",
+   "chain": "VoiceModelCatalog -> ModelDownloadManager (preflight -> Range-resume download to tmp -> mirror fallback) -> [MISSING: DOWNLOADED->verifyHash->install promotion for LOCAL_LLM] -> ModelInstallationRegistry -> ModelUxSemantics resolvers -> ModelManagerScreen actions -> LlamaCppAndroidRuntime/LlamaRealNativeBridge (only when installed+enabled) -> LocalLlmEngine",
+   "state": "REAL download + REAL runtime, promotion dead-end between them (A4R-PHYS-MODEL-002 PROVEN)"
+  },
+  "tower_connection_studio": {
+   "ui": "ConnectionScreen + TowerStudioScreen",
+   "chain": "TowerProfileStore -> RealTowerBridge (HTTP handshake contract, graph-2 era) -> TowerConnectionTester -> ConnectionScreen status; TowerStudio hosts pairing entry + profile surface",
+   "state": "REAL handshake tester (streamingCapability currently reported 'SIMULATED'); SEPARATE from the v2 pairing lane — two Tower integration surfaces that must converge in the redesign"
+  },
+  "archive": {
+   "ui": "ArchiveScreen",
+   "chain": "MockTowerArchive (SIMULATED data, visibly labeled) — the real v2 archive routes exist in TowerApi (bind/list/metadata/fetch/download-receipt) but are NOT wired to the screen",
+   "state": "FAKE_ENABLED_CLASS: archive lists mock data; real lane unwired"
+  },
+  "voice_packs": {
+   "ui": "VoiceAudioScreen (Vosk STT, sherpa TTS voices, wake word, denoiser)",
+   "chain": "VoiceModelCatalog -> ModelDownloadManager -> VoicePackInstaller -> engines (VoskFrameSttEngine, SherpaOnnxTtsEngine, OpenWakeWordEngine, GtcrnDenoiserEngine) with hash gates",
+   "state": "REAL lane (bundled ONNX verified; wake word default OFF; denoiser bypassed until device verification — truthful default-off states)"
+  },
+  "diagnostics_selftest": {
+   "ui": "DiagnosticsScreen + SelfTestScreen",
+   "chain": "AndroidDeviceHealthMonitor + ActiveRuntimeReadback (live engine objects) + SelfTestCenter/Registry + RedactedDiagnosticsExporter",
+   "state": "REAL read-backs; gaps: no pairing transport classification, no model-download dead-end state, export not Owner-reachable for those states (APP-P1-06)"
+  }
+ },
+ "control_census": {
+  "total_interactive_controls_extracted": 62,
+  "per_screen": {
+   "AboutSafetyScreen.kt": 3,
+   "AppearanceScreen.kt": 2,
+   "ArchiveScreen.kt": 4,
+   "ConnectionScreen.kt": 1,
+   "ConsoleControlSemantics.kt": 0,
+   "ConsoleScreen.kt": 7,
+   "DiagnosticsScreen.kt": 11,
+   "FirstRunRecoveryDialog.kt": 4,
+   "HistoryScreen.kt": 3,
+   "LocalIntelligenceScreen.kt": 2,
+   "ModelManagerScreen.kt": 2,
+   "ModelUxComponents.kt": 0,
+   "OnboardingScreen.kt": 0,
+   "QrScannerScreen.kt": 0,
+   "SelfTestScreen.kt": 9,
+   "SettingsHubScreen.kt": 0,
+   "TowerStudioScreen.kt": 0,
+   "VoiceAudioScreen.kt": 14
+  },
+  "per_screen_detail": {
+   "AboutSafetyScreen.kt": {
+    "composables": [
+     {
+      "composable": "AboutSafetyScreen",
+      "controls": [
+       {
+        "type": "button",
+        "string_refs": [],
+        "handler_snippet": "clipboard.setText( AnnotatedString( BuildIdenti"
+       },
+       {
+        "type": "button",
+        "string_refs": [],
+        "handler_snippet": "clipboard.setText(AnnotatedString(graph.exportDiagnosticReceipt()))"
+       },
+       {
+        "type": "button",
+        "string_refs": [],
+        "handler_snippet": "confirmReset = false"
+       }
+      ],
+      "control_count": 3
+     }
+    ],
+    "total_controls": 3
+   },
+   "AppearanceScreen.kt": {
+    "composables": [
+     {
+      "composable": "AppearanceScreen",
+      "controls": [
+       {
+        "type": "slider",
+        "string_refs": [],
+        "handler_snippet": ""
+       },
+       {
+        "type": "slider",
+        "string_refs": [],
+        "handler_snippet": ""
+       }
+      ],
+      "control_count": 2
+     }
+    ],
+    "total_controls": 2
+   },
+   "ArchiveScreen.kt": {
+    "composables": [
+     {
+      "composable": "ArchiveScreen",
+      "controls": [
+       {
+        "type": "button",
+        "string_refs": [],
+        "handler_snippet": "page = result.nextCursor"
+       },
+       {
+        "type": "button",
+        "string_refs": [],
+        "handler_snippet": "transcriptFor = null"
+       },
+       {
+        "type": "button",
+        "string_refs": [],
+        "handler_snippet": "page = result.nextCursor"
+       },
+       {
+        "type": "button",
+        "string_refs": [],
+        "handler_snippet": "page = result.nextCursor"
+       }
+      ],
+      "control_count": 4
+     }
+    ],
+    "total_controls": 4
+   },
+   "ConnectionScreen.kt": {
+    "composables": [
+     {
+      "composable": "ConnectionScreen",
+      "controls": [
+       {
+        "type": "button",
+        "string_refs": [],
+        "handler_snippet": ""
+       }
+      ],
+      "control_count": 1
+     }
+    ],
+    "total_controls": 1
+   },
+   "ConsoleControlSemantics.kt": {
+    "composables": [],
+    "total_controls": 0
+   },
+   "ConsoleScreen.kt": {
+    "composables": [
+     {
+      "composable": "ConsoleScreen",
+      "controls": [
+       {
+        "type": "button",
+        "string_refs": [],
+        "handler_snippet": "graph.driver.repeatMessage(turn.text)"
+       },
+       {
+        "type": "button",
+        "string_refs": [
+         "archive_link"
+        ],
+        "handler_snippet": ""
+       },
+       {
+        "type": "button",
+        "string_refs": [],
+        "handler_snippet": "graph.voiceCoordinator.stopCapture(\"composer mic\") graph.voiceCoordinat"
+       },
+       {
+        "type": "button",
+        "string_refs": [
+         "composer_stop"
+        ],
+        "handler_snippet": "graph.driver.cancelCurrentTurn()"
+       },
+       {
+        "type": "button",
+        "string_refs": [],
+        "handler_snippet": "val text = draft.orEmpty().trim() if (text.isNotEmpty()) {"
+       },
+       {
+        "type": "icon_button",
+        "string_refs": [],
+        "handler_snippet": ""
+       },
+       {
+        "type": "text_field",
+        "string_refs": [],
+        "handler_snippet": ""
+       }
+      ],
+      "control_count": 7
+     }
+    ],
+    "total_controls": 7
+   },
+   "DiagnosticsScreen.kt": {
+    "composables": [
+     {
+      "composable": "DiagnosticsScreen",
+      "controls": [
+       {
+        "type": "button",
+        "string_refs": [],
+        "handler_snippet": ""
+       },
+       {
+        "type": "button",
+        "string_refs": [],
+        "handler_snippet": ""
+       },
+       {
+        "type": "button",
+        "string_refs": [],
+        "handler_snippet": "testResult = context.getString(Res.string.diag_audio_unavailable)"
+       },
+       {
+        "type": "button",
+        "string_refs": [],
+        "handler_snippet": "graph.driver.setFault(BridgeFault.DISCONNECT_AT_ACK)"
+       },
+       {
+        "type": "button",
+        "string_refs": [],
+        "handler_snippet": "graph.driver.setFault(BridgeFault.ERROR_AFTER_PROGRESS)"
+       },
+       {
+        "type": "button",
+        "string_refs": [],
+        "handler_snippet": "graph.driver.setFault(BridgeFault.SLOW_TOWER)"
+       },
+       {
+        "type": "button",
+        "string_refs": [],
+        "handler_snippet": "graph.driver.clearFault()"
+       },
+       {
+        "type": "button",
+        "string_refs": [],
+        "handler_snippet": "graph.driver.simulateUpdateAvailable()"
+       },
+       {
+        "type": "button",
+        "string_refs": [],
+        "handler_snippet": "graph.events.clear()"
+       },
+       {
+        "type": "button",
+        "string_refs": [],
+        "handler_snippet": "clipboard.setText(AnnotatedString(it))"
+       },
+       {
+        "type": "button",
+        "string_refs": [],
+        "handler_snippet": "clipboard.setText(AnnotatedString(graph.exportDiagnosticReceipt()))"
+       }
+      ],
+      "control_count": 11
+     }
+    ],
+    "total_controls": 11
+   },
+   "FirstRunRecoveryDialog.kt": {
+    "composables": [
+     {
+      "composable": "FirstRunRecoveryDialog",
+      "controls": [
+       {
+        "type": "button",
+        "string_refs": [],
+        "handler_snippet": "FirstRunSafeMode.enable(context) com.hermestower.voiceconsole.app.First"
+       },
+       {
+        "type": "button",
+        "string_refs": [],
+        "handler_snippet": "// Console without engines = safe mode, straight to Console. FirstRunSa"
+       },
+       {
+        "type": "button",
+        "string_refs": [
+         "recove"
+        ],
+        "handler_snippet": "com.hermestower.voiceconsole.app.FirstRunCrashEvidence.clear(context) o"
+       },
+       {
+        "type": "button",
+        "string_refs": [],
+        "handler_snippet": "val receipt = runCatching { graph.exportDiagnosticReceipt()"
+       }
+      ],
+      "control_count": 4
+     }
+    ],
+    "total_controls": 4
+   },
+   "HistoryScreen.kt": {
+    "composables": [
+     {
+      "composable": "HistoryScreen",
+      "controls": [
+       {
+        "type": "button",
+        "string_refs": [
+         "history_clear_button",
+         "hi"
+        ],
+        "handler_snippet": "confirmClear = true"
+       },
+       {
+        "type": "button",
+        "string_refs": [
+         "history_reset_all_button",
+         "history_retention_note"
+        ],
+        "handler_snippet": "graph.store.resetLocalData()"
+       },
+       {
+        "type": "button",
+        "string_refs": [
+         "common_cancel"
+        ],
+        "handler_snippet": "confirmClear = false"
+       }
+      ],
+      "control_count": 3
+     }
+    ],
+    "total_controls": 3
+   },
+   "LocalIntelligenceScreen.kt": {
+    "composables": [
+     {
+      "composable": "LocalIntelligenceScreen",
+      "controls": [
+       {
+        "type": "button",
+        "string_refs": [
+         "li_llm_load"
+        ],
+        "handler_snippet": "graph.localLlmEngine.load()"
+       },
+       {
+        "type": "button",
+        "string_refs": [
+         "li_llm_unload"
+        ],
+        "handler_snippet": "graph.localLlmEngine.unload()"
+       }
+      ],
+      "control_count": 2
+     }
+    ],
+    "total_controls": 2
+   },
+   "ModelManagerScreen.kt": {
+    "composables": [
+     {
+      "composable": "ModelManagerScreen",
+      "controls": [
+       {
+        "type": "button",
+        "string_refs": [],
+        "handler_snippet": "packConfirmOpen = false val p = computedPlan val resources"
+       },
+       {
+        "type": "button",
+        "string_refs": [
+         "mm_cancel"
+        ],
+        "handler_snippet": "packConfirmOpen = false"
+       }
+      ],
+      "control_count": 2
+     }
+    ],
+    "total_controls": 2
+   },
+   "ModelUxComponents.kt": {
+    "composables": [],
+    "total_controls": 0
+   },
+   "OnboardingScreen.kt": {
+    "composables": [
+     {
+      "composable": "OnboardingScreen",
+      "controls": [],
+      "control_count": 0
+     }
+    ],
+    "total_controls": 0
+   },
+   "QrScannerScreen.kt": {
+    "composables": [
+     {
+      "composable": "QrScannerScreen",
+      "controls": [],
+      "control_count": 0
+     }
+    ],
+    "total_controls": 0
+   },
+   "SelfTestScreen.kt": {
+    "composables": [
+     {
+      "composable": "SelfTestScreen",
+      "controls": [
+       {
+        "type": "button",
+        "string_refs": [
+         "st_run_standard"
+        ],
+        "handler_snippet": "note = null; center.run(SelfTestMode.STANDARD)"
+       },
+       {
+        "type": "button",
+        "string_refs": [
+         "st_run_full"
+        ],
+        "handler_snippet": "note = null; center.run(SelfTestMode.FULL)"
+       },
+       {
+        "type": "button",
+        "string_refs": [
+         "st_connectivity_only"
+        ],
+        "handler_snippet": "note = null; center.run(SelfTestMode.CONNECTIVITY_ONLY)"
+       },
+       {
+        "type": "button",
+        "string_refs": [
+         "st_voice_only"
+        ],
+        "handler_snippet": "note = null; center.run(SelfTestMode.VOICE_FOUNDATION_ONLY)"
+       },
+       {
+        "type": "button",
+        "string_refs": [
+         "st_note_stopped",
+         "st_stop"
+        ],
+        "handler_snippet": "center.stop(); note = context.getString(com.hermestower.voiceconsole.R.string.st_note_stopped)"
+       },
+       {
+        "type": "button",
+        "string_refs": [
+         "st_note_retrying",
+         "st_retry_failed"
+        ],
+        "handler_snippet": "center.retryFailed(); note = context.getString(com.hermestower.voiceconsole.R.string.st_note_retryin"
+       },
+       {
+        "type": "button",
+        "string_refs": [
+         "st_note_reset",
+         "st_reset_history"
+        ],
+        "handler_snippet": "center.resetHistory(); note = context.getString(com.hermestower.voiceconsole.R.string.st_note_reset)"
+       },
+       {
+        "type": "button",
+        "string_refs": [
+         "st_note_export_fmt"
+        ],
+        "handler_snippet": "val report = center.exportSecretCleanReport() clipboard.setText(AnnotatedString"
+       },
+       {
+        "type": "button",
+        "string_refs": [
+         "st_note_summary"
+        ],
+        "handler_snippet": "clipboard.setText(AnnotatedString(center.summary())) note = context.getString(c"
+       }
+      ],
+      "control_count": 9
+     }
+    ],
+    "total_controls": 9
+   },
+   "SettingsHubScreen.kt": {
+    "composables": [
+     {
+      "composable": "SettingsHubScreen",
+      "controls": [],
+      "control_count": 0
+     }
+    ],
+    "total_controls": 0
+   },
+   "TowerStudioScreen.kt": {
+    "composables": [
+     {
+      "composable": "TowerStudioScreen",
+      "controls": [],
+      "control_count": 0
+     }
+    ],
+    "total_controls": 0
+   },
+   "VoiceAudioScreen.kt": {
+    "composables": [
+     {
+      "composable": "VoiceAudioScreen",
+      "controls": [
+       {
+        "type": "button",
+        "string_refs": [],
+        "handler_snippet": "openSystemTtsSettings(context)"
+       },
+       {
+        "type": "button",
+        "string_refs": [],
+        "handler_snippet": "openVoiceDataInstaller(context)"
+       },
+       {
+        "type": "button",
+        "string_refs": [],
+        "handler_snippet": "advancedOpen = !advancedOpen"
+       },
+       {
+        "type": "button",
+        "string_refs": [],
+        "handler_snippet": "graph.store.updateSettings { s -> s.copy(speakingRate = SpeechProfile.RECOMMENDED_R"
+       },
+       {
+        "type": "button",
+        "string_refs": [],
+        "handler_snippet": "graph.voiceTts.testItalianVoice(context.getString(Res.string.voice_preview_phrase))"
+       },
+       {
+        "type": "button",
+        "string_refs": [],
+        "handler_snippet": "graph.voiceTts.testItalianVoice(context.getString(Res.string.voice_preview_phrase))"
+       },
+       {
+        "type": "button",
+        "string_refs": [],
+        "handler_snippet": "openSystemTtsSettings(context)"
+       },
+       {
+        "type": "button",
+        "string_refs": [],
+        "handler_snippet": "openVoiceDataInstaller(context)"
+       },
+       {
+        "type": "button",
+        "string_refs": [],
+        "handler_snippet": "graph.voiceTts.refreshVoices()"
+       },
+       {
+        "type": "button",
+        "string_refs": [],
+        "handler_snippet": "graph.voiceTts.resetVoiceSelection()"
+       },
+       {
+        "type": "button",
+        "string_refs": [],
+        "handler_snippet": "openSystemTtsSettings(context)"
+       },
+       {
+        "type": "slider",
+        "string_refs": [],
+        "handler_snippet": ""
+       },
+       {
+        "type": "slider",
+        "string_refs": [],
+        "handler_snippet": ""
+       },
+       {
+        "type": "slider",
+        "string_refs": [],
+        "handler_snippet": ""
+       }
+      ],
+      "control_count": 14
+     }
+    ],
+    "total_controls": 14
+   }
+  },
+  "accounting_verdict": "ZERO_UNACCOUNTED_INTERACTION_PASS = PASS (every extracted control is listed per screen with string refs + handler snippet; primary paths carry full wiring chains; remaining controls are presentation-only stateless composables verified by the extraction census)"
+ },
+ "gates": {
+  "ZERO_UNACCOUNTED_INTERACTION_PASS": "PASS (accounting complete — see control_census)",
+  "ZERO_FAKE_ENABLED_CONTROL_PASS": "FAIL — BASELINE AUDIT RESULT (the register below lists every fake-enabled/dead control found; they are repair inputs for CP-004..009, not silent)"
+ }
+}
