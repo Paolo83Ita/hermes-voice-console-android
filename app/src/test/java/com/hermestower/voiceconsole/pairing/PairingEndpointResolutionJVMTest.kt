@@ -217,8 +217,9 @@ class PairingEndpointResolutionJVMTest {
         val parsed = PairingEnvelope.Parser { nowSec }.parse(v3Qr(mdnsCandidate()))
         val result = resolver.resolve(parsed.candidates)
         assertTrue(result is EndpointResolutionResult.Failed)
-        assertEquals(TransportFailureCode.NO_ELIGIBLE_ENDPOINT, (result as EndpointResolutionResult.Failed).primaryCode)
-        assertTrue(result.evidence.any { it.status == CandidateEvidence.CandidateStatus.SKIPPED_NOT_ELIGIBLE })
+        val failed = result as EndpointResolutionResult.Failed
+        assertEquals(TransportFailureCode.NO_ELIGIBLE_ENDPOINT, failed.primaryCode)
+        assertTrue(failed.evidence.any { it.status == CandidateEvidence.CandidateStatus.SKIPPED_NOT_ELIGIBLE })
     }
 
     @Test
@@ -251,8 +252,9 @@ class PairingEndpointResolutionJVMTest {
         val parsed = PairingEnvelope.Parser { nowSec }.parse(v3Qr(publicCandidate()))
         val result = resolver.resolve(parsed.candidates, listOf(manual))
         assertTrue(result is EndpointResolutionResult.Selected)
-        assertEquals("https://manual.fixture", (result as EndpointResolutionResult.Selected).candidate.urlOrHost)
-        assertTrue(result.evidence.any { it.typedCode == TransportFailureCode.DNS_RESOLUTION_FAILED })
+        val sel = result as EndpointResolutionResult.Selected
+        assertEquals("https://manual.fixture", sel.candidate.urlOrHost)
+        assertTrue(sel.evidence.any { it.typedCode == TransportFailureCode.DNS_RESOLUTION_FAILED })
     }
 
     @Test
