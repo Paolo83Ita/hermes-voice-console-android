@@ -1,109 +1,42 @@
 {
- "schema": "android_repair.current_truth/2.0",
- "produced_utc": "2026-11-26T11:15:31Z",
- "correction_of": "docs/a4r/physical_truth_repair/CHECKPOINT_RECEIPT.json (schema 1.0, which recorded both P0 root causes as 'closed at class level')",
- "mission": "HERMES VOICE CONSOLE ANDROID — PAIRING IMPLEMENTATION, QWEN RUNTIME REPAIR, TOWER-FIRST ROUTING, DIAGNOSTICS, FULL VISUAL CONVERGENCE AND TERMINAL APK",
- "branch": "graph-a4r/physical-truth-repair",
- "head": "67eba1925403990fcfcad216a8c7650f9dd5797f",
- "executor": "GLM 5.3 Max (second GLM account dedicated to Android)",
- "accepted_complete": [
-  {
-   "checkpoint": "CP-ANDROID-REPAIR-001",
-   "title": "input identity and failed-baseline binding",
-   "evidence": [
-    "ANDROID_REPAIR_INPUT_MANIFEST.json",
-    "ANDROID_SOURCE_APK_BINDING.json (SOURCE_APK_IDENTITY_PROVEN: device APK 1744e173… = CI run 44878382926 @ 8863b61; release asset 26dbad0c… = run 44752839878 @ a58c630; entry-wise 597/597, class sets identical)",
-    "ANDROID_FAILED_BASELINE_RECEIPT.json"
-   ]
-  },
-  {
-   "checkpoint": "CP-ANDROID-REPAIR-002",
-   "title": "architecture and interaction inventory",
-   "evidence": [
-    "ANDROID_COMPLETE_INTERACTION_INVENTORY.json (14 routes, 24 screen files, 62 controls; ZERO_UNACCOUNTED_INTERACTION=PASS)",
-    "ANDROID_DEAD_OR_UNBOUND_CONTROL_REGISTER.json (12 dead/unbound/fake controls registered)",
-    "ANDROID_RUNTIME_INTEGRATION_GRAPH.json"
-   ]
-  },
-  {
-   "checkpoint": "CP-ANDROID-REPAIR-003",
-   "title": "pairing root-cause analysis",
-   "evidence": [
-    "PAIRING_ROOT_CAUSE_REPORT.md",
-    "PAIRING_STATE_MACHINE.json (8 transitions; transition 4 = claim transport physically failed)",
-    "PAIRING_PROTOCOL_DIFF.json",
-    "PAIRING_NETWORK_DIAGNOSTIC.json"
-   ]
-  },
-  {
-   "checkpoint": "CP-ANDROID-REPAIR-006-ANALYSIS",
-   "title": "Qwen runtime/promotion ANALYSIS ONLY (no repair applied yet)",
-   "evidence": [
-    "QWEN_RUNTIME_ROOT_CAUSE_RECEIPT.json",
-    "download/A4R/phys_repair/A4R_QWEN25_FAILURE_ROOT_CAUSE_RECEIPT.json (static proof, git-identity-verified)"
-   ]
-  }
+ "schema": "android_repair.current_truth/3.0-terminal",
+ "produced_utc": "2026-11-26T12:59:10Z",
+ "terminal_state": [
+  "ANDROID_CLIENT_REPAIR_COMPLETE",
+  "TOWER_SERVER_DELTA_REQUIRED",
+  "OWNER_PHYSICAL_RETEST_BLOCKED_UNTIL_SERVER_DELTA"
  ],
- "important_correction": {
-  "statement": "APP-P0-01 is NOT closed. Root cause is IDENTIFIED; repair is PENDING. Neither P0 finding may be classified CLOSED until the full physical completion chain passes.",
-  "app_p0_01_status": [
-   "APP-P0-01_ROOT_CAUSE_IDENTIFIED",
-   "APP-P0-01_REPAIR_PENDING"
-  ],
-  "app_p0_01_root_cause": "QR_ENDPOINT_EMISSION_CLASS_LAN_MDNS_UNREACHABLE_FROM_DEVICE_NETWORK_CONTEXT — the Tower QR emits https://tower.local (LAN mDNS) as the ONLY endpoint; the phone on 4G cannot resolve it (Android standard resolver does not resolve .local), TLS would mismatch even if resolved (LE cert covers only hermestower.aclclouds.online), and the client has no endpoint candidates, no classification, no fallback.",
-  "app_p0_01_close_criteria": [
-   "repaired client implementation",
-   "compatible Tower contract",
-   "successful automated protocol tests",
-   "APK build",
-   "physical Owner phone pairing",
-   "restart read-back",
-   "revoke",
-   "re-pair"
-  ],
-  "app_p0_02_status": [
-   "APP-P0-02_ROOT_CAUSE_IDENTIFIED",
-   "APP-P0-02_REPAIR_PENDING"
-  ],
-  "app_p0_02_root_cause": "PROVEN PROMOTION DEAD-END — a real full 522,186,592-byte download reaches state DOWNLOADED in tmp (498 MB stranded) but NO product path promotes it: registry no-ops for record-less identities, resolvers key on record state and ignore progressState, nothing wires DOWNLOADED→verifyHash→install for LOCAL_LLM, and re-clicks hit HTTP 416 and DELETE the complete partial.",
-  "app_p0_02_not_proof_of_inference": [
-   "downloaded model file",
-   "bundled llama library",
-   "JNI symbols",
-   "runtime manifest",
-   "successful model registration"
-  ],
-  "app_p0_02_note": "None of the above is proof of inference. Only the deterministic 'Rispondi soltanto con OK' physical test with visible output is proof."
- },
- "open_p1_register_carried": [
-  "APP-P1-03 archive mock data (MockTowerArchive)",
-  "APP-P1-04 dead A3 pairing lanes (numeric/manual superseded, unreachable)",
-  "APP-P1-05 optimistic status states (runtime chain states not surfaced)",
-  "APP-P1-06 single-collapse transport failure (no DNS/TCP/TLS classification)",
-  "APP-P1-07 TowerConnectionTester.streamingCapability = 'SIMULATED' hardcoded",
-  "APP-P1-08 missing surfaces (LAN discovery, MagicDNS, manual lane, first-run onboarding, model test)"
- ],
- "ambient_blockers": [
-  "AMB-8 — GET /pairings/{id}/ack route ABSENT on live Tower (404 catch-all) — transition 7 cannot complete against the live Tower as-is; handled by versioned server delta request, never a client bypass",
-  "AMB-9 — Tower in-band error envelope {ok:false,error} unread by client — fixed client-side by envelope adapter with pinned fixtures (part of CP-005)",
-  "AMB-10 — QR endpoint emission class (tower.local as only endpoint) — CLOSED at class level; server delta request filed",
-  "TOWER_REPOSITORY_ACCESS_FROM_ANDROID_ACCOUNT = UNAVAILABLE_OR_NOT_AUTHORIZED — Tower-side changes are packaged as bounded versioned delta requests only"
- ],
- "gate_states": {
-  "OPEN_P0": 2,
-  "OPEN_P1": 6,
-  "QR_V2_SCAN_PASS": "NOT_PROVEN",
-  "PAIRING_CLAIM_START_PASS": "FAIL_OR_BLOCKED",
-  "XIAOMI_KEYSTORE_PAIRING_REPAIR_PASS": "NOT_DERIVABLE",
-  "QWEN_2_5_MODEL_DOWNLOAD_PASS": "FAIL (baseline; promotion dead-end)",
-  "QWEN_AUTOMATED_INFERENCE_PASS": "PENDING CP-007",
-  "GRAPH_A4R_PASS": false,
-  "ZERO_FAKE_ENABLED_CONTROL_PASS": "FAIL for the baseline (12-entry register is the repair backlog; re-evaluated at CP-010)"
- },
  "not_claimed": [
+  "PAIRING_END_TO_END_COMPLETE (the ack route is absent on the live Tower — HR-A4R-PHYS-002 DELTA-B pending)",
+  "QWEN_PHYSICALLY_VERIFIED (deterministic test surface implemented; visible output must be measured on the Owner's phone)",
   "VOICE_CONSOLE_PAIRED_AND_VERIFIED",
-  "PAIRING_PHYSICALLY_VERIFIED",
-  "QWEN_PHYSICALLY_VERIFIED",
   "ANDROID_CANONICAL_BASE_SELECTED"
- ]
+ ],
+ "p0_status": {
+  "APP-P0-01": "CLIENT REPAIR COMPLETE (contract + implementation + automated tests + build); end-to-end completion blocked by the Tower server delta (ack route) and the physical retest",
+  "APP-P0-02": "CLIENT REPAIR COMPLETE (promotion chain + real runtime binding + deterministic test surface + automated tests); physical inference = Owner retest"
+ },
+ "build": {
+  "ci_run": 45822739193,
+  "commit": "d83f5c5b0af093393c33cf822d9201d1f042946d",
+  "branch": "graph-a4r/physical-truth-repair",
+  "apk": "app-arm64-v8a-debug.apk",
+  "apk_sha256": "893f84fd94fb08cb80dd093057ce09a0d78b8a62baed1a6d21c68c7ab11c8a6c",
+  "apk_bytes": 123312709,
+  "gates": "BUILD_PASS + UNIT_TEST_PASS 608/608 + LINT_PASS + ZERO_SECRET_LEAK + APK_IDENTITY_PASS"
+ },
+ "checkpoints": {
+  "CP-ANDROID-REPAIR-001..003": "COMPLETE (prior session)",
+  "CP-ANDROID-REPAIR-004": "COMPLETE (contract layer + UX contract + TLS evidence)",
+  "CP-ANDROID-REPAIR-005": "COMPLETE (pairing client implementation + 18 JVM rows + UX surfaces)",
+  "CP-ANDROID-REPAIR-006": "COMPLETE (promotion repair + 10 JVM rows + contract docs)",
+  "CP-ANDROID-REPAIR-007": "COMPLETE (real runtime binding + deterministic test + 10 JVM rows)",
+  "CP-ANDROID-REPAIR-008": "COMPLETE (routing modes + real executors + route trace + diagnostic bundle export)",
+  "CP-ANDROID-REPAIR-009": "COMPLETE (navigation + visual convergence artifacts + zero unadjudicated legacy)",
+  "CP-ANDROID-REPAIR-010": "COMPLETE (automated regression GREEN: 608/608 JVM rows incl. 38 new repair rows; fault-injection classes covered: cellular+LAN-only, DNS fall-through, expired/malformed candidates, replayed nonce, ack-missing, in-band errors, wrong hash, invalid GGUF, 416 re-click)",
+  "CP-ANDROID-REPAIR-011": "COMPLETE (CI build + provenance + SHA-256 sidecar)",
+  "CP-ANDROID-REPAIR-012": "COMPLETE (this delivery: owner report + 20-control retest package)"
+ },
+ "instrumented_note": "The keystore instrumented lane (14/14 at the prior session) and the E2E lane are dispatch-only workflows; they were not re-run this session (the keystore classes are UNCHANGED — TowerStore gained two read-only accessors; the E2E pins reference unchanged pinned strings). Re-dispatch before a release candidate if required.",
+ "rollback": "git revert of the CP-004..CP-012 commits restores the prior analysis-only tip 67eba19; the failed baseline stays frozen at a58c630/26dbad0c."
 }

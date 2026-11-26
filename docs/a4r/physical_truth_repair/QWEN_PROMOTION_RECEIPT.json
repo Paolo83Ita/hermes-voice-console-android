@@ -1,0 +1,23 @@
+{
+ "schema": "android_repair.qwen_promotion_receipt/1.0",
+ "produced_utc": "2026-11-26T12:59:10Z",
+ "evidence": "CI run 45822739193 at d83f5c5: full unit suite GREEN (608/608) including ModelPromotionRepairTest (10 rows) and RoutingAndRealRuntimeJVMTest (10 rows)",
+ "automated_gates": {
+  "QWEN_DOWNLOAD_PASS": "PASS (JVM: full-download chain incl. resume + mirror fallback; the real 522,186,592-byte transfer was physically proven in the baseline)",
+  "QWEN_HASH_PASS": "PASS (JVM: verifyHash path + quarantine policy)",
+  "QWEN_ATOMIC_PROMOTION_PASS": "PASS (JVM: ModelPromotionController chain size->sha->gguf->preflight->fsync->atomic->registry->readback->cleanup)",
+  "QWEN_REGISTRY_READBACK_PASS": "PASS (JVM: ensureRecord upsert + registry reopen persistence)",
+  "LLAMA_NATIVE_LOAD_PASS": "CODE-LEVEL PASS (AAR bundled+verified since CP-G4.14-005; LlamaRealNativeBridge wired; native load on device = Owner retest)",
+  "LLAMA_JNI_PASS": "CODE-LEVEL PASS (JNI seam compiled; on-device = Owner retest)",
+  "GGUF_OPEN_PASS": "CODE-LEVEL PASS (ModelGgufValidator + LlamaCppAndroidRuntime.load; on-device = Owner retest)",
+  "MODEL_CREATE_PASS": "CODE-LEVEL PASS (on-device = Owner retest)",
+  "CONTEXT_CREATE_PASS": "CODE-LEVEL PASS (512 smallest-safe deterministic config)",
+  "TOKENIZATION_PASS": "CODE-LEVEL PASS (ChatML template builder)",
+  "INFERENCE_PASS": "PENDING PHYSICAL (deterministic test surface implemented; automated JVM rows pin the chain semantics)",
+  "VISIBLE_OUTPUT_PASS": "PENDING PHYSICAL (the honest gate: output must equal OK on the Owner's phone)",
+  "UNLOAD_PASS": "CODE-LEVEL PASS (runtime.unload + release)",
+  "RAM_RELEASE_PASS": "CODE-LEVEL PASS (post-unload native heap read-back field)",
+  "RESTART_READBACK_PASS": "PASS (JVM: registry + resolver read-back rows)"
+ },
+ "physical_gates": "OWNER_PHYSICAL_RETEST_PENDING (no physical-owner claim is made from CI/emulator evidence — mission section 9)"
+}
