@@ -1,0 +1,34 @@
+{
+ "schema": "android_repair.qwen_installation_contract/1.0",
+ "produced_utc": "2026-11-26T12:05:14Z",
+ "identity": {
+  "catalog_identity": "org.qwen.qwen2.5-0.5b-instruct.q5-k-m",
+  "artifact": "Qwen2.5-0.5B-Instruct GGUF q5_k_m",
+  "download_size_bytes": 522186592,
+  "source": "huggingface.co pinned revision (x-linked-size == catalog; mirror hf-mirror.com same immutable path)",
+  "license": "Apache-2.0"
+ },
+ "installed_truth_rules": [
+  "a component is INSTALLED iff (a) the registry record state == INSTALLED AND (b) the recorded installedPath exists on disk with the catalog installedSizeBytes (read-back);",
+  "'Scaricato' (DOWNLOADED) means bytes in tmp verified complete — it is NOT installation and the UI may never present it as usable;",
+  "no code path may create an INSTALLED record without the bytes on disk (ensureRecord creates records WITHOUT installedPath only);",
+  "the runtime resolver binds ONLY to installed artifacts (CP-007)."
+ ],
+ "registry_contract": {
+  "ensureRecord(entry, state, note)": "UPSERT — creates the record from the catalog when absent (R1 repair of the silent markState no-op)",
+  "markInstalled(entry, path)": "the ONLY transition to INSTALLED, after the atomic promotion",
+  "readback": "record survives restart (atomic JSON write: tmp + move)"
+ },
+ "promotion_outcome_codes": [
+  "NOT_DOWNLOADED",
+  "SIZE_MISMATCH",
+  "HASH_MISMATCH",
+  "GGUF_INVALID",
+  "INSUFFICIENT_STORAGE",
+  "PROMOTION_IO_FAILED",
+  "REGISTRY_WRITE_FAILED",
+  "READ_BACK_FAILED",
+  "PROMOTION_BUSY",
+  "PROMOTED"
+ ]
+}

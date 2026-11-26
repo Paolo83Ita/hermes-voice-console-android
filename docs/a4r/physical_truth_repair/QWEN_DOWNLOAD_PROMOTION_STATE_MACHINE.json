@@ -1,0 +1,124 @@
+{
+ "schema": "android_repair.qwen_download_promotion_state_machine/1.0",
+ "produced_utc": "2026-11-26T12:05:14Z",
+ "binding": "A4R-PHYS-MODEL-002 + QWEN_RUNTIME_ROOT_CAUSE_RECEIPT.json (stages 4-7 never ran in the baseline)",
+ "chain": [
+  {
+   "stage": 1,
+   "name": "catalog_selection",
+   "state": "DISCOVERED",
+   "guard": "pinned catalog entry (identity, revision, sha256, size)",
+   "baseline": "WORKING"
+  },
+  {
+   "stage": 2,
+   "name": "download",
+   "states": "DOWNLOADING -> (DOWNLOAD_PAUSED)? -> DOWNLOADED",
+   "guard": "resumable Range download to <identity>.part; UA set; bounded redirects (5); bounded retries with mirror fallback; size checked against catalog",
+   "baseline": "WORKING (real full 522,186,592-byte transfer proven)"
+  },
+  {
+   "stage": 3,
+   "name": "temporary_storage",
+   "guard": "tmp root, .part suffix, offset == file size on every attempt (no append corruption)",
+   "baseline": "WORKING (but unobservable: 498 MB stranded)"
+  },
+  {
+   "stage": 4,
+   "name": "expected_size_check",
+   "guard": "Files.size(.part) == catalog downloadSizeBytes",
+   "baseline": "NEVER RAN",
+   "repair": "ModelPromotionController step 1"
+  },
+  {
+   "stage": 5,
+   "name": "sha256_verification",
+   "guard": "ModelSha256.ofFile(.part) == catalog sha256; mismatch -> QUARANTINED with facts (evidence preserved)",
+   "baseline": "NEVER RAN for LOCAL_LLM",
+   "repair": "ModelPromotionController step 2 (existing verifyHash, now reached)"
+  },
+  {
+   "stage": "5b",
+   "name": "gguf_metadata_validation",
+   "guard": "LOCAL_LLM only: magic GGUF, version 1..3, sane tensor/kv counts",
+   "baseline": "ABSENT",
+   "repair": "ModelGgufValidator (new)"
+  },
+  {
+   "stage": 5,
+   "name": "available_storage_check",
+   "guard": "storage.preflight(installedSizeBytes).sufficient",
+   "baseline": "NEVER RAN",
+   "repair": "ModelPromotionController step 4"
+  },
+  {
+   "stage": 6,
+   "name": "fsync",
+   "guard": "channel.force(true) before the rename",
+   "baseline": "ABSENT",
+   "repair": "step 5"
+  },
+  {
+   "stage": 6,
+   "name": "atomic_rename_promotion",
+   "guard": "storage.installAtomically (previous preserved, ATOMIC_MOVE, REPLACE_EXISTING)",
+   "baseline": "NEVER RAN (VoicePackInstaller covered VOICE packs only)",
+   "repair": "step 6"
+  },
+  {
+   "stage": 7,
+   "name": "installation_registry_update",
+   "guard": "registry.markInstalled (UPSERT: identity from catalog; installedPath from the move)",
+   "baseline": "IMPOSSIBLE (registry no-oped for record-less identities)",
+   "repair": "R1 ensureRecord + markInstalled"
+  },
+  {
+   "stage": "7b",
+   "name": "runtime_registry_update",
+   "guard": "the LlmRuntime resolves the installed artifact by identity+version (read-back)",
+   "baseline": "NEVER REACHED",
+   "repair": "CP-007 binds it"
+  },
+  {
+   "stage": "7c",
+   "name": "temporary_file_cleanup",
+   "guard": ".part deleted ONLY after a verified install (read-back passed)",
+   "baseline": "NEVER RAN (and the 416 branch DELETED complete partials)",
+   "repair": "step 9 + R4"
+  },
+  {
+   "stage": "7d",
+   "name": "read_back",
+   "guard": "installed file exists && size == installedSizeBytes at the recorded path",
+   "baseline": "NEVER RAN",
+   "repair": "step 8"
+  },
+  {
+   "stage": "7e",
+   "name": "restart",
+   "guard": "registry reopen: the record survives (JSON atomic write); the runtime resolver re-resolves from disk",
+   "baseline": "record never existed",
+   "repair": "registry read-back test row"
+  }
+ ],
+ "failure_handling": {
+  "partial_download": "partial retained; resume from the ACTUAL file size (Range) — never blind append",
+  "network_interruption": "bounded retry + one mirror attempt (hf-mirror.com for pinned HF sources); partial retained",
+  "hash_mismatch": "QUARANTINED with expected/actual facts (GRAPH 4 §7 evidence policy); state FAILED; retry re-downloads",
+  "insufficient_space": "typed INSUFFICIENT_STORAGE from preflight; partial retained (no install attempted)",
+  "invalid_gguf": "typed GGUF_INVALID; bytes retained for diagnosis; NEVER marked installed",
+  "promotion_interruption": "atomic move: either the old state or the new one; the previous version is preserved by installAtomically",
+  "registry_write_failure": "typed REGISTRY_WRITE_FAILED; the read-back decides the truth (file present = recoverable at restart)",
+  "app_crash": "the .part survives; on next open the resume path or the 416-recovery path promotes it",
+  "duplicate_download": "in-flight job per identity; full-partial re-click = 416 recovery (never a second full transfer, never delete)",
+  "version_supersession": "previous version+sha preserved in the record (rollbackAvailable); rollback controller restores"
+ },
+ "on_failure_rules": [
+  "never mark INSTALLED",
+  "retain only resumable partial data when safe; otherwise clean temporary data",
+  "expose exact status (typed Code, never a bare boolean)",
+  "permit retry",
+  "avoid duplicate full files"
+ ],
+ "activation_note": "ACTIVATION stays an explicit Owner action (Tower-first preserved: local LLM optional + OFF by default)."
+}

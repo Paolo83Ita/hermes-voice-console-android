@@ -971,4 +971,6 @@ MANUAL_ADVANCED — unabhängige Auswahl pro Komponente, volle Sichtbarkeit, kei
     <string name="diagnostics_pairing_retry">Kopplung wiederholen</string>
     <string name="diagnostics_pairing_revoke">Diese Konsole widerrufen</string>
     <string name="diagnostics_pairing_empty">Noch keine Kopplungssitzung. Die Diagnose erscheint hier.</string>
+    <string name="mm_promotion_ok">%1$s installiert und verifiziert: bereit für den Test</string>
+    <string name="mm_promotion_failed">Förderung von %1$s fehlgeschlagen (%2$s): %3$s</string>
 </resources>

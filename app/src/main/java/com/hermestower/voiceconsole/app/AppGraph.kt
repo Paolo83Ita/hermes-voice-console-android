@@ -104,6 +104,16 @@ class AppGraph(
     val modelStorage = AndroidModelProviders.storageManager(context)
     val modelRegistry = AndroidModelProviders.registry(context)
     val modelDownloads = DefaultModelDownloadManager(modelStorage, modelRegistry)
+    // ANDROID REPAIR CP-006: the PROMOTION CONTROLLER — the repaired chain
+    // DOWNLOADED → size check → SHA-256 → GGUF validation → storage preflight →
+    // fsync → atomic promotion → registry → read-back → tmp cleanup. The old
+    // baseline left the Owner's complete 522 MB download stranded in tmp forever
+    // (A4R-PHYS-MODEL-002); every re-click destroyed it via 416.
+    val modelPromotion = com.hermestower.voiceconsole.models.ModelPromotionController(
+        storage = modelStorage,
+        registry = modelRegistry,
+        downloadManager = modelDownloads,
+    )
     val modelQualification = DefaultModelQualificationRunner(modelStorage)
     val modelActivation = DefaultModelActivationController(modelRegistry, modelQualification)
     val modelRollback = DefaultModelRollbackController(modelStorage, modelRegistry)

@@ -100,12 +100,16 @@ class DefaultModelDownloadManager(
         val resumeFrom = if (partial != null && Files.exists(partial)) Files.size(partial) else 0
         if (resumeFrom >= entry.downloadSizeBytes) {
             // Nothing left to fetch: the artifact is already fully on disk.
+            // CP-006 R2/R4: the FULL-SIZE partial is now OBSERVABLE (ensureRecord)
+            // and the promotion chain runs — the old path marked a record-less
+            // DOWNLOADED that silently no-opped (the 'Scaricato' + 'non
+            // installato' contradiction on the Owner's device).
             flowFor(entry.identity).value = flowFor(entry.identity).value.copy(
                 state = ModelInstallState.DOWNLOADED,
                 bytesDownloaded = resumeFrom,
                 totalBytes = resumeFrom,
             )
-            registry.markState(entry.identity, ModelInstallState.DOWNLOADED, "already complete")
+            registry.ensureRecord(entry, ModelInstallState.DOWNLOADED, "already complete on disk")
             return
         }
         launchDownload(entry, url)
@@ -189,7 +193,7 @@ class DefaultModelDownloadManager(
             registry.markState(entry.identity, ModelInstallState.FAILED, lastError)
         }
         synchronized(jobs) { jobs[entry.identity] = job }
-        registry.markState(entry.identity, ModelInstallState.DOWNLOADING, null)
+        registry.ensureRecord(entry, ModelInstallState.DOWNLOADING, null)
     }
 
     private class CancellationException2(message: String?) : Exception(message)
@@ -227,7 +231,9 @@ class DefaultModelDownloadManager(
             resumeFrom = 0L
         }
         if (resumeFrom > 0) {
-            registry.markState(entry.identity, ModelInstallState.DOWNLOADING, "resumed at $resumeFrom")
+            registry.ensureRecord(entry, ModelInstallState.DOWNLOADING, "resumed at $resumeFrom")
+        } else {
+            registry.ensureRecord(entry, ModelInstallState.DOWNLOADING, null)
         }
 
         // ---- explicit bounded redirect walk (UA + Range preserved on every hop) ----
@@ -261,8 +267,24 @@ class DefaultModelDownloadManager(
                 when {
                     code in 200..299 -> Unit
                     code == 416 -> {
-                        // Range not satisfiable: the resume offset is stale — one
-                        // honest restart from zero (bounded, once per download).
+                        // ANDROID REPAIR CP-006 (R4, A4R-PHYS-MODEL-002): the
+                        // DESTRUCTIVE dead-end fix. Range-at-EOF with a COMPLETE
+                        // partial means the artifact is already fully on disk —
+                        // verify-and-promote, NEVER blind delete-and-restart
+                        // (the old branch destroyed the Owner's complete 522 MB
+                        // download on every re-click). Only an INCOMPLETE stale
+                        // partial restarts honestly from zero (once, bounded).
+                        val partialNow = Files.exists(partial)
+                        if (partialNow && Files.size(partial) >= entry.downloadSizeBytes) {
+                            f.value = f.value.copy(
+                                state = ModelInstallState.DOWNLOADED,
+                                bytesDownloaded = Files.size(partial),
+                                totalBytes = entry.downloadSizeBytes,
+                            )
+                            registry.ensureRecord(entry, ModelInstallState.DOWNLOADED, "complete partial recovered (416 Range-at-EOF): verify and promote")
+                            conn.disconnect()
+                            return@withContext
+                        }
                         if (rangeResetDone) throw IOException("Range not satisfiable after restart.")
                         rangeResetDone = true
                         Files.deleteIfExists(partial)
@@ -311,7 +333,7 @@ class DefaultModelDownloadManager(
                 }
                 if (written != total) throw IOException("Incomplete download: $written of $total bytes.")
                 f.value = f.value.copy(state = ModelInstallState.DOWNLOADED, bytesDownloaded = written, totalBytes = total)
-                registry.markState(entry.identity, ModelInstallState.DOWNLOADED, null)
+                registry.ensureRecord(entry, ModelInstallState.DOWNLOADED, null)
                 return@withContext
             } finally {
                 conn.disconnect()
@@ -334,7 +356,7 @@ class DefaultModelDownloadManager(
     fun verifyHash(entry: ModelCatalogEntry): Boolean {
         val f = flowFor(entry.identity)
         f.value = f.value.copy(state = ModelInstallState.HASH_VERIFICATION_PENDING)
-        registry.markState(entry.identity, ModelInstallState.HASH_VERIFICATION_PENDING, null)
+        registry.ensureRecord(entry, ModelInstallState.HASH_VERIFICATION_PENDING, null)
         val partial = partialFile(entry)
         val actual = if (partial != null && Files.exists(partial)) ModelSha256.ofFile(partial) else null
         return if (actual == entry.sha256) {
@@ -357,7 +379,7 @@ class DefaultModelDownloadManager(
         val partial = partialFile(entry) ?: return null
         if (!Files.exists(partial)) return null
         fState(entry.identity, ModelInstallState.INSTALLING)
-        registry.markState(entry.identity, ModelInstallState.INSTALLING, null)
+        registry.ensureRecord(entry, ModelInstallState.INSTALLING, null)
         return try {
             val target = storage.installAtomically(entry, partial)
             fState(entry.identity, ModelInstallState.INSTALLED)
@@ -375,4 +397,7 @@ class DefaultModelDownloadManager(
         val f = flowFor(identity)
         f.value = f.value.copy(state = state, error = error)
     }
+
+    /** CP-006: public accessor for the promotion controller (the .part path). */
+    fun partialFileOf(entry: ModelCatalogEntry): Path? = partialFile(entry)
 }

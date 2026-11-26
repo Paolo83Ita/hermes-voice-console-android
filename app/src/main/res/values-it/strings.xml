@@ -971,4 +971,6 @@ MANUAL_ADVANCED — selezione indipendente per componente, visibilità totale, n
     <string name="diagnostics_pairing_retry">Riprova abbinamento</string>
     <string name="diagnostics_pairing_revoke">Revoca questa console</string>
     <string name="diagnostics_pairing_empty">Nessuna sessione di abbinamento. La diagnostica appare qui.</string>
+    <string name="mm_promotion_ok">%1$s installato e verificato: pronto per il test</string>
+    <string name="mm_promotion_failed">Promozione di %1$s non riuscita (%2$s): %3$s</string>
 </resources>

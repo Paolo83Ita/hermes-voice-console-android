@@ -612,8 +612,26 @@ fun ModelManagerScreen(graph: AppGraph) {
                                     registryTick++
                                 }
                                 com.hermestower.voiceconsole.models.ModelPrimaryAction.VERIFY -> {
-                                    statusNote = if (graph.modelDownloads.verifiedExisting(entry)) context.getString(R.string.mm_hash_verified)
-                                    else context.getString(R.string.mm_no_verified_file, entry.identity)
+                                    // ANDROID REPAIR CP-006 (R2, A4R-PHYS-MODEL-002):
+                                    // the VERIFY action now runs the FULL promotion
+                                    // chain (size → SHA-256 → GGUF → storage → fsync →
+                                    // atomic install → registry → read-back) — never a
+                                    // boolean-only hash check that leaves the artifact
+                                    // stranded in tmp. ACTIVATION stays explicit.
+                                    scope.launch {
+                                        val result = graph.modelPromotion.promote(entry)
+                                        statusNote = when (result.code) {
+                                            com.hermestower.voiceconsole.models.ModelPromotionController.Code.PROMOTED ->
+                                                context.getString(R.string.mm_promotion_ok, entry.displayName)
+                                            else -> context.getString(
+                                                R.string.mm_promotion_failed,
+                                                entry.displayName,
+                                                result.code.name,
+                                                result.detail ?: "",
+                                            )
+                                        }
+                                        registryTick++
+                                    }
                                 }
                                 com.hermestower.voiceconsole.models.ModelPrimaryAction.INSTALL -> {
                                     val resources = graph.deviceResourceReader.read()

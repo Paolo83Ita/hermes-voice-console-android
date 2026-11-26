@@ -101,11 +101,12 @@ fun DiagnosticsScreen(graph: AppGraph, onOpenStudio: () -> Unit = {}, onOpenSelf
                     )
                 }
                 snap.evidence.forEach { ev ->
+                    val statusText = ev.status.name + (ev.typedCode?.let { c2 -> "/$c2" } ?: "")
                     Text(
                         stringResource(
                             Res.string.diagnostics_pairing_row_fmt,
                             ev.transportClass.name,
-                            "${ev.status.name}${ev.typedCode?.let { c2 -> \"/$c2\" } ?: \"\"} (${ev.hostView})",
+                            "$statusText (${ev.hostView})",
                         ),
                         style = HermesType.bodySecondary, color = c.textSecondary,
                     )
@@ -114,7 +115,7 @@ fun DiagnosticsScreen(graph: AppGraph, onOpenStudio: () -> Unit = {}, onOpenSelf
                     TextButton(onClick = {
                         scope.launch {
                             val after = graph.pairingSessionController.retry()
-                            testResult = "pairing retry -> ${after.state.name} ${after.typedCode ?: \"\"}"
+                            testResult = "pairing retry -> " + after.state.name + " " + (after.typedCode ?: "")
                         }
                     }) { Text(stringResource(Res.string.diagnostics_pairing_retry)) }
                     TextButton(onClick = {

@@ -18,6 +18,17 @@ interface ModelInstallationRegistry {
     fun snapshot(): List<InstallationRecord>
     fun record(identity: String): InstallationRecord?
     fun markState(identity: String, state: ModelInstallState, note: String?)
+
+    /**
+     * ANDROID REPAIR CP-006 (R1, A4R-PHYS-MODEL-002): UPSERT for record-less
+     * identities. The old markState silently NO-OPPED when no record existed,
+     * so a completed download (state DOWNLOADED) was never observable and the
+     * UX resolvers kept showing NOT_DOWNLOADED. ensureRecord creates the
+     * record from the CATALOG entry when absent (no installedPath — the file
+     * is not installed yet) and then applies the state transition.
+     */
+    fun ensureRecord(entry: ModelCatalogEntry, state: ModelInstallState, note: String?)
+
     fun markInstalled(entry: ModelCatalogEntry, installedPath: Path)
     fun markVerified(identity: String, at: Instant)
     fun markQualified(identity: String, at: Instant)
@@ -60,6 +71,34 @@ class FileInstallationRegistry(
 
     override fun markState(identity: String, state: ModelInstallState, note: String?) {
         synchronized(lock) { mutate(identity) { it.copy(state = state.name, lastNote = note, updatedAt = now()) } }
+    }
+
+    override fun ensureRecord(entry: ModelCatalogEntry, state: ModelInstallState, note: String?) {
+        synchronized(lock) {
+            val records = readAll().toMutableList()
+            val idx = records.indexOfFirst { it.identity == entry.identity }
+            if (idx >= 0) {
+                records[idx] = records[idx].copy(state = state.name, lastNote = note, updatedAt = now())
+            } else {
+                // R1: the record is CREATED from the catalog entry — a download
+                // in flight (or complete) is observable even before installation;
+                // installedPath stays null until markInstalled (the truth rule:
+                // never a pre-declared installed record without bytes on disk).
+                records += InstallationRecord(
+                    identity = entry.identity,
+                    componentType = entry.componentType,
+                    displayName = entry.displayName,
+                    version = entry.version,
+                    state = state.name,
+                    active = false,
+                    installedPath = null,
+                    sha256 = entry.sha256,
+                    lastNote = note,
+                    updatedAt = now(),
+                )
+            }
+            writeAll(records)
+        }
     }
 
     override fun markInstalled(entry: ModelCatalogEntry, installedPath: Path) {

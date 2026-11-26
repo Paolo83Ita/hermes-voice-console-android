@@ -76,7 +76,7 @@ object CompatVerdictResolver {
         if (progressState == "QUARANTINED" || recordState == "QUARANTINED") {
             return CompatVerdict(CompatVerdictKind.QUARANTINED)
         }
-        if (recordState == "FAILED") return CompatVerdict(CompatVerdictKind.FAILED)
+        if (recordState == "FAILED" || progressState == "FAILED") return CompatVerdict(CompatVerdictKind.FAILED)
         if (compatible == false) {
             val reason = incompatibilityReason
             val memory = reason != null && listOf("memory", "ram", "memoria").any { reason.contains(it, ignoreCase = true) }
@@ -85,16 +85,22 @@ object CompatVerdictResolver {
         }
         if (entryClassification in BLOCKED) return CompatVerdict(CompatVerdictKind.DOWNLOAD_BLOCKED, entryClassification)
         if (entryClassification == "RUNTIME_BUNDLED") return CompatVerdict(CompatVerdictKind.COMPATIBLE)
-        if (runtimeRequirement != null && recordState == null) {
+        // ANDROID REPAIR CP-006 (R3, A4R-PHYS-MODEL-002): the PROGRESS state is
+        // the on-disk truth when no installation record exists yet (the record
+        // could not exist before the ensureRecord repair). A DOWNLOADED partial
+        // is VERIFICATION_REQUIRED (the promote path), a HASH_VERIFIED partial
+        // is INSTALL_READY — the card no longer lies 'non installato' beside a
+        // completed download.
+        val effectiveState = recordState ?: progressState
+        if (runtimeRequirement != null && effectiveState == null) {
             return if (runtimeAvailable) CompatVerdict(CompatVerdictKind.NOT_DOWNLOADED)
             else CompatVerdict(CompatVerdictKind.RUNTIME_UNAVAILABLE)
         }
-        return when (recordState) {
+        return when (effectiveState) {
             null -> CompatVerdict(CompatVerdictKind.NOT_DOWNLOADED)
             "DOWNLOADING", "DOWNLOAD_PAUSED" -> CompatVerdict(CompatVerdictKind.NOT_DOWNLOADED)
-            "DOWNLOADED" -> CompatVerdict(CompatVerdictKind.VERIFICATION_REQUIRED)
+            "DOWNLOADED", "HASH_VERIFICATION_PENDING", "INSTALLING" -> CompatVerdict(CompatVerdictKind.VERIFICATION_REQUIRED)
             "HASH_VERIFIED" -> CompatVerdict(CompatVerdictKind.INSTALL_READY)
-            "INSTALLING" -> CompatVerdict(CompatVerdictKind.VERIFICATION_REQUIRED)
             "INSTALLED" -> if (active == true) CompatVerdict(CompatVerdictKind.IN_USE)
             else CompatVerdict(CompatVerdictKind.VERIFICATION_REQUIRED)
             "RUNTIME_AVAILABLE" -> CompatVerdict(CompatVerdictKind.VERIFICATION_REQUIRED)
@@ -144,17 +150,20 @@ object ModelActionResolver {
             // transfer in flight — the primary action is the transfer control
             return ModelActionPlan(ModelPrimaryAction.DETAILS_ONLY, transferActions = true)
         }
+        // CP-006 R3: the record-less progress truth participates in the action
+        // decision too (a DOWNLOADED partial promotes — never re-downloads).
+        val effectiveState = recordState ?: progressState
         val primary = when {
             verdict.kind == CompatVerdictKind.QUARANTINED ||
                 progressState == "QUARANTINED" || recordState == "QUARANTINED" -> ModelPrimaryAction.REVIEW_ISSUE
-            verdict.kind == CompatVerdictKind.FAILED || recordState == "FAILED" -> ModelPrimaryAction.REPAIR
-            recordState == "ACTIVE" || active == true -> ModelPrimaryAction.TEST
-            recordState == "FUNCTIONAL_TEST_PASSED" -> ModelPrimaryAction.ACTIVATE
-            recordState == "RUNTIME_AVAILABLE" -> ModelPrimaryAction.RUN_FUNCTIONAL_TEST
-            recordState == "RUNTIME_RESOLVED" -> ModelPrimaryAction.CHECK_RUNTIME
-            recordState == "INSTALLED" -> ModelPrimaryAction.CHECK_RUNTIME
-            recordState == "HASH_VERIFIED" -> ModelPrimaryAction.INSTALL
-            recordState == "DOWNLOADED" -> ModelPrimaryAction.VERIFY
+            verdict.kind == CompatVerdictKind.FAILED || recordState == "FAILED" || progressState == "FAILED" -> ModelPrimaryAction.REPAIR
+            effectiveState == "ACTIVE" || active == true -> ModelPrimaryAction.TEST
+            effectiveState == "FUNCTIONAL_TEST_PASSED" -> ModelPrimaryAction.ACTIVATE
+            effectiveState == "RUNTIME_AVAILABLE" -> ModelPrimaryAction.RUN_FUNCTIONAL_TEST
+            effectiveState == "RUNTIME_RESOLVED" -> ModelPrimaryAction.CHECK_RUNTIME
+            effectiveState == "INSTALLED" -> ModelPrimaryAction.CHECK_RUNTIME
+            effectiveState == "HASH_VERIFIED" -> ModelPrimaryAction.INSTALL
+            effectiveState == "DOWNLOADED" || effectiveState == "HASH_VERIFICATION_PENDING" || effectiveState == "INSTALLING" -> ModelPrimaryAction.VERIFY
             entryClassification == "RUNTIME_BUNDLED" -> ModelPrimaryAction.TEST
             entryClassification == "VERIFIED_DOWNLOADABLE" -> ModelPrimaryAction.DOWNLOAD
             else -> ModelPrimaryAction.DETAILS_ONLY

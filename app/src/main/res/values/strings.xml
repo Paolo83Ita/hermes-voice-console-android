@@ -971,4 +971,6 @@ MANUAL_ADVANCED — independent per-component selection, full visibility, no sil
     <string name="diagnostics_pairing_retry">Retry pairing</string>
     <string name="diagnostics_pairing_revoke">Revoke this console</string>
     <string name="diagnostics_pairing_empty">No pairing session yet. Pairing diagnostics appear here.</string>
+    <string name="mm_promotion_ok">%1$s installed and verified: ready for the test</string>
+    <string name="mm_promotion_failed">Promotion of %1$s failed (%2$s): %3$s</string>
 </resources>

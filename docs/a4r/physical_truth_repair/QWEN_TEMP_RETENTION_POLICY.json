@@ -1,0 +1,22 @@
+{
+ "schema": "android_repair.qwen_temp_retention_policy/1.0",
+ "produced_utc": "2026-11-26T12:05:14Z",
+ "roots": {
+  "tmp/<identity>.part": "the resumable download partial",
+  "staging/": "delivery staging",
+  "previous/": "preserved previous versions (rollback evidence)",
+  "quarantine/": "rejected partials WITH facts (hash mismatch, corruption) — evidence, never silently destroyed",
+  "receipts/": "installation receipts",
+  "logs/": "model lane logs (secret-clean)"
+ },
+ "rules": [
+  "RETAIN .part while a download is in flight or interrupted (resume path);",
+  "RETAIN a COMPLETE .part until promotion completes (the Owner's 498 MB case: it was correct to keep the bytes — the DEFECT was that nothing ever promoted them and a re-click DELETED them);",
+  "RETAIN a wrong-hash .part ONLY as quarantined evidence (moved to quarantine/ with facts), not as resumable data;",
+  "RETAIN bytes on GGUF_INVALID for diagnosis (typed failure, no install);",
+  "DELETE .part ONLY (a) after a VERIFIED install (read-back passed) or (b) on explicit Owner cancel;",
+  "the 416-with-full-partial class NEVER deletes (verify-and-promote — R4);",
+  "no duplicate full files: one .part per identity; promotion moves it (not copies)."
+ ],
+ "baseline_violation_recorded": "the baseline left tmp=498.0 MB for 5 days with no path to promotion and a destructive re-click (device storage diagnostics 2026-11-26)."
+}
