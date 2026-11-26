@@ -270,8 +270,9 @@ class PairingEndpointResolutionJVMTest {
         )
         val result = resolver.resolve(listOf(expired, malformed, publicCandidateFromModel()))
         assertTrue(result is EndpointResolutionResult.Selected)
-        assertTrue(result.evidence.any { it.status == CandidateEvidence.CandidateStatus.SKIPPED_EXPIRED })
-        assertTrue(result.evidence.any { it.status == CandidateEvidence.CandidateStatus.SKIPPED_MALFORMED })
+        val sel = result as EndpointResolutionResult.Selected
+        assertTrue(sel.evidence.any { it.status == CandidateEvidence.CandidateStatus.SKIPPED_EXPIRED })
+        assertTrue(sel.evidence.any { it.status == CandidateEvidence.CandidateStatus.SKIPPED_MALFORMED })
     }
 
     private fun publicCandidateFromModel() = EndpointCandidate(
